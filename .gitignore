@@ -1,9 +1,2 @@
-
-*.o
-CLIENT/build-RHE_Client-Desktop_Qt_5_12_0_MinGW_64_bit-Debug/*.*
-CLIENT/build-RHE_Client-Desktop_Qt_5_12_0_MinGW_64_bit-Debug/debug/*.*
-CLIENT/build-RHE_Client-Desktop_Qt_5_12_0_MinGW_64_bit-Debug/release/*.*
-*.Release
-*.exe
+CLIENT/build*
 *.user
-CLIENT/build-RHE_Client-Desktop_Qt_5_12_0_MinGW_64_bit-Debug/Makefile
