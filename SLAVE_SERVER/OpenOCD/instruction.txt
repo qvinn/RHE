@@ -1,0 +1,24 @@
+git clone https://github.com/ntfreak/openocd
+
+cd openocd/
+
+sudo apt-get install libtool
+
+sudo apt-get install gcc --reinstall # profilactic option
+
+sudo apt-get install pkg-config-arm-linux-gnueabi
+
+sudo apt-get install libftdi-dev
+
+
+sudo apt-get install libusb-1.0
+
+./bootstrap #(x2)
+
+./configure --enable-usb-blaster --enable-remote-bitbang --disable-dependency-tracking (added flag --disable-dependency-tracking)
+
+sudo apt install make
+
+make
+
+sudo make install
