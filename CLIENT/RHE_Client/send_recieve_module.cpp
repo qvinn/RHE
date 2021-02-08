@@ -20,6 +20,7 @@
 #define CLIENT_WANT_CLOSE_CONNECTION 21
 #define S_SERVER_END_RCV_FILE 22
 #define FLASH_FPGA 23
+#define SET_FPGA_ID 24
 
 Send_Recieve_Module::Send_Recieve_Module(std::string _server_ip, int _server_port, General_Widget *widg)
 {
@@ -139,6 +140,12 @@ void Send_Recieve_Module::ping_to_server()
 void Send_Recieve_Module::ping_to_S_server()
 {
     send_U_Packet(Socket, std::string(), my_client_ID, PING_CLIENT_TO_S_SERVER, std::string());
+    // SET ID FOR TEST!!! COMMENT THIS NEXT TIME
+    usleep(100000);
+    std::string tmp_str = "0x020F10dd";
+    QByteArray byteArray(tmp_str.c_str(), tmp_str.length());
+    set_FPGA_id(byteArray);
+    //
 }
 
 bool Send_Recieve_Module::send_file_to_ss(QByteArray File_byteArray)
@@ -192,6 +199,19 @@ void Send_Recieve_Module::close_connection()
     closesocket(Socket);
     WSACleanup();
     emit logout_signal();
+}
+
+void Send_Recieve_Module::set_FPGA_id(QByteArray FPGA_id)
+{
+    // EXAMPLE
+    // std::string => QByteArray
+    //QByteArray byteArray(stdString.c_str(), stdString.length());
+
+    // QByteArray => std::string
+    //std::string stdString(byteArray.constData(), byteArray.length());
+
+    std::string stdString(FPGA_id.constData(), FPGA_id.length());
+    send_U_Packet(Socket,std::string(), 0, SET_FPGA_ID, stdString);
 }
 
 //-------------------PRIVATE----------------------------------------------------------------
@@ -270,12 +290,14 @@ void Send_Recieve_Module::send_U_Packet(int sock, std::string ip, int id,int cod
     }
 
     struct U_packet *send_packet = (struct U_packet*)malloc(sizeof(struct U_packet));
+    memset(send_packet->data,0,32); // Для надежности заполним 32 байта send_packet->data значениями NULL
     send_packet->code_op = code_op;
     send_packet->id = id;
     if(data.length() > 0)
     {
         memcpy(send_packet->data,data.c_str(),data.size());
-        //printf("convert data: %s\n",send_packet->data);        
+        //printf("convert data: %s\n",send_packet->data);
+        //qDebug() << "convert data: " << send_packet->data;
     }
     char *send_buf = (char*)malloc(sizeof(struct U_packet));
     memcpy(send_buf,send_packet,sizeof(struct U_packet));

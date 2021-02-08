@@ -16,6 +16,9 @@
 #include <arpa/inet.h>
 #include "iniparser.h"	// for .ini parse
 
+#include <iostream> // for write to wile with c++
+#include <fstream>	// for write to wile with c++
+
 #define CS_ERROR 1
 #define CS_OK 0
 
@@ -32,7 +35,7 @@ class client_conn_v_1
         int code_op;
         char data[DATA_BUFFER];
     };
-    //Q_OBJECT
+
 public:
     client_conn_v_1(std::string _server_ip, int _server_port);
     bool init_connection();
@@ -51,6 +54,8 @@ private:
 	int start_recive_file();
 	int rcv_new_data_for_file(char *buf);
 	int end_recive_file();
+	void set_FPGA_id(char *buf);
+	void create_OpenOCD_cfg();
 
     std::string server_ip;
     int server_port;
@@ -58,8 +63,10 @@ private:
     int Socket = -1;
     int Rcv_Socet = -1;
 
-    int my_client_ID = INIT_ID; // INIT_ID
+    int my_client_ID = INIT_ID;
     std::mutex my_client_ID_mutex;
+	
+	std::string curr_FPGA_id = "";
 	
 	FILE *fp;
 };

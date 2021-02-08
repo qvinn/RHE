@@ -41,6 +41,7 @@
 #define CLIENT_WANT_CLOSE_CONNECTION 21
 #define S_SERVER_END_RCV_FILE 22
 #define FLASH_FPGA 23
+#define SET_FPGA_ID 24
 
 // Карта code_op - КОНЕЦ
 
@@ -260,8 +261,8 @@ int main()
 void send_U_Packet(int sock, string ip, int id,int code_op, string data)
 {
 	const char *send_ip;
-	const char *send_data;
 	struct U_packet *send_packet = (struct U_packet*)malloc(sizeof(struct U_packet));
+	memset(send_packet->data,0,32); // Для надежности заполним 32 байта send_packet->data значениями NULL
 
 	if(ip.length() > 0)
 	{
@@ -270,7 +271,6 @@ void send_U_Packet(int sock, string ip, int id,int code_op, string data)
 	
 	if(data.length() > 0)
 	{
-		send_data = data.c_str();
 		memcpy(send_packet->data,data.c_str(),data.size());
 		//printf("convert data: %s\n",send_packet->data);
 	}
@@ -423,7 +423,7 @@ void recive_new_data(char *buf, int sock)
 			if(finded_s_server != ERROR)
 			{
 				send_U_Packet(finded_s_server, std::string(), 0, CLIENT_FINISH_SEND_FILE, std::string());
-				printf("\t|___Client with id %i FINISH file to slave-server with id %i\n", sock, finded_s_server);
+				printf("\t|___Client with id %i FINISH send file to slave-server with id %i\n", sock, finded_s_server);
 			}			
 			break;	
 		}
@@ -456,6 +456,19 @@ void recive_new_data(char *buf, int sock)
 			{
 				send_U_Packet(finded_s_server, std::string(), 0, FLASH_FPGA, std::string());
 				printf("\t|___Client with id %i need FLASH FPGA on slave server with id %i\n", sock, finded_s_server);
+			}			
+			break;	
+		}
+		
+		case SET_FPGA_ID:
+		{
+			// Перенаправляем запрос от клиента к slave-серверу
+			int finded_s_server = find_pair_for(sock);
+			if(finded_s_server != ERROR)
+			{
+				//printf("data: %s\n",tmp_packet->data);
+				send_U_Packet(finded_s_server, std::string(), 0, SET_FPGA_ID, std::string(tmp_packet->data));
+				printf("\t|___Client with id %i SET_FPGA_ID to slave-server with id %i\n", sock, finded_s_server);
 			}			
 			break;	
 		}
