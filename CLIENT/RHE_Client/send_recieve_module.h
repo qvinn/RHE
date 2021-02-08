@@ -94,6 +94,7 @@
             void ping_to_server();
             void ping_to_S_server();
             bool send_file_to_ss(/*QString filename*/QByteArray File_byteArray);
+            void close_connection();
 
         private:
             void reset_ID();

@@ -363,28 +363,28 @@
 <context>
     <name>Send_Recieve_Module</name>
     <message>
+        <location filename="../send_recieve_module.cpp" line="256"/>
         <location filename="../send_recieve_module.cpp" line="262"/>
-        <location filename="../send_recieve_module.cpp" line="271"/>
         <source>Error</source>
         <translation type="unfinished">Ошибка</translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="252"/>
+        <location filename="../send_recieve_module.cpp" line="246"/>
         <source>Server answer PING</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="257"/>
+        <location filename="../send_recieve_module.cpp" line="251"/>
         <source>Slave server answer PING</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="262"/>
+        <location filename="../send_recieve_module.cpp" line="256"/>
         <source>You are dropped</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="271"/>
+        <location filename="../send_recieve_module.cpp" line="262"/>
         <source>Can&apos;t get ID from Server - no more places</source>
         <translation type="unfinished"></translation>
     </message>

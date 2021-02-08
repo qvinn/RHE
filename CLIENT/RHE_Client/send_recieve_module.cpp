@@ -155,7 +155,7 @@ void Send_Recieve_Module::client_check_connection() {
 #define CLIENT_START_SEND_FILE 18
 #define CLIENT_SENDING_FILE 19
 #define CLIENT_FINISH_SEND_FILE 20
-
+#define CLIENT_WANT_CLOSE_CONNECTION 21
 
 Send_Recieve_Module::Send_Recieve_Module(std::string _server_ip, int _server_port, General_Widget *widg)
 {
@@ -219,20 +219,14 @@ void Send_Recieve_Module::wait_analize_recv_data()
             {
                 qDebug() << "LOST CONNECTION:     " << "Recive Error: " << WSAGetLastError();
 //                emit show_message_box_signal(tr("Error"), (tr("LOST CONNECTION: ") + QString::number(WSAGetLastError())), 0);
-                reset_ID();
-                closesocket(Socket);
-                WSACleanup();
-                emit logout_signal();
+                close_connection();
                 return;
             }
             if(bytes_read < 0)
             {
                 qDebug() << "Recive Error: " << WSAGetLastError();
 //                emit show_message_box_signal(tr("Error"), QString::number(WSAGetLastError()), 0);
-                reset_ID();
-                closesocket(Socket);
-                WSACleanup();
-                emit logout_signal();
+                close_connection();
                 return;
             }
         }
@@ -260,19 +254,13 @@ void Send_Recieve_Module::wait_analize_recv_data()
         case DROP_CONNECTION:
             printf("_________________________________YOU ARE DROPPED\n");
             emit show_message_box_signal(tr("Error"), tr("You are dropped"), 0);
-            reset_ID();
-            closesocket(Socket);
-            WSACleanup();
-            emit logout_signal();
+            close_connection();
             break;
 
         case NO_MORE_PLACES:
             printf("_________________________________Can't get ID from Server - no more places\n");
             emit show_message_box_signal(tr("Error"), tr("Can't get ID from Server - no more places"), 0);
-            reset_ID();
-            closesocket(Socket);
-            WSACleanup();
-            emit logout_signal();
+            close_connection();
             break;
 
         default:
@@ -373,6 +361,14 @@ bool Send_Recieve_Module::send_file_to_ss(/*QString filename*/QByteArray File_by
 
 //    file.close();
     return true;
+}
+
+void Send_Recieve_Module::close_connection()
+{
+    reset_ID();
+    closesocket(Socket);
+    WSACleanup();
+    emit logout_signal();
 }
 
 //-------------------PRIVATE----------------------------------------------------------------
