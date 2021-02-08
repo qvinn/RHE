@@ -38,6 +38,7 @@
 #define CLIENT_START_SEND_FILE 18
 #define CLIENT_SENDING_FILE 19
 #define CLIENT_FINISH_SEND_FILE 20
+#define CLIENT_WANT_CLOSE_CONNECTION 21
 
 // Карта code_op - КОНЕЦ
 
@@ -395,7 +396,7 @@ void recive_new_data(char *buf, int sock)
 			if(finded_s_server != ERROR)
 			{
 				send_U_Packet(finded_s_server, std::string(), 0, CLIENT_START_SEND_FILE, std::string());
-				printf("\t|___Client with id %id START sending file to slave-server with id %i\n", sock, finded_s_server);
+				printf("\t|___Client with id %i START sending file to slave-server with id %i\n", sock, finded_s_server);
 			}			
 			break;	
 		}
@@ -408,7 +409,7 @@ void recive_new_data(char *buf, int sock)
 			{
 				//printf("data: %s\n",tmp_packet->data);
 				send_U_Packet(finded_s_server, std::string(), 0, CLIENT_SENDING_FILE, std::string(tmp_packet->data));
-				printf("\t|___Client with id %id SENDING file to slave-server with id %i\n", sock, finded_s_server);
+				printf("\t|___Client with id %i SENDING file to slave-server with id %i\n", sock, finded_s_server);
 			}			
 			break;	
 		}
@@ -420,8 +421,16 @@ void recive_new_data(char *buf, int sock)
 			if(finded_s_server != ERROR)
 			{
 				send_U_Packet(finded_s_server, std::string(), 0, CLIENT_FINISH_SEND_FILE, std::string());
-				printf("\t|___Client with id %id FINISH file to slave-server with id %i\n", sock, finded_s_server);
+				printf("\t|___Client with id %i FINISH file to slave-server with id %i\n", sock, finded_s_server);
 			}			
+			break;	
+		}
+		
+		case CLIENT_WANT_CLOSE_CONNECTION:
+		{
+			printf("\t|___Client with id %i want CLOSE connection\n", sock);
+			reset_Pair(sock);
+			close(sock);			
 			break;	
 		}
 		

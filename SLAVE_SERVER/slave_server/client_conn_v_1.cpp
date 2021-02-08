@@ -13,6 +13,7 @@
 #define CLIENT_START_SEND_FILE 18
 #define CLIENT_SENDING_FILE 19
 #define CLIENT_FINISH_SEND_FILE 20
+#define CLIENT_WANT_CLOSE_CONNECTION 21
 
 
 client_conn_v_1::client_conn_v_1(std::string _server_ip, int _server_port)
