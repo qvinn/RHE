@@ -1,57 +1,6 @@
 #ifndef SEND_RECIEVE_MODULE_H
     #define SEND_RECIEVE_MODULE_H
 
-    /*
-    #include <unistd.h>
-    #include <winsock.h>
-    #include <QByteArray>
-
-    class Send_Recieve_Module {
-        public:
-            Send_Recieve_Module();
-            void send_data(QByteArray *data);
-            QByteArray recv_data(int *bytes_read);
-
-        private:
-            struct packet {
-                int code;
-                char message[10];
-            };
-
-            struct first_connection {
-                int my_id;
-            };
-
-            struct init_new_client {
-                int code_opp;
-                int id;
-            };
-
-            struct default_packet {
-                int code_opp;
-            };
-
-            struct client_chk_connection {
-                int id;
-                int code_opp;
-            };
-
-            int send_struct();
-            int initialize_client_on_server();
-            void set_id(char *buf);
-            void wait_server_data();
-            void client_check_connection();
-
-            LPHOSTENT hostEntry;
-            int my_client_ID = -1;
-
-    };
-    */
-
-//    #include <QObject>
-//    #include <QDebug>
-//    #include <QFile>
-
     #include <iostream>
     #include <winsock.h>
     #include <process.h>
@@ -93,14 +42,14 @@
 
             void ping_to_server();
             void ping_to_S_server();
-            bool send_file_to_ss(/*QString filename*/QByteArray File_byteArray);
+            bool send_file_to_ss(QByteArray File_byteArray);
             void close_connection();
 
         private:
             void reset_ID();
             int establish_socket();
             void send_U_Packet(int sock, std::string ip, int id,int code_op, std::string data);
-            void set_client_id(char *buf);
+            void set_client_id(/*char *buf*/int id);
             QByteArray form_2bytes_QBA(QByteArray *data);
 
             General_Widget *gen_widg = nullptr;

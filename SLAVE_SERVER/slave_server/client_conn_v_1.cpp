@@ -29,7 +29,6 @@ bool client_conn_v_1::init_connection()
     int status = establish_socket();
     if(status == CS_ERROR)
     {
-        //wprintf(L"Error: %ld\n", WSAGetLastError());
 		printf("Cant establish_socket()\n");
         my_client_ID_mutex.lock();
         my_client_ID = INIT_ID;
@@ -86,7 +85,7 @@ void client_conn_v_1::wait_analize_recv_data()
         memcpy(tmp_packet,recv_buf,sizeof (U_packet));
         switch (tmp_packet->code_op) {
         case SLAVE_SERVER_WANT_INIT_CONNECTION:
-            set_client_id(recv_buf);
+            set_client_id(tmp_packet->id);
             my_client_ID_mutex.lock();
             printf("Server want give me ID %i\n", my_client_ID);
             my_client_ID_mutex.unlock();
@@ -124,11 +123,7 @@ void client_conn_v_1::wait_analize_recv_data()
 		
 		case CLIENT_SENDING_FILE:
 		{
-			//char recv_data[32];
-			//printf("recv_data_size: %li\n", sizeof(tmp_packet->data));
-			//printf("recv_data: %s\n",tmp_packet->data);
-			//memcpy(recv_data,tmp_packet->data,sizeof (recv_data));
-			printf("recv file data: %s\n",tmp_packet->data);
+			//printf("recv file data: %s\n",tmp_packet->data);
 			rcv_new_data_for_file(tmp_packet->data);
 			printf("_________________________________Client sending file\n");
 			break;	
@@ -150,30 +145,12 @@ void client_conn_v_1::wait_analize_recv_data()
 
 void client_conn_v_1::ping_to_server()
 {
-    char send_buf[sizeof (U_packet)];
-    U_packet *tmp_packet = (U_packet*)malloc(sizeof(U_packet));
-    my_client_ID_mutex.lock();
-    tmp_packet->id = my_client_ID;
-    my_client_ID_mutex.unlock();
-    tmp_packet->code_op = PING_TO_SERVER;
-
-    memcpy(send_buf,tmp_packet,sizeof (U_packet));
-    send(Socket, send_buf, sizeof(U_packet), 0);
-    free(tmp_packet);
+	send_U_Packet(Socket,std::string(), 0, PING_TO_SERVER, std::string());
 }
 
 void client_conn_v_1::answer_to_client()
 {
-	char send_buf[sizeof (U_packet)];
-    U_packet *tmp_packet = (U_packet*)malloc(sizeof(U_packet));
-    my_client_ID_mutex.lock();
-    tmp_packet->id = my_client_ID;
-    my_client_ID_mutex.unlock();
-    tmp_packet->code_op = S_SERVER_ANSWER_TO_CLIENT;
-
-    memcpy(send_buf,tmp_packet,sizeof (U_packet));
-    send(Socket, send_buf, sizeof(U_packet), 0);
-    free(tmp_packet);
+	send_U_Packet(Socket,std::string(), 0, S_SERVER_ANSWER_TO_CLIENT, std::string());
 }
 
 //-------------------PRIVATE----------------------------------------------------------------
@@ -222,19 +199,42 @@ int client_conn_v_1::establish_socket()
 	return CS_OK;
 }
 
-void client_conn_v_1::set_client_id(char *buf)
+void client_conn_v_1::set_client_id(int id)
 {
-    U_packet *init_client = (U_packet*)malloc(sizeof(U_packet));
-    memcpy(init_client,buf,sizeof (U_packet));
     my_client_ID_mutex.lock();
-    my_client_ID = init_client->id;
+    my_client_ID = id;
     my_client_ID_mutex.unlock();
-    free(init_client);
+}
+
+void client_conn_v_1::send_U_Packet(int sock, std::string ip, int id,int code_op, std::string data)
+{
+    const char *send_ip;
+
+    if(ip.length() > 0)
+    {
+        send_ip = ip.c_str();
+    }
+
+
+    struct U_packet *send_packet = (struct U_packet*)malloc(sizeof(struct U_packet));
+    send_packet->code_op = code_op;
+    send_packet->id = id;
+    if(data.length() > 0)
+    {
+        memcpy(send_packet->data,data.c_str(),data.size());
+        //printf("convert data: %s\n",send_packet->data);        
+    }
+    char *send_buf = (char*)malloc(sizeof(struct U_packet));
+    memcpy(send_buf,send_packet,sizeof(struct U_packet));
+    send(Socket, send_buf, sizeof(struct U_packet), 0);
+
+    free(send_packet);
+    free(send_buf);
 }
 
 int client_conn_v_1::start_recive_file()
 {
-	if ((fp=fopen("firmware.txt", "wb"))==NULL)
+	if ((fp=fopen("cyclone_4_project.svf", "wb"))==NULL)
 	{
 		return CS_ERROR;
 	}
@@ -246,9 +246,9 @@ int client_conn_v_1::rcv_new_data_for_file(char *buf)
 	char tst[2];
 	tst[0] = buf[0];
 	tst[1] = buf[1];
-	printf("[0][1] bytes: %s\n", tst);
+	//printf("[0][1] bytes: %s\n", tst);
 	int size = atoi(tst);
-	printf("size: %d\n", size);
+	//printf("size: %d\n", size);
 	
 	fwrite(buf+2, sizeof(char), size, fp);
 	

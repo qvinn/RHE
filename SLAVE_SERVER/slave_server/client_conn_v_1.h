@@ -45,7 +45,8 @@ public:
 private:
     void reset_ID();
     int establish_socket();
-    void set_client_id(char *buf);
+    void set_client_id(int id);
+	void send_U_Packet(int sock, std::string ip, int id,int code_op, std::string data);
 	
 	int start_recive_file();
 	int rcv_new_data_for_file(char *buf);
