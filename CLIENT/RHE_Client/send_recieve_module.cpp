@@ -18,6 +18,8 @@
 #define CLIENT_SENDING_FILE 19
 #define CLIENT_FINISH_SEND_FILE 20
 #define CLIENT_WANT_CLOSE_CONNECTION 21
+#define S_SERVER_END_RCV_FILE 22
+#define FLASH_FPGA 23
 
 Send_Recieve_Module::Send_Recieve_Module(std::string _server_ip, int _server_port, General_Widget *widg)
 {
@@ -115,6 +117,11 @@ void Send_Recieve_Module::wait_analize_recv_data()
             qDebug() << "_________________________________Can't get ID from Server - no more places";
             emit show_message_box_signal(tr("Error"), tr("Can't get ID from Server - no more places"), 0);
             close_connection();
+            break;
+
+        case S_SERVER_END_RCV_FILE:
+            qDebug() << "_________________________________Slave server end recive file";
+            send_U_Packet(Socket,std::string(), 0, FLASH_FPGA, std::string());
             break;
 
         default:
@@ -261,7 +268,6 @@ void Send_Recieve_Module::send_U_Packet(int sock, std::string ip, int id,int cod
     {
         send_ip = ip.c_str();
     }
-
 
     struct U_packet *send_packet = (struct U_packet*)malloc(sizeof(struct U_packet));
     send_packet->code_op = code_op;

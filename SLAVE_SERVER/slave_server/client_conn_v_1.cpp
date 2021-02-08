@@ -14,6 +14,8 @@
 #define CLIENT_SENDING_FILE 19
 #define CLIENT_FINISH_SEND_FILE 20
 #define CLIENT_WANT_CLOSE_CONNECTION 21
+#define S_SERVER_END_RCV_FILE 22
+#define FLASH_FPGA 23
 
 
 client_conn_v_1::client_conn_v_1(std::string _server_ip, int _server_port)
@@ -123,7 +125,6 @@ void client_conn_v_1::wait_analize_recv_data()
 		
 		case CLIENT_SENDING_FILE:
 		{
-			//printf("recv file data: %s\n",tmp_packet->data);
 			rcv_new_data_for_file(tmp_packet->data);
 			printf("_________________________________Client sending file\n");
 			break;	
@@ -133,6 +134,14 @@ void client_conn_v_1::wait_analize_recv_data()
 		{
 			end_recive_file();
 			printf("_________________________________Client FINISH sending file\n");
+			send_U_Packet(Socket,std::string(), 0, S_SERVER_END_RCV_FILE, std::string());
+			printf("_________________________________Slave server FINISH recive file\n");
+			break;	
+		}
+		
+		case FLASH_FPGA:
+		{
+			printf("_________________________________FLASH FPGA\n");
 			break;	
 		}
 

@@ -39,6 +39,8 @@
 #define CLIENT_SENDING_FILE 19
 #define CLIENT_FINISH_SEND_FILE 20
 #define CLIENT_WANT_CLOSE_CONNECTION 21
+#define S_SERVER_END_RCV_FILE 22
+#define FLASH_FPGA 23
 
 // Карта code_op - КОНЕЦ
 
@@ -431,6 +433,30 @@ void recive_new_data(char *buf, int sock)
 			printf("\t|___Client with id %i want CLOSE connection\n", sock);
 			reset_Pair(sock);
 			close(sock);			
+			break;	
+		}
+		
+		case S_SERVER_END_RCV_FILE:
+		{
+			// Перенаправляем сообщение от slave-серверу к клиенту
+			int finded_client = find_pair_for(sock);
+			if(finded_client != ERROR)
+			{
+				send_U_Packet(finded_client, std::string(), 0, S_SERVER_END_RCV_FILE, std::string());
+				printf("\t|___Slave server with id %i end recive file from client with id %i\n", sock, finded_client);
+			}			
+			break;	
+		}
+		
+		case FLASH_FPGA:
+		{
+			// Перенаправляем запрос от клиента к slave-серверу
+			int finded_s_server = find_pair_for(sock);
+			if(finded_s_server != ERROR)
+			{
+				send_U_Packet(finded_s_server, std::string(), 0, FLASH_FPGA, std::string());
+				printf("\t|___Client with id %i need FLASH FPGA on slave server with id %i\n", sock, finded_s_server);
+			}			
 			break;	
 		}
 		
