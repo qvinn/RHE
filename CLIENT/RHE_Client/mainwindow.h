@@ -1,9 +1,10 @@
 #ifndef MAINWINDOW_H
     #define MAINWINDOW_H
 
+    #include <QMenuBar>
+    #include <QComboBox>
     #include <QMainWindow>
-    #include <QApplication>
-    #include <QDir>
+    #include <QWidgetAction>
     #include "registration_widget.h"
     #include "rhe_widget.h"
 
@@ -19,16 +20,43 @@
             MainWindow(QWidget *parent = nullptr);
             ~MainWindow() override;
 
+        private:
+            void initialize_ui();
+            void set_ui_text();
+            void load_settings();
+            void login();
+            void logout();
+
+            Ui::MainWindow *ui;
+            General_Widget *gen_widg = nullptr;
+            Send_Recieve_Module *snd_rcv_module = nullptr;
+            RegistrationWidget *ptr_registration_widg = nullptr;
+            RHE_Widget *ptr_RHE_widg = nullptr;
+            QMenuBar *menu_bar = nullptr;
+            QComboBox *cmbBx_lng_chs = nullptr;
+            QAction *chkBx_fls_chckng_actn = nullptr;
+            QAction *chkBx_pins_chckng_actn = nullptr;
+            QAction *chkBx_ld_mnl_frmwr_actn = nullptr;
+            QAction *ext_actn = nullptr;
+            QMenu *menu_file = nullptr;
+            QMenu *menu_settngs = nullptr;
+            QWidgetAction *cmbBx_lng_chs_actn = nullptr;
+
+            bool ui_initialized = false;
+            bool language_changed = false;
+
+        public slots:
+            void slot_re_translate();
+
         private slots:
             void resizeEvent(QResizeEvent *) override;
             void on_button_login_logout_clicked();
             void on_button_register_clicked();
-
-    private:
-            Ui::MainWindow *ui;
-            RegistrationWidget *ptr_registration_widg = nullptr;
-            RHE_Widget *ptr_RHE_widg = nullptr;
-
+            void onPshBttnExt();
+            void onChkBxFlsChckngStateChanged();
+            void onChkBxPinsChckngStateChanged();
+            void onChkBxLdMnlFrmwrStateChanged();
+            void onCmbBxLngChsCurrentIndexChanged(int index);
     };
 
 #endif // MAINWINDOW_H
