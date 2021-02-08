@@ -44,6 +44,7 @@
             void ping_to_S_server();
             bool send_file_to_ss(QByteArray File_byteArray);
             void close_connection();
+            void set_FPGA_id(QByteArray FPGA_id);
 
         private:
             void reset_ID();

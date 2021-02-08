@@ -16,7 +16,9 @@
 #define CLIENT_WANT_CLOSE_CONNECTION 21
 #define S_SERVER_END_RCV_FILE 22
 #define FLASH_FPGA 23
+#define SET_FPGA_ID 24
 
+//#include <iostream>
 
 client_conn_v_1::client_conn_v_1(std::string _server_ip, int _server_port)
 {
@@ -37,7 +39,7 @@ bool client_conn_v_1::init_connection()
         my_client_ID_mutex.unlock();
         close(Socket);
         return false;
-    }
+	}
     return true;
 }
 
@@ -49,15 +51,15 @@ int client_conn_v_1::get_id_for_client()
     tmp_packet->id = my_client_ID;
     my_client_ID_mutex.unlock();
     tmp_packet->code_op = SLAVE_SERVER_WANT_INIT_CONNECTION;
-
+	
     memcpy(send_buf,tmp_packet,sizeof (U_packet));
     int send_status = send(Socket, send_buf, sizeof(U_packet), 0);
     if(send_status < 0)
     {
         //wprintf(L"Init Client Error: %ld\n", WSAGetLastError());
-    }
+	}
     free(tmp_packet);
-
+	
     return CS_OK;
 }
 
@@ -66,90 +68,101 @@ void client_conn_v_1::wait_analize_recv_data()
     while(1)
     {
         int bytes_read = 0;
-
+		
         char recv_buf[RECIVE_BUFFER_SIZE];
         bytes_read = recv(Rcv_Socet, recv_buf, RECIVE_BUFFER_SIZE, 0); // Socket | Rcv_Socet
         if(bytes_read < 1)
         {
             if(bytes_read == 0)
             {
-                printf("LOST CONNECTION:     \n"); //wprintf(L"Recive Error: %ld\n", WSAGetLastError());
+                printf("LOST CONNECTION:     \n");
                 return;
-            }
+			}
             if(bytes_read < 0)
             {
 				printf("LOST CONNECTION:     \n");
                 return;
-            }
-        }
+			}
+		}
         U_packet *tmp_packet = (U_packet*)malloc(sizeof(U_packet));
-        printf("~~~~~DEBUG: recive any data\n");
+        //printf("~~~~~DEBUG: recive any data\n");
         memcpy(tmp_packet,recv_buf,sizeof (U_packet));
         switch (tmp_packet->code_op) {
-        case SLAVE_SERVER_WANT_INIT_CONNECTION:
-            set_client_id(tmp_packet->id);
-            my_client_ID_mutex.lock();
-            printf("Server want give me ID %i\n", my_client_ID);
-            my_client_ID_mutex.unlock();
-            break;
-
-        case PING_TO_SERVER:
-            printf("_________________________________Server answer PING\n");
-            break;
+			case SLAVE_SERVER_WANT_INIT_CONNECTION:
+			set_client_id(tmp_packet->id);
+			my_client_ID_mutex.lock();
+			printf("Server want give me ID %i\n", my_client_ID);
+			my_client_ID_mutex.unlock();
+			break;
 			
-		case DROP_CONNECTION:
-            printf("_________________________________WE ARE DROPPED\n");
-            reset_ID();
-            close(Socket);
-            break;
-
-        case NO_MORE_PLACES:
-            printf("_________________________________Can't get ID from Server - no more places\n");
-            reset_ID();
-            close(Socket);
-            break;
+			case PING_TO_SERVER:
+			printf("_________________________________Server answer PING\n");
+			break;
 			
-		case PING_CLIENT_TO_S_SERVER:
+			case DROP_CONNECTION:
+			printf("_________________________________WE ARE DROPPED\n");
+			reset_ID();
+			close(Socket);
+			break;
+			
+			case NO_MORE_PLACES:
+			printf("_________________________________Can't get ID from Server - no more places\n");
+			reset_ID();
+			close(Socket);
+			break;
+			
+			case PING_CLIENT_TO_S_SERVER:
 			answer_to_client();
-            printf("_________________________________Slave server answer to client\n");
-            break;
+			printf("_________________________________Slave server answer to slave server\n");
+			break;
 			
-		case CLIENT_START_SEND_FILE:
-		{
-			if(start_recive_file()!= CS_ERROR)
+			case CLIENT_START_SEND_FILE:
 			{
-				printf("_________________________________Client START sending file\n");
+				if(start_recive_file()!= CS_ERROR)
+				{
+					printf("_________________________________Client START sending file\n");
+				}
+				break;	
 			}
-			break;	
+			
+			case CLIENT_SENDING_FILE:
+			{
+				printf("data: %s\n",tmp_packet->data);
+				rcv_new_data_for_file(tmp_packet->data);
+				printf("_________________________________Client sending file\n");
+				break;	
+			}
+			
+			case CLIENT_FINISH_SEND_FILE:
+			{
+				end_recive_file();
+				printf("_________________________________Client FINISH sending file\n");
+				send_U_Packet(Socket,std::string(), 0, S_SERVER_END_RCV_FILE, std::string());
+				printf("_________________________________Slave server FINISH recive file\n");
+				break;	
+			}
+			
+			case FLASH_FPGA:
+			{
+				printf("_________________________________FLASH FPGA\n");
+				break;	
+			}
+			
+			case SET_FPGA_ID:
+			{
+				//printf("data: %s\n",tmp_packet->data);
+				set_FPGA_id(tmp_packet->data);
+				printf("_________________________________new FPGA_ID is %s\n", this->curr_FPGA_id.c_str());
+				create_OpenOCD_cfg();
+				printf("_________________________________new OpenOCD.cfg was created\n");
+				break;	
+			}
+			
+			default:
+			break;
 		}
-		
-		case CLIENT_SENDING_FILE:
-		{
-			rcv_new_data_for_file(tmp_packet->data);
-			printf("_________________________________Client sending file\n");
-			break;	
-		}
-		
-		case CLIENT_FINISH_SEND_FILE:
-		{
-			end_recive_file();
-			printf("_________________________________Client FINISH sending file\n");
-			send_U_Packet(Socket,std::string(), 0, S_SERVER_END_RCV_FILE, std::string());
-			printf("_________________________________Slave server FINISH recive file\n");
-			break;	
-		}
-		
-		case FLASH_FPGA:
-		{
-			printf("_________________________________FLASH FPGA\n");
-			break;	
-		}
-
-        default:
-            break;
-        }
         free(tmp_packet);
-    }
+	}
 }
 
 void client_conn_v_1::ping_to_server()
@@ -218,32 +231,32 @@ void client_conn_v_1::set_client_id(int id)
 void client_conn_v_1::send_U_Packet(int sock, std::string ip, int id,int code_op, std::string data)
 {
     const char *send_ip;
-
+	
     if(ip.length() > 0)
     {
         send_ip = ip.c_str();
-    }
-
-
+	}
+	
     struct U_packet *send_packet = (struct U_packet*)malloc(sizeof(struct U_packet));
+	memset(send_packet->data,0,32); // Для надежности заполним 32 байта send_packet->data значениями NULL
     send_packet->code_op = code_op;
     send_packet->id = id;
     if(data.length() > 0)
     {
         memcpy(send_packet->data,data.c_str(),data.size());
         //printf("convert data: %s\n",send_packet->data);        
-    }
+	}
     char *send_buf = (char*)malloc(sizeof(struct U_packet));
     memcpy(send_buf,send_packet,sizeof(struct U_packet));
     send(Socket, send_buf, sizeof(struct U_packet), 0);
-
+	
     free(send_packet);
     free(send_buf);
 }
 
 int client_conn_v_1::start_recive_file()
 {
-	if ((fp=fopen("cyclone_4_project.svf", "wb"))==NULL)
+	if ((fp=fopen("any_project.svf", "wb"))==NULL)
 	{
 		return CS_ERROR;
 	}
@@ -268,6 +281,31 @@ int client_conn_v_1::end_recive_file()
 {
 	fclose(fp);
 	return CS_OK;
+}
+
+void client_conn_v_1::set_FPGA_id(char *buf)
+{
+	//printf("recv FPGA_ID: %s\n",buf);
+	std::string tmp_str(buf);
+	this->curr_FPGA_id = tmp_str;
+}
+
+void client_conn_v_1::create_OpenOCD_cfg()
+{
+	std::ofstream OOCD ("OpenOCD_run.cfg");
+	if (OOCD.is_open())
+	{
+		OOCD << "adapter driver usb_blaster\n";
+		OOCD << "usb_blaster_lowlevel_driver ftdi\n";
+		OOCD << "jtag newtap any_FPGA tap -expected-id "; OOCD << this->curr_FPGA_id; OOCD << " -irlen 10\n";		
+		OOCD << "init\n";
+		OOCD << "svf -tap any_FPGA.tap any_project.svf\n";
+		OOCD << "exit\n";
+		OOCD.close();
+	} else 
+	{
+		printf("Unable to open file\n");
+	}
 }
 
 
