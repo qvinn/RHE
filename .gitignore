@@ -1,6 +1,6 @@
+*.ini
 CLIENT/build*
 *.user
 build*
-SLAVE_SERVER/slave_server/slave_server.ini
 SLAVE_SERVER/slave_server/slave_server
 MASTER_SERVER/server
