@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Language/RHE_Client_en.qm</file>
+        <file>Language/RHE_Client_ru.qm</file>
+        <file>Language/RHE_Client_ua.qm</file>
+    </qresource>
+</RCC>

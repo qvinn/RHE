@@ -1,10 +1,12 @@
-
-
 #include "mainwindow.h"
 
 int main(int argc, char *argv[]) {
-    QLocale ua("uk_UA");
-    QLocale::setDefault(ua);
+    QStringList paths = QCoreApplication::libraryPaths();
+    paths.append(".");
+    paths.append("imageformats");
+    paths.append("platforms");
+    paths.append("sqldrivers");
+    QCoreApplication::setLibraryPaths(paths);
     QApplication a(argc, argv);
     a.setStyle("windowsvista");
     MainWindow Mw;

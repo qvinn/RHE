@@ -173,9 +173,9 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>10</y>
-      <width>771</width>
-      <height>531</height>
+      <y>0</y>
+      <width>861</width>
+      <height>571</height>
      </rect>
     </property>
     <property name="palette">
@@ -290,16 +290,25 @@
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::MinimumExpanding</enum>
+       </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>40</width>
-         <height>20</height>
+         <width>1</width>
+         <height>1</height>
         </size>
        </property>
       </spacer>
      </item>
      <item>
       <widget class="QPushButton" name="button_register">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
          <width>90</width>
@@ -308,7 +317,7 @@
        </property>
        <property name="maximumSize">
         <size>
-         <width>90</width>
+         <width>110</width>
          <height>25</height>
         </size>
        </property>
@@ -457,9 +466,9 @@
           <colorrole role="Button">
            <brush brushstyle="SolidPattern">
             <color alpha="255">
-             <red>211</red>
-             <green>211</green>
-             <blue>211</blue>
+             <red>173</red>
+             <green>216</green>
+             <blue>230</blue>
             </color>
            </brush>
           </colorrole>
@@ -484,18 +493,18 @@
           <colorrole role="Base">
            <brush brushstyle="SolidPattern">
             <color alpha="255">
-             <red>211</red>
-             <green>211</green>
-             <blue>211</blue>
+             <red>173</red>
+             <green>216</green>
+             <blue>230</blue>
             </color>
            </brush>
           </colorrole>
           <colorrole role="Window">
            <brush brushstyle="SolidPattern">
             <color alpha="255">
-             <red>211</red>
-             <green>211</green>
-             <blue>211</blue>
+             <red>173</red>
+             <green>216</green>
+             <blue>230</blue>
             </color>
            </brush>
           </colorrole>
@@ -521,28 +530,53 @@
        </property>
        <property name="styleSheet">
         <string notr="true">QPushButton:checked{
-                                      background-color: lightblue;
-                                      border-style: outset;
-                                      color: black;
-									  font: bold 10p;
-                                      border-style: outset;
-                                      border-width: 1px;
-                                      border-radius: 0px;
-                                      border-color: blue;
-                                      padding: 0px 0px;}
+	background-color: lightblue;
+	border-style: outset;
+	color: black;
+	font: bold 10p;
+	border-style: outset;
+	border-width: 1px;
+	border-radius: 0px;
+	border-color: blue;
+	padding: 0px 0px;
+}
+QPushButton:pressed{
+	background-color: lightblue;
+	border-style: outset;
+	color: black;
+	font: bold 10p;
+	border-style: outset;
+	border-width: 1px;
+	border-radius: 0px;
+	border-color: blue;
+	padding: 0px 0px;
+}
+QPushButton:disabled{
+	background-color: lightblue;
+	border-style: outset;
+	color: black;
+	font: bold 10p;
+	border-style: outset;
+	border-width: 1px;
+	border-radius: 0px;
+	border-color: blue;
+	padding: 0px 0px;
+}
 QPushButton{
-                                      background-color: lightGray;
-                                      color: black;
-                                      border-style: outset;
-                                      border-width: 1px;
-                                      border-radius: 0px;
-                                      border-color: gray;
-                                      padding: 0px 0px;}
+	background-color: lightGray;
+	color: black;
+	border-style: outset;
+	border-width: 1px;
+	border-radius: 0px;
+	border-color: gray;
+	padding: 0px 0px;
+}
 QPushButton:hover{
-                                     border-style: outset;
-                                     border-width: 1px;
-                                     border-radius: 0px;
-                                     border-color: royalblue;}</string>
+	border-style: outset;
+	border-width: 1px;
+	border-radius: 0px;
+	border-color: royalblue;
+}</string>
        </property>
        <property name="text">
         <string>Register</string>
@@ -570,6 +604,12 @@ QPushButton:hover{
      </item>
      <item>
       <widget class="QPushButton" name="button_login_logout">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
          <width>90</width>
@@ -727,9 +767,9 @@ QPushButton:hover{
           <colorrole role="Button">
            <brush brushstyle="SolidPattern">
             <color alpha="255">
-             <red>211</red>
-             <green>211</green>
-             <blue>211</blue>
+             <red>173</red>
+             <green>216</green>
+             <blue>230</blue>
             </color>
            </brush>
           </colorrole>
@@ -754,18 +794,18 @@ QPushButton:hover{
           <colorrole role="Base">
            <brush brushstyle="SolidPattern">
             <color alpha="255">
-             <red>211</red>
-             <green>211</green>
-             <blue>211</blue>
+             <red>173</red>
+             <green>216</green>
+             <blue>230</blue>
             </color>
            </brush>
           </colorrole>
           <colorrole role="Window">
            <brush brushstyle="SolidPattern">
             <color alpha="255">
-             <red>211</red>
-             <green>211</green>
-             <blue>211</blue>
+             <red>173</red>
+             <green>216</green>
+             <blue>230</blue>
             </color>
            </brush>
           </colorrole>
@@ -791,28 +831,53 @@ QPushButton:hover{
        </property>
        <property name="styleSheet">
         <string notr="true">QPushButton:checked{
-                                      background-color: lightblue;
-                                      border-style: outset;
-                                      color: black;
-									  font: bold 10p;
-                                      border-style: outset;
-                                      border-width: 1px;
-                                      border-radius: 0px;
-                                      border-color: blue;
-                                      padding: 0px 0px;}
+	background-color: lightblue;
+	border-style: outset;
+	color: black;
+	font: bold 10p;
+	border-style: outset;
+	border-width: 1px;
+	border-radius: 0px;
+	border-color: blue;
+	padding: 0px 0px;
+}
+QPushButton:pressed{
+	background-color: lightblue;
+	border-style: outset;
+	color: black;
+	font: bold 10p;
+	border-style: outset;
+	border-width: 1px;
+	border-radius: 0px;
+	border-color: blue;
+	padding: 0px 0px;
+}
+QPushButton:disabled{
+	background-color: lightblue;
+	border-style: outset;
+	color: black;
+	font: bold 10p;
+	border-style: outset;
+	border-width: 1px;
+	border-radius: 0px;
+	border-color: blue;
+	padding: 0px 0px;
+}
 QPushButton{
-                                      background-color: lightGray;
-                                      color: black;
-                                      border-style: outset;
-                                      border-width: 1px;
-                                      border-radius: 0px;
-                                      border-color: gray;
-                                      padding: 0px 0px;}
+	background-color: lightGray;
+	color: black;
+	border-style: outset;
+	border-width: 1px;
+	border-radius: 0px;
+	border-color: gray;
+	padding: 0px 0px;
+}
 QPushButton:hover{
-                                     border-style: outset;
-                                     border-width: 1px;
-                                     border-radius: 0px;
-                                     border-color: royalblue;}</string>
+	border-style: outset;
+	border-width: 1px;
+	border-radius: 0px;
+	border-color: royalblue;
+}</string>
        </property>
        <property name="text">
         <string>Login</string>
