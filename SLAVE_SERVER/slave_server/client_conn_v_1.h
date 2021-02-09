@@ -22,7 +22,8 @@
 #define CS_ERROR 1
 #define CS_OK 0
 
-#define DATA_BUFFER 32
+#define DATA_BUFFER 60 // 32
+#define RECIVE_BUFFER_SIZE (DATA_BUFFER+20) // 52
 
 #define INIT_ID -2
 
@@ -67,6 +68,8 @@ private:
     std::mutex my_client_ID_mutex;
 	
 	std::string curr_FPGA_id = "";
+	
+	int debug_bytes_count = 0;
 	
 	FILE *fp;
 };
