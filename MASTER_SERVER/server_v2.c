@@ -16,8 +16,9 @@
 
 // Предварительные настройки сервера
 #define SERVER_PORT 3425
-#define RECIVE_BUFFER_SIZE 52 // 1024
-#define DATA_BUFFER 32
+
+#define DATA_BUFFER 60 // 32
+#define RECIVE_BUFFER_SIZE (DATA_BUFFER+20) // 52
 // Предварительные настройки сервера - КОНЕЦ
 
 // Вспомогательные флаги
@@ -161,7 +162,7 @@ int main()
     int sock, listener;
     struct sockaddr_in addr;
 	
-    listener = socket(AF_INET, SOCK_STREAM, 0);
+    listener = socket(AF_INET, SOCK_STREAM, 0); // SOCK_STREAM
     if(listener < 0)
     {
         perror("socket");
@@ -262,7 +263,7 @@ void send_U_Packet(int sock, string ip, int id,int code_op, string data)
 {
 	const char *send_ip;
 	struct U_packet *send_packet = (struct U_packet*)malloc(sizeof(struct U_packet));
-	memset(send_packet->data,0,32); // Для надежности заполним 32 байта send_packet->data значениями NULL
+	memset(send_packet->data,0,DATA_BUFFER); // Для надежности заполним DATA_BUFFER байта send_packet->data значениями NULL
 
 	if(ip.length() > 0)
 	{
@@ -357,7 +358,7 @@ int new_listen_thread(int sock)
 void recive_new_data(char *buf, int sock)
 {
 	struct U_packet *tmp_packet = (struct U_packet*)malloc(sizeof(struct U_packet));
-	memset(tmp_packet,0,52);
+	memset(tmp_packet,0,RECIVE_BUFFER_SIZE); // ДЛЯ ТЕСТА
 	memcpy(tmp_packet,buf,sizeof (struct U_packet));
 	switch (tmp_packet->code_op) {	
 		case PING_TO_SERVER:
@@ -443,7 +444,7 @@ void recive_new_data(char *buf, int sock)
 			int finded_client = find_pair_for(sock);
 			if(finded_client != ERROR)
 			{
-				send_U_Packet(finded_client, std::string(), 0, S_SERVER_END_RCV_FILE, std::string());
+				send_U_Packet(finded_client, std::string(), 0, S_SERVER_END_RCV_FILE, std::string(tmp_packet->data));
 				printf("\t|___Slave server with id %i end recive file from client with id %i\n", sock, finded_client);
 			}			
 			break;	

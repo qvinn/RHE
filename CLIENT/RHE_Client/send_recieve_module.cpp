@@ -1,9 +1,5 @@
 #include "send_recieve_module.h"
 
-#define RECIVE_BUFFER_SIZE 52 // 1024
-#define DATA_BUFFER 32
-#define TRUE_DATA_BUFFER (DATA_BUFFER-2) // Два байта зарезервировано для определения размера передаваемых данных
-
 #define INIT_ID -1
 
 #define CLIENT_WANT_INIT_CONNECTION 10
@@ -121,8 +117,14 @@ void Send_Recieve_Module::wait_analize_recv_data()
             break;
 
         case S_SERVER_END_RCV_FILE:
-            qDebug() << "_________________________________Slave server end recive file";
-            send_U_Packet(Socket,"", 0, FLASH_FPGA, "");
+            qDebug() << "_________________________________Slave server end recive file";            
+            qDebug() << "Slave server recive bytese" << atoi(tmp_packet->data);
+            last_send_file.lock();
+            if(atoi(tmp_packet->data) == last_send_file_bytes)
+            {
+                send_U_Packet(Socket,"", 0, FLASH_FPGA, "");
+            }
+            last_send_file.unlock();
             break;
 
         default:
@@ -173,17 +175,24 @@ bool Send_Recieve_Module::send_file_to_ss(QByteArray File_byteArray)
             packets.push_back(packet);
         }
 
+        last_send_file.lock();
+        last_send_file_bytes = 0;
+        last_send_file.unlock();
+
         send_U_Packet(Socket,"", 0, CLIENT_START_SEND_FILE,"");
-        //usleep(100000);
         for(int i = 0; i < packets.size(); i++)
         {
             //qDebug() << "SEND BUFF " << packets.at(i).data() << endl;
             send_U_Packet(Socket,"", 0, CLIENT_SENDING_FILE,QString::fromStdString(packets.at(i).toStdString()));
-            //usleep(100000);
         }
+        last_send_file.lock();
+        last_send_file_bytes = File_byteArray.length();
+        last_send_file.unlock();
+
         send_U_Packet(Socket,"", 0, CLIENT_FINISH_SEND_FILE, "");
+
+        qDebug() << "BYTES SEND: " << File_byteArray.length();
         qDebug() << "HOPS_COUNT: " << packets.size() + 1;
-        //usleep(100000);
     }
     return true;
 }
@@ -232,7 +241,7 @@ int Send_Recieve_Module::establish_socket()
         return CS_ERROR;
     }
 
-    theSocket = socket(AF_INET, SOCK_STREAM, 0);
+    theSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); //  (SOCK_STREAM)IPPROTO_TCP SOCK_SEQPACKET
 
     if((signed)theSocket == SOCKET_ERROR) {
         //printf("ERROR  (can't create socket) ");  wprintf(L" ERROR  (can't create socket): %ld\n", WSAGetLastError());
@@ -277,7 +286,7 @@ void Send_Recieve_Module::send_U_Packet(int sock, QString ip, int id,int code_op
     }
 
     struct U_packet *send_packet = (struct U_packet*)malloc(sizeof(struct U_packet));
-    memset(send_packet->data,0,32); // Для надежности заполним 32 байта send_packet->data значениями NULL
+    memset(send_packet->data,0,DATA_BUFFER); // Для надежности заполним DATA_BUFFER байта send_packet->data значениями NULL
     send_packet->code_op = code_op;
     send_packet->id = id;
     if(data.length() > 0)

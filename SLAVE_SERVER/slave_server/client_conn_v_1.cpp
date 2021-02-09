@@ -1,7 +1,5 @@
 #include "client_conn_v_1.h"
 
-#define RECIVE_BUFFER_SIZE 52 // 1024
-
 #define CLIENT_WANT_INIT_CONNECTION 10
 #define SEND_FILE 11
 #define SLAVE_SERVER_WANT_INIT_CONNECTION 12
@@ -137,7 +135,7 @@ void client_conn_v_1::wait_analize_recv_data()
 			{
 				end_recive_file();
 				printf("_________________________________Client FINISH sending file\n");
-				send_U_Packet(Socket,std::string(), 0, S_SERVER_END_RCV_FILE, std::string());
+				send_U_Packet(Socket,std::string(), 0, S_SERVER_END_RCV_FILE, std::to_string(debug_bytes_count));
 				printf("_________________________________Slave server FINISH recive file\n");
 				break;	
 			}
@@ -190,7 +188,7 @@ void client_conn_v_1::reset_ID()
 
 int client_conn_v_1::establish_socket()
 {
-    int sock = socket(AF_INET, SOCK_STREAM, 0);
+    int sock = socket(AF_INET, SOCK_STREAM, 0); // SOCK_STREAM/SOCK_SEQPACKET
     if(sock < 0)
     {
         perror("socket");
@@ -242,7 +240,7 @@ void client_conn_v_1::send_U_Packet(int sock, std::string ip, int id,int code_op
 	}
 	
     struct U_packet *send_packet = (struct U_packet*)malloc(sizeof(struct U_packet));
-	memset(send_packet->data,0,32); // Для надежности заполним 32 байта send_packet->data значениями NULL
+	memset(send_packet->data,0,DATA_BUFFER); // Для надежности заполним DATA_BUFFER байта send_packet->data значениями NULL
     send_packet->code_op = code_op;
     send_packet->id = id;
     if(data.length() > 0)
@@ -261,9 +259,10 @@ void client_conn_v_1::send_U_Packet(int sock, std::string ip, int id,int code_op
 int client_conn_v_1::start_recive_file()
 {
 	if ((fp=fopen("any_project.svf", "wb"))==NULL)
-	{
+	{		
 		return CS_ERROR;
 	}
+	debug_bytes_count = 0;
 	return CS_OK;
 }
 
@@ -275,6 +274,7 @@ int client_conn_v_1::rcv_new_data_for_file(char *buf)
 	//printf("[0][1] bytes: %s\n", tst);
 	int size = atoi(tst);
 	//printf("size: %d\n", size);
+	debug_bytes_count += size;
 	
 	fwrite(buf+2, sizeof(char), size, fp);
 	
@@ -284,6 +284,7 @@ int client_conn_v_1::rcv_new_data_for_file(char *buf)
 int client_conn_v_1::end_recive_file()
 {
 	fclose(fp);
+	printf("Bytes recive: %i\n", debug_bytes_count);
 	return CS_OK;
 }
 

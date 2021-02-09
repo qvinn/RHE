@@ -22,14 +22,17 @@
 
     #define CS_ERROR 1
     #define CS_OK 0
-    #define DATA_BUFFER 32
+
+    #define DATA_BUFFER 60 // 32
+    #define RECIVE_BUFFER_SIZE (DATA_BUFFER+20) // 52
+    #define TRUE_DATA_BUFFER (DATA_BUFFER-2) // Два байта зарезервировано для определения размера передаваемых данных
 
     class Send_Recieve_Module : public QObject {
         Q_OBJECT
         struct U_packet {
-            char ip[12];
-            int id;
-            int code_op;
+            char ip[12];    // 12 байт
+            int id;         // 4 байта
+            int code_op;    // 4 байта
             char data[DATA_BUFFER];
         };
 
@@ -61,6 +64,9 @@
 
             int my_client_ID = -1; // INIT_ID
             std::mutex my_client_ID_mutex;
+
+            int last_send_file_bytes = 0;
+            std::mutex last_send_file;
 
         signals:
             void logout_signal();
