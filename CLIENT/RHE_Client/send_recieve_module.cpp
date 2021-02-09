@@ -182,6 +182,7 @@ bool Send_Recieve_Module::send_file_to_ss(QByteArray File_byteArray)
             //usleep(100000);
         }
         send_U_Packet(Socket,"", 0, CLIENT_FINISH_SEND_FILE, "");
+        qDebug() << "HOPS_COUNT: " << packets.size() + 1;
         //usleep(100000);
     }
     return true;
@@ -283,7 +284,7 @@ void Send_Recieve_Module::send_U_Packet(int sock, QString ip, int id,int code_op
     {
         memcpy(send_packet->data,data.toLatin1().data(),data.count());
         //printf("convert data: %s\n",send_packet->data);
-        //qDebug() << "convert data: " << send_packet->data;
+        qDebug() << "convert data: " << send_packet->data;
     }
     char *send_buf = (char*)malloc(sizeof(struct U_packet));
     memcpy(send_buf,send_packet,sizeof(struct U_packet));

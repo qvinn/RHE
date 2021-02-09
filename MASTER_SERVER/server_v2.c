@@ -357,6 +357,7 @@ int new_listen_thread(int sock)
 void recive_new_data(char *buf, int sock)
 {
 	struct U_packet *tmp_packet = (struct U_packet*)malloc(sizeof(struct U_packet));
+	memset(tmp_packet,0,52);
 	memcpy(tmp_packet,buf,sizeof (struct U_packet));
 	switch (tmp_packet->code_op) {	
 		case PING_TO_SERVER:

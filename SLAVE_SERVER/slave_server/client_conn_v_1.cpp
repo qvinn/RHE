@@ -144,8 +144,8 @@ void client_conn_v_1::wait_analize_recv_data()
 			
 			case FLASH_FPGA:
 			{
-				system("openocd -f OpenOCD_run.cfg");
 				printf("_________________________________FLASH FPGA\n");
+				system("openocd -f OpenOCD_run.cfg");				
 				break;	
 			}
 			
@@ -160,7 +160,10 @@ void client_conn_v_1::wait_analize_recv_data()
 			}
 			
 			default:
-			break;
+			{
+				printf("\t|___UNKNOWN PACKET\n");
+				break;	
+			}
 		}
         free(tmp_packet);
 	}
