@@ -22,7 +22,7 @@
 #define FLASH_FPGA 23
 #define SET_FPGA_ID 24
 
-Send_Recieve_Module::Send_Recieve_Module(std::string _server_ip, int _server_port, General_Widget *widg)
+Send_Recieve_Module::Send_Recieve_Module(QString _server_ip, int _server_port, General_Widget *widg)
 {
     this->server_ip = _server_ip;
     this->server_port = _server_port;
@@ -50,7 +50,7 @@ bool Send_Recieve_Module::init_connection()
 int Send_Recieve_Module::get_id_for_client()
 {
     my_client_ID_mutex.lock();
-    send_U_Packet(Socket, std::string(), my_client_ID, CLIENT_WANT_INIT_CONNECTION, std::string());
+    send_U_Packet(Socket, "", my_client_ID, CLIENT_WANT_INIT_CONNECTION, "");
     my_client_ID_mutex.unlock();
 
     return CS_OK;
@@ -122,7 +122,7 @@ void Send_Recieve_Module::wait_analize_recv_data()
 
         case S_SERVER_END_RCV_FILE:
             qDebug() << "_________________________________Slave server end recive file";
-            send_U_Packet(Socket,std::string(), 0, FLASH_FPGA, std::string());
+            send_U_Packet(Socket,"", 0, FLASH_FPGA, "");
             break;
 
         default:
@@ -134,18 +134,12 @@ void Send_Recieve_Module::wait_analize_recv_data()
 
 void Send_Recieve_Module::ping_to_server()
 {
-    send_U_Packet(Socket, std::string(), my_client_ID, PING_TO_SERVER, std::string());
+    send_U_Packet(Socket, "", my_client_ID, PING_TO_SERVER, "");
 }
 
 void Send_Recieve_Module::ping_to_S_server()
 {
-    send_U_Packet(Socket, std::string(), my_client_ID, PING_CLIENT_TO_S_SERVER, std::string());
-    // SET ID FOR TEST!!! COMMENT THIS NEXT TIME
-    usleep(100000);
-    std::string tmp_str = "0x020F10dd";
-    QByteArray byteArray(tmp_str.c_str(), tmp_str.length());
-    set_FPGA_id(byteArray);
-    //
+    send_U_Packet(Socket, "", my_client_ID, PING_CLIENT_TO_S_SERVER, "");
 }
 
 bool Send_Recieve_Module::send_file_to_ss(QByteArray File_byteArray)
@@ -155,11 +149,11 @@ bool Send_Recieve_Module::send_file_to_ss(QByteArray File_byteArray)
     if(hops < 1) // Если данные помещаются в одну посылку
     {
         QByteArray Result_byteArray = form_2bytes_QBA(&File_byteArray);
-        send_U_Packet(Socket,std::string(), 0, CLIENT_START_SEND_FILE,std::string());
+        send_U_Packet(Socket,"", 0, CLIENT_START_SEND_FILE,"");
         //usleep(100000);
-        send_U_Packet(Socket,std::string(), 0, CLIENT_SENDING_FILE, Result_byteArray.toStdString());
+        send_U_Packet(Socket,"", 0, CLIENT_SENDING_FILE, QString::fromStdString(Result_byteArray.toStdString()));
         //usleep(100000);
-        send_U_Packet(Socket,std::string(), 0, CLIENT_FINISH_SEND_FILE, std::string());
+        send_U_Packet(Socket,"", 0, CLIENT_FINISH_SEND_FILE, "");
         //usleep(100000);
     } else
     {
@@ -179,15 +173,15 @@ bool Send_Recieve_Module::send_file_to_ss(QByteArray File_byteArray)
             packets.push_back(packet);
         }
 
-        send_U_Packet(Socket,std::string(), 0, CLIENT_START_SEND_FILE,std::string());
+        send_U_Packet(Socket,"", 0, CLIENT_START_SEND_FILE,"");
         //usleep(100000);
         for(int i = 0; i < packets.size(); i++)
         {
             //qDebug() << "SEND BUFF " << packets.at(i).data() << endl;
-            send_U_Packet(Socket,std::string(), 0, CLIENT_SENDING_FILE,packets.at(i).toStdString());
+            send_U_Packet(Socket,"", 0, CLIENT_SENDING_FILE,QString::fromStdString(packets.at(i).toStdString()));
             //usleep(100000);
         }
-        send_U_Packet(Socket,std::string(), 0, CLIENT_FINISH_SEND_FILE, std::string());
+        send_U_Packet(Socket,"", 0, CLIENT_FINISH_SEND_FILE, "");
         //usleep(100000);
     }
     return true;
@@ -201,17 +195,9 @@ void Send_Recieve_Module::close_connection()
     emit logout_signal();
 }
 
-void Send_Recieve_Module::set_FPGA_id(QByteArray FPGA_id)
+void Send_Recieve_Module::set_FPGA_id(QString FPGA_id)
 {
-    // EXAMPLE
-    // std::string => QByteArray
-    //QByteArray byteArray(stdString.c_str(), stdString.length());
-
-    // QByteArray => std::string
-    //std::string stdString(byteArray.constData(), byteArray.length());
-
-    std::string stdString(FPGA_id.constData(), FPGA_id.length());
-    send_U_Packet(Socket,std::string(), 0, SET_FPGA_ID, stdString);
+    send_U_Packet(Socket,"", 0, SET_FPGA_ID, FPGA_id);
 }
 
 //-------------------PRIVATE----------------------------------------------------------------
@@ -234,7 +220,7 @@ int Send_Recieve_Module::establish_socket()
     version = MAKEWORD(2, 2);
     WSAStartup(version,(LPWSADATA)&wsaData);
 
-    const char *serv_ip = server_ip.c_str();
+    const char *serv_ip = server_ip.toLatin1().data();
     hostEntry = gethostbyname(serv_ip); // SERVER_IP
 
     if(!hostEntry) {
@@ -280,13 +266,13 @@ int Send_Recieve_Module::establish_socket()
     return CS_OK;
 }
 
-void Send_Recieve_Module::send_U_Packet(int sock, std::string ip, int id,int code_op, std::string data)
+void Send_Recieve_Module::send_U_Packet(int sock, QString ip, int id,int code_op, QString data)
 {
     const char *send_ip;
 
     if(ip.length() > 0)
     {
-        send_ip = ip.c_str();
+        send_ip = ip.toLatin1().data();
     }
 
     struct U_packet *send_packet = (struct U_packet*)malloc(sizeof(struct U_packet));
@@ -295,7 +281,7 @@ void Send_Recieve_Module::send_U_Packet(int sock, std::string ip, int id,int cod
     send_packet->id = id;
     if(data.length() > 0)
     {
-        memcpy(send_packet->data,data.c_str(),data.size());
+        memcpy(send_packet->data,data.toLatin1().data(),data.count());
         //printf("convert data: %s\n",send_packet->data);
         //qDebug() << "convert data: " << send_packet->data;
     }

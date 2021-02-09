@@ -9,12 +9,14 @@ RHE_Widget::RHE_Widget(QWidget *parent, General_Widget *widg, Send_Recieve_Modul
     path_to_proj = new QString("");
     prev_path_to_proj = new QString("");
     svf_file = new QFile();
-    pixmp_name = new QList<QString>();
+    pixmp_names = new QList<QString>();
+    jtag_id_codes = new QList<QString>();
     initialize_ui();
 }
 
 RHE_Widget::~RHE_Widget() {
-    delete pixmp_name;
+    delete pixmp_names;
+    delete jtag_id_codes;
     delete path_to_proj;
     delete prev_path_to_proj;
     delete svf_file;
@@ -72,12 +74,12 @@ void RHE_Widget::on_pushButton_3_clicked() {
 void RHE_Widget::on_cmbBx_chs_brd_currentIndexChanged(int index) {
     if(ui_initialized && (index != -1)) {
         gen_widg->save_setting("settings/CURRENT_BOARD", index);
-        if(pixmp_name->at(index).count() == 0) {
+        if(pixmp_names->at(index).count() == 0) {
             ui->label->clear();
             QPixmap tmp;
             pixmp_brd.swap(tmp);
         } else {
-            if(pixmp_brd.load(qApp->applicationDirPath() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString() + pixmp_name->at(index))){
+            if(pixmp_brd.load(qApp->applicationDirPath() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString() + pixmp_names->at(index))){
                 paintEvent(nullptr);
                 ui->label->setPixmap(pixmp_brd.scaled(ui->label->size(), Qt::KeepAspectRatio));
             }
@@ -122,6 +124,7 @@ void RHE_Widget::on_pshBttn_snd_frmwr_clicked() {
         gen_widg->show_message_box("", tr("svf-file not generated"), 0);
         return;
     }
+    snd_rcv_module->set_FPGA_id(jtag_id_codes->at(ui->cmbBx_chs_brd->currentIndex()));
     if(svf_file->open(QIODevice::ReadOnly)) {
         snd_rcv_module->send_file_to_ss(svf_file->readAll());
         svf_file->close();
@@ -160,11 +163,17 @@ void RHE_Widget::initialize_ui() {
     }
     if(ui->cmbBx_chs_brd->count() == 0) {
         ui->cmbBx_chs_brd->addItem("");
-        pixmp_name->append("");
-        read_xml_file(false);
+        pixmp_names->append("");
+        if(read_xml_file(false)) {
+            ui_initialized = true;
+            ui->cmbBx_chs_brd->setCurrentIndex(gen_widg->get_setting("settings/CURRENT_BOARD").toInt());
+        } else {
+            QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
+        }
+    } else {
+        ui_initialized = true;
+        ui->cmbBx_chs_brd->setCurrentIndex(gen_widg->get_setting("settings/CURRENT_BOARD").toInt());
     }
-    ui_initialized = true;
-    ui->cmbBx_chs_brd->setCurrentIndex(gen_widg->get_setting("settings/CURRENT_BOARD").toInt());
 }
 
 void RHE_Widget::set_ui_text() {
@@ -361,8 +370,8 @@ bool RHE_Widget::read_xml_file(bool read_board_params, QString *cur_fpga, QList<
             if((xmlReader.name().toString().compare("pin", Qt::CaseInsensitive) == 0) && (xmlReader.attributes().hasAttribute("io_standard"))) {
                 pins_io_stndrd->append(xmlReader.attributes().value("io_standard").toString().replace(" ", ""));
             }
-            if(xmlReader.name().toString().compare("fpga", Qt::CaseInsensitive) == 0) {
-                cur_fpga->append(xmlReader.readElementText());
+            if((xmlReader.name().toString().compare("fpga", Qt::CaseInsensitive) == 0) && (xmlReader.attributes().hasAttribute("name"))) {
+                cur_fpga->append(xmlReader.attributes().value("name").toString().replace(" ", ""));
             } else if(xmlReader.name().toString().compare("board", Qt::CaseInsensitive) == 0) {
                 read_board_data = false;
                 break;
@@ -375,9 +384,18 @@ bool RHE_Widget::read_xml_file(bool read_board_params, QString *cur_fpga, QList<
             } else {
                 ui->cmbBx_chs_brd->addItem(xmlReader.attributes().value("name").toString());
             }
+        } else if(!read_board_params && (xmlReader.name().toString().compare("fpga", Qt::CaseInsensitive) == 0) && (xmlReader.attributes().hasAttribute("jtag_id_code"))) {
+            QString tmp_str(xmlReader.attributes().value("jtag_id_code").toString().replace(" ", ""));
+            if(tmp_str.count() != 0) {
+                jtag_id_codes->append(tmp_str);
+            } else {
+                gen_widg->show_message_box("", (tr("'jtag_id_code' in board list doesn't exist for board: ") + ui->cmbBx_chs_brd->itemText(ui->cmbBx_chs_brd->count() - 1) + "\nPlease, contact with teacher or administrator"), 0);
+                xml_file.close();
+                return false;
+            }
         } else if(!ui_initialized) {
             if((xmlReader.name().toString().compare("pic", Qt::CaseInsensitive) == 0) && (xmlReader.attributes().hasAttribute("name"))) {
-                pixmp_name->append(xmlReader.attributes().value("name").toString());
+                pixmp_names->append(xmlReader.attributes().value("name").toString());
             }
         }
     }

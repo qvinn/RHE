@@ -8,7 +8,6 @@
     #include <stdio.h>
     #include "tchar.h"
     #include <fstream>
-    #include <cstring>
     #include <cstddef>
     #include "time.h"
     #include <direct.h>
@@ -35,7 +34,7 @@
         };
 
         public:
-            Send_Recieve_Module(std::string _server_ip, int _server_port, General_Widget *widg = nullptr);
+            Send_Recieve_Module(QString _server_ip, int _server_port, General_Widget *widg = nullptr);
             bool init_connection();
             int get_id_for_client();
             void wait_analize_recv_data();
@@ -44,17 +43,17 @@
             void ping_to_S_server();
             bool send_file_to_ss(QByteArray File_byteArray);
             void close_connection();
-            void set_FPGA_id(QByteArray FPGA_id);
+            void set_FPGA_id(QString FPGA_id);
 
         private:
             void reset_ID();
             int establish_socket();
-            void send_U_Packet(int sock, std::string ip, int id,int code_op, std::string data);
+            void send_U_Packet(int sock, QString ip, int id,int code_op, QString data);
             void set_client_id(/*char *buf*/int id);
             QByteArray form_2bytes_QBA(QByteArray *data);
 
             General_Widget *gen_widg = nullptr;
-            std::string server_ip;
+            QString server_ip;
             int server_port;
 
             int Socket = -1;
