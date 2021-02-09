@@ -12,4 +12,8 @@
 		<pin number = "25" direction = "input" io_standard = "2.5V"></pin>
 		<pic name = "cycl2.png"></pic>
 	</board>
+	<board name = "EP2C5 Mini Dev Board">
+		<fpga name = "EP2C5T144C8" jtag_id_code = "0x020b10dd"></fpga>
+		<pic name = "EP2C5_Mini_Dev_Board.png"></pic>
+	</board>
 </boards>
