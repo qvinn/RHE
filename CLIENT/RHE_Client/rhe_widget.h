@@ -28,13 +28,13 @@
             void pshBttn_ld_frmwr_set_enabled(bool flag);
             void pshBttn_snd_frmwr_set_enabled(bool flag);
             void set_fname_lname(QString str);
+            void initialize_ui();
 
             bool sof_exist = false;
             bool svf_exist = false;
             bool pins_chk = false;
 
         private:
-            void initialize_ui();
             void set_ui_text();
             void check_is_proj_folder(bool folder_exist);
             bool read_xml_file(bool type, QString *cur_fpga = nullptr, QList<QString> *pins_numb = nullptr, QList<QString> *pins_typ = nullptr, QList<QString> *pins_io_stndrt = nullptr);

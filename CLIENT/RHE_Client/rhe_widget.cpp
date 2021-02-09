@@ -156,6 +156,8 @@ void RHE_Widget::pshBttn_snd_frmwr_set_enabled(bool flag) {
 }
 
 void RHE_Widget::initialize_ui() {
+    path_to_proj->clear();
+    QDir::setCurrent(qApp->applicationDirPath());
     pshBttn_snd_frmwr_set_enabled(false);
     pshBttn_chk_prj_stat_set_enabled(false);
     if(gen_widg->get_setting("settings/MANUALY_LOAD_FIRMWARE").toBool() && gen_widg->get_setting("settings/ENABLE_FILE_CHEKING").toBool()) {

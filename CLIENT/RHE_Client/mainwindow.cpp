@@ -200,6 +200,7 @@ void MainWindow::logout() {
         ui->button_login_logout->setText(tr("Login"));
         ui->button_register->show();
         ui->stackedWidget->setCurrentWidget(ptr_registration_widg);
+        ptr_RHE_widg->initialize_ui();
     }
 }
 
