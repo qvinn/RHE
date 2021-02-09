@@ -46,7 +46,8 @@
             QString *path_to_proj = nullptr;
             QString *prev_path_to_proj = nullptr;
             QFile *svf_file = nullptr;
-            QList<QString> *pixmp_name = nullptr;
+            QList<QString> *pixmp_names = nullptr;
+            QList<QString> *jtag_id_codes = nullptr;
             QString lname_fname;
             QPixmap pixmp_brd;
 

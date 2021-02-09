@@ -16,7 +16,6 @@
             General_Widget();
             ~General_Widget() override;
 
-            void create_base_settings();
             QVariant get_setting(QString type);
             void save_setting(QString type, QVariant val);
             QStringList* load_files(bool files, bool path, QString title, QString filter);
@@ -26,6 +25,9 @@
             void change_current_locale();
 
         private:
+            void create_base_settings();
+            void check_setting_exist(QString type, QVariant val);
+
             QStringList *files_list = nullptr;
             QSettings *settings = nullptr;
             QTranslator *language_translator = nullptr;

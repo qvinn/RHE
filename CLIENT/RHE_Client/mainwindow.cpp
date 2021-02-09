@@ -5,7 +5,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->setupUi(this);
     QDir::setCurrent(qApp->applicationDirPath());
     gen_widg = new General_Widget();
-    snd_rcv_module = new Send_Recieve_Module("192.168.1.3", 3425, gen_widg);
+    snd_rcv_module = new Send_Recieve_Module(gen_widg->get_setting("settings/SERVER_IP").toString().toLatin1().data(), 3425, gen_widg);
     ptr_registration_widg = new RegistrationWidget(this, gen_widg, snd_rcv_module);
     ptr_RHE_widg = new RHE_Widget(this, gen_widg, snd_rcv_module);
     ui->stackedWidget->addWidget(ptr_registration_widg);
@@ -164,7 +164,6 @@ void MainWindow::set_ui_text() {
 }
 
 void MainWindow::load_settings() {
-    gen_widg->create_base_settings();
     bool fls_chk = gen_widg->get_setting("settings/ENABLE_FILE_CHEKING").toBool();
     int pins_chk;
     if(gen_widg->get_setting("settings/ENABLE_PINS_CHEKING").toInt() < 0) {

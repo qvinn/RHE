@@ -9,6 +9,7 @@ General_Widget::General_Widget() {
 #else
     settings = new QSettings(path, QSettings::IniFormat);
 #endif
+    create_base_settings();
     language_translator = new QTranslator();
 }
 
@@ -16,18 +17,6 @@ General_Widget::~General_Widget() {
     delete files_list;
     delete settings;
     delete language_translator;
-}
-
-void General_Widget::create_base_settings() {
-    if(!settings->contains("settings/ENABLE_FILE_CHEKING")) {
-        save_setting("settings/ENABLE_FILE_CHEKING", 1);
-        save_setting("settings/ENABLE_PINS_CHEKING", 1);
-        save_setting("settings/MANUALY_LOAD_FIRMWARE", 0);
-        save_setting("settings/LANGUAGE", 0);
-        save_setting("settings/CURRENT_BOARD", 0);
-        save_setting("settings/PATH_TO_DATA", "data/");
-        save_setting("settings/BOARDS_LIST_FILENAME", "Boards_List.xml");
-    }
 }
 
 QVariant General_Widget::get_setting(QString type) {
@@ -55,6 +44,22 @@ void General_Widget::save_setting(QString type, QVariant val) {
         settings->setValue(lst.at(1), val);
     }
     settings->sync();
+}
+
+void General_Widget::create_base_settings() {
+    check_setting_exist("settings/ENABLE_PINS_CHEKING", 1);
+    check_setting_exist("settings/MANUALY_LOAD_FIRMWARE", 0);
+    check_setting_exist("settings/LANGUAGE", 0);
+    check_setting_exist("settings/CURRENT_BOARD", 0);
+    check_setting_exist("settings/PATH_TO_DATA", "data/");
+    check_setting_exist("settings/BOARDS_LIST_FILENAME", "Boards_List.xml");
+    check_setting_exist("settings/SERVER_IP", "192.168.1.10");
+}
+
+void General_Widget::check_setting_exist(QString type, QVariant val) {
+    if(!settings->contains(type)) {
+        save_setting(type, val);
+    }
 }
 
 QStringList* General_Widget::load_files(bool files, bool path, QString title, QString filter) {
