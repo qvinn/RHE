@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?> 
 <boards>
 	<board name = "OMDAZZ">
-		<fpga>EP4CE10E22C8</fpga>
+		<fpga name = "EP4CE10E22C8" jtag_id_code = "0x020F10dd"></fpga>
 		<pin number = "23" direction = "input" io_standard = "2.5V"></pin>
 		<pin number = "25" direction = "input" io_standard = "2.5V"></pin>
 		<pic name = "omdazz.png"></pic>
 	</board>
 	<board name = "Cyclone II">
-		<fpga>EP2C70F896I8</fpga>
+		<fpga name = "EP2C70F896I8" jtag_id_code = "0x020F10dd"></fpga>
 		<pin number = "23" direction = "input" io_standard = "2.5V"></pin>
 		<pin number = "25" direction = "input" io_standard = "2.5V"></pin>
 		<pic name = "cycl2.png"></pic>
