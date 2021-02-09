@@ -144,6 +144,7 @@ void client_conn_v_1::wait_analize_recv_data()
 			
 			case FLASH_FPGA:
 			{
+				system("openocd -f OpenOCD_run.cfg");
 				printf("_________________________________FLASH FPGA\n");
 				break;	
 			}
