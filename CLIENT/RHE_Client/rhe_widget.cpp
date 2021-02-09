@@ -164,6 +164,7 @@ void RHE_Widget::initialize_ui() {
     if(ui->cmbBx_chs_brd->count() == 0) {
         ui->cmbBx_chs_brd->addItem("");
         pixmp_names->append("");
+        jtag_id_codes->append("");
         if(read_xml_file(false)) {
             ui_initialized = true;
             ui->cmbBx_chs_brd->setCurrentIndex(gen_widg->get_setting("settings/CURRENT_BOARD").toInt());
