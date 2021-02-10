@@ -331,7 +331,7 @@ int new_listen_thread(int sock)
 		// Проанализируем данные для первичной обработки
 		int bytes_read = 0;
 		char *buf = (char*)malloc(sizeof(char)*RECIVE_BUFFER_SIZE);		
-        bytes_read = recv(sock, buf, RECIVE_BUFFER_SIZE, 0);
+        bytes_read = recv(sock, buf, RECIVE_BUFFER_SIZE, MSG_WAITALL);
 		if(bytes_read == 0)
 		{
 			printf("Connection with client id %i has lost\n", sock);

@@ -68,7 +68,7 @@ void client_conn_v_1::wait_analize_recv_data()
         int bytes_read = 0;
 		
         char recv_buf[RECIVE_BUFFER_SIZE];
-        bytes_read = recv(Rcv_Socet, recv_buf, RECIVE_BUFFER_SIZE, 0); // Socket | Rcv_Socet
+        bytes_read = recv(Rcv_Socet, recv_buf, RECIVE_BUFFER_SIZE, MSG_WAITALL); // Socket | Rcv_Socet
         if(bytes_read < 1)
         {
             if(bytes_read == 0)
