@@ -53,88 +53,90 @@ int Send_Recieve_Module::get_id_for_client() {
 }
 
 void Send_Recieve_Module::wait_analize_recv_data() {
-    int bytes_read = 0;
-    char recv_buf[RECIVE_BUFFER_SIZE];
-    bytes_read = socket->read(recv_buf, RECIVE_BUFFER_SIZE);
-    if(bytes_read < 1) {
-        if(bytes_read == 0) {
-            set_disconnected();
-            qDebug() << "LOST CONNECTION:     " << "Recive Error: " << socket->error();
-            emit show_message_box_signal(tr("Error"), QString::number(socket->error()), 0);
-            return;
-        } else if(bytes_read < 0) {
-            set_disconnected();
-            qDebug() << "LOST CONNECTION:     " << "Recive Error: " << socket->error();
-            emit show_message_box_signal(tr("Error"), QString::number(socket->error()), 0);
-            return;
-        }
-    }
-    U_packet *tmp_packet = (U_packet*)malloc(sizeof(U_packet));
-//    qDebug() << "~~~~~DEBUG: recive any data: \n";
-    memcpy(tmp_packet,recv_buf, sizeof (U_packet));
-    switch(tmp_packet->code_op) {
-        case CLIENT_WANT_INIT_CONNECTION: {
-            set_client_id(tmp_packet->id);
-            qDebug() << "Server want give me ID: " << my_client_ID;
-            break;
-        }
-        case PING_TO_SERVER: {
-            qDebug() << "_________________________________Server answer PING";
-            emit show_message_box_signal("", tr("Server answer PING"), 2);
-            break;
-        }
-        case S_SERVER_ANSWER_TO_CLIENT: {
-            qDebug() << "_________________________________Slave server answer PING";
-            emit show_message_box_signal("", tr("Slave server answer PING"), 2);
-            break;
-        }
-        case DROP_CONNECTION: {
-            set_disconnected();
-            qDebug() << "_________________________________YOU ARE DROPPED";
-            emit show_message_box_signal(tr("Error"), tr("You are dropped"), 0);
-            break;
-        }
-        case NO_MORE_PLACES: {
-            set_disconnected();
-            qDebug() << "_________________________________Can't get ID from Server - no more places";
-            emit show_message_box_signal(tr("Error"), tr("Can't get ID from Server - no more places"), 0);
-            break;
-        }
-        case S_SERVER_END_RCV_FILE: {
-            qDebug() << "_________________________________Slave server end recive file";
-            qDebug() << "Slave server recive bytese" << atoi(tmp_packet->data);
-            if(atoi(tmp_packet->data) == last_send_file_bytes) {
-                send_U_Packet(0, FLASH_FPGA, "");
+    while(socket->bytesAvailable()) {
+        int bytes_read = 0;
+        char recv_buf[RECIVE_BUFFER_SIZE];
+        bytes_read = socket->read(recv_buf, RECIVE_BUFFER_SIZE);
+        if(bytes_read < 1) {
+            if(bytes_read == 0) {
+                set_disconnected();
+                qDebug() << "LOST CONNECTION:     " << "Recive Error: " << socket->error();
+                emit show_message_box_signal(tr("Error"), QString::number(socket->error()), 0);
+                return;
+            } else if(bytes_read < 0) {
+                set_disconnected();
+                qDebug() << "LOST CONNECTION:     " << "Recive Error: " << socket->error();
+                emit show_message_box_signal(tr("Error"), QString::number(socket->error()), 0);
+                return;
             }
-            break;
         }
-        case S_SERVER_START_SEND_FILE:
-        {
-            if(start_recive_file()!= CS_ERROR)
+        U_packet *tmp_packet = (U_packet*)malloc(sizeof(U_packet));
+//        qDebug() << "~~~~~DEBUG: recive any data: \n";
+        memcpy(tmp_packet,recv_buf, sizeof (U_packet));
+        switch(tmp_packet->code_op) {
+            case CLIENT_WANT_INIT_CONNECTION: {
+                set_client_id(tmp_packet->id);
+                qDebug() << "Server want give me ID: " << my_client_ID;
+                break;
+            }
+            case PING_TO_SERVER: {
+                qDebug() << "_________________________________Server answer PING";
+                emit show_message_box_signal("", tr("Server answer PING"), 2);
+                break;
+            }
+            case S_SERVER_ANSWER_TO_CLIENT: {
+                qDebug() << "_________________________________Slave server answer PING";
+                emit show_message_box_signal("", tr("Slave server answer PING"), 2);
+                break;
+            }
+            case DROP_CONNECTION: {
+                set_disconnected();
+                qDebug() << "_________________________________YOU ARE DROPPED";
+                emit show_message_box_signal(tr("Error"), tr("You are dropped"), 0);
+                break;
+            }
+            case NO_MORE_PLACES: {
+                set_disconnected();
+                qDebug() << "_________________________________Can't get ID from Server - no more places";
+                emit show_message_box_signal(tr("Error"), tr("Can't get ID from Server - no more places"), 0);
+                break;
+            }
+            case S_SERVER_END_RCV_FILE: {
+                qDebug() << "_________________________________Slave server end recive file";
+                qDebug() << "Slave server recive bytese" << atoi(tmp_packet->data);
+                if(atoi(tmp_packet->data) == last_send_file_bytes) {
+                    send_U_Packet(0, FLASH_FPGA, "");
+                }
+                break;
+            }
+            case S_SERVER_START_SEND_FILE:
             {
-                qDebug() << "_________________________________Slave server START sending file";
+                if(start_recive_file()!= CS_ERROR)
+                {
+                    qDebug() << "_________________________________Slave server START sending file";
+                }
+                break;
             }
-            break;
+            case S_SERVER_SENDING_FILE:
+            {
+                qDebug() << "data: " << QString(tmp_packet->data);
+                rcv_new_data_for_file(tmp_packet->data);
+                qDebug() << "_________________________________Slave server sending file";
+                break;
+            }
+            case S_SERVER_FINISH_SEND_FILE:
+            {
+                end_recive_file();
+                qDebug() << "_________________________________Slave server FINISH sending file";
+                break;
+            }
+            default: {
+                qDebug() << "_________________________________UNKNOWN PACKET";
+                break;
+            }
         }
-        case S_SERVER_SENDING_FILE:
-        {
-            qDebug() << "data: " << QString(tmp_packet->data);
-            rcv_new_data_for_file(tmp_packet->data);
-            qDebug() << "_________________________________Slave server sending file";
-            break;
-        }
-        case S_SERVER_FINISH_SEND_FILE:
-        {
-            end_recive_file();
-            qDebug() << "_________________________________Slave server FINISH sending file";
-            break;
-        }
-        default: {
-            qDebug() << "_________________________________UNKNOWN PACKET";
-            break;
-        }
+        free(tmp_packet);
     }
-    free(tmp_packet);
 }
 
 void Send_Recieve_Module::ping_to_server() {
