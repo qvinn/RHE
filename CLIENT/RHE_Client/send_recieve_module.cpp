@@ -17,6 +17,10 @@
 #define S_SERVER_END_RCV_FILE 22
 #define FLASH_FPGA 23
 #define SET_FPGA_ID 24
+#define S_SERVER_START_SEND_FILE 25
+#define S_SERVER_SENDING_FILE 26
+#define S_SERVER_FINISH_SEND_FILE 27
+
 
 Send_Recieve_Module::Send_Recieve_Module(QString _server_ip, int _server_port, General_Widget *widg) {
     this->server_ip = _server_ip;
@@ -104,7 +108,29 @@ void Send_Recieve_Module::wait_analize_recv_data() {
             }
             break;
         }
+        case S_SERVER_START_SEND_FILE:
+        {
+            if(start_recive_file()!= CS_ERROR)
+            {
+                qDebug() << "_________________________________Slave server START sending file";
+            }
+            break;
+        }
+        case S_SERVER_SENDING_FILE:
+        {
+            qDebug() << "data: " << QString(tmp_packet->data);
+            rcv_new_data_for_file(tmp_packet->data);
+            qDebug() << "_________________________________Slave server sending file";
+            break;
+        }
+        case S_SERVER_FINISH_SEND_FILE:
+        {
+            end_recive_file();
+            qDebug() << "_________________________________Slave server FINISH sending file";
+            break;
+        }
         default: {
+            qDebug() << "_________________________________UNKNOWN PACKET";
             break;
         }
     }
@@ -232,4 +258,36 @@ QByteArray Send_Recieve_Module::form_2bytes_QBA(QByteArray *data) {
     Result_byteArray.append(*data);
     //qDebug() << Result_byteArray;
     return Result_byteArray;
+}
+
+int Send_Recieve_Module::start_recive_file()
+{
+    if ((fp=fopen("DEBUG_from_s_server.txt", "wb"))==NULL)
+    {
+        return CS_ERROR;
+    }
+    file_rcv_bytes_count = 0;
+    return CS_OK;
+}
+
+int Send_Recieve_Module::rcv_new_data_for_file(char *buf)
+{
+    char tst[2];
+    tst[0] = buf[0];
+    tst[1] = buf[1];
+    //printf("[0][1] bytes: %s\n", tst);
+    int size = atoi(tst);
+    //printf("size: %d\n", size);
+    file_rcv_bytes_count += size;
+
+    fwrite(buf+2, sizeof(char), size, fp);
+
+    return CS_OK;
+}
+
+int Send_Recieve_Module::end_recive_file()
+{
+    fclose(fp);
+    qDebug() << "HBytes recive: " <<file_rcv_bytes_count;
+    return CS_OK;
 }

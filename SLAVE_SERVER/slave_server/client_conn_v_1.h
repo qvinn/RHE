@@ -24,6 +24,7 @@
 
 #define DATA_BUFFER 60 // 32
 #define RECIVE_BUFFER_SIZE (DATA_BUFFER+20) // 52
+#define TRUE_DATA_BUFFER (DATA_BUFFER-2) // Два байта зарезервировано для определения размера передаваемых данных
 
 #define INIT_ID -2
 
@@ -45,6 +46,7 @@ public:
 
     void ping_to_server();
 	void answer_to_client();
+	void send_file_to_client(std::string filename);
 
 private:
     void reset_ID();
@@ -57,6 +59,8 @@ private:
 	int end_recive_file();
 	void set_FPGA_id(char *buf);
 	void create_OpenOCD_cfg();
+	//void send_file_to_client(std:: string filename);
+	std::string form_2bytes_BA(std::string data);
 
     std::string server_ip;
     int server_port;
@@ -69,7 +73,7 @@ private:
 	
 	std::string curr_FPGA_id = "";
 	
-	int debug_bytes_count = 0;
+	int file_rcv_bytes_count = 0;
 	
 	FILE *fp;
 };
