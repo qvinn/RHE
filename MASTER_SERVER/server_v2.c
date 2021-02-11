@@ -43,6 +43,9 @@
 #define S_SERVER_END_RCV_FILE 22
 #define FLASH_FPGA 23
 #define SET_FPGA_ID 24
+#define S_SERVER_START_SEND_FILE 25
+#define S_SERVER_SENDING_FILE 26
+#define S_SERVER_FINISH_SEND_FILE 27
 
 // Карта code_op - КОНЕЦ
 
@@ -471,6 +474,43 @@ void recive_new_data(char *buf, int sock)
 				//printf("data: %s\n",tmp_packet->data);
 				send_U_Packet(finded_s_server, std::string(), 0, SET_FPGA_ID, std::string(tmp_packet->data));
 				printf("\t|___Client with id %i SET_FPGA_ID to slave-server with id %i\n", sock, finded_s_server);
+			}			
+			break;	
+		}
+		
+		case S_SERVER_START_SEND_FILE:
+		{
+			// Перенаправляем запрос от slave-серверу к клиенту
+			int finded_client = find_pair_for(sock);
+			if(finded_client != ERROR)
+			{
+				send_U_Packet(finded_client, std::string(), 0, S_SERVER_START_SEND_FILE, std::string());
+				printf("\t|___Slave_server with id %i START sending file to client with id %i\n", sock, finded_client);
+			}			
+			break;	
+		}
+		
+		case S_SERVER_SENDING_FILE:
+		{
+			// Перенаправляем запрос от slave-серверу к клиенту
+			int finded_client = find_pair_for(sock);
+			if(finded_client != ERROR)
+			{
+				//printf("data: %s\n",tmp_packet->data);
+				send_U_Packet(finded_client, std::string(), 0, S_SERVER_SENDING_FILE, std::string(tmp_packet->data));
+				printf("\t|___Slave_server with id %i SENDING file to client with id %i\n", sock, finded_client);
+			}			
+			break;	
+		}
+		
+		case S_SERVER_FINISH_SEND_FILE:
+		{
+			// Перенаправляем запрос от slave-серверу к клиенту
+			int finded_client = find_pair_for(sock);
+			if(finded_client != ERROR)
+			{
+				send_U_Packet(finded_client, std::string(), 0, S_SERVER_FINISH_SEND_FILE, std::string());
+				printf("\t|___Slave_server with id %i FINISH send file to client with id %i\n", sock, finded_client);
 			}			
 			break;	
 		}

@@ -40,10 +40,16 @@
             void send_U_Packet(int id, int code_op, QByteArray data);
             void set_client_id(int id);
             QByteArray form_2bytes_QBA(QByteArray *data);
+            int start_recive_file();
+            int rcv_new_data_for_file(char *buf);
+            int end_recive_file();
 
             General_Widget *gen_widg = nullptr;
             QTcpSocket *socket = nullptr;
             QString server_ip;
+
+            int file_rcv_bytes_count = 0;
+            FILE *fp;
 
             int server_port;
             int my_client_ID = -1; // INIT_ID

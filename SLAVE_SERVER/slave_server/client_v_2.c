@@ -32,16 +32,6 @@ int main(int argc, char *argv[])
 
     if(client->get_id_for_client() != CS_OK){return 0;}
 	// Установка соединения с сервером - КОНЕЦ
-
-/*     sleep(5);
-
-    for(int i= 0; i < 3; i++)
-    {
-        client->ping_to_server();
-        sleep(2);
-    } */
-	
-	//while(1){}
 	
 	std::string cmd;
 
@@ -52,6 +42,9 @@ int main(int argc, char *argv[])
         if(cmd == "ping")
         {
             client->ping_to_server();
+        } else if(cmd == "sendfile")
+        {
+		client->send_file_to_client("debug_result.txt");
         } else if(cmd == "")
         {
 
