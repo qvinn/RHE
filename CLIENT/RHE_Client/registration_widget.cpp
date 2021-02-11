@@ -47,21 +47,14 @@ bool RegistrationWidget::login() {
             ui->lineEdit_password->setText("");
             ui->lineEdit_FName->setText("");
             ui->lineEdit_LName->setText("");
-
-            // Иницализируем поключение
-            if(!snd_rcv_module->init_connection()) {
+            if(!snd_rcv_module->init_connection()) {        // Иницализируем поключение
                 gen_widg->show_message_box(tr("Error"), tr("Can't init connection"), 0);
                 return false;
             }
-            // Создаем поток для приема входящих пакетов
-            std::thread waiting_thread(&Send_Recieve_Module::wait_analize_recv_data, snd_rcv_module);
-            waiting_thread.detach();
-            // Запросим у сервера ID
-            if(snd_rcv_module->get_id_for_client() != CS_OK) {
+            if(snd_rcv_module->get_id_for_client() != CS_OK) {          // Запросим у сервера ID
                 gen_widg->show_message_box(tr("Error"), tr("Can't get ID"), 0);
                 return false;
             }
-
             return true;
         } else {
             gen_widg->show_message_box(tr("Error"), tr("You enter wrong login or password"), 0);

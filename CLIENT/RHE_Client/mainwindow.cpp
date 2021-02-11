@@ -96,7 +96,7 @@ void MainWindow::on_button_login_logout_clicked() {
     if(ui->stackedWidget->currentWidget() == ptr_registration_widg) {
         login();
     } else {
-        snd_rcv_module->close_connection();
+        snd_rcv_module->set_disconnected();
     }
 }
 

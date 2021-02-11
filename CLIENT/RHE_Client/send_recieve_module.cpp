@@ -18,300 +18,200 @@
 #define FLASH_FPGA 23
 #define SET_FPGA_ID 24
 
-Send_Recieve_Module::Send_Recieve_Module(QString _server_ip, int _server_port, General_Widget *widg)
-{
+Send_Recieve_Module::Send_Recieve_Module(QString _server_ip, int _server_port, General_Widget *widg) {
     this->server_ip = _server_ip;
     this->server_port = _server_port;
     gen_widg = widg;
+    socket = new QTcpSocket(this);
+    connect(socket, &QAbstractSocket::readyRead, this, &Send_Recieve_Module::wait_analize_recv_data);
+    connect(socket, &QAbstractSocket::disconnected, this, &Send_Recieve_Module::server_disconnected);
     connect(this, &Send_Recieve_Module::show_message_box_signal, gen_widg, &General_Widget::show_message_box);
 }
 
-//-------------------PUBLIC----------------------------------------------------------------
+Send_Recieve_Module::~Send_Recieve_Module() {
+    delete socket;
+}
 
-bool Send_Recieve_Module::init_connection()
-{
-    int status = establish_socket();
-    if(status == CS_ERROR)
-    {
-        //wprintf(L"Error: %ld\n", WSAGetLastError());
-        qDebug() << "Error: " << WSAGetLastError();
+//-------------------PUBLIC----------------------------------------------------------------
+bool Send_Recieve_Module::init_connection() {
+    if(!establish_socket()) {
+        qDebug() << "Error: " << socket->error();
         reset_ID();
-        closesocket(Socket);
-        WSACleanup();
+        socket->close();
         return false;
     }
     return true;
 }
 
-int Send_Recieve_Module::get_id_for_client()
-{
-    my_client_ID_mutex.lock();
-    send_U_Packet(Socket, "", my_client_ID, CLIENT_WANT_INIT_CONNECTION, "");
-    my_client_ID_mutex.unlock();
-
+int Send_Recieve_Module::get_id_for_client() {
+    send_U_Packet(my_client_ID, CLIENT_WANT_INIT_CONNECTION, "");
     return CS_OK;
 }
 
-void Send_Recieve_Module::wait_analize_recv_data()
-{
-    while(1)
-    {
-        int bytes_read = 0;
-
-        char recv_buf[RECIVE_BUFFER_SIZE];
-        bytes_read = recv(Rcv_Socet, recv_buf, RECIVE_BUFFER_SIZE, 0);
-        if(bytes_read < 1)
-        {
-            if(bytes_read == 0)
-            {
-                qDebug() << "LOST CONNECTION:     " << "Recive Error: " << WSAGetLastError();
-//                emit show_message_box_signal(tr("Error"), (tr("LOST CONNECTION: ") + QString::number(WSAGetLastError())), 0);
-                close_connection();
-                return;
-            }
-            if(bytes_read < 0)
-            {
-                qDebug() << "Recive Error: " << WSAGetLastError();
-//                emit show_message_box_signal(tr("Error"), QString::number(WSAGetLastError()), 0);
-                close_connection();
-                return;
-            }
+void Send_Recieve_Module::wait_analize_recv_data() {
+    int bytes_read = 0;
+    char recv_buf[RECIVE_BUFFER_SIZE];
+    bytes_read = socket->read(recv_buf, RECIVE_BUFFER_SIZE);
+    if(bytes_read < 1) {
+        if(bytes_read == 0) {
+            set_disconnected();
+            qDebug() << "LOST CONNECTION:     " << "Recive Error: " << socket->error();
+            emit show_message_box_signal(tr("Error"), QString::number(socket->error()), 0);
+            return;
+        } else if(bytes_read < 0) {
+            set_disconnected();
+            qDebug() << "LOST CONNECTION:     " << "Recive Error: " << socket->error();
+            emit show_message_box_signal(tr("Error"), QString::number(socket->error()), 0);
+            return;
         }
-        U_packet *tmp_packet = (U_packet*)malloc(sizeof(U_packet));
-        //printf("~~~~~DEBUG: recive any data\n");
-        //qDebug() << "~~~~~DEBUG: recive any data: \n";
-        memcpy(tmp_packet,recv_buf,sizeof (U_packet));
-        switch (tmp_packet->code_op) {
-        case CLIENT_WANT_INIT_CONNECTION:
+    }
+    U_packet *tmp_packet = (U_packet*)malloc(sizeof(U_packet));
+//    qDebug() << "~~~~~DEBUG: recive any data: \n";
+    memcpy(tmp_packet,recv_buf, sizeof (U_packet));
+    switch(tmp_packet->code_op) {
+        case CLIENT_WANT_INIT_CONNECTION: {
             set_client_id(tmp_packet->id);
-            my_client_ID_mutex.lock();
-            //printf("Server want give me ID %i\n", my_client_ID);
             qDebug() << "Server want give me ID: " << my_client_ID;
-            my_client_ID_mutex.unlock();
             break;
-
-        case PING_TO_SERVER:
-            //printf("_________________________________Server answer PING\n");
+        }
+        case PING_TO_SERVER: {
             qDebug() << "_________________________________Server answer PING";
             emit show_message_box_signal("", tr("Server answer PING"), 2);
             break;
-
-        case S_SERVER_ANSWER_TO_CLIENT:
-            //printf("_________________________________Slave server answer PING\n");
+        }
+        case S_SERVER_ANSWER_TO_CLIENT: {
             qDebug() << "_________________________________Slave server answer PING";
             emit show_message_box_signal("", tr("Slave server answer PING"), 2);
             break;
-
-        case DROP_CONNECTION:
-            //printf("_________________________________YOU ARE DROPPED\n");
+        }
+        case DROP_CONNECTION: {
+            set_disconnected();
             qDebug() << "_________________________________YOU ARE DROPPED";
             emit show_message_box_signal(tr("Error"), tr("You are dropped"), 0);
-            close_connection();
-            break;
-
-        case NO_MORE_PLACES:
-            //printf("_________________________________Can't get ID from Server - no more places\n");
-            qDebug() << "_________________________________Can't get ID from Server - no more places";
-            emit show_message_box_signal(tr("Error"), tr("Can't get ID from Server - no more places"), 0);
-            close_connection();
-            break;
-
-        case S_SERVER_END_RCV_FILE:
-            qDebug() << "_________________________________Slave server end recive file";            
-            qDebug() << "Slave server recive bytese" << atoi(tmp_packet->data);
-            last_send_file.lock();
-            if(atoi(tmp_packet->data) == last_send_file_bytes)
-            {
-                send_U_Packet(Socket,"", 0, FLASH_FPGA, "");
-            }
-            last_send_file.unlock();
-            break;
-
-        default:
             break;
         }
-        free(tmp_packet);
+        case NO_MORE_PLACES: {
+            set_disconnected();
+            qDebug() << "_________________________________Can't get ID from Server - no more places";
+            emit show_message_box_signal(tr("Error"), tr("Can't get ID from Server - no more places"), 0);
+            break;
+        }
+        case S_SERVER_END_RCV_FILE: {
+            qDebug() << "_________________________________Slave server end recive file";
+            qDebug() << "Slave server recive bytese" << atoi(tmp_packet->data);
+            if(atoi(tmp_packet->data) == last_send_file_bytes) {
+                send_U_Packet(0, FLASH_FPGA, "");
+            }
+            break;
+        }
+        default: {
+            break;
+        }
     }
+    free(tmp_packet);
 }
 
-void Send_Recieve_Module::ping_to_server()
-{
-    send_U_Packet(Socket, "", my_client_ID, PING_TO_SERVER, "");
+void Send_Recieve_Module::ping_to_server() {
+    send_U_Packet(my_client_ID, PING_TO_SERVER, "");
 }
 
-void Send_Recieve_Module::ping_to_S_server()
-{
-    send_U_Packet(Socket, "", my_client_ID, PING_CLIENT_TO_S_SERVER, "");
+void Send_Recieve_Module::ping_to_S_server() {
+    send_U_Packet(my_client_ID, PING_CLIENT_TO_S_SERVER, "");
 }
 
-bool Send_Recieve_Module::send_file_to_ss(QByteArray File_byteArray)
-{
+bool Send_Recieve_Module::send_file_to_ss(QByteArray File_byteArray) {
     int hops = File_byteArray.size() / TRUE_DATA_BUFFER;
-
-    if(hops < 1) // Если данные помещаются в одну посылку
-    {
+    if(hops < 1) {      // Если данные помещаются в одну посылку
         QByteArray Result_byteArray = form_2bytes_QBA(&File_byteArray);
-        send_U_Packet(Socket,"", 0, CLIENT_START_SEND_FILE,"");
+        send_U_Packet(0, CLIENT_START_SEND_FILE, "");
         //usleep(100000);
-        send_U_Packet(Socket,"", 0, CLIENT_SENDING_FILE, QString::fromStdString(Result_byteArray.toStdString()));
+        send_U_Packet(0, CLIENT_SENDING_FILE, Result_byteArray);
         //usleep(100000);
-        send_U_Packet(Socket,"", 0, CLIENT_FINISH_SEND_FILE, "");
+        send_U_Packet(0, CLIENT_FINISH_SEND_FILE, "");
         //usleep(100000);
-    } else
-    {
+    } else {
         QVector<QByteArray> packets;
         QByteArray tmp_data;
         QByteArray packet;
-
         // Чтобы было удобней отсчитывать в цикле, определим первую посылку отдельно
-        tmp_data = File_byteArray.mid(0,TRUE_DATA_BUFFER).data();
+        tmp_data = File_byteArray.mid(0, TRUE_DATA_BUFFER).data();
         packet = form_2bytes_QBA(&tmp_data);
         packets.push_back(packet);
-
-        for(int i = 1; i < hops + 1; i++)
-        {
-            tmp_data = File_byteArray.mid(i*TRUE_DATA_BUFFER,TRUE_DATA_BUFFER).data();
+        for(int i = 1; i < hops + 1; i++) {
+            tmp_data = File_byteArray.mid((i * TRUE_DATA_BUFFER), TRUE_DATA_BUFFER).data();
             packet = form_2bytes_QBA(&tmp_data);
             packets.push_back(packet);
         }
-
-        last_send_file.lock();
         last_send_file_bytes = 0;
-        last_send_file.unlock();
-
-        send_U_Packet(Socket,"", 0, CLIENT_START_SEND_FILE,"");
-        for(int i = 0; i < packets.size(); i++)
-        {
+        send_U_Packet(0, CLIENT_START_SEND_FILE, "");
+        for(int i = 0; i < packets.size(); i++) {
             //qDebug() << "SEND BUFF " << packets.at(i).data() << endl;
-            send_U_Packet(Socket,"", 0, CLIENT_SENDING_FILE,QString::fromStdString(packets.at(i).toStdString()));
+            send_U_Packet(0, CLIENT_SENDING_FILE, packets.at(i));
         }
-        last_send_file.lock();
         last_send_file_bytes = File_byteArray.length();
-        last_send_file.unlock();
-
-        send_U_Packet(Socket,"", 0, CLIENT_FINISH_SEND_FILE, "");
-
+        send_U_Packet(0, CLIENT_FINISH_SEND_FILE, "");
         qDebug() << "BYTES SEND: " << File_byteArray.length();
         qDebug() << "HOPS_COUNT: " << packets.size() + 1;
     }
     return true;
 }
 
-void Send_Recieve_Module::close_connection()
-{
-    reset_ID();
-    closesocket(Socket);
-    WSACleanup();
-    emit logout_signal();
+void Send_Recieve_Module::set_disconnected() {
+    manual_disconnect = true;
+    close_connection();
+    manual_disconnect = false;
 }
 
-void Send_Recieve_Module::set_FPGA_id(QString FPGA_id)
-{
-    send_U_Packet(Socket,"", 0, SET_FPGA_ID, FPGA_id);
+void Send_Recieve_Module::set_FPGA_id(QString FPGA_id) {
+    send_U_Packet(0, SET_FPGA_ID, FPGA_id.toLatin1());
 }
 
 //-------------------PRIVATE----------------------------------------------------------------
-
-void Send_Recieve_Module::reset_ID()
-{
-    my_client_ID_mutex.lock();
-    my_client_ID = INIT_ID;  // При какиом-нибудь сбое сбрасываем ID в -1
-    my_client_ID_mutex.unlock();
+void Send_Recieve_Module::server_disconnected() {
+    if(!manual_disconnect) {
+        emit show_message_box_signal(tr("Error"), tr("Server disconnected"), 0);
+        close_connection();
+    }
 }
 
-int Send_Recieve_Module::establish_socket()
-{
-    WORD version;
-    WSADATA wsaData;
-    LPHOSTENT hostEntry;
-    SOCKET theSocket;
-    struct sockaddr_in serverInfo;
-
-    version = MAKEWORD(2, 2);
-    WSAStartup(version,(LPWSADATA)&wsaData);
-
-    const char *serv_ip = server_ip.toLatin1().data();
-    hostEntry = gethostbyname(serv_ip); // SERVER_IP
-
-    if(!hostEntry) {
-        //printf(">>> ERROR  (hostEntry NULL) ");  wprintf(L" ERROR  (hostEntry NULL): %ld\n", WSAGetLastError());
-        qDebug() << "ERROR  (hostEntry NULL) " <<  WSAGetLastError();
-        WSACleanup();
-        reset_ID(); // При какиом-нибудь сбое сбрасываем ID в -1
-        return CS_ERROR;
+void Send_Recieve_Module::close_connection() {
+    if(socket->isOpen()) {
+        reset_ID();
+        socket->close();
+        emit logout_signal();
     }
-
-    theSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); //  (SOCK_STREAM)IPPROTO_TCP SOCK_SEQPACKET
-
-    if((signed)theSocket == SOCKET_ERROR) {
-        //printf("ERROR  (can't create socket) ");  wprintf(L" ERROR  (can't create socket): %ld\n", WSAGetLastError());
-        qDebug() << "ERROR  (can't create socket)" << WSAGetLastError();
-        reset_ID(); // При какиом-нибудь сбое сбрасываем ID в -1
-        return CS_ERROR;
-    } else {
-        //printf(">>> Create socket \n");
-        qDebug() << ">>> Create socket";
-    }
-
-
-    serverInfo.sin_family = AF_INET;
-    serverInfo.sin_addr = *((LPIN_ADDR)*hostEntry->h_addr_list);
-    serverInfo.sin_port = htons(this->server_port); // SERVER_PORT
-    int result = ::connect(theSocket, (LPSOCKADDR)&serverInfo, sizeof(serverInfo));
-
-    if(result == SOCKET_ERROR) {
-        //printf("ERROR (can't connect to Server) "); wprintf(L" ERROR (can't connect to Server): %ld\n", WSAGetLastError());
-        qDebug() << "ERROR (can't connect to Server)";
-        reset_ID(); // При какиом-нибудь сбое сбрасываем ID в -1
-        return CS_ERROR;
-    } else {
-        //printf(">>> Connect to Server\n");
-        qDebug() << ">>> Connect to Server";
-    }
-
-    Socket = (*((int *)&theSocket));
-    Rcv_Socet = Socket;
-    //printf("~~~~NEW SOCKET: %i\n", Socket);
-    qDebug() << "~~~~NEW SOCKET: " << Socket;
-    return CS_OK;
 }
 
-void Send_Recieve_Module::send_U_Packet(int sock, QString ip, int id,int code_op, QString data)
-{
-    const char *send_ip;
+void Send_Recieve_Module::reset_ID() {
+    my_client_ID = INIT_ID;     // При какиом-нибудь сбое сбрасываем ID в -1
+}
 
-    if(ip.length() > 0)
-    {
-        send_ip = ip.toLatin1().data();
-    }
+bool Send_Recieve_Module::establish_socket() {
+    socket->connectToHost(server_ip, server_port, QIODevice::ReadWrite);
+    return socket->waitForConnected(-1);
+}
 
+void Send_Recieve_Module::send_U_Packet(int id,int code_op, QByteArray data) {
     struct U_packet *send_packet = (struct U_packet*)malloc(sizeof(struct U_packet));
-    memset(send_packet->data,0,DATA_BUFFER); // Для надежности заполним DATA_BUFFER байта send_packet->data значениями NULL
+    memset(send_packet->data, 0, DATA_BUFFER);    // Для надежности заполним DATA_BUFFER байта send_packet->data значениями NULL
     send_packet->code_op = code_op;
     send_packet->id = id;
-    if(data.length() > 0)
-    {
-        memcpy(send_packet->data,data.toLatin1().data(),data.count());
-        //printf("convert data: %s\n",send_packet->data);
+    if(data.length() > 0) {
+        memcpy(send_packet->data, data.data(), data.count());
         qDebug() << "convert data: " << send_packet->data;
     }
     char *send_buf = (char*)malloc(sizeof(struct U_packet));
-    memcpy(send_buf,send_packet,sizeof(struct U_packet));
-    send(sock, send_buf, sizeof(struct U_packet), 0);
-
+    memcpy(send_buf, send_packet, sizeof(struct U_packet));
+    socket->write(send_buf, sizeof(struct U_packet));
     free(send_packet);
     free(send_buf);
 }
 
-void Send_Recieve_Module::set_client_id(int id)
-{
-    my_client_ID_mutex.lock();
+void Send_Recieve_Module::set_client_id(int id) {
     my_client_ID = id;
-    my_client_ID_mutex.unlock();
 }
 
-QByteArray Send_Recieve_Module::form_2bytes_QBA(QByteArray *data)
-{
+QByteArray Send_Recieve_Module::form_2bytes_QBA(QByteArray *data) {
     QByteArray Result_byteArray;
     int size = data->size();
     char str[3];
@@ -323,7 +223,9 @@ QByteArray Send_Recieve_Module::form_2bytes_QBA(QByteArray *data)
     * char str[3] - 3, по тому, что в третьей ячейке будет находится \0
     */
     // FIXME: Определять размер и записывать его в один символ, как 1 байт.
-    if(size < 10){str[1] = 'e';}
+    if(size < 10) {
+        str[1] = 'e';
+    }
     //printf("pos1: %i, pos2: %i\n",str[0],str[1]);
     //printf("str: %s\n",str);
     Result_byteArray.append(str);

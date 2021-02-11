@@ -1,23 +1,7 @@
 #ifndef SEND_RECIEVE_MODULE_H
     #define SEND_RECIEVE_MODULE_H
 
-    #include <iostream>
-    #include <winsock.h>
-    #include <process.h>
-    #include <conio.h>
-    #include <stdio.h>
-    #include "tchar.h"
-    #include <fstream>
-    #include <cstddef>
-    #include "time.h"
-    #include <direct.h>
-
-    #include <thread>
-    #include <mutex>
-
-    #include <unistd.h>  //Для sleep
-    #include <signal.h>	// for SIGPIPE
-
+    #include <QTcpSocket>
     #include "general_widget.h"
 
     #define CS_ERROR 1
@@ -38,35 +22,33 @@
 
         public:
             Send_Recieve_Module(QString _server_ip, int _server_port, General_Widget *widg = nullptr);
+            ~Send_Recieve_Module() override;
             bool init_connection();
             int get_id_for_client();
             void wait_analize_recv_data();
-
             void ping_to_server();
             void ping_to_S_server();
             bool send_file_to_ss(QByteArray File_byteArray);
-            void close_connection();
+            void set_disconnected();
             void set_FPGA_id(QString FPGA_id);
 
         private:
+            void server_disconnected();
+            void close_connection();
             void reset_ID();
-            int establish_socket();
-            void send_U_Packet(int sock, QString ip, int id,int code_op, QString data);
-            void set_client_id(/*char *buf*/int id);
+            bool establish_socket();
+            void send_U_Packet(int id, int code_op, QByteArray data);
+            void set_client_id(int id);
             QByteArray form_2bytes_QBA(QByteArray *data);
 
             General_Widget *gen_widg = nullptr;
+            QTcpSocket *socket = nullptr;
             QString server_ip;
+
             int server_port;
-
-            int Socket = -1;
-            int Rcv_Socet = -1;
-
             int my_client_ID = -1; // INIT_ID
-            std::mutex my_client_ID_mutex;
-
             int last_send_file_bytes = 0;
-            std::mutex last_send_file;
+            bool manual_disconnect = false;
 
         signals:
             void logout_signal();
