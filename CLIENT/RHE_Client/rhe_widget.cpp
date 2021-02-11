@@ -55,10 +55,6 @@ void RHE_Widget::resizeEvent(QResizeEvent *) {
 }
 
 void RHE_Widget::on_pushButton_clicked() {
-//    QString str = ui->textEdit->toPlainText();
-//    if(str.length() != 0) {
-//        snd_rcv_module->send_data(new QByteArray(str.toLatin1()));
-//    }
     tmp_clr = !tmp_clr;
     showEvent(nullptr);
 }

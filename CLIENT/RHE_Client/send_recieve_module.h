@@ -23,6 +23,7 @@
         public:
             Send_Recieve_Module(QString _server_ip, int _server_port, General_Widget *widg = nullptr);
             ~Send_Recieve_Module() override;
+
             bool init_connection();
             int get_id_for_client();
             void wait_analize_recv_data();
@@ -46,14 +47,13 @@
 
             General_Widget *gen_widg = nullptr;
             QTcpSocket *socket = nullptr;
+            QFile *file = nullptr;
             QString server_ip;
 
             int file_rcv_bytes_count = 0;
-            FILE *fp;
-
-            int server_port;
-            int my_client_ID = -1; // INIT_ID
             int last_send_file_bytes = 0;
+            int my_client_ID = -1;          // INIT_ID
+            int server_port;
             bool manual_disconnect = false;
 
         signals:

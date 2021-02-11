@@ -27,12 +27,15 @@ Send_Recieve_Module::Send_Recieve_Module(QString _server_ip, int _server_port, G
     this->server_port = _server_port;
     gen_widg = widg;
     socket = new QTcpSocket(this);
+    file = new QFile(qApp->applicationDirPath() + "/DEBUG_from_s_server.txt");
     connect(socket, &QAbstractSocket::readyRead, this, &Send_Recieve_Module::wait_analize_recv_data);
     connect(socket, &QAbstractSocket::disconnected, this, &Send_Recieve_Module::server_disconnected);
+    connect(qApp, &QApplication::aboutToQuit, this, &Send_Recieve_Module::set_disconnected);
     connect(this, &Send_Recieve_Module::show_message_box_signal, gen_widg, &General_Widget::show_message_box);
 }
 
 Send_Recieve_Module::~Send_Recieve_Module() {
+    delete file;
     delete socket;
 }
 
@@ -54,22 +57,8 @@ int Send_Recieve_Module::get_id_for_client() {
 
 void Send_Recieve_Module::wait_analize_recv_data() {
     while(socket->bytesAvailable()) {
-        int bytes_read = 0;
         char recv_buf[RECIVE_BUFFER_SIZE];
-        bytes_read = socket->read(recv_buf, RECIVE_BUFFER_SIZE);
-        if(bytes_read < 1) {
-            if(bytes_read == 0) {
-                set_disconnected();
-                qDebug() << "LOST CONNECTION:     " << "Recive Error: " << socket->error();
-                emit show_message_box_signal(tr("Error"), QString::number(socket->error()), 0);
-                return;
-            } else if(bytes_read < 0) {
-                set_disconnected();
-                qDebug() << "LOST CONNECTION:     " << "Recive Error: " << socket->error();
-                emit show_message_box_signal(tr("Error"), QString::number(socket->error()), 0);
-                return;
-            }
-        }
+        socket->read(recv_buf, RECIVE_BUFFER_SIZE);
         U_packet *tmp_packet = (U_packet*)malloc(sizeof(U_packet));
 //        qDebug() << "~~~~~DEBUG: recive any data: \n";
         memcpy(tmp_packet,recv_buf, sizeof (U_packet));
@@ -109,23 +98,19 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 }
                 break;
             }
-            case S_SERVER_START_SEND_FILE:
-            {
-                if(start_recive_file()!= CS_ERROR)
-                {
+            case S_SERVER_START_SEND_FILE: {
+                if(start_recive_file() != CS_ERROR) {
                     qDebug() << "_________________________________Slave server START sending file";
                 }
                 break;
             }
-            case S_SERVER_SENDING_FILE:
-            {
+            case S_SERVER_SENDING_FILE: {
                 qDebug() << "data: " << QString(tmp_packet->data);
                 rcv_new_data_for_file(tmp_packet->data);
                 qDebug() << "_________________________________Slave server sending file";
                 break;
             }
-            case S_SERVER_FINISH_SEND_FILE:
-            {
+            case S_SERVER_FINISH_SEND_FILE: {
                 end_recive_file();
                 qDebug() << "_________________________________Slave server FINISH sending file";
                 break;
@@ -152,11 +137,8 @@ bool Send_Recieve_Module::send_file_to_ss(QByteArray File_byteArray) {
     if(hops < 1) {      // Если данные помещаются в одну посылку
         QByteArray Result_byteArray = form_2bytes_QBA(&File_byteArray);
         send_U_Packet(0, CLIENT_START_SEND_FILE, "");
-        //usleep(100000);
         send_U_Packet(0, CLIENT_SENDING_FILE, Result_byteArray);
-        //usleep(100000);
         send_U_Packet(0, CLIENT_FINISH_SEND_FILE, "");
-        //usleep(100000);
     } else {
         QVector<QByteArray> packets;
         QByteArray tmp_data;
@@ -262,34 +244,28 @@ QByteArray Send_Recieve_Module::form_2bytes_QBA(QByteArray *data) {
     return Result_byteArray;
 }
 
-int Send_Recieve_Module::start_recive_file()
-{
-    if ((fp=fopen("DEBUG_from_s_server.txt", "wb"))==NULL)
-    {
+int Send_Recieve_Module::start_recive_file() {
+    file->open(QFile::WriteOnly | QFile::Truncate);     //clear file
+    file->close();
+    if(!file->open(QIODevice::Append)) {
         return CS_ERROR;
     }
     file_rcv_bytes_count = 0;
     return CS_OK;
 }
 
-int Send_Recieve_Module::rcv_new_data_for_file(char *buf)
-{
+int Send_Recieve_Module::rcv_new_data_for_file(char *buf) {
     char tst[2];
     tst[0] = buf[0];
     tst[1] = buf[1];
-    //printf("[0][1] bytes: %s\n", tst);
     int size = atoi(tst);
-    //printf("size: %d\n", size);
     file_rcv_bytes_count += size;
-
-    fwrite(buf+2, sizeof(char), size, fp);
-
+    file->write(buf + 2);
     return CS_OK;
 }
 
-int Send_Recieve_Module::end_recive_file()
-{
-    fclose(fp);
-    qDebug() << "HBytes recive: " <<file_rcv_bytes_count;
+int Send_Recieve_Module::end_recive_file() {
+    file->close();
+    qDebug() << "HBytes recive: " << file_rcv_bytes_count;
     return CS_OK;
 }
