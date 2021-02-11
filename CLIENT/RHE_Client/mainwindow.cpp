@@ -102,7 +102,6 @@ void MainWindow::on_button_login_logout_clicked() {
 
 void MainWindow::on_button_register_clicked() {
     if(ptr_registration_widg->register_user()) {
-        ui->button_register->hide();
         on_button_login_logout_clicked();
     }
 }

@@ -3,7 +3,7 @@
 General_Widget::General_Widget() {
     files_list = new QStringList();
     QString path = qApp->applicationDirPath();
-    path.append("./settings.cfg");
+    path.append("/settings.cfg");
 #ifdef __linux__
     settings = new QSettings(path, QSettings::NativeFormat);
 #else
