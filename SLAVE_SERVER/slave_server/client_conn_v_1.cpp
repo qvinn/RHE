@@ -371,6 +371,8 @@ void client_conn_v_1::send_file_to_client(std::string filename)
 	
 	std::cout << "HOPS_COUNT: " << hops << "\n";
 	
+	file.close();
+	
 	delete[] file_buf;
 	delete[] part_of_file;
 }
