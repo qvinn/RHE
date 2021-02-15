@@ -42,6 +42,8 @@ void MainWindow::resizeEvent(QResizeEvent *) {
     menu_bar->setGeometry(0, 0, this->width(), (menu_file->height() - 11));     //11 - MAGIC NUMBER
     ui->horizontalLayoutWidget->setGeometry(0, (this->height() - ui->horizontalLayoutWidget->height()), this->width(), ui->horizontalLayoutWidget->height());
     ui->stackedWidget->setGeometry(0, menu_bar->height(), this->width(), (this->height() - ui->horizontalLayoutWidget->height() - menu_bar->height()));
+//    ptr_registration_widg->resizeEvent(nullptr);
+//    ptr_RHE_widg->resizeEvent(nullptr);
 }
 
 void MainWindow::onPshBttnExt() {

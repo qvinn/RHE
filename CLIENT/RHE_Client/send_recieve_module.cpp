@@ -199,6 +199,9 @@ void Send_Recieve_Module::reset_ID() {
 
 bool Send_Recieve_Module::establish_socket() {
     socket->connectToHost(server_ip, server_port, QIODevice::ReadWrite);
+    if(!socket->isOpen() || !socket->isValid()) {
+        return false;
+    }
     return socket->waitForConnected(-1);
 }
 

@@ -11,11 +11,17 @@ RHE_Widget::RHE_Widget(QWidget *parent, General_Widget *widg, Send_Recieve_Modul
     svf_file = new QFile();
     pixmp_names = new QList<QString>();
     jtag_id_codes = new QList<QString>();
+    led_colors = new QList<QString>();
+    led_x_y = new QList<QPoint>();
+    led_width_height = new QList<QPoint>();
     initialize_ui();
 }
 
 RHE_Widget::~RHE_Widget() {
     delete pixmp_names;
+    delete led_x_y;
+    delete led_width_height;
+    delete led_colors;
     delete jtag_id_codes;
     delete path_to_proj;
     delete prev_path_to_proj;
@@ -29,18 +35,23 @@ void RHE_Widget::showEvent(QShowEvent *) {
 }
 
 void RHE_Widget::paintEvent(QPaintEvent *) {
-    if(!pixmp_brd.isNull()) {
+    if(!pixmp_brd.isNull() && !clr_trnsprnt) {
         QPainter painter(&pixmp_brd);
-        QRect rectangle(58, 220, 11, 6);
+        QRect rectangle(led_x_y->at(ui->cmbBx_chs_brd->currentIndex()).x(), led_x_y->at(ui->cmbBx_chs_brd->currentIndex()).y(), led_width_height->at(ui->cmbBx_chs_brd->currentIndex()).x(), led_width_height->at(ui->cmbBx_chs_brd->currentIndex()).y());
         QColor clr;
-        if(!tmp_clr) {
-            clr = QColor(255, 40, 0, 255);
+        if(!board_is_on) {
+            clr.setNamedColor("#00DEFDEF"); //00-Alpha DE-Red FD-Green EF-Blue
         } else {
-            clr = QColor(100, 255, 0, 255);
+            clr.setNamedColor(led_colors->at(ui->cmbBx_chs_brd->currentIndex()));
         }
         painter.setPen(QPen(clr, 1, Qt::SolidLine));
         painter.setBrush(QBrush(clr));
-        painter.drawRect(rectangle);
+        if(clr.alpha() == 0) {
+            clr_trnsprnt = true;
+        } else {
+            clr_trnsprnt = false;
+            painter.drawRect(rectangle);
+        }
     }
 }
 
@@ -55,8 +66,14 @@ void RHE_Widget::resizeEvent(QResizeEvent *) {
 }
 
 void RHE_Widget::on_pushButton_clicked() {
-    tmp_clr = !tmp_clr;
-    showEvent(nullptr);
+    if((led_x_y->at(ui->cmbBx_chs_brd->currentIndex()).x() != -1) || (led_x_y->at(ui->cmbBx_chs_brd->currentIndex()).y() != -1) || (led_width_height->at(ui->cmbBx_chs_brd->currentIndex()).x() != -1) || (led_width_height->at(ui->cmbBx_chs_brd->currentIndex()).y() != -1) || (led_colors->at(ui->cmbBx_chs_brd->currentIndex()).count() == 9)) {
+        board_is_on = !board_is_on;
+        clr_trnsprnt = false;
+        showEvent(nullptr);
+        if(clr_trnsprnt) {
+            on_cmbBx_chs_brd_currentIndexChanged(ui->cmbBx_chs_brd->currentIndex());
+        }
+    }
 }
 
 void RHE_Widget::on_pushButton_2_clicked() {
@@ -163,6 +180,9 @@ void RHE_Widget::initialize_ui() {
         ui->cmbBx_chs_brd->addItem("");
         pixmp_names->append("");
         jtag_id_codes->append("");
+        led_x_y->append(QPoint(-1, -1));
+        led_width_height->append(QPoint(-1, -1));
+        led_colors->append("");
         if(read_xml_file(false)) {
             ui_initialized = true;
             ui->cmbBx_chs_brd->setCurrentIndex(gen_widg->get_setting("settings/CURRENT_BOARD").toInt());
@@ -357,6 +377,7 @@ bool RHE_Widget::read_xml_file(bool read_board_params, QString *cur_fpga, QList<
     }
     QXmlStreamReader xmlReader(&xml_file);
     bool read_board_data = false;
+    int cnt = 0;
     while(!xmlReader.atEnd() && !xmlReader.hasError()) {
         xmlReader.readNext();
         if(read_board_data) {
@@ -382,6 +403,7 @@ bool RHE_Widget::read_xml_file(bool read_board_params, QString *cur_fpga, QList<
                 }
             } else {
                 ui->cmbBx_chs_brd->addItem(xmlReader.attributes().value("name").toString());
+                cnt++;
             }
         } else if(!read_board_params && (xmlReader.name().toString().compare("fpga", Qt::CaseInsensitive) == 0) && (xmlReader.attributes().hasAttribute("jtag_id_code"))) {
             QString tmp_str(xmlReader.attributes().value("jtag_id_code").toString().replace(" ", ""));
@@ -395,11 +417,56 @@ bool RHE_Widget::read_xml_file(bool read_board_params, QString *cur_fpga, QList<
         } else if(!ui_initialized) {
             if((xmlReader.name().toString().compare("pic", Qt::CaseInsensitive) == 0) && (xmlReader.attributes().hasAttribute("name"))) {
                 pixmp_names->append(xmlReader.attributes().value("name").toString());
+            } else if(xmlReader.name().toString().compare("led", Qt::CaseInsensitive) == 0) {
+                if(xmlReader.attributes().hasAttribute("x_on_pic")) {
+                    add_data_to_qpoint(led_x_y, xmlReader.attributes().value("x_on_pic").toInt(), true);
+                }
+                if(xmlReader.attributes().hasAttribute("y_on_pic")) {
+                    add_data_to_qpoint(led_x_y, xmlReader.attributes().value("y_on_pic").toInt(), false);
+                }
+                if(xmlReader.attributes().hasAttribute("width")) {
+                    add_data_to_qpoint(led_width_height, xmlReader.attributes().value("width").toInt(), true);
+                }
+                if(xmlReader.attributes().hasAttribute("height")) {
+                    add_data_to_qpoint(led_width_height, xmlReader.attributes().value("height").toInt(), false);
+                }
+                if(xmlReader.attributes().hasAttribute("color")) {
+                    led_colors->append(xmlReader.attributes().value("color").toString());
+                }
+            }
+        } else if((xmlReader.name().toString().compare("board", Qt::CaseInsensitive) == 0) && (!xmlReader.attributes().hasAttribute("name"))) {
+            if(pixmp_names->count() < ui->cmbBx_chs_brd->count()) {
+                pixmp_names->append("");
+            }
+            if(led_x_y->count() < ui->cmbBx_chs_brd->count()) {
+                add_data_to_qpoint(led_x_y, -1, true);
+            }
+            if(led_width_height->count() < ui->cmbBx_chs_brd->count()) {
+                add_data_to_qpoint(led_width_height, -1, true);
+            }
+            if(led_colors->count() < ui->cmbBx_chs_brd->count()) {
+                led_colors->append("");
             }
         }
     }
     xml_file.close();
     return true;
+}
+
+void RHE_Widget::add_data_to_qpoint(QList<QPoint> *lst, int val, bool is_x) {
+    if(lst->count() != ui->cmbBx_chs_brd->count()) {
+        if(is_x) {
+            lst->append(QPoint(val, -1));
+        } else {
+            lst->append(QPoint(-1, val));
+        }
+    } else {
+        if(is_x) {
+            lst->replace((lst->count() - 1), QPoint(val, lst->last().y()));
+        } else {
+            lst->replace((lst->count() - 1), QPoint(lst->last().x(), val));
+        }
+    }
 }
 
 void RHE_Widget::slot_re_translate() {

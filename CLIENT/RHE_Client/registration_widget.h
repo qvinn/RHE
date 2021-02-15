@@ -32,7 +32,9 @@
             QString user_fname;
 
         public slots:
+            void resizeEvent(QResizeEvent *) override;
             void slot_re_translate();
+
     };
 
 #endif // REGISTRATION_H

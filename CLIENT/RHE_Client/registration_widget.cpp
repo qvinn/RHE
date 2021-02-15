@@ -15,6 +15,14 @@ RegistrationWidget::~RegistrationWidget() {
     delete ui;
 }
 
+void RegistrationWidget::resizeEvent(QResizeEvent *) {
+//    this->resize(dynamic_cast<QWidget*>(this->parent())->width(), dynamic_cast<QWidget*>(this->parent())->height());
+    ui->verticalLayoutWidget_3->setGeometry(0, 0, this->width(), this->height());
+    ui->horizontalLayoutWidget->setGeometry(ui->verticalLayoutWidget_3->x(), ui->verticalLayoutWidget_3->y(), ui->verticalLayoutWidget_3->width(), ui->verticalLayoutWidget_3->height());
+//    ui->verticalLayoutWidget_2->setGeometry((ui->verticalLayoutWidget_3->x() + ui->verticalLayoutWidget_3->contentsMargins().left()), (ui->verticalLayoutWidget_3->y() + ui->verticalLayoutWidget_3->contentsMargins().top()), (ui->verticalLayoutWidget_3->width() - ui->verticalLayoutWidget_3->contentsMargins().left() - ui->verticalLayoutWidget_3->contentsMargins().right()), (ui->verticalLayoutWidget_3->height() - ui->verticalLayoutWidget_3->contentsMargins().top() - ui->verticalLayoutWidget_3->contentsMargins().bottom()));
+//    ui->grpBx_rgstr->resize((ui->verticalLayout_1->geometry().width() - ui->verticalLayout_1->contentsMargins().left() - ui->verticalLayout_1->contentsMargins().right()), (ui->verticalLayout_1->geometry().height() - ui->verticalLayout_1->contentsMargins().top() - ui->verticalLayout_1->contentsMargins().bottom()));
+}
+
 bool RegistrationWidget::register_user() {
     if((ui->lineEdit_FName->text().length() != 0) && (ui->lineEdit_LName->text().length() != 0) && (ui->lineEdit_login->text().length() != 0) && (ui->lineEdit_password->text().length() != 0)) {
         QStringList lst = account_info->allKeys();

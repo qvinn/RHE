@@ -1,17 +1,20 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes" ?> 
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?> 
 <boards>
 	<board name = "OMDAZZ">
 		<fpga name = "EP4CE10E22C8" jtag_id_code = "0x020F10DD"></fpga>
 		<pin number = "23" direction = "input" io_standard = "2.5V"></pin>
 		<pin number = "25" direction = "input" io_standard = "2.5V"></pin>
 		<pic name = "omdazz.png"></pic>
+		<led x_on_pic = "58" y_on_pic = "220" width = "11" height = "6" color = "#FF64FF00"></led>
 	</board>
 	<board name = "Terasic DE0-Nano">
 		<fpga name = "EP4CE22F17C6" jtag_id_code = "0x020F30DD"></fpga>
 		<pic name = "de0-nano.png"></pic>
+		<led x_on_pic = "120" y_on_pic = "55" width = "12" height = "18" color = "#FF0F5CFF"></led>
 	</board>
 	<board name = "EP2C5 Mini Dev Board">
 		<fpga name = "EP2C5T144C8" jtag_id_code = "0x020B10DD"></fpga>
 		<pic name = "EP2C5_Mini_Dev_Board.png"></pic>
+		<led x_on_pic = "25" y_on_pic = "345" width = "11" height = "19" color = "#FFFF3232"></led>
 	</board>
 </boards>

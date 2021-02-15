@@ -37,8 +37,9 @@
         private:
             void set_ui_text();
             void check_is_proj_folder(bool folder_exist);
-            bool read_xml_file(bool type, QString *cur_fpga = nullptr, QList<QString> *pins_numb = nullptr, QList<QString> *pins_typ = nullptr, QList<QString> *pins_io_stndrt = nullptr);
             bool check_fpga_connections(QString path_to_fit_rprtr);
+            bool read_xml_file(bool type, QString *cur_fpga = nullptr, QList<QString> *pins_numb = nullptr, QList<QString> *pins_typ = nullptr, QList<QString> *pins_io_stndrt = nullptr);
+            void add_data_to_qpoint(QList<QPoint> *lst, int val, bool is_x);
 
             Ui::RHE_Widget *ui;
             General_Widget *gen_widg = nullptr;
@@ -48,6 +49,9 @@
             QFile *svf_file = nullptr;
             QList<QString> *pixmp_names = nullptr;
             QList<QString> *jtag_id_codes = nullptr;
+            QList<QString> *led_colors = nullptr;
+            QList<QPoint> *led_x_y = nullptr;
+            QList<QPoint> *led_width_height = nullptr;
             QString lname_fname;
             QPixmap pixmp_brd;
 
@@ -56,7 +60,8 @@
             bool path_exist = false;
             bool ui_initialized = false;
 
-            bool tmp_clr = false;
+            bool board_is_on = false;
+            bool clr_trnsprnt = true;
 
         public slots:
             void resizeEvent(QResizeEvent *) override;
