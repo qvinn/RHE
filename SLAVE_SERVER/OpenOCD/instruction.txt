@@ -13,7 +13,7 @@ sudo apt-get install libftdi-dev
 
 sudo apt-get install libusb-1.0
 
-./bootstrap #(x2)
+./bootstrap #(x2) (if ist's not work do: sudo apt-get install autotools-dev sudo apt-get install automake)
 
 ./configure --enable-usb-blaster --enable-remote-bitbang --disable-dependency-tracking (added flag --disable-dependency-tracking)
 
