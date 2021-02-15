@@ -10,6 +10,12 @@
     <height>600</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>538</width>
+    <height>296</height>
+   </size>
+  </property>
   <property name="palette">
    <palette>
     <active>

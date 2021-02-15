@@ -10,6 +10,12 @@
     <height>559</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>538</width>
+    <height>246</height>
+   </size>
+  </property>
   <property name="palette">
    <palette>
     <active>
@@ -248,7 +254,7 @@
      <x>0</x>
      <y>0</y>
      <width>861</width>
-     <height>561</height>
+     <height>241</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_1">
@@ -270,7 +276,7 @@
     <item>
      <widget class="QGroupBox" name="grpBx_rgstr">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -358,7 +364,7 @@
          <x>-1</x>
          <y>19</y>
          <width>821</width>
-         <height>501</height>
+         <height>181</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_1">
@@ -461,7 +467,7 @@
              <x>-1</x>
              <y>19</y>
              <width>381</width>
-             <height>451</height>
+             <height>131</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -475,7 +481,35 @@
              <number>20</number>
             </property>
             <item>
+             <spacer name="verticalSpacer_4">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>8</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
              <widget class="QLabel" name="label_login">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>170</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="font">
                <font>
                 <family>Tahoma</family>
@@ -491,6 +525,12 @@
             </item>
             <item>
              <widget class="QLineEdit" name="lineEdit_login">
+              <property name="minimumSize">
+               <size>
+                <width>170</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="palette">
                <palette>
                 <active>
@@ -610,6 +650,18 @@
             </item>
             <item>
              <widget class="QLabel" name="label_password">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>170</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="font">
                <font>
                 <family>Tahoma</family>
@@ -625,6 +677,12 @@
             </item>
             <item>
              <widget class="QLineEdit" name="lineEdit_password">
+              <property name="minimumSize">
+               <size>
+                <width>170</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="palette">
                <palette>
                 <active>
@@ -757,17 +815,17 @@
              </widget>
             </item>
             <item>
-             <spacer name="verticalSpacer">
+             <spacer name="verticalSpacer_6">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
               </property>
               <property name="sizeType">
-               <enum>QSizePolicy::Expanding</enum>
+               <enum>QSizePolicy::Fixed</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
                 <width>20</width>
-                <height>40</height>
+                <height>20</height>
                </size>
               </property>
              </spacer>
@@ -782,7 +840,7 @@
            <number>0</number>
           </property>
           <item>
-           <spacer name="verticalSpacer_3">
+           <spacer name="verticalSpacer_2">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
             </property>
@@ -799,6 +857,18 @@
           </item>
           <item>
            <widget class="QLabel" name="label_frst_name">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>170</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="font">
              <font>
               <family>Tahoma</family>
@@ -814,6 +884,12 @@
           </item>
           <item>
            <widget class="QLineEdit" name="lineEdit_FName">
+            <property name="minimumSize">
+             <size>
+              <width>170</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="palette">
              <palette>
               <active>
@@ -916,7 +992,7 @@
            </widget>
           </item>
           <item>
-           <spacer name="verticalSpacer_4">
+           <spacer name="verticalSpacer_3">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
             </property>
@@ -933,6 +1009,18 @@
           </item>
           <item>
            <widget class="QLabel" name="label_lst_name">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>170</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="font">
              <font>
               <family>Tahoma</family>
@@ -948,6 +1036,12 @@
           </item>
           <item>
            <widget class="QLineEdit" name="lineEdit_LName">
+            <property name="minimumSize">
+             <size>
+              <width>170</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="palette">
              <palette>
               <active>
@@ -1077,14 +1171,17 @@
            </widget>
           </item>
           <item>
-           <spacer name="verticalSpacer_2">
+           <spacer name="verticalSpacer_1">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
               <width>20</width>
-              <height>40</height>
+              <height>20</height>
              </size>
             </property>
            </spacer>

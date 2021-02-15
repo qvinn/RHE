@@ -15,12 +15,15 @@ RegistrationWidget::~RegistrationWidget() {
     delete ui;
 }
 
+void RegistrationWidget::showEvent(QShowEvent *) {
+    resizeEvent(nullptr);
+}
+
 void RegistrationWidget::resizeEvent(QResizeEvent *) {
-//    this->resize(dynamic_cast<QWidget*>(this->parent())->width(), dynamic_cast<QWidget*>(this->parent())->height());
-    ui->verticalLayoutWidget_3->setGeometry(0, 0, this->width(), this->height());
-    ui->horizontalLayoutWidget->setGeometry(ui->verticalLayoutWidget_3->x(), ui->verticalLayoutWidget_3->y(), ui->verticalLayoutWidget_3->width(), ui->verticalLayoutWidget_3->height());
-//    ui->verticalLayoutWidget_2->setGeometry((ui->verticalLayoutWidget_3->x() + ui->verticalLayoutWidget_3->contentsMargins().left()), (ui->verticalLayoutWidget_3->y() + ui->verticalLayoutWidget_3->contentsMargins().top()), (ui->verticalLayoutWidget_3->width() - ui->verticalLayoutWidget_3->contentsMargins().left() - ui->verticalLayoutWidget_3->contentsMargins().right()), (ui->verticalLayoutWidget_3->height() - ui->verticalLayoutWidget_3->contentsMargins().top() - ui->verticalLayoutWidget_3->contentsMargins().bottom()));
-//    ui->grpBx_rgstr->resize((ui->verticalLayout_1->geometry().width() - ui->verticalLayout_1->contentsMargins().left() - ui->verticalLayout_1->contentsMargins().right()), (ui->verticalLayout_1->geometry().height() - ui->verticalLayout_1->contentsMargins().top() - ui->verticalLayout_1->contentsMargins().bottom()));
+    ui->verticalLayoutWidget_3->setGeometry(0, 0, this->width(), ui->verticalLayoutWidget_3->height());
+    ui->horizontalLayoutWidget->setGeometry(ui->grpBx_rgstr->contentsRect().x(), ui->grpBx_rgstr->contentsRect().y(), ui->grpBx_rgstr->contentsRect().width(), ui->grpBx_rgstr->contentsRect().height());
+    ui->verticalLayoutWidget_2->setGeometry(ui->grpBx_lgn->contentsRect().x(), ui->grpBx_lgn->contentsRect().y(), ui->grpBx_lgn->contentsRect().width(), ui->grpBx_lgn->contentsRect().height());
+    ui->verticalSpacer_2->changeSize(ui->verticalSpacer_2->geometry().width(), (ui->grpBx_rgstr->contentsMargins().top() + ui->verticalSpacer_4->sizeHint().height()));
 }
 
 bool RegistrationWidget::register_user() {

@@ -64,12 +64,12 @@
             bool clr_trnsprnt = true;
 
         public slots:
-            void resizeEvent(QResizeEvent *) override;
             void slot_re_translate();
 
         private slots:
             void showEvent(QShowEvent *) override;
             void paintEvent(QPaintEvent *) override;
+            void resizeEvent(QResizeEvent *) override;
             void on_pushButton_clicked();
             void on_cmbBx_chs_brd_currentIndexChanged(int index);
             void on_pshBttn_set_path_to_proj_clicked();
