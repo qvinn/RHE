@@ -6,6 +6,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <iostream>			// for write to wile with c++
+#include <fstream>			// for write to wile with c++
 #include <vector>			// for vector
 #include <mutex>          	// std::mutex
 #include <thread>			// std::thread
@@ -119,6 +121,27 @@ std::mutex Chain_Pair_mutex;								// Мьютекс для доступа к �
 
 int main()
 {
+	// Проверим наличие .ini-файла
+	std::ifstream ini_file("server.ini");
+	if(!ini_file.good())
+	{
+		printf("Default server.ini was created\n");
+		std::ofstream server_ini_file ("server.ini");
+		if (server_ini_file.is_open())
+		{
+			server_ini_file << "# Server settings\n";
+			server_ini_file << "[start]\n";
+			server_ini_file << "server_listen_port = 3425;\n";		
+			server_ini_file << "total_clients = 4;\n";
+			server_ini_file << "total_slave_servers = 4;\n";
+			server_ini_file.close();
+		} else 
+		{
+			printf("Unable to open file\n");
+		}
+	}
+	// Проверим наличие .ini-файла - КОНЕЦ
+	
 	// Инициализируем настройки у slave-сервера
 	dictionary  *   ini ;
 	ini = iniparser_load("server.ini");
