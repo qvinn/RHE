@@ -41,7 +41,7 @@ MainWindow::~MainWindow() {
 void MainWindow::resizeEvent(QResizeEvent *) {
     ui->horizontalLayoutWidget->setGeometry(0, (this->height() - ui->horizontalLayoutWidget->height()), this->width(), ui->horizontalLayoutWidget->height());
     ui->verticalLayoutWidget->resize(this->width(), (this->height() - ui->horizontalLayoutWidget->height()));
-    ui->stackedWidget->setGeometry(0, menu_bar->height(), this->width(), (this->height() - ui->horizontalLayoutWidget->height() - menu_bar->height()));
+    ui->stackedWidget->setGeometry(0, (menu_bar->height() + ui->line_1->height()), this->width(), (ui->verticalLayoutWidget->height() - menu_bar->height() - (2 * ui->line_1->height())));
 }
 
 void MainWindow::onPshBttnExt() {
@@ -108,12 +108,15 @@ void MainWindow::on_button_register_clicked() {
 
 void MainWindow::initialize_ui() {
     menu_bar = new QMenuBar(this);
+    menu_bar->setStyleSheet("QMenuBar { background-color: #F5F5F5 } QMenuBar::item:selected { background: #9D9D90; } QMenuBar::item:pressed { background: #5D5D50; }" );
     ui->verticalLayout->insertWidget(0, menu_bar);
     menu_file = new QMenu(menu_bar);
+    menu_file->setStyleSheet("QMenu { background-color: #F5F5F5 } QMenu::item:selected { background: #9D9D90; }" );
     menu_bar->addMenu(menu_file);
     ext_actn = new QAction(menu_file);
     menu_file->addAction(ext_actn);
     menu_settngs = new QMenu(menu_bar);
+    menu_settngs->setStyleSheet("QMenu { background-color: #F5F5F5 } QMenu::item:selected { background: #9D9D90; }" );
     menu_bar->addMenu(menu_settngs);
     chkBx_fls_chckng_actn = new QAction(menu_settngs);
     chkBx_fls_chckng_actn->setCheckable(true);

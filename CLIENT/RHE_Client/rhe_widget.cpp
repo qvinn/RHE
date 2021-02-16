@@ -93,7 +93,7 @@ void RHE_Widget::on_cmbBx_chs_brd_currentIndexChanged(int index) {
             pixmp_brd.swap(tmp);
         } else {
             if(pixmp_brd.load(qApp->applicationDirPath() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString() + pixmp_names->at(index))){
-                paintEvent(nullptr);
+                showEvent(nullptr);
                 ui->label->setPixmap(pixmp_brd.scaled(ui->label->size(), Qt::KeepAspectRatio));
             }
         }
@@ -436,16 +436,24 @@ bool RHE_Widget::read_xml_file(bool read_board_params, QString *cur_fpga, QList<
             }
         } else if((xmlReader.name().toString().compare("board", Qt::CaseInsensitive) == 0) && (!xmlReader.attributes().hasAttribute("name"))) {
             if(pixmp_names->count() < ui->cmbBx_chs_brd->count()) {
-                pixmp_names->append("");
+                while(pixmp_names->count() != ui->cmbBx_chs_brd->count()) {
+                    pixmp_names->append("");
+                }
             }
             if(led_x_y->count() < ui->cmbBx_chs_brd->count()) {
-                add_data_to_qpoint(led_x_y, -1, true);
+                while(led_x_y->count() != ui->cmbBx_chs_brd->count()) {
+                    add_data_to_qpoint(led_x_y, -1, true);
+                }
             }
             if(led_width_height->count() < ui->cmbBx_chs_brd->count()) {
-                add_data_to_qpoint(led_width_height, -1, true);
+                while(led_width_height->count() != ui->cmbBx_chs_brd->count()) {
+                    add_data_to_qpoint(led_width_height, -1, true);
+                }
             }
             if(led_colors->count() < ui->cmbBx_chs_brd->count()) {
-                led_colors->append("");
+                while(led_colors->count() != ui->cmbBx_chs_brd->count()) {
+                    led_colors->append("");
+                }
             }
         }
     }
