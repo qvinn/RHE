@@ -39,8 +39,8 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::resizeEvent(QResizeEvent *) {
-    menu_bar->setGeometry(0, 0, this->width(), (menu_file->height() - 11));     //11 - MAGIC NUMBER
     ui->horizontalLayoutWidget->setGeometry(0, (this->height() - ui->horizontalLayoutWidget->height()), this->width(), ui->horizontalLayoutWidget->height());
+    ui->verticalLayoutWidget->resize(this->width(), (this->height() - ui->horizontalLayoutWidget->height()));
     ui->stackedWidget->setGeometry(0, menu_bar->height(), this->width(), (this->height() - ui->horizontalLayoutWidget->height() - menu_bar->height()));
 }
 
@@ -108,6 +108,7 @@ void MainWindow::on_button_register_clicked() {
 
 void MainWindow::initialize_ui() {
     menu_bar = new QMenuBar(this);
+    ui->verticalLayout->insertWidget(0, menu_bar);
     menu_file = new QMenu(menu_bar);
     menu_bar->addMenu(menu_file);
     ext_actn = new QAction(menu_file);

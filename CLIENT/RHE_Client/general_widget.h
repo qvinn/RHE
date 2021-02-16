@@ -10,7 +10,7 @@
     #include <QFileDialog>
     #include <QApplication>
 
-    class General_Widget : public QObject {
+    class General_Widget : public QWidget {
         Q_OBJECT
         public:
             General_Widget();

@@ -54,6 +54,7 @@ void General_Widget::create_base_settings() {
     check_setting_exist("settings/PATH_TO_DATA", "data/");
     check_setting_exist("settings/BOARDS_LIST_FILENAME", "Boards_List.xml");
     check_setting_exist("settings/SERVER_IP", "192.168.1.10");
+    check_setting_exist("settings/VERSION", "1.0");
 }
 
 void General_Widget::check_setting_exist(QString type, QVariant val) {
@@ -122,7 +123,7 @@ int General_Widget::show_message_box(QString str1, QString str2, int type) {
     if(str1.count() == 0) {
         msgBox.setWindowTitle(tr("Warning"));
     }
-    msgBox.setParent(nullptr);
+    msgBox.setParent(this);
     if(type == 1) {
         if(str1.count() == 0) {
             msgBox.setWindowTitle(tr("Question"));

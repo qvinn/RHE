@@ -59,7 +59,7 @@ void RHE_Widget::resizeEvent(QResizeEvent *) {
     ui->horizontalLayoutWidget->setGeometry(0, (this->height() - ui->horizontalLayoutWidget->height()), this->width(), ui->horizontalLayoutWidget->height());
     ui->widget->resize(this->width(), (this->height() - ui->horizontalLayoutWidget->height()));
     ui->horizontalLayoutWidget_2->setGeometry(0, 0, ui->widget->width(), ui->widget->height());
-    ui->verticalLayout_3->setGeometry(QRect(ui->textEdit->width(), 0, (ui->widget->width() - ui->textEdit->width()), ui->widget->height()));
+    ui->verticalLayout_3->setGeometry(QRect(ui->cmbBx_chs_brd->width(), 0, (ui->widget->width() - ui->cmbBx_chs_brd->width()), ui->widget->height()));
     if(!pixmp_brd.isNull()) {
         ui->label->setPixmap(pixmp_brd.scaled(ui->label->size(), Qt::KeepAspectRatio));
     }
@@ -370,7 +370,7 @@ bool RHE_Widget::check_fpga_connections(QString path_to_fit_rprtr) {
 
 bool RHE_Widget::read_xml_file(bool read_board_params, QString *cur_fpga, QList<QString> *pins_numb, QList<QString> *pins_typ, QList<QString> *pins_io_stndrd) {
     QString fl_lst_str = tr("file-list of boards and their parameters");
-    QFile xml_file(qApp->applicationDirPath() + "/" + gen_widg->get_setting("settings/BOARDS_LIST_FILENAME").toString());
+    QFile xml_file(qApp->applicationDirPath() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString() + gen_widg->get_setting("settings/BOARDS_LIST_FILENAME").toString());
     if(!xml_file.open(QFile::ReadOnly | QFile::Text)){
         gen_widg->show_message_box("", (tr("Cannot open ") + fl_lst_str), 0);
         return false;

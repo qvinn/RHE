@@ -59,7 +59,6 @@
             bool fit_exist = false;
             bool path_exist = false;
             bool ui_initialized = false;
-
             bool board_is_on = false;
             bool clr_trnsprnt = true;
 
