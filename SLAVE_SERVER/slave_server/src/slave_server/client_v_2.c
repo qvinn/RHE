@@ -11,6 +11,30 @@ int server_listen_port = 0;
 
 int main(int argc, char *argv[])
 {
+	#ifdef HW_EN
+		printf("RUN_CONFIGURATION: HARDWARE\n");
+	#endif
+	
+	// Проверим наличие .ini-файла
+	std::ifstream ini_file("slave_server.ini");
+	if(!ini_file.good())
+	{
+		printf("Default server.ini was created\n");
+		std::ofstream server_ini_file ("slave_server.ini");
+		if (server_ini_file.is_open())
+		{
+			server_ini_file << "# Slave-server settings\n";
+			server_ini_file << "[start]\n";
+			server_ini_file << "server_ip = \"192.168.1.3\"; ip of main server \n";		
+			server_ini_file << "server_listen_port = 3425; \n";
+			server_ini_file.close();
+		} else 
+		{
+			printf("Unable to open file\n");
+		}
+	}
+	// Проверим наличие .ini-файла - КОНЕЦ
+	
 	// Инициализируем настройки у slave-сервера
 	dictionary  *   ini ;
 	ini = iniparser_load("slave_server.ini");
