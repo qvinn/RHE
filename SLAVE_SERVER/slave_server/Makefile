@@ -21,7 +21,7 @@ slave_server_app:
 	
 gpio_tst:
 	mkdir -p $(BUILD_DIR_NAME)
-	$(CC) -Wall -o $(BUILD_DIR_NAME)/debug_manager ./src/Debug_manager/DEBUG_manager.cpp -lwiringPi -lpthread
+	$(CC) -Wall $(IFLAG) -o $(BUILD_DIR_NAME)/debug_manager ./src/Debug_module/debug_class.cpp ./src/Debug_manager/DEBUG_manager.cpp -lwiringPi -lpthread
 	
 clear:
 	rm -f *.o

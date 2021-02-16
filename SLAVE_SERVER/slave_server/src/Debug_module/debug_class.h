@@ -1,5 +1,6 @@
 #include <wiringPi.h>
 #include <vector>
+#include <stdio.h>
 
 // "debug_class.h"
 class Debug {
@@ -14,6 +15,7 @@ class Debug {
 		Debug();
 		void setup_pins(std::vector<int> par_number_of_pins, int par_duration_ms, int par_discrete_delay);
 		void start_debug();
+		void show_LOG();
 	
 	private:
 		void clear_pin_log();

@@ -30,7 +30,7 @@ void Debug::setup_pins(std::vector<int> par_number_of_pins, int par_duration_ms,
 	
 	for(int i=0; i < 16; i++)
 	{
-		pins.push_back(std::vector<pinState>);
+		pins.push_back(std::vector<pinState>());
 	}
 	
 	// Сконфигурируем пины
@@ -68,6 +68,18 @@ void Debug::start_debug()
 	delay(discrete_delay);
 	curr_time = curr_time+discrete_delay;
 	}
+}
+
+void Debug::show_LOG()
+{
+	for(int i=0; i < pins.size(); i++)
+	{
+		for(int k=0; k < pins.at(i).size(); k++)
+		{
+			printf("Pin width num: %i, at %i ms have state: %i\n",i, pins.at(i).at(k).time,pins.at(i).at(k).state);
+		}
+	}
+	
 }
 
 
