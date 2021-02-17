@@ -1,9 +1,6 @@
-QT += core gui network
+QT += core widgets gui network printsupport
 
-greaterThan(QT_MAJOR_VERSION, 4):QT += widgets
-
-CONFIG += c++11
-CONFIG += app
+CONFIG += app c++11
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
@@ -15,6 +12,7 @@ SOURCES += \
     general_widget.cpp \
     main.cpp \
     mainwindow.cpp \
+    qcustomplot.cpp \
     registration_widget.cpp \
     rhe_widget.cpp \
     send_recieve_module.cpp
@@ -27,6 +25,7 @@ FORMS += \
 HEADERS += \
     general_widget.h \
     mainwindow.h \
+    qcustomplot.h \
     registration_widget.h \
     rhe_widget.h \
     send_recieve_module.h
@@ -35,7 +34,7 @@ TRANSLATIONS += Language/RHE_Client_en.ts \
                 Language/RHE_Client_ua.ts \
                 Language/RHE_Client_ru.ts
 
-CODECFORSRC     = UTF-8
+CODECFORSRC = UTF-8
 
 RESOURCES += \
     RHE_Client_Languages.qrc

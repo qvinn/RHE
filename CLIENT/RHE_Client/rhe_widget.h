@@ -6,6 +6,7 @@
     #include <QDirIterator>
     #include <QResizeEvent>
     #include <QXmlStreamReader>
+    #include "qcustomplot.h"
     #include "general_widget.h"
     #include "send_recieve_module.h"
 
@@ -40,6 +41,8 @@
             bool check_fpga_connections(QString path_to_fit_rprtr);
             bool read_xml_file(bool type, QString *cur_fpga = nullptr, QList<QString> *pins_numb = nullptr, QList<QString> *pins_typ = nullptr, QList<QString> *pins_io_stndrt = nullptr);
             void add_data_to_qpoint(QList<QPoint> *lst, int val, bool is_x);
+            void add_data_to_graph(QList<int> val, double time);
+            void limitAxisRange(QCPAxis *axis, const QCPRange &newRange, const QCPRange &limitRange);
 
             Ui::RHE_Widget *ui;
             General_Widget *gen_widg = nullptr;
@@ -54,6 +57,9 @@
             QList<QPoint> *led_width_height = nullptr;
             QString lname_fname;
             QPixmap pixmp_brd;
+            QTimer *tmr = nullptr;
+            QList<QCPGraph *> *graph_list = nullptr;
+            QList<int> *prev_vals = nullptr;
 
             bool qpf_exist = false;
             bool fit_exist = false;
@@ -61,6 +67,11 @@
             bool ui_initialized = false;
             bool board_is_on = false;
             bool clr_trnsprnt = true;
+
+            int debug_pins_cnt = 16;
+            unsigned int cnt = -1;
+            double debug_time = 0.0;
+            double prev_debug_time = 0.0;
 
         public slots:
             void slot_re_translate();
@@ -70,13 +81,18 @@
             void paintEvent(QPaintEvent *) override;
             void resizeEvent(QResizeEvent *) override;
             void on_pushButton_clicked();
+            void on_pushButton_2_clicked();
+            void on_pushButton_3_clicked();
+            void on_pushButton_strt_drw_clicked();
+            void on_pushButton_stp_drw_clicked();
             void on_cmbBx_chs_brd_currentIndexChanged(int index);
             void on_pshBttn_set_path_to_proj_clicked();
             void on_pshBttn_snd_frmwr_clicked();
             void on_pshBttn_chk_prj_stat_clicked();
             void on_pshBttn_ld_frmwr_clicked();
-            void on_pushButton_2_clicked();
-            void on_pushButton_3_clicked();
+            void slot_xAxisChanged(const QCPRange &newRange);
+            void slot_yAxisChanged(const QCPRange &newRange);
+            void slot_Timer();
     };
 
 #endif // RHE_WIDGET_H

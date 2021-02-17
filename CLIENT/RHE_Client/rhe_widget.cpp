@@ -14,7 +14,15 @@ RHE_Widget::RHE_Widget(QWidget *parent, General_Widget *widg, Send_Recieve_Modul
     led_colors = new QList<QString>();
     led_x_y = new QList<QPoint>();
     led_width_height = new QList<QPoint>();
+    connect(ui->diagram->xAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(slot_xAxisChanged(QCPRange)));
+    connect(ui->diagram->yAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(slot_yAxisChanged(QCPRange)));
+    graph_list = new QList<QCPGraph *>();
+    prev_vals = new QList<int>();
     initialize_ui();
+    tmr = new QTimer(this);
+    tmr->setInterval(100);
+    connect(tmr, SIGNAL(timeout()), this, SLOT(slot_Timer()));
+    on_pushButton_stp_drw_clicked();
 }
 
 RHE_Widget::~RHE_Widget() {
@@ -26,6 +34,8 @@ RHE_Widget::~RHE_Widget() {
     delete path_to_proj;
     delete prev_path_to_proj;
     delete svf_file;
+    delete prev_vals;
+    delete graph_list;
     delete ui;
 }
 
@@ -82,6 +92,16 @@ void RHE_Widget::on_pushButton_2_clicked() {
 
 void RHE_Widget::on_pushButton_3_clicked() {
     snd_rcv_module->ping_to_S_server();
+}
+
+void RHE_Widget::on_pushButton_strt_drw_clicked() {
+    tmr->setInterval(100);
+    tmr->start();
+}
+
+
+void RHE_Widget::on_pushButton_stp_drw_clicked() {
+    tmr->stop();
 }
 
 void RHE_Widget::on_cmbBx_chs_brd_currentIndexChanged(int index) {
@@ -169,6 +189,21 @@ void RHE_Widget::pshBttn_snd_frmwr_set_enabled(bool flag) {
 }
 
 void RHE_Widget::initialize_ui() {
+    ui->diagram->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+    ui->diagram->yAxis->setTicks(false);
+    ui->diagram->xAxis->rescale();
+    ui->diagram->yAxis->rescale();
+    ui->diagram->yAxis->setRange(0, 30);
+    ui->diagram->xAxis->setRange(0, ui->diagram->xAxis->range().maxRange);
+    ui->diagram->replot();
+    ui->diagram->setProperty("xmin", ui->diagram->xAxis->range().minRange);
+    ui->diagram->setProperty("xmax", ui->diagram->xAxis->range().maxRange);
+    ui->diagram->setProperty("ymin", ui->diagram->yAxis->range().lower);
+    ui->diagram->setProperty("ymax", ui->diagram->yAxis->range().upper);
+    for(int i = 0; i < debug_pins_cnt; i++) {
+        graph_list->append(ui->diagram->addGraph());
+        prev_vals->append(0);
+    }
     path_to_proj->clear();
     QDir::setCurrent(qApp->applicationDirPath());
     pshBttn_snd_frmwr_set_enabled(false);
@@ -475,6 +510,66 @@ void RHE_Widget::add_data_to_qpoint(QList<QPoint> *lst, int val, bool is_x) {
             lst->replace((lst->count() - 1), QPoint(lst->last().x(), val));
         }
     }
+}
+
+void RHE_Widget::add_data_to_graph(QList<int> val, double time) {
+    for(int i = 0; i < graph_list->count(); i++) {
+        if(prev_vals->at(i) != val.at(i)) {
+           graph_list->at(i)->addData(prev_debug_time, (1 + (i * 2) + val.at(i)));
+        }
+        graph_list->at(i)->addData(time, (1 + (i * 2) + val.at(i)));
+        prev_vals->replace(i, val.at(i));
+    }
+    ui->diagram->replot();
+    prev_debug_time = time;
+}
+
+void RHE_Widget::limitAxisRange(QCPAxis *axis, const QCPRange &newRange, const QCPRange &limitRange) {
+    auto lowerBound = limitRange.lower;
+    auto upperBound = limitRange.upper;
+    QCPRange fixedRange(newRange);
+    if(fixedRange.lower < lowerBound) {     // code assumes upperBound > lowerBound
+        fixedRange.lower = lowerBound;
+        fixedRange.upper = lowerBound + newRange.size();
+        if((fixedRange.upper > upperBound) || (qFuzzyCompare(newRange.size(), upperBound-lowerBound))) {
+            fixedRange.upper = upperBound;
+        }
+        axis->setRange(fixedRange);         // adapt this line to use your plot/axis
+    } else if(fixedRange.upper > upperBound) {
+        fixedRange.upper = upperBound;
+        fixedRange.lower = upperBound - newRange.size();
+        if((fixedRange.lower < lowerBound) || (qFuzzyCompare(newRange.size(), upperBound-lowerBound))) {
+            fixedRange.lower = lowerBound;
+        }
+        axis->setRange(fixedRange);         // adapt this line to use your plot/axis
+    }
+}
+
+void RHE_Widget::slot_xAxisChanged(const QCPRange &newRange) {
+    QCPAxis *axis = qobject_cast<QCPAxis *>(QObject::sender());
+    QCustomPlot *plot = axis->parentPlot();
+    QCPRange limitRange(plot->property("xmin").toDouble(), plot->property("xmax").toDouble());
+    limitAxisRange(axis, newRange, limitRange);
+}
+
+void RHE_Widget::slot_yAxisChanged(const QCPRange &newRange) {
+    QCPAxis *axis = qobject_cast<QCPAxis *>(QObject::sender());
+    QCustomPlot *plot = axis->parentPlot();
+    QCPRange limitRange(plot->property("ymin").toDouble(), plot->property("ymax").toDouble());
+    limitAxisRange(axis, newRange, limitRange);
+}
+
+void RHE_Widget::slot_Timer() {
+    on_pushButton_stp_drw_clicked();
+    cnt++;
+    debug_time = (static_cast<double>(cnt) / 1.0);
+    QList<int> val;
+    val.clear();
+    for(int i = 0; i < graph_list->count(); i++) {
+        val.append(rand() % 2);
+    }
+    add_data_to_graph(val, debug_time);
+    on_pushButton_strt_drw_clicked();
 }
 
 void RHE_Widget::slot_re_translate() {
