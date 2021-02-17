@@ -48,6 +48,8 @@
 #define S_SERVER_START_SEND_FILE 25
 #define S_SERVER_SENDING_FILE 26
 #define S_SERVER_FINISH_SEND_FILE 27
+#define SUCCESS_CHANGE_FPGA 28
+#define NOT_SUCCESS_CHANGE_FPGA 29
 
 // Карта code_op - КОНЕЦ
 
@@ -109,6 +111,8 @@ void reset_Pair( int id);
 int find_pair_for(int id);
 
 std::string find_FPGA_ID_for(int id);
+
+int change_FPGA(int curr_client_id,std::string FPGA_id);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -293,7 +297,7 @@ void send_U_Packet(int sock, string ip, int id,int code_op, string data)
 	const char *send_ip;
 	struct U_packet *send_packet = (struct U_packet*)malloc(sizeof(struct U_packet));
 	memset(send_packet->data,0,DATA_BUFFER); // Для надежности заполним DATA_BUFFER байта send_packet->data значениями NULL
-
+	
 	if(ip.length() > 0)
 	{
 		send_ip = ip.c_str();
@@ -304,7 +308,7 @@ void send_U_Packet(int sock, string ip, int id,int code_op, string data)
 		memcpy(send_packet->data,data.c_str(),data.size());
 		//printf("convert data: %s\n",send_packet->data);
 	}
-		
+	
 	send_packet->code_op = code_op;
 	send_packet->id = id;
 	// FIXME: Добавить функцию формирования ip и data
@@ -495,13 +499,23 @@ void recive_new_data(char *buf, int sock)
 		case SET_FPGA_ID:
 		{
 			// Перенаправляем запрос от клиента к slave-серверу
-			int finded_s_server = find_pair_for(sock);
-			if(finded_s_server != ERROR)
-			{
+			/* int finded_s_server = find_pair_for(sock);
+				if(finded_s_server != ERROR)
+				{
 				//printf("data: %s\n",tmp_packet->data);
 				send_U_Packet(finded_s_server, std::string(), 0, SET_FPGA_ID, std::string(tmp_packet->data));
 				printf("\t|___Client with id %i SET_FPGA_ID to slave-server with id %i\n", sock, finded_s_server);
-			}			
+			} */
+			printf("Client with id: %i want change FPGA on device with id: %s\n",sock,tmp_packet->data);
+			if(change_FPGA(sock,std::string(tmp_packet->data)) == SUCCESS)
+			{
+				send_U_Packet(sock, std::string(), 0, SUCCESS_CHANGE_FPGA, std::string());
+				printf("Client SUCCESSFULLY change FPGA_ID\n");
+			} else 
+			{
+				send_U_Packet(sock, std::string(), 0, NOT_SUCCESS_CHANGE_FPGA, std::string());
+				printf("Client NOT SUCCESSFULLY change FPGA_ID\n");
+			}
 			break;	
 		}
 		
@@ -625,4 +639,44 @@ std::string find_FPGA_ID_for(int id)
 	}
 	Chain_Pair_mutex.unlock();
 	return std::string();	
+}
+
+int change_FPGA(int curr_client_id,std::string FPGA_id)
+{
+	Chain_Pair_mutex.lock();
+	
+	// Проверим на то, не хотим ли мы поменять FPGA_id на тот, который установлен сейчас
+	int finded_client = 0; // Сохраним на будущее finded_client, чтобы было потом быстрее определить Pairs.at(k)
+	for(int k = 0; k < Pairs.size(); k++)
+	{
+		if(Pairs.at(k).id_Cl == curr_client_id) // Найдем нашего клиента
+		{
+			if(Pairs.at(k).FPGA_id.compare(FPGA_id) == 0) // Его текущее FPGA_id совпало с тем, которое мы хотим получить
+			{
+				Chain_Pair_mutex.unlock();
+				return SUCCESS;
+			} else 
+			{
+				finded_client = k; // Сохраним это значение, оно нам пригодится
+			}
+		}
+	}
+	for(int i = 0; i < Pairs.size(); i++)
+	{
+		// Если обнаружен подходящий slave-сервер
+		if ((Pairs.at(i).id_SS != INIT_ID) && 
+			(Pairs.at(i).id_Cl == INIT_ID) && 
+		(Pairs.at(i).FPGA_id.compare(FPGA_id) == 0))
+		{
+			// Сначала обнулим состояние клиента на текущем slave-сервер
+			Pairs[finded_client].id_Cl = INIT_ID;
+			
+			// Теперь на этом найденном slave-сервере установим этого клиента
+			Pairs[i].id_Cl = curr_client_id;
+			Chain_Pair_mutex.unlock();
+			return SUCCESS;
+		}
+	}
+	Chain_Pair_mutex.unlock();
+	return ERROR;
 }

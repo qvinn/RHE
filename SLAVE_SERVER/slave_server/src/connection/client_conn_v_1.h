@@ -61,7 +61,7 @@ private:
 	int start_recive_file();
 	int rcv_new_data_for_file(char *buf);
 	int end_recive_file();
-	void set_FPGA_id(char *buf);
+	//void set_FPGA_id(char *buf);
 	void create_OpenOCD_cfg();
 	//void send_file_to_client(std:: string filename);
 	std::string form_2bytes_BA(std::string data);
@@ -76,7 +76,7 @@ private:
     int my_client_ID = INIT_ID;
     std::mutex my_client_ID_mutex;
 	
-	std::string curr_FPGA_id = "";
+	//std::string curr_FPGA_id = "";
 	
 	int file_rcv_bytes_count = 0;
 	
