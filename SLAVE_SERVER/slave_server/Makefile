@@ -1,14 +1,30 @@
-CC	= g++
+CC		= g++
 CFLAGS  += -g -std=c++11
-LFLAGS  += -L. -liniparser
-IFLAG	+= -I.
+LFLAGS  += -L./lib -liniparser -lpthread
+IFLAG	+= -I./src/Parser -I./src/connection -I./src/Debug_module
+FILES	+= ./src/slave_server/client_v_2.c ./src/connection/client_conn_v_1.cpp
 
-all: client_build_v2
+BUILD_DIR_NAME = ./build
+
+ifeq ($(HW_EN),YES)
+    DFLAGS	+= -DHW_EN
+	LFLAGS	+= -lwiringPi
+else
+endif
+
+all: slave_server_app
 	
-client_build_v2:
-	$(CC) $(CFLAGS) $(IFLAG) client_v_2.c client_conn_v_1.cpp -o slave_server -lpthread -fstack-protector $(LFLAGS)
+slave_server_app:
+	@echo HW_EN: $(HW_EN)
+	mkdir -p $(BUILD_DIR_NAME)
+	$(CC) $(CFLAGS) $(DFLAGS) $(IFLAG) $(FILES) -o $(BUILD_DIR_NAME)/slave_server $(LFLAGS) -fstack-protector 
+	
+gpio_tst:
+	mkdir -p $(BUILD_DIR_NAME)
+	$(CC) -Wall $(IFLAG) -o $(BUILD_DIR_NAME)/debug_manager ./src/Debug_module/debug_class.cpp ./src/Debug_manager/DEBUG_manager.cpp -lwiringPi -lpthread
+	
 clear:
 	rm -f *.o
 
 clear_all:
-	rm -f *.o client
+	rm -f *.o slave_server

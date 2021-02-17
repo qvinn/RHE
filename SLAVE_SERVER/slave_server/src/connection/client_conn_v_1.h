@@ -19,6 +19,10 @@
 #include <iostream> // for write to wile with c++
 #include <fstream>	// for write to wile with c++
 
+#ifdef HW_EN
+	#include "debug_class.h"
+#endif
+
 #define CS_ERROR 1
 #define CS_OK 0
 
