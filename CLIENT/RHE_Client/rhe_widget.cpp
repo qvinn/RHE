@@ -108,9 +108,7 @@ void RHE_Widget::on_pushButton_stp_drw_clicked() {
 void RHE_Widget::on_cmbBx_chs_brd_currentIndexChanged(int index) {
     if(ui_initialized && (index != -1)) {
         gen_widg->save_setting("settings/CURRENT_BOARD", index);
-        if(index != 0) {
-            snd_rcv_module->set_FPGA_id(jtag_id_codes->at(index));
-        }
+        snd_rcv_module->set_FPGA_id(jtag_id_codes->at(index));
         if(pixmp_names->at(index).count() == 0) {
             ui->label->clear();
             QPixmap tmp;
@@ -193,20 +191,27 @@ void RHE_Widget::pshBttn_snd_frmwr_set_enabled(bool flag) {
 
 void RHE_Widget::initialize_ui() {
     ui->diagram->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-    ui->diagram->yAxis->setTicks(false);
     ui->diagram->xAxis->rescale();
     ui->diagram->yAxis->rescale();
-    ui->diagram->yAxis->setRange(0, 30);
+    ui->diagram->yAxis->setRange(0, (debug_pins_cnt * 2));
     ui->diagram->xAxis->setRange(0, ui->diagram->xAxis->range().maxRange);
     ui->diagram->replot();
     ui->diagram->setProperty("xmin", ui->diagram->xAxis->range().minRange);
     ui->diagram->setProperty("xmax", ui->diagram->xAxis->range().maxRange);
     ui->diagram->setProperty("ymin", ui->diagram->yAxis->range().lower);
     ui->diagram->setProperty("ymax", ui->diagram->yAxis->range().upper);
+    ui->diagram->yAxis->setSubTicks(false);
+    QSharedPointer<QCPAxisTickerText> textTicker(new QCPAxisTickerText);
     for(int i = 0; i < debug_pins_cnt; i++) {
+        QString tmp = "pin ";
+        if((i + 1) < 10) {
+            tmp.append(QString::number(0));
+        }
         graph_list->append(ui->diagram->addGraph());
+        textTicker->addTick((i * 2 + 1), tmp.append(QString::number(i + 1)));
         prev_vals->append(0);
     }
+    ui->diagram->yAxis->setTicker(textTicker);
     path_to_proj->clear();
     QDir::setCurrent(qApp->applicationDirPath());
     pshBttn_snd_frmwr_set_enabled(false);
@@ -215,12 +220,6 @@ void RHE_Widget::initialize_ui() {
         pshBttn_ld_frmwr_set_enabled(false);
     }
     if(ui->cmbBx_chs_brd->count() == 0) {
-        ui->cmbBx_chs_brd->addItem("");
-        pixmp_names->append("");
-        jtag_id_codes->append("");
-        led_x_y->append(QPoint(-1, -1));
-        led_width_height->append(QPoint(-1, -1));
-        led_colors->append("");
         if(read_xml_file(false)) {
             ui_initialized = true;
             ui->cmbBx_chs_brd->setCurrentIndex(gen_widg->get_setting("settings/CURRENT_BOARD").toInt());
@@ -565,7 +564,7 @@ void RHE_Widget::slot_yAxisChanged(const QCPRange &newRange) {
 void RHE_Widget::slot_Timer() {
     on_pushButton_stp_drw_clicked();
     cnt++;
-    debug_time = (static_cast<double>(cnt) / 1.0);
+    debug_time = (static_cast<double>(cnt) / 100.0);
     QList<int> val;
     val.clear();
     for(int i = 0; i < graph_list->count(); i++) {
