@@ -67,6 +67,7 @@
             bool ui_initialized = false;
             bool board_is_on = false;
             bool clr_trnsprnt = true;
+            int prev_board_index;
 
             int debug_pins_cnt = 16;
             unsigned int cnt = -1;
@@ -74,7 +75,6 @@
             double prev_debug_time = 0.0;
 
         public slots:
-            void slot_choose_board(QString jtag_code);
             void slot_re_translate();
 
         private slots:
@@ -94,6 +94,8 @@
             void slot_xAxisChanged(const QCPRange &newRange);
             void slot_yAxisChanged(const QCPRange &newRange);
             void slot_Timer();
+            void slot_choose_board(QString jtag_code);
+            void slot_accept_board(bool flg);
     };
 
 #endif // RHE_WIDGET_H

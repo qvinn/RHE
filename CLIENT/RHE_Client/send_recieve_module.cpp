@@ -44,13 +44,13 @@ Send_Recieve_Module::~Send_Recieve_Module() {
 
 //-------------------PUBLIC----------------------------------------------------------------
 bool Send_Recieve_Module::init_connection() {
-    if(!establish_socket()) {
+    connected = establish_socket();
+    if(!connected) {
         qDebug() << "Error: " << socket->error();
         reset_ID();
         socket->close();
-        return false;
     }
-    return true;
+    return connected;
 }
 
 int Send_Recieve_Module::get_id_for_client() {
@@ -121,12 +121,13 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 break;
             }
             case SUCCESS_CHANGE_FPGA: {
-
+                emit accept_board_signal(true);
                 qDebug() << "_________________________________Client change FPGA Successfuly";
                 break;
             }
             case NOT_SUCCESS_CHANGE_FPGA: {
-
+                emit show_message_box_signal(tr("Error"), tr("Selected board not available"), 0);
+                emit accept_board_signal(false);
                 qDebug() << "_________________________________Client change FPGA NOT Successfuly";
                 break;
             }
@@ -202,6 +203,7 @@ void Send_Recieve_Module::server_disconnected() {
 void Send_Recieve_Module::close_connection() {
     if(socket->isOpen()) {
         reset_ID();
+        connected = false;
         socket->close();
         emit logout_signal();
     }
@@ -220,19 +222,21 @@ bool Send_Recieve_Module::establish_socket() {
 }
 
 void Send_Recieve_Module::send_U_Packet(int id,int code_op, QByteArray data) {
-    struct U_packet *send_packet = (struct U_packet*)malloc(sizeof(struct U_packet));
-    memset(send_packet->data, 0, DATA_BUFFER);    // Для надежности заполним DATA_BUFFER байта send_packet->data значениями NULL
-    send_packet->code_op = code_op;
-    send_packet->id = id;
-    if(data.length() > 0) {
-        memcpy(send_packet->data, data.data(), data.count());
-        qDebug() << "convert data: " << send_packet->data;
+    if(connected) {
+        struct U_packet *send_packet = (struct U_packet*)malloc(sizeof(struct U_packet));
+        memset(send_packet->data, 0, DATA_BUFFER);    // Для надежности заполним DATA_BUFFER байта send_packet->data значениями NULL
+        send_packet->code_op = code_op;
+        send_packet->id = id;
+        if(data.length() > 0) {
+            memcpy(send_packet->data, data.data(), data.count());
+            qDebug() << "convert data: " << send_packet->data;
+        }
+        char *send_buf = (char*)malloc(sizeof(struct U_packet));
+        memcpy(send_buf, send_packet, sizeof(struct U_packet));
+        socket->write(send_buf, sizeof(struct U_packet));
+        free(send_packet);
+        free(send_buf);
     }
-    char *send_buf = (char*)malloc(sizeof(struct U_packet));
-    memcpy(send_buf, send_packet, sizeof(struct U_packet));
-    socket->write(send_buf, sizeof(struct U_packet));
-    free(send_packet);
-    free(send_buf);
 }
 
 void Send_Recieve_Module::set_client_id(int id) {

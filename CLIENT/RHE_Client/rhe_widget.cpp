@@ -15,6 +15,7 @@ RHE_Widget::RHE_Widget(QWidget *parent, General_Widget *widg, Send_Recieve_Modul
     led_x_y = new QList<QPoint>();
     led_width_height = new QList<QPoint>();
     connect(snd_rcv_module, &Send_Recieve_Module::choose_board_signal, this, &RHE_Widget::slot_choose_board);
+    connect(snd_rcv_module, &Send_Recieve_Module::accept_board_signal, this, &RHE_Widget::slot_accept_board);
     connect(ui->diagram->xAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(slot_xAxisChanged(QCPRange)));
     connect(ui->diagram->yAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(slot_yAxisChanged(QCPRange)));
     graph_list = new QList<QCPGraph *>();
@@ -222,13 +223,15 @@ void RHE_Widget::initialize_ui() {
     if(ui->cmbBx_chs_brd->count() == 0) {
         if(read_xml_file(false)) {
             ui_initialized = true;
-            ui->cmbBx_chs_brd->setCurrentIndex(gen_widg->get_setting("settings/CURRENT_BOARD").toInt());
+            prev_board_index = gen_widg->get_setting("settings/CURRENT_BOARD").toInt();
+            ui->cmbBx_chs_brd->setCurrentIndex(prev_board_index);
         } else {
             QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
         }
     } else {
         ui_initialized = true;
-        ui->cmbBx_chs_brd->setCurrentIndex(gen_widg->get_setting("settings/CURRENT_BOARD").toInt());
+        prev_board_index = gen_widg->get_setting("settings/CURRENT_BOARD").toInt();
+        ui->cmbBx_chs_brd->setCurrentIndex(prev_board_index);
     }
 }
 
@@ -579,6 +582,14 @@ void RHE_Widget::slot_choose_board(QString jtag_code) {
         if(jtag_id_codes->at(i).compare(jtag_code, Qt::CaseInsensitive) == 0) {
             emit ui->cmbBx_chs_brd->setCurrentIndex(i);
         }
+    }
+}
+
+void RHE_Widget::slot_accept_board(bool flg) {
+    if(flg) {
+        prev_board_index = ui->cmbBx_chs_brd->currentIndex();
+    } else {
+        emit ui->cmbBx_chs_brd->setCurrentIndex(prev_board_index);
     }
 }
 

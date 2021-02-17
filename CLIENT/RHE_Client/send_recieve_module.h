@@ -55,10 +55,12 @@
             int my_client_ID = -1;          // INIT_ID
             int server_port;
             bool manual_disconnect = false;
+            bool connected = false;
 
         signals:
             void logout_signal();
             void choose_board_signal(QString jtag_code);
+            void accept_board_signal(bool flg);
             void show_message_box_signal(QString str1, QString str2, int type);
     };
 
