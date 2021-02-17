@@ -74,6 +74,7 @@
             double prev_debug_time = 0.0;
 
         public slots:
+            void slot_choose_board(QString jtag_code);
             void slot_re_translate();
 
         private slots:

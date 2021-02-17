@@ -58,6 +58,7 @@
 
         signals:
             void logout_signal();
+            void choose_board_signal(QString jtag_code);
             void show_message_box_signal(QString str1, QString str2, int type);
     };
 

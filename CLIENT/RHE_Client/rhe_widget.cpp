@@ -14,6 +14,7 @@ RHE_Widget::RHE_Widget(QWidget *parent, General_Widget *widg, Send_Recieve_Modul
     led_colors = new QList<QString>();
     led_x_y = new QList<QPoint>();
     led_width_height = new QList<QPoint>();
+    connect(snd_rcv_module, &Send_Recieve_Module::choose_board_signal, this, &RHE_Widget::slot_choose_board);
     connect(ui->diagram->xAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(slot_xAxisChanged(QCPRange)));
     connect(ui->diagram->yAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(slot_yAxisChanged(QCPRange)));
     graph_list = new QList<QCPGraph *>();
@@ -107,6 +108,9 @@ void RHE_Widget::on_pushButton_stp_drw_clicked() {
 void RHE_Widget::on_cmbBx_chs_brd_currentIndexChanged(int index) {
     if(ui_initialized && (index != -1)) {
         gen_widg->save_setting("settings/CURRENT_BOARD", index);
+        if(index != 0) {
+            snd_rcv_module->set_FPGA_id(jtag_id_codes->at(index));
+        }
         if(pixmp_names->at(index).count() == 0) {
             ui->label->clear();
             QPixmap tmp;
@@ -157,7 +161,6 @@ void RHE_Widget::on_pshBttn_snd_frmwr_clicked() {
         gen_widg->show_message_box("", tr("svf-file not generated"), 0);
         return;
     }
-    snd_rcv_module->set_FPGA_id(jtag_id_codes->at(ui->cmbBx_chs_brd->currentIndex()));
     if(svf_file->open(QIODevice::ReadOnly)) {
         snd_rcv_module->send_file_to_ss(svf_file->readAll());
         svf_file->close();
@@ -570,6 +573,14 @@ void RHE_Widget::slot_Timer() {
     }
     add_data_to_graph(val, debug_time);
     on_pushButton_strt_drw_clicked();
+}
+
+void RHE_Widget::slot_choose_board(QString jtag_code) {
+    for(int i = 0; i < jtag_id_codes->count(); i++) {
+        if(jtag_id_codes->at(i).compare(jtag_code, Qt::CaseInsensitive) == 0) {
+            emit ui->cmbBx_chs_brd->setCurrentIndex(i);
+        }
+    }
 }
 
 void RHE_Widget::slot_re_translate() {
