@@ -21,10 +21,11 @@
 
 //#include <iostream>
 
-client_conn_v_1::client_conn_v_1(std::string _server_ip, int _server_port)
+client_conn_v_1::client_conn_v_1(std::string _server_ip, int _server_port, std::string _FPGA_id)
 {
     this->server_ip = _server_ip;
     this->server_port = _server_port;
+	this->FPGA_id = _FPGA_id;
 }
 
 //-------------------PUBLIC----------------------------------------------------------------
@@ -46,7 +47,7 @@ bool client_conn_v_1::init_connection()
 
 int client_conn_v_1::get_id_for_client()
 {
-    char send_buf[sizeof (U_packet)];
+/*     char send_buf[sizeof (U_packet)];
     U_packet *tmp_packet = (U_packet*)malloc(sizeof(U_packet));
     my_client_ID_mutex.lock();
     tmp_packet->id = my_client_ID;
@@ -59,7 +60,11 @@ int client_conn_v_1::get_id_for_client()
     {
         //wprintf(L"Init Client Error: %ld\n", WSAGetLastError());
 	}
-    free(tmp_packet);
+    free(tmp_packet); */
+	
+	my_client_ID_mutex.lock();
+	send_U_Packet(Socket,std::string(), my_client_ID, SLAVE_SERVER_WANT_INIT_CONNECTION, this->FPGA_id);
+	my_client_ID_mutex.unlock();
 	
     return CS_OK;
 }
@@ -305,7 +310,7 @@ void client_conn_v_1::create_OpenOCD_cfg()
 	{
 		OOCD << "adapter driver usb_blaster\n";
 		OOCD << "usb_blaster_lowlevel_driver ftdi\n";
-		OOCD << "jtag newtap any_FPGA tap -expected-id "; OOCD << this->curr_FPGA_id; OOCD << " -irlen 10\n";		
+		OOCD << "jtag newtap any_FPGA tap -expected-id "; OOCD << this->FPGA_id; OOCD << " -irlen 10\n";		
 		OOCD << "init\n";
 		OOCD << "svf -tap any_FPGA.tap any_project.svf\n";
 		OOCD << "exit\n";

@@ -79,12 +79,12 @@ typedef struct client_description {
 // Структура для хранения
 typedef struct slave_server_description {
 	int id;
-	// Также можно добавить другие поля по необходимости
 } slave_server_description;
 
 
 typedef struct Chain_Pair {
 	int id_SS;		// (-1 | ID slave-сервер)
+	std::string FPGA_id;
 	int id_Cl;		// (-1 | ID клиента)
 } Chain_Pair;
 
@@ -96,7 +96,7 @@ void send_U_Packet(int sock, string ip, int id,int code_op, string data);
 // Метод, который вызывается, как отдельный поток - слушает конкретного клиента/slave-сервера
 int new_listen_thread(int sock);
 
-int check_avalible_Pair_place(int sock, int who); // 0 - slave-сервер | 1 - client
+int check_avalible_Pair_place(int sock, int who, std::string _FPGA_id); // 0 - slave-сервер | 1 - client
 
 // Универсальный метод для приема новых данных
 void recive_new_data(char *buf, int sock);
@@ -107,6 +107,8 @@ void recive_new_data(char *buf, int sock);
 void reset_Pair( int id);
 
 int find_pair_for(int id);
+
+std::string find_FPGA_ID_for(int id);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -179,7 +181,7 @@ int main()
 	Chain_Pair_mutex.lock();
 	for(int i=0; i<total_slave_servers; i++)
 	{
-		Pairs.push_back(Chain_Pair{INIT_ID,INIT_ID});
+		Pairs.push_back(Chain_Pair{INIT_ID,std::string(),INIT_ID});
 	}
 	Chain_Pair_mutex.unlock();
 	// Инициализация структур перед использованием - КОНЕЦ
@@ -235,6 +237,7 @@ int main()
 		
 		int id = tmp_packet->id;
 		int code_op = tmp_packet->code_op;
+		std::string data(tmp_packet->data);
 		free(tmp_packet);	
 		
 		if(id == -1)
@@ -243,11 +246,11 @@ int main()
 			инициализирован
 		*/
 		{
-			//int new_client_id = check_avalible_client_place(sock);
-			int new_client_id = check_avalible_Pair_place(sock,1);
+			int new_client_id = check_avalible_Pair_place(sock,1, std::string());
 			if(new_client_id != ERROR && code_op == CLIENT_WANT_INIT_CONNECTION)
 			{
-				send_U_Packet(sock, std::string(), new_client_id, CLIENT_WANT_INIT_CONNECTION, std::string());
+				std::string sent_fpga_id = find_FPGA_ID_for(new_client_id);
+				send_U_Packet(sock, std::string(), new_client_id, CLIENT_WANT_INIT_CONNECTION, sent_fpga_id);
 				std::thread client_rcv_loop(new_listen_thread, sock);
 				client_rcv_loop.detach();
 			} else // Если сервер не смог выделить ID для пользователя
@@ -262,7 +265,7 @@ int main()
 			инициализирован
 		*/
 		{
-			int new_slave_server_id = check_avalible_Pair_place(sock,0);
+			int new_slave_server_id = check_avalible_Pair_place(sock,0,data);
 			if(new_slave_server_id != ERROR && code_op == SLAVE_SERVER_WANT_INIT_CONNECTION)
 			{
 				send_U_Packet(sock, std::string(), new_slave_server_id, SLAVE_SERVER_WANT_INIT_CONNECTION, std::string());
@@ -312,8 +315,8 @@ void send_U_Packet(int sock, string ip, int id,int code_op, string data)
 	free(send_buf);	
 }
 
-int check_avalible_Pair_place(int sock, int who) // 0 - slave-сервер | 1 - client
-{
+int check_avalible_Pair_place(int sock, int who, std::string _FPGA_id) // 0 - slave-сервер | 1 - client
+{	
 	Chain_Pair_mutex.lock();
 	if(who == 0)
 	{
@@ -321,8 +324,9 @@ int check_avalible_Pair_place(int sock, int who) // 0 - slave-сервер | 1 -
 		{
 			if (Pairs.at(i).id_SS == INIT_ID)
 			{
-				printf("--->   Accept new slave_server with ID: %i\n",sock);
+				printf("--->   Accept new slave_server with ID: %i and FPGA_ID: %s\n",sock,_FPGA_id.c_str());
 				Pairs[i].id_SS = sock;
+				Pairs[i].FPGA_id = _FPGA_id;
 				Chain_Pair_mutex.unlock();
 				return sock;
 			}
@@ -598,4 +602,27 @@ int find_pair_for(int id)
 	}
 	Chain_Pair_mutex.unlock();
 	return ERROR;
+}
+
+std::string find_FPGA_ID_for(int id)
+{
+	Chain_Pair_mutex.lock();
+	std::string result;
+	for(int i=0; i<Pairs.size(); i++)
+	{
+		if(Pairs.at(i).id_Cl == id)
+		{
+			result = Pairs.at(i).FPGA_id;
+			Chain_Pair_mutex.unlock();
+			return result;
+		}
+		if(Pairs.at(i).id_SS == id)
+		{
+			result = Pairs.at(i).FPGA_id;
+			Chain_Pair_mutex.unlock();
+			return result;
+		}
+	}
+	Chain_Pair_mutex.unlock();
+	return std::string();	
 }

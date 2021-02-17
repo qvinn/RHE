@@ -43,11 +43,11 @@ class client_conn_v_1
     };
 
 public:
-    client_conn_v_1(std::string _server_ip, int _server_port);
+    client_conn_v_1(std::string _server_ip, int _server_port, std::string _FPGA_id);
     bool init_connection();
     int get_id_for_client();
     void wait_analize_recv_data();
-
+	
     void ping_to_server();
 	void answer_to_client();
 	void send_file_to_client(std::string filename);
@@ -66,8 +66,9 @@ private:
 	//void send_file_to_client(std:: string filename);
 	std::string form_2bytes_BA(std::string data);
 
-    std::string server_ip;
-    int server_port;
+    std::string server_ip = "";
+    int server_port = 0;
+	std::string FPGA_id = "";
 
     int Socket = -1;
     int Rcv_Socet = -1;

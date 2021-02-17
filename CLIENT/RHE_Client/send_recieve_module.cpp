@@ -67,6 +67,8 @@ void Send_Recieve_Module::wait_analize_recv_data() {
             case CLIENT_WANT_INIT_CONNECTION: {
                 set_client_id(tmp_packet->id);
                 qDebug() << "Server want give me ID: " << my_client_ID;
+                qDebug() << "Attach to FPGA with ID: " << tmp_packet->data;
+                // emit
                 break;
             }
             case PING_TO_SERVER: {
