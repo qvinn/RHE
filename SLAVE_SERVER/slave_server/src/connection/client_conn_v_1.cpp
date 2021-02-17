@@ -18,6 +18,8 @@
 #define S_SERVER_START_SEND_FILE 25
 #define S_SERVER_SENDING_FILE 26
 #define S_SERVER_FINISH_SEND_FILE 27
+#define SUCCESS_CHANGE_FPGA 28
+#define NOT_SUCCESS_CHANGE_FPGA 28
 
 //#include <iostream>
 
@@ -26,6 +28,8 @@ client_conn_v_1::client_conn_v_1(std::string _server_ip, int _server_port, std::
     this->server_ip = _server_ip;
     this->server_port = _server_port;
 	this->FPGA_id = _FPGA_id;
+	
+	create_OpenOCD_cfg();
 }
 
 //-------------------PUBLIC----------------------------------------------------------------
@@ -155,7 +159,7 @@ void client_conn_v_1::wait_analize_recv_data()
 				break;	
 			}
 			
-			case SET_FPGA_ID:
+			/* case SET_FPGA_ID:
 			{
 				//printf("data: %s\n",tmp_packet->data);
 				set_FPGA_id(tmp_packet->data);
@@ -163,7 +167,7 @@ void client_conn_v_1::wait_analize_recv_data()
 				create_OpenOCD_cfg();
 				printf("_________________________________new OpenOCD.cfg was created\n");
 				break;	
-			}
+			} */
 			
 			default:
 			{
@@ -296,15 +300,16 @@ int client_conn_v_1::end_recive_file()
 	return CS_OK;
 }
 
-void client_conn_v_1::set_FPGA_id(char *buf)
+/* void client_conn_v_1::set_FPGA_id(char *buf)
 {
 	//printf("recv FPGA_ID: %s\n",buf);
 	std::string tmp_str(buf);
 	this->curr_FPGA_id = tmp_str;
-}
+} */
 
 void client_conn_v_1::create_OpenOCD_cfg()
 {
+	printf("create OpenOCD_cfg file\n");
 	std::ofstream OOCD ("OpenOCD_run.cfg");
 	if (OOCD.is_open())
 	{

@@ -20,6 +20,8 @@
 #define S_SERVER_START_SEND_FILE 25
 #define S_SERVER_SENDING_FILE 26
 #define S_SERVER_FINISH_SEND_FILE 27
+#define SUCCESS_CHANGE_FPGA 28
+#define NOT_SUCCESS_CHANGE_FPGA 29
 
 
 Send_Recieve_Module::Send_Recieve_Module(QString _server_ip, int _server_port, General_Widget *widg) {
@@ -116,6 +118,16 @@ void Send_Recieve_Module::wait_analize_recv_data() {
             case S_SERVER_FINISH_SEND_FILE: {
                 end_recive_file();
                 qDebug() << "_________________________________Slave server FINISH sending file";
+                break;
+            }
+            case SUCCESS_CHANGE_FPGA: {
+
+                qDebug() << "_________________________________Client change FPGA Successfuly";
+                break;
+            }
+            case NOT_SUCCESS_CHANGE_FPGA: {
+
+                qDebug() << "_________________________________Client change FPGA NOT Successfuly";
                 break;
             }
             default: {
