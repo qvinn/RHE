@@ -20,7 +20,8 @@ SOURCES += \
 FORMS += \
     mainwindow.ui \
     registration_widget.ui \
-    rhe_widget.ui
+    rhe_widget.ui \
+    waveform_viewer.ui
 
 HEADERS += \
     general_widget.h \

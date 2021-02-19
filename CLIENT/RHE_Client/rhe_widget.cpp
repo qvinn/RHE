@@ -14,11 +14,10 @@ RHE_Widget::RHE_Widget(QWidget *parent, General_Widget *widg, Send_Recieve_Modul
     led_colors = new QList<QString>();
     led_x_y = new QList<QPoint>();
     led_width_height = new QList<QPoint>();
+    wvfrm_vwr = new Waveform_Viewer_Widget(this, gen_widg, false);
+    connect(wvfrm_vwr, &Waveform_Viewer_Widget::built_in_signal, this, &RHE_Widget::slot_built_in);
     connect(snd_rcv_module, &Send_Recieve_Module::choose_board_signal, this, &RHE_Widget::slot_choose_board);
     connect(snd_rcv_module, &Send_Recieve_Module::accept_board_signal, this, &RHE_Widget::slot_accept_board);
-    connect(ui->diagram->xAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(slot_xAxisChanged(QCPRange)));
-    connect(ui->diagram->yAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(slot_yAxisChanged(QCPRange)));
-    graph_list = new QList<QCPGraph *>();
     prev_vals = new QList<int>();
     initialize_ui();
     tmr = new QTimer(this);
@@ -36,8 +35,8 @@ RHE_Widget::~RHE_Widget() {
     delete path_to_proj;
     delete prev_path_to_proj;
     delete svf_file;
+    delete wvfrm_vwr;
     delete prev_vals;
-    delete graph_list;
     delete ui;
 }
 
@@ -97,6 +96,7 @@ void RHE_Widget::on_pushButton_3_clicked() {
 }
 
 void RHE_Widget::on_pushButton_strt_drw_clicked() {
+    wvfrm_vwr->pshBttn_open_save_wvfrm_set_enabled(false);
     tmr->setInterval(100);
     tmr->start();
 }
@@ -104,6 +104,7 @@ void RHE_Widget::on_pushButton_strt_drw_clicked() {
 
 void RHE_Widget::on_pushButton_stp_drw_clicked() {
     tmr->stop();
+    wvfrm_vwr->pshBttn_open_save_wvfrm_set_enabled(true);
 }
 
 void RHE_Widget::on_cmbBx_chs_brd_currentIndexChanged(int index) {
@@ -120,6 +121,26 @@ void RHE_Widget::on_cmbBx_chs_brd_currentIndexChanged(int index) {
                 ui->label->setPixmap(pixmp_brd.scaled(ui->label->size(), Qt::KeepAspectRatio));
             }
         }
+    }
+}
+
+void RHE_Widget::on_hrzntlSldr_cnt_dbg_pins_valueChanged(int value) {
+    if(ui_initialized) {
+        ui->lcdNmbr_cnt_dbg_pins->display(value);
+        gen_widg->save_setting("settings/DEBUG_PINS_NUMBER", value);
+        wvfrm_vwr->plot_re_scale = true;
+        cnt = 0;
+        prev_debug_time = 0;
+        prev_vals->clear();
+        for(int i = 0; i < value; i++) {
+            prev_vals->append(0);
+        }
+        wvfrm_vwr->remove_graphs_form_plot();
+        wvfrm_vwr->graph_count = value;
+        wvfrm_vwr->re_scale_graph();
+        wvfrm_vwr->add_graphs_to_plot();
+        wvfrm_vwr->plot_re_scale = false;
+        wvfrm_vwr->re_scale_graph();
     }
 }
 
@@ -191,28 +212,14 @@ void RHE_Widget::pshBttn_snd_frmwr_set_enabled(bool flag) {
 }
 
 void RHE_Widget::initialize_ui() {
-    ui->diagram->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-    ui->diagram->xAxis->rescale();
-    ui->diagram->yAxis->rescale();
-    ui->diagram->yAxis->setRange(0, (debug_pins_cnt * 2));
-    ui->diagram->xAxis->setRange(0, ui->diagram->xAxis->range().maxRange);
-    ui->diagram->replot();
-    ui->diagram->setProperty("xmin", ui->diagram->xAxis->range().minRange);
-    ui->diagram->setProperty("xmax", ui->diagram->xAxis->range().maxRange);
-    ui->diagram->setProperty("ymin", ui->diagram->yAxis->range().lower);
-    ui->diagram->setProperty("ymax", ui->diagram->yAxis->range().upper);
-    ui->diagram->yAxis->setSubTicks(false);
-    QSharedPointer<QCPAxisTickerText> textTicker(new QCPAxisTickerText);
-    for(int i = 0; i < debug_pins_cnt; i++) {
-        QString tmp = "pin ";
-        if((i + 1) < 10) {
-            tmp.append(QString::number(0));
-        }
-        graph_list->append(ui->diagram->addGraph());
-        textTicker->addTick((i * 2 + 1), tmp.append(QString::number(i + 1)));
+    ui->hrzntlSldr_cnt_dbg_pins->setValue(gen_widg->get_setting("settings/DEBUG_PINS_NUMBER").toInt());
+    ui->lcdNmbr_cnt_dbg_pins->display(ui->hrzntlSldr_cnt_dbg_pins->value());
+    wvfrm_vwr->graph_count = ui->hrzntlSldr_cnt_dbg_pins->value();
+    wvfrm_vwr->initialize_ui();
+    for(int i = 0; i < ui->hrzntlSldr_cnt_dbg_pins->value(); i++) {
         prev_vals->append(0);
     }
-    ui->diagram->yAxis->setTicker(textTicker);
+    ui->verticalLayout_3->addWidget(wvfrm_vwr);
     path_to_proj->clear();
     QDir::setCurrent(qApp->applicationDirPath());
     pshBttn_snd_frmwr_set_enabled(false);
@@ -517,63 +524,17 @@ void RHE_Widget::add_data_to_qpoint(QList<QPoint> *lst, int val, bool is_x) {
     }
 }
 
-void RHE_Widget::add_data_to_graph(QList<int> val, double time) {
-    for(int i = 0; i < graph_list->count(); i++) {
-        if(prev_vals->at(i) != val.at(i)) {
-           graph_list->at(i)->addData(prev_debug_time, (1 + (i * 2) + val.at(i)));
-        }
-        graph_list->at(i)->addData(time, (1 + (i * 2) + val.at(i)));
-        prev_vals->replace(i, val.at(i));
-    }
-    ui->diagram->replot();
-    prev_debug_time = time;
-}
-
-void RHE_Widget::limitAxisRange(QCPAxis *axis, const QCPRange &newRange, const QCPRange &limitRange) {
-    auto lowerBound = limitRange.lower;
-    auto upperBound = limitRange.upper;
-    QCPRange fixedRange(newRange);
-    if(fixedRange.lower < lowerBound) {     // code assumes upperBound > lowerBound
-        fixedRange.lower = lowerBound;
-        fixedRange.upper = lowerBound + newRange.size();
-        if((fixedRange.upper > upperBound) || (qFuzzyCompare(newRange.size(), upperBound-lowerBound))) {
-            fixedRange.upper = upperBound;
-        }
-        axis->setRange(fixedRange);         // adapt this line to use your plot/axis
-    } else if(fixedRange.upper > upperBound) {
-        fixedRange.upper = upperBound;
-        fixedRange.lower = upperBound - newRange.size();
-        if((fixedRange.lower < lowerBound) || (qFuzzyCompare(newRange.size(), upperBound-lowerBound))) {
-            fixedRange.lower = lowerBound;
-        }
-        axis->setRange(fixedRange);         // adapt this line to use your plot/axis
-    }
-}
-
-void RHE_Widget::slot_xAxisChanged(const QCPRange &newRange) {
-    QCPAxis *axis = qobject_cast<QCPAxis *>(QObject::sender());
-    QCustomPlot *plot = axis->parentPlot();
-    QCPRange limitRange(plot->property("xmin").toDouble(), plot->property("xmax").toDouble());
-    limitAxisRange(axis, newRange, limitRange);
-}
-
-void RHE_Widget::slot_yAxisChanged(const QCPRange &newRange) {
-    QCPAxis *axis = qobject_cast<QCPAxis *>(QObject::sender());
-    QCustomPlot *plot = axis->parentPlot();
-    QCPRange limitRange(plot->property("ymin").toDouble(), plot->property("ymax").toDouble());
-    limitAxisRange(axis, newRange, limitRange);
-}
-
 void RHE_Widget::slot_Timer() {
     on_pushButton_stp_drw_clicked();
     cnt++;
     debug_time = (static_cast<double>(cnt) / 100.0);
     QList<int> val;
     val.clear();
-    for(int i = 0; i < graph_list->count(); i++) {
+    for(int i = 0; i < ui->hrzntlSldr_cnt_dbg_pins->value(); i++) {
         val.append(rand() % 2);
     }
-    add_data_to_graph(val, debug_time);
+    wvfrm_vwr->add_data_to_graph_rltm(val, prev_vals, debug_time, prev_debug_time, true);
+    prev_debug_time = debug_time;
     on_pushButton_strt_drw_clicked();
 }
 
@@ -591,6 +552,10 @@ void RHE_Widget::slot_accept_board(bool flg) {
     } else {
         emit ui->cmbBx_chs_brd->setCurrentIndex(prev_board_index);
     }
+}
+
+void RHE_Widget::slot_built_in() {
+    ui->verticalLayout_3->addWidget(wvfrm_vwr);
 }
 
 void RHE_Widget::slot_re_translate() {

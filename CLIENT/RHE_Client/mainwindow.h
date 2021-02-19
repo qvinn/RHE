@@ -37,6 +37,7 @@
             QAction *chkBx_fls_chckng_actn = nullptr;
             QAction *chkBx_pins_chckng_actn = nullptr;
             QAction *chkBx_ld_mnl_frmwr_actn = nullptr;
+            QAction *wvfrm_vwr_actn = nullptr;
             QAction *ext_actn = nullptr;
             QMenu *menu_file = nullptr;
             QMenu *menu_settngs = nullptr;
@@ -52,6 +53,7 @@
             void resizeEvent(QResizeEvent *) override;
             void on_button_login_logout_clicked();
             void on_button_register_clicked();
+            void onPshBttnWvfrmVwr();
             void onPshBttnExt();
             void onChkBxFlsChckngStateChanged();
             void onChkBxPinsChckngStateChanged();

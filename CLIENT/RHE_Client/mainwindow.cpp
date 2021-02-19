@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 MainWindow::~MainWindow() {
     delete ptr_registration_widg;
     delete ptr_RHE_widg;
+    delete wvfrm_vwr_actn;
     delete ext_actn;
     delete chkBx_fls_chckng_actn;
     delete chkBx_pins_chckng_actn;
@@ -42,6 +43,13 @@ void MainWindow::resizeEvent(QResizeEvent *) {
     ui->horizontalLayoutWidget->setGeometry(0, (this->height() - ui->horizontalLayoutWidget->height()), this->width(), ui->horizontalLayoutWidget->height());
     ui->verticalLayoutWidget->resize(this->width(), (this->height() - ui->horizontalLayoutWidget->height()));
     ui->stackedWidget->setGeometry(0, (menu_bar->height() + ui->line_1->height()), this->width(), (ui->verticalLayoutWidget->height() - menu_bar->height() - (2 * ui->line_1->height())));
+}
+
+void MainWindow::onPshBttnWvfrmVwr() {
+    Waveform_Viewer_Widget *wvfrm_vwr = new Waveform_Viewer_Widget(nullptr, gen_widg, true);    
+    wvfrm_vwr->graph_count = 16;
+    wvfrm_vwr->initialize_ui();
+    wvfrm_vwr->show();
 }
 
 void MainWindow::onPshBttnExt() {
@@ -113,6 +121,9 @@ void MainWindow::initialize_ui() {
     menu_file = new QMenu(menu_bar);
     menu_file->setStyleSheet("QMenu { background-color: #F5F5F5 } QMenu::item:selected { background: #9D9D90; }" );
     menu_bar->addMenu(menu_file);
+    wvfrm_vwr_actn = new QAction(menu_file);
+    menu_file->addAction(wvfrm_vwr_actn);
+    menu_file->addSeparator();
     ext_actn = new QAction(menu_file);
     menu_file->addAction(ext_actn);
     menu_settngs = new QMenu(menu_bar);
@@ -127,10 +138,12 @@ void MainWindow::initialize_ui() {
     chkBx_ld_mnl_frmwr_actn = new QAction(menu_settngs);
     chkBx_ld_mnl_frmwr_actn->setCheckable(true);
     menu_settngs->addAction(chkBx_ld_mnl_frmwr_actn);
+    menu_settngs->addSeparator();
     cmbBx_lng_chs = new QComboBox(menu_settngs);
     cmbBx_lng_chs_actn = new QWidgetAction(menu_settngs);
     cmbBx_lng_chs_actn->setDefaultWidget(cmbBx_lng_chs);
     menu_settngs->addAction(cmbBx_lng_chs_actn);
+    connect(wvfrm_vwr_actn, &QAction::triggered, this, &MainWindow::onPshBttnWvfrmVwr);
     connect(ext_actn, &QAction::triggered, this, &MainWindow::onPshBttnExt);
     connect(chkBx_fls_chckng_actn, &QAction::changed, this, &MainWindow::onChkBxFlsChckngStateChanged);
     connect(chkBx_pins_chckng_actn, &QAction::changed, this, &MainWindow::onChkBxPinsChckngStateChanged);
@@ -142,6 +155,7 @@ void MainWindow::set_ui_text() {
     language_changed = false;
     menu_file->setTitle(tr("File"));
     menu_settngs->setTitle(tr("Settings"));
+    wvfrm_vwr_actn->setText(tr("Open waveform viewer"));
     ext_actn->setText(tr("Exit"));
     chkBx_fls_chckng_actn->setText(tr("Files checking"));
     chkBx_pins_chckng_actn->setText(tr("Pins checking"));
