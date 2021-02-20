@@ -107,12 +107,19 @@ QStringList* General_Widget::load_files(bool files, bool path, QString title, QS
 //    return file;
 //}
 
-void General_Widget::save_file(QWidget *widg, QString *data, QString *file_name, bool re_write, bool fl_nm_exist) {
+void General_Widget::save_file(QWidget *widg, QString title, QString filter, QString *data, QString *file_name, bool re_write, bool fl_nm_exist) {
     QString fileName;
     if(fl_nm_exist) {
         fileName.append(*file_name);
     } else {
-        fileName = QFileDialog::getSaveFileName(widg, tr("Saving waveform"), qApp->applicationDirPath(), tr("Waveform (*.wvfrm)"));
+        fileName = QFileDialog::getSaveFileName(widg, title, qApp->applicationDirPath(), filter);
+#ifdef __linux__
+        QStringList lst_1 = filter.split("*");
+        QStringList lst_2 = lst_1.at(lst_1.count() - 1).split(")");
+        if(!fileName.contains(lst_2.at(0))) {
+            fileName.append(lst_2.at(0));
+        }
+#endif
     }
     if(!fileName.isEmpty()) {
         QFile *file = new QFile(fileName);
@@ -232,9 +239,10 @@ void Waveform_Viewer_Widget::on_chckBx_as_wndw_stateChanged(int state) {
     if(state == 2) {
         this->setWindowFlags(Qt::Window | Qt::WindowMinMaxButtonsHint | Qt::WindowTitleHint);
         this->show();
+        emit as_window_signal(true);
     } else {
         this->setWindowFlags(flags);
-        emit built_in_signal();
+        emit as_window_signal(false);
     }
 }
 
@@ -261,7 +269,7 @@ void Waveform_Viewer_Widget::on_pshBttn_open_save_wvfrm_clicked() {
                         str.append("\n");
                     }
                 }
-                gen_widg->save_file(this, &str, &fn_nm, false, static_cast<bool>(i));
+                gen_widg->save_file(this, tr("Saving waveform"), tr("Waveform (*.wvfrm)"), &str, &fn_nm, false, static_cast<bool>(i));
             }
         }
     } else {

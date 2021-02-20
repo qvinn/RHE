@@ -14,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     initialize_ui();
     set_ui_text();
     load_settings();
+    connect(ptr_RHE_widg, &RHE_Widget::resize_signal, this, &MainWindow::slot_re_size);
     connect(gen_widg, &General_Widget::re_translate_signal, this, &MainWindow::slot_re_translate);
     connect(gen_widg, &General_Widget::re_translate_signal, ptr_registration_widg, &RegistrationWidget::slot_re_translate);
     connect(gen_widg, &General_Widget::re_translate_signal, ptr_RHE_widg, &RHE_Widget::slot_re_translate);
@@ -219,6 +220,12 @@ void MainWindow::logout() {
         ui->stackedWidget->setCurrentWidget(ptr_registration_widg);
         ptr_RHE_widg->initialize_ui();
     }
+}
+
+void MainWindow::slot_re_size() {
+    QSize cur_size = this->size();
+    this->resize(this->minimumSize());
+    this->resize(cur_size);
 }
 
 void MainWindow::slot_re_translate() {

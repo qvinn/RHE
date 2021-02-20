@@ -15,7 +15,7 @@ RHE_Widget::RHE_Widget(QWidget *parent, General_Widget *widg, Send_Recieve_Modul
     led_x_y = new QList<QPoint>();
     led_width_height = new QList<QPoint>();
     wvfrm_vwr = new Waveform_Viewer_Widget(this, gen_widg, false);
-    connect(wvfrm_vwr, &Waveform_Viewer_Widget::built_in_signal, this, &RHE_Widget::slot_built_in);
+    connect(wvfrm_vwr, &Waveform_Viewer_Widget::as_window_signal, this, &RHE_Widget::slot_as_window);
     connect(snd_rcv_module, &Send_Recieve_Module::choose_board_signal, this, &RHE_Widget::slot_choose_board);
     connect(snd_rcv_module, &Send_Recieve_Module::accept_board_signal, this, &RHE_Widget::slot_accept_board);
     prev_vals = new QList<int>();
@@ -554,8 +554,13 @@ void RHE_Widget::slot_accept_board(bool flg) {
     }
 }
 
-void RHE_Widget::slot_built_in() {
-    ui->verticalLayout_3->addWidget(wvfrm_vwr);
+void RHE_Widget::slot_as_window(bool as_window) {
+    if(!as_window) {
+        ui->verticalLayout_3->addWidget(wvfrm_vwr);
+    } else {
+        ui->verticalLayout_3->removeWidget(wvfrm_vwr);
+    }
+    emit resize_signal();
 }
 
 void RHE_Widget::slot_re_translate() {

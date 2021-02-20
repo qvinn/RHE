@@ -91,7 +91,10 @@
             void slot_Timer();
             void slot_choose_board(QString jtag_code);
             void slot_accept_board(bool flg);
-            void slot_built_in();
+            void slot_as_window(bool as_window);
+
+        signals:
+            void resize_signal();
     };
 
 #endif // RHE_WIDGET_H

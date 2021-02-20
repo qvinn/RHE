@@ -59,6 +59,7 @@
             void onChkBxPinsChckngStateChanged();
             void onChkBxLdMnlFrmwrStateChanged();
             void onCmbBxLngChsCurrentIndexChanged(int index);
+            void slot_re_size();
     };
 
 #endif // MAINWINDOW_H

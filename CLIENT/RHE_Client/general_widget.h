@@ -22,7 +22,7 @@
             void save_setting(QString type, QVariant val);
             QStringList* load_files(bool files, bool path, QString title, QString filter);
 //            QFile* load_file(QString title, QString filter);
-            void save_file(QWidget *widg = nullptr, QString *data = nullptr, QString *file_name = nullptr, bool re_write = false, bool fl_nm_exist = false);
+            void save_file(QWidget *widg = nullptr, QString title = "", QString filter = "",  QString *data = nullptr, QString *file_name = nullptr, bool re_write = false, bool fl_nm_exist = false);
             QString load_file_path(QString title, QString filter);
             int show_message_box(QString str1, QString str2, int type);
             void change_current_locale();
@@ -85,7 +85,7 @@
             void slot_yAxisChanged(const QCPRange &newRange);
 
         signals:
-            void built_in_signal();
+            void as_window_signal(bool as_window);
     };
 
 #endif // GENERAL_WIDGET_H
