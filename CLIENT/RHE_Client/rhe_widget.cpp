@@ -130,7 +130,6 @@ void RHE_Widget::on_hrzntlSldr_cnt_dbg_pins_valueChanged(int value) {
         gen_widg->save_setting("settings/DEBUG_PINS_NUMBER", value);
         wvfrm_vwr->plot_re_scale = true;
         cnt = 0;
-        prev_debug_time = 0;
         prev_vals->clear();
         for(int i = 0; i < value; i++) {
             prev_vals->append(0);
@@ -530,11 +529,14 @@ void RHE_Widget::slot_Timer() {
     debug_time = (static_cast<double>(cnt) / 100.0);
     QList<int> val;
     val.clear();
+    bool val_changed = false;
     for(int i = 0; i < ui->hrzntlSldr_cnt_dbg_pins->value(); i++) {
         val.append(rand() % 2);
+        if(prev_vals->at(i) != val.at(i)) {
+            val_changed = true;
+        }
     }
-    wvfrm_vwr->add_data_to_graph_rltm(val, prev_vals, debug_time, prev_debug_time, true);
-    prev_debug_time = debug_time;
+    wvfrm_vwr->add_data_to_graph_rltm(val, prev_vals, debug_time, val_changed, true);
     on_pushButton_strt_drw_clicked();
 }
 

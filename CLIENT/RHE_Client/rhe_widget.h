@@ -68,7 +68,6 @@
 
             long int cnt = -1;
             double debug_time = 0.0;
-            double prev_debug_time = 0.0;
 
         public slots:
             void slot_re_translate();
