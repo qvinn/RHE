@@ -58,8 +58,8 @@
             void add_graphs_to_plot();
             void remove_graphs_form_plot();
             void re_scale_graph();
-            void add_data_to_graph(QList<int> val, QList<int> *prev_vals, double time, bool val_changed, bool val_binary);
-            void add_data_to_graph_rltm(QList<int> val, QList<int> *prev_vals, double time, bool val_changed, bool val_binary);
+            void add_data_to_graph(QList<int> val, QList<int> *prev_vals, double time, bool val_changed);
+            void add_data_to_graph_rltm(QList<int> val, QList<int> *prev_vals, double time, bool val_changed);
 
             bool plot_re_scale = false;
             int graph_count;

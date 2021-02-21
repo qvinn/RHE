@@ -258,7 +258,7 @@ void Waveform_Viewer_Widget::on_pshBttn_open_save_wvfrm_clicked() {
                     if(k == 0) {
                         str.append(QString::number(ui->diagram->graph(k)->data()->at(i)->key) + "/");
                     }
-                    str.append(QString::number(ui->diagram->graph(k)->data()->at(i)->value));
+                    str.append(QString::number(ui->diagram->graph(k)->data()->at(i)->value - (k * 2) - 1));
                     if(k != (graph_count - 1)) {
                         str.append("/");
                     } else {
@@ -310,7 +310,7 @@ void Waveform_Viewer_Widget::on_pshBttn_open_save_wvfrm_clicked() {
                             vals.append(lst_dat.at(i).toInt());
                         }
                     }
-                    add_data_to_graph(vals, &prev_vals, debug_time, false, false);
+                    add_data_to_graph(vals, &prev_vals, debug_time, false);
                     vals.clear();
                 }
                 file->close();
@@ -389,25 +389,18 @@ void Waveform_Viewer_Widget::re_scale_graph() {
     ui->diagram->setProperty("ymax", ui->diagram->yAxis->range().upper);
 }
 
-void Waveform_Viewer_Widget::add_data_to_graph(QList<int> val, QList<int> *prev_vals, double time, bool val_changed, bool val_binary) {
+void Waveform_Viewer_Widget::add_data_to_graph(QList<int> val, QList<int> *prev_vals, double time, bool val_changed) {
     for(int i = 0; i < graph_list->count(); i++) {
-        if(val_binary) {
-            if(val_changed) {
-                graph_list->at(i)->addData(time, (1 + (i * 2) + prev_vals->at(i)));
-            }
-            graph_list->at(i)->addData(time, (1 + (i * 2) + val.at(i)));
-        } else {
-            if(val_changed) {
-                graph_list->at(i)->addData(time, prev_vals->at(i));
-            }
-            graph_list->at(i)->addData(time, val.at(i));
+        if(val_changed) {
+            graph_list->at(i)->addData(time, (1 + (i * 2) + prev_vals->at(i)));
         }
+        graph_list->at(i)->addData(time, (1 + (i * 2) + val.at(i)));
         prev_vals->replace(i, val.at(i));
     }
 }
 
-void Waveform_Viewer_Widget::add_data_to_graph_rltm(QList<int> val, QList<int> *prev_vals, double time, bool val_changed, bool val_binary) {
-    add_data_to_graph(val, prev_vals, time, val_changed, val_binary);
+void Waveform_Viewer_Widget::add_data_to_graph_rltm(QList<int> val, QList<int> *prev_vals, double time, bool val_changed) {
+    add_data_to_graph(val, prev_vals, time, val_changed);
     ui->diagram->replot();
 }
 

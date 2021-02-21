@@ -536,7 +536,7 @@ void RHE_Widget::slot_Timer() {
             val_changed = true;
         }
     }
-    wvfrm_vwr->add_data_to_graph_rltm(val, prev_vals, debug_time, val_changed, true);
+    wvfrm_vwr->add_data_to_graph_rltm(val, prev_vals, debug_time, val_changed);
     on_pushButton_strt_drw_clicked();
 }
 
