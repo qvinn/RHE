@@ -101,7 +101,6 @@ void RHE_Widget::on_pushButton_strt_drw_clicked() {
     tmr->start();
 }
 
-
 void RHE_Widget::on_pushButton_stp_drw_clicked() {
     tmr->stop();
     wvfrm_vwr->pshBttn_open_save_wvfrm_set_enabled(true);

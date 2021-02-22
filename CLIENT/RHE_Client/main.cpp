@@ -8,6 +8,9 @@ int main(int argc, char *argv[]) {
     paths.append("sqldrivers");
     QCoreApplication::setLibraryPaths(paths);
     QApplication a(argc, argv);
+#ifdef __linux__
+    a.setWindowIcon(QIcon(":/icons/1.png"));
+#endif
     a.setStyle("windowsvista");
     MainWindow Mw;
     Mw.show();

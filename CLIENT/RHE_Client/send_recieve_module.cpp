@@ -60,11 +60,12 @@ int Send_Recieve_Module::get_id_for_client() {
 
 void Send_Recieve_Module::wait_analize_recv_data() {
     while(socket->bytesAvailable()) {
-        char recv_buf[RECIVE_BUFFER_SIZE];
-        socket->read(recv_buf, RECIVE_BUFFER_SIZE);
-        U_packet *tmp_packet = (U_packet*)malloc(sizeof(U_packet));
-//        qDebug() << "~~~~~DEBUG: recive any data: \n";
-        memcpy(tmp_packet,recv_buf, sizeof (U_packet));
+        QByteArray recv = socket->read(RECIVE_BUFFER_SIZE);
+        U_packet *tmp_packet = reinterpret_cast<U_packet *>(recv.data());
+//        char recv_buf[RECIVE_BUFFER_SIZE];
+//        socket->read(recv_buf, RECIVE_BUFFER_SIZE);
+//        U_packet *tmp_packet = (U_packet*)malloc(sizeof(U_packet));
+//        memcpy(tmp_packet,recv_buf, sizeof (U_packet));
         switch(tmp_packet->code_op) {
             case CLIENT_WANT_INIT_CONNECTION: {
                 set_client_id(tmp_packet->id);
@@ -136,7 +137,7 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 break;
             }
         }
-        free(tmp_packet);
+//        free(tmp_packet);
     }
 }
 
@@ -223,7 +224,7 @@ bool Send_Recieve_Module::establish_socket() {
 
 void Send_Recieve_Module::send_U_Packet(int id,int code_op, QByteArray data) {
     if(connected) {
-        struct U_packet *send_packet = (struct U_packet*)malloc(sizeof(struct U_packet));
+        /*struct */U_packet *send_packet = (/*struct */U_packet*)malloc(sizeof(/*struct */U_packet));
         memset(send_packet->data, 0, DATA_BUFFER);    // Для надежности заполним DATA_BUFFER байта send_packet->data значениями NULL
         send_packet->code_op = code_op;
         send_packet->id = id;

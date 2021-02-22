@@ -37,8 +37,11 @@ TRANSLATIONS += Language/RHE_Client_en.ts \
 
 CODECFORSRC = UTF-8
 
+win32:RC_ICONS += icons/1.ico
+
 RESOURCES += \
-    RHE_Client_Languages.qrc
+    RHE_Client_Languages.qrc \
+    icons.qrc
 
 system(lrelease \"$$_PRO_FILE_\")
 tr.commands = lupdate \"$$_PRO_FILE_\" && lrelease \"$$_PRO_FILE_\"
