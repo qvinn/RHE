@@ -48,8 +48,10 @@ void MainWindow::resizeEvent(QResizeEvent *) {
 
 void MainWindow::onPshBttnWvfrmVwr() {
     Waveform_Viewer_Widget *wvfrm_vwr = new Waveform_Viewer_Widget(nullptr, gen_widg, true);    
-    wvfrm_vwr->graph_count = 16;
     wvfrm_vwr->initialize_ui();
+    wvfrm_vwr->graph_count = 16;
+    wvfrm_vwr->re_scale_graph();
+    wvfrm_vwr->add_graphs_to_plot();
     wvfrm_vwr->show();
 }
 

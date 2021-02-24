@@ -19,11 +19,10 @@ RHE_Widget::RHE_Widget(QWidget *parent, General_Widget *widg, Send_Recieve_Modul
     connect(snd_rcv_module, &Send_Recieve_Module::choose_board_signal, this, &RHE_Widget::slot_choose_board);
     connect(snd_rcv_module, &Send_Recieve_Module::accept_board_signal, this, &RHE_Widget::slot_accept_board);
     prev_vals = new QList<int>();
-    initialize_ui();
     tmr = new QTimer(this);
     tmr->setInterval(100);
-    connect(tmr, SIGNAL(timeout()), this, SLOT(slot_Timer()));
-    on_pushButton_stp_drw_clicked();
+    connect(tmr, &QTimer::timeout, this, &RHE_Widget::slot_timer_interrupt);
+    pre_initialize_ui();
 }
 
 RHE_Widget::~RHE_Widget() {
@@ -96,20 +95,32 @@ void RHE_Widget::on_pushButton_3_clicked() {
 }
 
 void RHE_Widget::on_pushButton_strt_drw_clicked() {
-    wvfrm_vwr->pshBttn_open_save_wvfrm_set_enabled(false);
-    tmr->setInterval(100);
-    tmr->start();
+    if(tmr->isActive()) {
+        pause_timer();
+    } else {
+        if(cnt == -1) {
+            wvfrm_vwr->remove_data_from_graph();
+        }
+        wvfrm_vwr->pshBttn_open_save_wvfrm_set_enabled(false);
+        tmr->setInterval(100);
+        tmr->start();
+    }
 }
 
 void RHE_Widget::on_pushButton_stp_drw_clicked() {
-    tmr->stop();
-    wvfrm_vwr->pshBttn_open_save_wvfrm_set_enabled(true);
+    pause_timer();
+    cnt = -1;
+    debug_time = 0.0;
 }
 
 void RHE_Widget::on_cmbBx_chs_brd_currentIndexChanged(int index) {
     if(ui_initialized && (index != -1)) {
         gen_widg->save_setting("settings/CURRENT_BOARD", index);
         snd_rcv_module->set_FPGA_id(jtag_id_codes->at(index));
+        pshBttn_snd_frmwr_set_enabled(false);
+        if(gen_widg->get_setting("settings/MANUALY_LOAD_FIRMWARE").toBool() && gen_widg->get_setting("settings/ENABLE_FILE_CHEKING").toBool()) {
+            pshBttn_ld_frmwr_set_enabled(false);
+        }
         if(pixmp_names->at(index).count() == 0) {
             ui->label->clear();
             QPixmap tmp;
@@ -209,15 +220,14 @@ void RHE_Widget::pshBttn_snd_frmwr_set_enabled(bool flag) {
     ui->pshBttn_snd_frmwr->setEnabled(flag);
 }
 
-void RHE_Widget::initialize_ui() {
-    ui->hrzntlSldr_cnt_dbg_pins->setValue(gen_widg->get_setting("settings/DEBUG_PINS_NUMBER").toInt());
-    ui->lcdNmbr_cnt_dbg_pins->display(ui->hrzntlSldr_cnt_dbg_pins->value());
-    wvfrm_vwr->graph_count = ui->hrzntlSldr_cnt_dbg_pins->value();
+void RHE_Widget::pre_initialize_ui() {
     wvfrm_vwr->initialize_ui();
-    for(int i = 0; i < ui->hrzntlSldr_cnt_dbg_pins->value(); i++) {
-        prev_vals->append(0);
-    }
     ui->verticalLayout_3->addWidget(wvfrm_vwr);
+    initialize_ui();
+}
+
+void RHE_Widget::initialize_ui() {
+    on_pushButton_stp_drw_clicked();
     path_to_proj->clear();
     QDir::setCurrent(qApp->applicationDirPath());
     pshBttn_snd_frmwr_set_enabled(false);
@@ -227,17 +237,20 @@ void RHE_Widget::initialize_ui() {
     }
     if(ui->cmbBx_chs_brd->count() == 0) {
         if(read_xml_file(false)) {
-            ui_initialized = true;
-            prev_board_index = gen_widg->get_setting("settings/CURRENT_BOARD").toInt();
-            ui->cmbBx_chs_brd->setCurrentIndex(prev_board_index);
+            post_initialize_ui();
         } else {
             QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
         }
     } else {
-        ui_initialized = true;
-        prev_board_index = gen_widg->get_setting("settings/CURRENT_BOARD").toInt();
-        ui->cmbBx_chs_brd->setCurrentIndex(prev_board_index);
+        post_initialize_ui();
     }
+}
+
+void RHE_Widget::post_initialize_ui() {
+    ui_initialized = true;
+    prev_board_index = gen_widg->get_setting("settings/CURRENT_BOARD").toInt();
+    ui->cmbBx_chs_brd->setCurrentIndex(prev_board_index);
+    ui->hrzntlSldr_cnt_dbg_pins->setValue(gen_widg->get_setting("settings/DEBUG_PINS_NUMBER").toInt());
 }
 
 void RHE_Widget::set_ui_text() {
@@ -522,8 +535,13 @@ void RHE_Widget::add_data_to_qpoint(QList<QPoint> *lst, int val, bool is_x) {
     }
 }
 
-void RHE_Widget::slot_Timer() {
-    on_pushButton_stp_drw_clicked();
+void RHE_Widget::pause_timer() {
+    tmr->stop();
+    wvfrm_vwr->pshBttn_open_save_wvfrm_set_enabled(true);
+}
+
+void RHE_Widget::slot_timer_interrupt() {
+    on_pushButton_strt_drw_clicked();
     cnt++;
     debug_time = (static_cast<double>(cnt) / 100.0);
     QList<int> val;

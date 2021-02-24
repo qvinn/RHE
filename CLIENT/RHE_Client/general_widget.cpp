@@ -235,6 +235,10 @@ void Waveform_Viewer_Widget::on_pshBttn_fl_scl_clicked() {
     re_scale_graph();
 }
 
+void Waveform_Viewer_Widget::on_pshBttn_clr_clicked() {
+    remove_data_from_graph();
+}
+
 void Waveform_Viewer_Widget::on_chckBx_as_wndw_stateChanged(int state) {
     if(state == 2) {
         this->setWindowFlags(Qt::Window | Qt::WindowMinMaxButtonsHint | Qt::WindowTitleHint);
@@ -349,8 +353,6 @@ void Waveform_Viewer_Widget::initialize_ui() {
     ui->diagram->axisRect()->setBackground(axisRectGradient);
     ui->diagram->xAxis->setSubTicks(false);
     ui->diagram->yAxis->setSubTicks(false);
-    re_scale_graph();
-    add_graphs_to_plot();
 }
 
 void Waveform_Viewer_Widget::add_graphs_to_plot() {
@@ -364,6 +366,7 @@ void Waveform_Viewer_Widget::add_graphs_to_plot() {
         (*textTicker)->addTick((i * 2 + 1), tmp.append(QString::number(i + 1)));
     }
     ui->diagram->yAxis->setTicker(*textTicker);
+    on_pshBttn_clr_clicked();
 }
 
 void Waveform_Viewer_Widget::remove_graphs_form_plot() {
@@ -402,6 +405,14 @@ void Waveform_Viewer_Widget::add_data_to_graph(QList<int> val, QList<int> *prev_
 void Waveform_Viewer_Widget::add_data_to_graph_rltm(QList<int> val, QList<int> *prev_vals, double time, bool val_changed) {
     add_data_to_graph(val, prev_vals, time, val_changed);
     ui->diagram->replot();
+}
+
+void Waveform_Viewer_Widget::remove_data_from_graph() {
+    for(int i = 0; i < graph_count; i++) {
+        graph_list->at(i)->data().data()->clear();
+        graph_list->at(i)->data().clear();
+    }
+    re_scale_graph();
 }
 
 void Waveform_Viewer_Widget::limitAxisRange(QCPAxis *axis, const QCPRange &newRange, const QCPRange &limitRange) {

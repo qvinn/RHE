@@ -1355,7 +1355,7 @@ QPushButton:hover{
           <widget class="QPushButton" name="pushButton_strt_drw">
            <property name="minimumSize">
             <size>
-             <width>90</width>
+             <width>135</width>
              <height>25</height>
             </size>
            </property>
@@ -1623,7 +1623,7 @@ QPushButton:hover{
 }</string>
            </property>
            <property name="text">
-            <string>Start Draw</string>
+            <string>Start/Pause Draw</string>
            </property>
            <property name="autoDefault">
             <bool>false</bool>

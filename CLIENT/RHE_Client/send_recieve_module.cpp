@@ -232,11 +232,12 @@ void Send_Recieve_Module::send_U_Packet(int id,int code_op, QByteArray data) {
             memcpy(send_packet->data, data.data(), data.count());
             qDebug() << "convert data: " << send_packet->data;
         }
-        char *send_buf = (char*)malloc(sizeof(struct U_packet));
-        memcpy(send_buf, send_packet, sizeof(struct U_packet));
-        socket->write(send_buf, sizeof(struct U_packet));
+//        char *send_buf = (char*)malloc(sizeof(/*struct */U_packet));
+//        memcpy(send_buf, send_packet, sizeof(/*struct */U_packet));
+        QByteArray send_buf = QByteArray::fromRawData(reinterpret_cast<const char*>(send_packet), sizeof(U_packet));
+        socket->write(send_buf.data(), sizeof(/*struct */U_packet));
         free(send_packet);
-        free(send_buf);
+//        free(send_buf);
     }
 }
 

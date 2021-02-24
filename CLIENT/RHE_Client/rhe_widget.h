@@ -35,11 +35,14 @@
             bool pins_chk = false;
 
         private:
+            void pre_initialize_ui();
+            void post_initialize_ui();
             void set_ui_text();
             void check_is_proj_folder(bool folder_exist);
             bool check_fpga_connections(QString path_to_fit_rprtr);
             bool read_xml_file(bool type, QString *cur_fpga = nullptr, QList<QString> *pins_numb = nullptr, QList<QString> *pins_typ = nullptr, QList<QString> *pins_io_stndrt = nullptr);
             void add_data_to_qpoint(QList<QPoint> *lst, int val, bool is_x);
+            void pause_timer();
 
             Ui::RHE_Widget *ui;
             General_Widget *gen_widg = nullptr;
@@ -66,8 +69,8 @@
             bool clr_trnsprnt = true;
             int prev_board_index;
 
-            long int cnt = -1;
-            double debug_time = 0.0;
+            long int cnt;
+            double debug_time;
 
         public slots:
             void slot_re_translate();
@@ -87,7 +90,7 @@
             void on_pshBttn_snd_frmwr_clicked();
             void on_pshBttn_chk_prj_stat_clicked();
             void on_pshBttn_ld_frmwr_clicked();
-            void slot_Timer();
+            void slot_timer_interrupt();
             void slot_choose_board(QString jtag_code);
             void slot_accept_board(bool flg);
             void slot_as_window(bool as_window);
