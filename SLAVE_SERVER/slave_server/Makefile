@@ -9,6 +9,7 @@ BUILD_DIR_NAME = ./build
 ifeq ($(HW_EN),YES)
     DFLAGS	+= -DHW_EN
 	LFLAGS	+= -lwiringPi
+	FILES	+= ./src/Debug_module/debug_class.cpp
 else
 endif
 

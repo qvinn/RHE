@@ -19,7 +19,13 @@
 #define S_SERVER_SENDING_FILE 26
 #define S_SERVER_FINISH_SEND_FILE 27
 #define SUCCESS_CHANGE_FPGA 28
-#define NOT_SUCCESS_CHANGE_FPGA 28
+#define NOT_SUCCESS_CHANGE_FPGA 29
+#define S_SERVER_SENDING_DEBUG_INFO 30
+#define CLIENT_WANT_START_DEBUG 31
+#define CLIENT_WANT_STOP_DEBUG 32
+
+#define DATA_EXIST 1
+#define DATA_NOT_EXIST 0
 
 //#include <iostream>
 
@@ -30,6 +36,13 @@ client_conn_v_1::client_conn_v_1(std::string _server_ip, int _server_port, std::
 	this->FPGA_id = _FPGA_id;
 	
 	create_OpenOCD_cfg();
+	
+#ifdef HW_EN
+	gdb = new Debug();
+	// FIXME: Вынести конфигурацию отладки в отдельную операцию
+	std::vector<int> pins_numbers{8,9,7};
+	gdb->setup_all(pins_numbers,2000,1000);
+#endif
 }
 
 //-------------------PUBLIC----------------------------------------------------------------
@@ -50,25 +63,28 @@ bool client_conn_v_1::init_connection()
 }
 
 int client_conn_v_1::get_id_for_client()
-{
-/*     char send_buf[sizeof (U_packet)];
-    U_packet *tmp_packet = (U_packet*)malloc(sizeof(U_packet));
-    my_client_ID_mutex.lock();
-    tmp_packet->id = my_client_ID;
-    my_client_ID_mutex.unlock();
-    tmp_packet->code_op = SLAVE_SERVER_WANT_INIT_CONNECTION;
+{	
+/* 	my_client_ID_mutex.lock();	
+	send_U_Packet(Socket, my_client_ID, SLAVE_SERVER_WANT_INIT_CONNECTION, this->FPGA_id.c_str());
+	my_client_ID_mutex.unlock(); */
 	
-    memcpy(send_buf,tmp_packet,sizeof (U_packet));
-    int send_status = send(Socket, send_buf, sizeof(U_packet), 0);
-    if(send_status < 0)
-    {
-        //wprintf(L"Init Client Error: %ld\n", WSAGetLastError());
-	}
-    free(tmp_packet); */
+	s_server_get_id *intit_conn = (s_server_get_id*)malloc(sizeof(s_server_get_id));
+	char *send_buff = (char*)malloc(sizeof(struct U_packet));
 	
-	my_client_ID_mutex.lock();
-	send_U_Packet(Socket,std::string(), my_client_ID, SLAVE_SERVER_WANT_INIT_CONNECTION, this->FPGA_id);
+	intit_conn->id = INIT_ID;
 	my_client_ID_mutex.unlock();
+	memset(intit_conn->FPGA_id,0,sizeof(intit_conn->FPGA_id));
+	memcpy(intit_conn->FPGA_id, this->FPGA_id.c_str(), this->FPGA_id.length());
+	
+	memcpy(send_buff, intit_conn, sizeof(s_server_get_id));
+	send_U_Packet(Socket, INIT_ID, SLAVE_SERVER_WANT_INIT_CONNECTION, send_buff);
+	
+	free(intit_conn);
+	free(send_buff);
+	
+#ifdef HW_EN
+	gdb->setup_sock(Socket);
+#endif
 	
     return CS_OK;
 }
@@ -147,7 +163,13 @@ void client_conn_v_1::wait_analize_recv_data()
 			{
 				end_recive_file();
 				printf("_________________________________Client FINISH sending file\n");
-				send_U_Packet(Socket,std::string(), 0, S_SERVER_END_RCV_FILE, std::to_string(file_rcv_bytes_count));
+				//send_U_Packet(Socket,std::string(), 0, S_SERVER_END_RCV_FILE, std::to_string(file_rcv_bytes_count));
+				//char buff[DATA_BUFFER];
+				char *buff = (char*)malloc(DATA_BUFFER);
+				sprintf(buff, "%i", file_rcv_bytes_count);
+				//send_U_Packet(Socket, 0, S_SERVER_END_RCV_FILE, std::to_string(file_rcv_bytes_count));
+				send_U_Packet(Socket, 0, S_SERVER_END_RCV_FILE, buff);
+				free(buff);
 				printf("_________________________________Slave server FINISH recive file\n");
 				break;	
 			}
@@ -159,15 +181,29 @@ void client_conn_v_1::wait_analize_recv_data()
 				break;	
 			}
 			
-			/* case SET_FPGA_ID:
+#ifdef HW_EN
+			case CLIENT_WANT_START_DEBUG:
 			{
-				//printf("data: %s\n",tmp_packet->data);
-				set_FPGA_id(tmp_packet->data);
-				printf("_________________________________new FPGA_ID is %s\n", this->curr_FPGA_id.c_str());
-				create_OpenOCD_cfg();
-				printf("_________________________________new OpenOCD.cfg was created\n");
+				if(gdb->debug_is_run() == 1)
+				{
+					printf("_________________________________DEBUG ALREADY RUN!\n");
+					break;
+				}
+				std::thread gdb_thread(&Debug::start_debug_mode_2,gdb);
+				gdb_thread.detach();
+				printf("_________________________________START DEBUG\n");			
 				break;	
-			} */
+			}
+#endif
+
+#ifdef HW_EN
+			case CLIENT_WANT_STOP_DEBUG:
+			{
+				gdb->stop_debug();
+				printf("_________________________________STOP DEBUG\n");
+				break;	
+			}
+#endif
 			
 			default:
 			{
@@ -181,12 +217,14 @@ void client_conn_v_1::wait_analize_recv_data()
 
 void client_conn_v_1::ping_to_server()
 {
-	send_U_Packet(Socket,std::string(), 0, PING_TO_SERVER, std::string());
+	//send_U_Packet(Socket,std::string(), 0, PING_TO_SERVER, std::string());
+	send_U_Packet(Socket, 0, PING_TO_SERVER, NULL);
 }
 
 void client_conn_v_1::answer_to_client()
 {
-	send_U_Packet(Socket,std::string(), 0, S_SERVER_ANSWER_TO_CLIENT, std::string());
+	//send_U_Packet(Socket,std::string(), 0, S_SERVER_ANSWER_TO_CLIENT, std::string());
+	send_U_Packet(Socket, 0, S_SERVER_ANSWER_TO_CLIENT, NULL);
 }
 
 //-------------------PRIVATE----------------------------------------------------------------
@@ -242,27 +280,22 @@ void client_conn_v_1::set_client_id(int id)
     my_client_ID_mutex.unlock();
 }
 
-void client_conn_v_1::send_U_Packet(int sock, std::string ip, int id,int code_op, std::string data)
+void client_conn_v_1::send_U_Packet(int sock, int id, int code_op, const char *data)
 {
-    const char *send_ip;
-	
-    if(ip.length() > 0)
-    {
-        send_ip = ip.c_str();
-	}
-	
-    struct U_packet *send_packet = (struct U_packet*)malloc(sizeof(struct U_packet));
-	memset(send_packet->data,0,DATA_BUFFER); // Для надежности заполним DATA_BUFFER байта send_packet->data значениями NULL
+    struct U_packet *send_packet = (struct U_packet*)malloc(sizeof(struct U_packet));	
     send_packet->code_op = code_op;
-    send_packet->id = id;
-    if(data.length() > 0)
-    {
-        memcpy(send_packet->data,data.c_str(),data.size());
-        //printf("convert data: %s\n",send_packet->data);        
+	send_packet->id = id; // FIXME - в последующем избавиться
+
+	memset(send_packet->data,0,DATA_BUFFER); // Для надежности заполним DATA_BUFFER байт send_packet->data значениями NULL
+	if(data != NULL)
+	{
+		memcpy(send_packet->data,data,DATA_BUFFER);
 	}
+	
     char *send_buf = (char*)malloc(sizeof(struct U_packet));
     memcpy(send_buf,send_packet,sizeof(struct U_packet));
-    send(Socket, send_buf, sizeof(struct U_packet), 0);
+
+    send(sock, send_buf, sizeof(struct U_packet), 0);
 	
     free(send_packet);
     free(send_buf);
@@ -299,13 +332,6 @@ int client_conn_v_1::end_recive_file()
 	printf("Bytes recive: %i\n", file_rcv_bytes_count);
 	return CS_OK;
 }
-
-/* void client_conn_v_1::set_FPGA_id(char *buf)
-{
-	//printf("recv FPGA_ID: %s\n",buf);
-	std::string tmp_str(buf);
-	this->curr_FPGA_id = tmp_str;
-} */
 
 void client_conn_v_1::create_OpenOCD_cfg()
 {
@@ -358,25 +384,32 @@ void client_conn_v_1::send_file_to_client(std::string filename)
     {
         result_string = form_2bytes_BA(std::string(file_buf));
 		std::cout << "result_string: " << result_string << "\n";
-        send_U_Packet(Socket,"", 0, S_SERVER_START_SEND_FILE,"");
-        send_U_Packet(Socket,"", 0, S_SERVER_SENDING_FILE, result_string);
-        send_U_Packet(Socket,"", 0, S_SERVER_FINISH_SEND_FILE, "");
+        //send_U_Packet(Socket,"", 0, S_SERVER_START_SEND_FILE,"");
+        //send_U_Packet(Socket,"", 0, S_SERVER_SENDING_FILE, result_string);
+        //send_U_Packet(Socket,"", 0, S_SERVER_FINISH_SEND_FILE, "");
+		send_U_Packet(Socket, 0, S_SERVER_START_SEND_FILE, NULL);
+		send_U_Packet(Socket, 0, S_SERVER_SENDING_FILE, result_string.c_str());
+		send_U_Packet(Socket, 0, S_SERVER_FINISH_SEND_FILE, NULL);
     }else 
 	{
-		send_U_Packet(Socket,"", 0, S_SERVER_START_SEND_FILE,"");
+		//send_U_Packet(Socket,"", 0, S_SERVER_START_SEND_FILE,"");
+		send_U_Packet(Socket, 0, S_SERVER_START_SEND_FILE, NULL);
 		
 		// Чтобы было удобней отсчитывать в цикле, определим первую посылку отдельно
 		memcpy(part_of_file,file_buf,TRUE_DATA_BUFFER);
 		result_string = form_2bytes_BA(std::string(part_of_file));
-		send_U_Packet(Socket,"", 0, S_SERVER_SENDING_FILE, result_string);
+		//send_U_Packet(Socket,"", 0, S_SERVER_SENDING_FILE, result_string);
+		send_U_Packet(Socket, 0, S_SERVER_SENDING_FILE, result_string.c_str());
 		
 		for(int i = 1; i < hops + 1; i++)
         {
 			memcpy(part_of_file,(file_buf+(i*TRUE_DATA_BUFFER)),TRUE_DATA_BUFFER);
 			result_string = form_2bytes_BA(std::string(part_of_file));
-			send_U_Packet(Socket,"", 0, S_SERVER_SENDING_FILE, result_string);
+			//send_U_Packet(Socket,"", 0, S_SERVER_SENDING_FILE, result_string);
+			send_U_Packet(Socket, 0, S_SERVER_SENDING_FILE, result_string.c_str());
 		}
-		send_U_Packet(Socket,"", 0, S_SERVER_FINISH_SEND_FILE, "");
+		//send_U_Packet(Socket,"", 0, S_SERVER_FINISH_SEND_FILE, "");
+		send_U_Packet(Socket, 0, S_SERVER_FINISH_SEND_FILE, NULL);
 	}
 	
 	std::cout << "HOPS_COUNT: " << hops << "\n";

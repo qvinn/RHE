@@ -41,6 +41,11 @@ class client_conn_v_1
         int code_op;
         char data[DATA_BUFFER];
     };
+	
+	typedef struct s_server_get_id {
+		int id;
+		char FPGA_id[20];
+	} s_server_get_id;
 
 public:
     client_conn_v_1(std::string _server_ip, int _server_port, std::string _FPGA_id);
@@ -56,14 +61,12 @@ private:
     void reset_ID();
     int establish_socket();
     void set_client_id(int id);
-	void send_U_Packet(int sock, std::string ip, int id,int code_op, std::string data);
+	void send_U_Packet(int sock, int id, int code_op, const char *data);
 	
 	int start_recive_file();
 	int rcv_new_data_for_file(char *buf);
 	int end_recive_file();
-	//void set_FPGA_id(char *buf);
 	void create_OpenOCD_cfg();
-	//void send_file_to_client(std:: string filename);
 	std::string form_2bytes_BA(std::string data);
 
     std::string server_ip = "";
@@ -76,11 +79,13 @@ private:
     int my_client_ID = INIT_ID;
     std::mutex my_client_ID_mutex;
 	
-	//std::string curr_FPGA_id = "";
-	
 	int file_rcv_bytes_count = 0;
 	
 	FILE *fp;
+#ifdef HW_EN
+	Debug *gdb;
+#endif
+	
 };
 
 #endif // CLIENT_CONN_V_1_H

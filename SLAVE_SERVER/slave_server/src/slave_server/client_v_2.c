@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 			server_ini_file << "[start]\n";
 			server_ini_file << "server_ip = \"192.168.137.182\"; ip of main server \n";		
 			server_ini_file << "server_listen_port = 3425; \n";
-			server_ini_file << "FPGA_id = \"0x020B10DD\"; \n"; // id по-молчанию для cyclone_2 // 0x020b10dd 0x020F30DD
+			server_ini_file << "FPGA_id = \"0x020B10DD\"; \n"; // id по-молчанию для cyclone_2 // 0x020B10DD(cyclone_2) 0x020F30DD
 			server_ini_file.close();
 		} else 
 		{
