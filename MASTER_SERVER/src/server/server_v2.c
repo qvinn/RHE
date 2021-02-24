@@ -50,6 +50,9 @@
 #define S_SERVER_FINISH_SEND_FILE 27
 #define SUCCESS_CHANGE_FPGA 28
 #define NOT_SUCCESS_CHANGE_FPGA 29
+#define S_SERVER_SENDING_DEBUG_INFO 30
+#define CLIENT_WANT_START_DEBUG 31
+#define CLIENT_WANT_STOP_DEBUG 32
 
 // Карта code_op - КОНЕЦ
 
@@ -71,19 +74,13 @@ struct U_packet {
 	char data[DATA_BUFFER];
 };
 
+typedef struct info_about_new_device {
+		int id;
+		char FPGA_id[20];
+} info_about_new_device;
+
 //----------------------------------------------
-// Структура для хранения
-typedef struct client_description {
-	int id;
-	// Также можно добавить другие поля по необходимости
-} client_description;
-
-// Структура для хранения
-typedef struct slave_server_description {
-	int id;
-} slave_server_description;
-
-
+// Структура для хранения пар slave-сервера и назначенного ему
 typedef struct Chain_Pair {
 	int id_SS;		// (-1 | ID slave-сервер)
 	std::string FPGA_id;
@@ -93,7 +90,7 @@ typedef struct Chain_Pair {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // Метод для отправки универсального пакета
-void send_U_Packet(int sock, string ip, int id,int code_op, string data);
+void send_U_Packet(int sock, int id, int code_op, const char *data);
 
 // Метод, который вызывается, как отдельный поток - слушает конкретного клиента/slave-сервера
 int new_listen_thread(int sock);
@@ -105,7 +102,6 @@ void recive_new_data(char *buf, int sock);
 
 // Метод, который задает клиенту или slave-серверу с id статус INIT_ID(по скольку у них у всех уникальный ID)
 // можно выполнить поочередный поиск
-//void reset_client_or_slave_s(int id);
 void reset_Pair( int id);
 
 int find_pair_for(int id);
@@ -115,12 +111,6 @@ std::string find_FPGA_ID_for(int id);
 int change_FPGA(int curr_client_id,std::string FPGA_id);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-std::vector<client_description> clients;
-std::mutex clients_mutex;
-
-std::vector<slave_server_description> slave_servers;
-std::mutex slave_servers_mutex;
 
 std::vector<Chain_Pair> Pairs;								// Вектор, который будет хранить "пары-связки" slave-серверов и клиентов
 std::mutex Chain_Pair_mutex;								// Мьютекс для доступа к данным
@@ -168,19 +158,6 @@ int main()
 	// sigaction(SIGPIPE, &(struct sigaction){sigpipe_handler}, NULL);
 	
 	// Инициализация структур перед использованием
-	clients_mutex.lock();
-	for(int i=0; i<total_clients; i++)
-	{
-		clients.push_back(client_description{INIT_ID});
-	}
-	clients_mutex.unlock();
-	
-	slave_servers_mutex.lock();
-	for(int i=0; i<total_slave_servers; i++)
-	{
-		slave_servers.push_back(slave_server_description{INIT_ID});
-	}
-	slave_servers_mutex.unlock();
 	
 	Chain_Pair_mutex.lock();
 	for(int i=0; i<total_slave_servers; i++)
@@ -239,9 +216,18 @@ int main()
         if(bytes_read <= 0) {continue;}		
 		memcpy(tmp_packet,buf,sizeof(struct U_packet));
 		
+		// Проанализируем данные в поле tmp_packet->data и выровняем их по "info_about_new_device"
+		info_about_new_device *new_conn_info = (info_about_new_device*)malloc(sizeof(info_about_new_device));
+		memcpy(new_conn_info,tmp_packet->data,sizeof(info_about_new_device));
+		int id_v_2 = new_conn_info->id;
+		std::string data(new_conn_info->FPGA_id);
+		printf("+DEVICE info: id: %i, FPGA_id: %s\n",new_conn_info->id,data.c_str());
+		free(new_conn_info);
+		// Проанализируем данные в поле tmp_packet->data - КОНЕЦ
+		
 		int id = tmp_packet->id;
 		int code_op = tmp_packet->code_op;
-		std::string data(tmp_packet->data);
+		//std::string data(tmp_packet->data);
 		free(tmp_packet);	
 		
 		if(id == -1)
@@ -254,12 +240,14 @@ int main()
 			if(new_client_id != ERROR && code_op == CLIENT_WANT_INIT_CONNECTION)
 			{
 				std::string sent_fpga_id = find_FPGA_ID_for(new_client_id);
-				send_U_Packet(sock, std::string(), new_client_id, CLIENT_WANT_INIT_CONNECTION, sent_fpga_id);
+				//send_U_Packet(sock, new_client_id, CLIENT_WANT_INIT_CONNECTION, sent_fpga_id);
+				send_U_Packet(sock, new_client_id, CLIENT_WANT_INIT_CONNECTION, sent_fpga_id.c_str());
 				std::thread client_rcv_loop(new_listen_thread, sock);
 				client_rcv_loop.detach();
 			} else // Если сервер не смог выделить ID для пользователя
 			{
-				send_U_Packet(sock, std::string(), 0, NO_MORE_PLACES, std::string());
+				//send_U_Packet(sock, std::string(), 0, NO_MORE_PLACES, std::string());
+				send_U_Packet(sock, 0, NO_MORE_PLACES, NULL);
 				close(sock);
 			}
 			free(buf);
@@ -272,12 +260,14 @@ int main()
 			int new_slave_server_id = check_avalible_Pair_place(sock,0,data);
 			if(new_slave_server_id != ERROR && code_op == SLAVE_SERVER_WANT_INIT_CONNECTION)
 			{
-				send_U_Packet(sock, std::string(), new_slave_server_id, SLAVE_SERVER_WANT_INIT_CONNECTION, std::string());
+				//send_U_Packet(sock, new_slave_server_id, SLAVE_SERVER_WANT_INIT_CONNECTION, std::string());
+				send_U_Packet(sock, new_slave_server_id, SLAVE_SERVER_WANT_INIT_CONNECTION, NULL);
 				std::thread slave_server_rcv_loop(new_listen_thread, sock);
 				slave_server_rcv_loop.detach();
 			} else // Если сервер не смог выделить ID для пользователя
 			{
-				send_U_Packet(sock, std::string(), 0, NO_MORE_PLACES, std::string());
+				//send_U_Packet(sock, std::string(), 0, NO_MORE_PLACES, std::string());
+				send_U_Packet(sock, 0, NO_MORE_PLACES, NULL);
 				close(sock);
 			}
 			free(buf);
@@ -292,31 +282,25 @@ int main()
     return 0;
 }
 
-void send_U_Packet(int sock, string ip, int id,int code_op, string data)
+void send_U_Packet(int sock, int id, int code_op, const char *data)
 {
-	const char *send_ip;
-	struct U_packet *send_packet = (struct U_packet*)malloc(sizeof(struct U_packet));
-	memset(send_packet->data,0,DATA_BUFFER); // Для надежности заполним DATA_BUFFER байта send_packet->data значениями NULL
-	
-	if(ip.length() > 0)
+    struct U_packet *send_packet = (struct U_packet*)malloc(sizeof(struct U_packet));	
+    send_packet->code_op = code_op;
+	send_packet->id = id; // FIXME - в последующем избавиться
+
+	memset(send_packet->data,0,DATA_BUFFER); // Для надежности заполним DATA_BUFFER байт send_packet->data значениями NULL
+	if(data != NULL) // data_exist == DATA_EXIST
 	{
-		send_ip = ip.c_str();
+		memcpy(send_packet->data,data,DATA_BUFFER);
 	}
 	
-	if(data.length() > 0)
-	{
-		memcpy(send_packet->data,data.c_str(),data.size());
-		//printf("convert data: %s\n",send_packet->data);
-	}
+    char *send_buf = (char*)malloc(sizeof(struct U_packet));
+    memcpy(send_buf,send_packet,sizeof(struct U_packet));
+
+    send(sock, send_buf, sizeof(struct U_packet), 0);
 	
-	send_packet->code_op = code_op;
-	send_packet->id = id;
-	// FIXME: Добавить функцию формирования ip и data
-	char *send_buf = (char*)malloc(sizeof(struct U_packet));
-	memcpy(send_buf,send_packet,sizeof(struct U_packet));
-	send(sock, send_buf, sizeof(struct U_packet), 0);	
-	free(send_packet);
-	free(send_buf);	
+    free(send_packet);
+    free(send_buf);
 }
 
 int check_avalible_Pair_place(int sock, int who, std::string _FPGA_id) // 0 - slave-сервер | 1 - client
@@ -399,7 +383,8 @@ void recive_new_data(char *buf, int sock)
 		{
 			printf("\t|___Connection with id %i want PING server\n", sock);
 			// Ответим на ping
-			send_U_Packet(sock, std::string(), 0, PING_TO_SERVER, std::string());
+			//send_U_Packet(sock, std::string(), 0, PING_TO_SERVER, std::string());
+			send_U_Packet(sock, 0, PING_TO_SERVER, NULL);
 			break;	
 		}
 		
@@ -409,7 +394,8 @@ void recive_new_data(char *buf, int sock)
 			int finded_s_server = find_pair_for(sock);
 			if(finded_s_server != ERROR)
 			{
-				send_U_Packet(finded_s_server, std::string(), 0, PING_CLIENT_TO_S_SERVER, std::string());
+				//send_U_Packet(finded_s_server, std::string(), 0, PING_CLIENT_TO_S_SERVER, std::string());
+				send_U_Packet(finded_s_server, 0, PING_CLIENT_TO_S_SERVER, NULL);
 				printf("\t|___Client with id %i want PING slave-server with id %i\n", sock, finded_s_server);
 			}			
 			break;	
@@ -421,7 +407,8 @@ void recive_new_data(char *buf, int sock)
 			int finded_client = find_pair_for(sock);
 			if(finded_client != ERROR)
 			{
-				send_U_Packet(finded_client, std::string(), 0, S_SERVER_ANSWER_TO_CLIENT, std::string());
+				//send_U_Packet(finded_client, std::string(), 0, S_SERVER_ANSWER_TO_CLIENT, std::string());
+				send_U_Packet(finded_client, 0, S_SERVER_ANSWER_TO_CLIENT, NULL);
 				printf("\t|___Slave Server with id %i want answer PING to client with id %i\n", sock, finded_client);
 			}
 			break;	
@@ -433,7 +420,8 @@ void recive_new_data(char *buf, int sock)
 			int finded_s_server = find_pair_for(sock);
 			if(finded_s_server != ERROR)
 			{
-				send_U_Packet(finded_s_server, std::string(), 0, CLIENT_START_SEND_FILE, std::string());
+				//send_U_Packet(finded_s_server, std::string(), 0, CLIENT_START_SEND_FILE, std::string());
+				send_U_Packet(finded_s_server, 0, CLIENT_START_SEND_FILE, NULL);
 				printf("\t|___Client with id %i START sending file to slave-server with id %i\n", sock, finded_s_server);
 			}			
 			break;	
@@ -446,7 +434,8 @@ void recive_new_data(char *buf, int sock)
 			if(finded_s_server != ERROR)
 			{
 				//printf("data: %s\n",tmp_packet->data);
-				send_U_Packet(finded_s_server, std::string(), 0, CLIENT_SENDING_FILE, std::string(tmp_packet->data));
+				//send_U_Packet(finded_s_server, std::string(), 0, CLIENT_SENDING_FILE, std::string(tmp_packet->data));
+				send_U_Packet(finded_s_server, 0, CLIENT_SENDING_FILE, tmp_packet->data);
 				printf("\t|___Client with id %i SENDING file to slave-server with id %i\n", sock, finded_s_server);
 			}			
 			break;	
@@ -458,7 +447,8 @@ void recive_new_data(char *buf, int sock)
 			int finded_s_server = find_pair_for(sock);
 			if(finded_s_server != ERROR)
 			{
-				send_U_Packet(finded_s_server, std::string(), 0, CLIENT_FINISH_SEND_FILE, std::string());
+				//send_U_Packet(finded_s_server, std::string(), 0, CLIENT_FINISH_SEND_FILE, std::string());
+				send_U_Packet(finded_s_server, 0, CLIENT_FINISH_SEND_FILE, NULL);
 				printf("\t|___Client with id %i FINISH send file to slave-server with id %i\n", sock, finded_s_server);
 			}			
 			break;	
@@ -478,7 +468,8 @@ void recive_new_data(char *buf, int sock)
 			int finded_client = find_pair_for(sock);
 			if(finded_client != ERROR)
 			{
-				send_U_Packet(finded_client, std::string(), 0, S_SERVER_END_RCV_FILE, std::string(tmp_packet->data));
+				//send_U_Packet(finded_client, std::string(), 0, S_SERVER_END_RCV_FILE, std::string(tmp_packet->data));
+				send_U_Packet(finded_client, 0, S_SERVER_END_RCV_FILE, tmp_packet->data);
 				printf("\t|___Slave server with id %i end recive file from client with id %i\n", sock, finded_client);
 			}			
 			break;	
@@ -490,7 +481,8 @@ void recive_new_data(char *buf, int sock)
 			int finded_s_server = find_pair_for(sock);
 			if(finded_s_server != ERROR)
 			{
-				send_U_Packet(finded_s_server, std::string(), 0, FLASH_FPGA, std::string());
+				//send_U_Packet(finded_s_server, std::string(), 0, FLASH_FPGA, std::string());
+				send_U_Packet(finded_s_server, 0, FLASH_FPGA, NULL);
 				printf("\t|___Client with id %i need FLASH FPGA on slave server with id %i\n", sock, finded_s_server);
 			}			
 			break;	
@@ -499,22 +491,17 @@ void recive_new_data(char *buf, int sock)
 		case SET_FPGA_ID:
 		{
 			// Перенаправляем запрос от клиента к slave-серверу
-			/* int finded_s_server = find_pair_for(sock);
-				if(finded_s_server != ERROR)
-				{
-				//printf("data: %s\n",tmp_packet->data);
-				send_U_Packet(finded_s_server, std::string(), 0, SET_FPGA_ID, std::string(tmp_packet->data));
-				printf("\t|___Client with id %i SET_FPGA_ID to slave-server with id %i\n", sock, finded_s_server);
-			} */
 			printf("Client with id: %i want change FPGA on device with id: %s\n",sock,tmp_packet->data);
 			if(change_FPGA(sock,std::string(tmp_packet->data)) == SUCCESS)
 			{
-				send_U_Packet(sock, std::string(), 0, SUCCESS_CHANGE_FPGA, std::string());
-				printf("Client SUCCESSFULLY change FPGA_ID\n");
+				//send_U_Packet(sock, std::string(), 0, SUCCESS_CHANGE_FPGA, std::string());
+				send_U_Packet(sock, 0, SUCCESS_CHANGE_FPGA, NULL);
+				printf("\t|___Client SUCCESSFULLY change FPGA_ID\n");
 			} else 
 			{
-				send_U_Packet(sock, std::string(), 0, NOT_SUCCESS_CHANGE_FPGA, std::string());
-				printf("Client NOT SUCCESSFULLY change FPGA_ID\n");
+				//send_U_Packet(sock, std::string(), 0, NOT_SUCCESS_CHANGE_FPGA, std::string());
+				send_U_Packet(sock, 0, NOT_SUCCESS_CHANGE_FPGA, NULL);
+				printf("\t|___Client NOT SUCCESSFULLY change FPGA_ID\n");
 			}
 			break;	
 		}
@@ -525,7 +512,8 @@ void recive_new_data(char *buf, int sock)
 			int finded_client = find_pair_for(sock);
 			if(finded_client != ERROR)
 			{
-				send_U_Packet(finded_client, std::string(), 0, S_SERVER_START_SEND_FILE, std::string());
+				//send_U_Packet(finded_client, std::string(), 0, S_SERVER_START_SEND_FILE, std::string());
+				send_U_Packet(finded_client, 0, S_SERVER_START_SEND_FILE, NULL);
 				printf("\t|___Slave_server with id %i START sending file to client with id %i\n", sock, finded_client);
 			}			
 			break;	
@@ -538,7 +526,8 @@ void recive_new_data(char *buf, int sock)
 			if(finded_client != ERROR)
 			{
 				//printf("data: %s\n",tmp_packet->data);
-				send_U_Packet(finded_client, std::string(), 0, S_SERVER_SENDING_FILE, std::string(tmp_packet->data));
+				//send_U_Packet(finded_client, std::string(), 0, S_SERVER_SENDING_FILE, std::string(tmp_packet->data));
+				send_U_Packet(finded_client, 0, S_SERVER_SENDING_FILE, tmp_packet->data);
 				printf("\t|___Slave_server with id %i SENDING file to client with id %i\n", sock, finded_client);
 			}			
 			break;	
@@ -550,8 +539,50 @@ void recive_new_data(char *buf, int sock)
 			int finded_client = find_pair_for(sock);
 			if(finded_client != ERROR)
 			{
-				send_U_Packet(finded_client, std::string(), 0, S_SERVER_FINISH_SEND_FILE, std::string());
+				//send_U_Packet(finded_client, std::string(), 0, S_SERVER_FINISH_SEND_FILE, std::string());
+				send_U_Packet(finded_client, 0, S_SERVER_FINISH_SEND_FILE, NULL);
 				printf("\t|___Slave_server with id %i FINISH send file to client with id %i\n", sock, finded_client);
+			}			
+			break;	
+		}
+		
+		case S_SERVER_SENDING_DEBUG_INFO:
+		{
+			// Перенаправляем запрос от slave-серверу к клиенту
+			int finded_client = find_pair_for(sock);
+			if(finded_client != ERROR)
+			{
+				//printf("data: %s\n",tmp_packet->data);
+				//send_U_Packet(finded_client, std::string(), 0, S_SERVER_SENDING_DEBUG_INFO, std::string(tmp_packet->data));
+				//send_Debug_info(S_SERVER_SENDING_DEBUG_INFO,finded_client,tmp_packet->data);
+				send_U_Packet(finded_client, 0, S_SERVER_SENDING_DEBUG_INFO, tmp_packet->data);
+				printf("\t|___Slave_server with id %i SENDING debug info to client with id %i\n", sock, finded_client);
+			}			
+			break;	
+		}
+		
+		case CLIENT_WANT_START_DEBUG:
+		{
+			// Перенаправляем запрос от клиента к slave-серверу
+			int finded_s_server = find_pair_for(sock);
+			if(finded_s_server != ERROR)
+			{
+				//send_U_Packet(finded_s_server, std::string(), 0, CLIENT_WANT_START_DEBUG, std::string());
+				send_U_Packet(finded_s_server, 0, CLIENT_WANT_START_DEBUG, NULL);
+				printf("\t|___Client with id %i START debug process on slave-server with id %i\n", sock, finded_s_server);
+			}			
+			break;	
+		}
+		
+		case CLIENT_WANT_STOP_DEBUG:
+		{
+			// Перенаправляем запрос от клиента к slave-серверу
+			int finded_s_server = find_pair_for(sock);
+			if(finded_s_server != ERROR)
+			{
+				//send_U_Packet(finded_s_server, std::string(), 0, CLIENT_WANT_STOP_DEBUG, std::string());
+				send_U_Packet(finded_s_server, 0, CLIENT_WANT_STOP_DEBUG, NULL);
+				printf("\t|___Client with id %i STOP debug process on slave-server with id %i\n", sock, finded_s_server);
 			}			
 			break;	
 		}
@@ -574,17 +605,20 @@ void reset_Pair( int id)
 	{
 		if(Pairs.at(i).id_Cl == id)
 		{
-			send_U_Packet(id, std::string(), 0, DROP_CONNECTION, std::string());
+			//send_U_Packet(id, std::string(), 0, DROP_CONNECTION, std::string());
+			send_U_Packet(id, 0, DROP_CONNECTION, NULL);
 			close(id);
 			printf("--->   Reset client with ID: %i\n",id);
 			
 			Pairs[i].id_Cl = INIT_ID;
 		} else if(Pairs.at(i).id_SS == id)
 		{
-			send_U_Packet(Pairs.at(i).id_Cl, std::string(), 0, DROP_CONNECTION, std::string());
+			//send_U_Packet(Pairs.at(i).id_Cl, std::string(), 0, DROP_CONNECTION, std::string());
+			send_U_Packet(Pairs.at(i).id_Cl, 0, DROP_CONNECTION, NULL);
 			close(Pairs.at(i).id_Cl);
 			printf("--->   Reset client with ID: %i\n",Pairs.at(i).id_Cl);
-			send_U_Packet(id, std::string(), 0, DROP_CONNECTION, std::string());
+			//send_U_Packet(id, std::string(), 0, DROP_CONNECTION, std::string());
+			send_U_Packet(id, 0, DROP_CONNECTION, NULL);
 			close(id);
 			printf("--->   Reset slave_server with ID: %i\n",id);
 			
