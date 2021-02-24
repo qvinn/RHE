@@ -22,6 +22,9 @@
 #define S_SERVER_FINISH_SEND_FILE 27
 #define SUCCESS_CHANGE_FPGA 28
 #define NOT_SUCCESS_CHANGE_FPGA 29
+#define S_SERVER_SENDING_DEBUG_INFO 30
+#define CLIENT_WANT_START_DEBUG 31
+#define CLIENT_WANT_STOP_DEBUG 32
 
 
 Send_Recieve_Module::Send_Recieve_Module(QString _server_ip, int _server_port, General_Widget *widg) {
@@ -132,21 +135,27 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 qDebug() << "_________________________________Client change FPGA NOT Successfuly";
                 break;
             }
+            case S_SERVER_SENDING_DEBUG_INFO: {
+                recive_dbg_info(tmp_packet->data);
+                qDebug() << "_________________________________Slave server sending DEBUG INFO";
+                break;
+            }
             default: {
                 qDebug() << "_________________________________UNKNOWN PACKET";
                 break;
             }
         }
-//        free(tmp_packet);
     }
 }
 
 void Send_Recieve_Module::ping_to_server() {
-    send_U_Packet(my_client_ID, PING_TO_SERVER, "");
+    //send_U_Packet(my_client_ID, PING_TO_SERVER, "");
+    send_U_Packet(my_client_ID, CLIENT_WANT_START_DEBUG, "");
 }
 
 void Send_Recieve_Module::ping_to_S_server() {
-    send_U_Packet(my_client_ID, PING_CLIENT_TO_S_SERVER, "");
+    //send_U_Packet(my_client_ID, PING_CLIENT_TO_S_SERVER, "");
+    send_U_Packet(my_client_ID, CLIENT_WANT_STOP_DEBUG, "");
 }
 
 bool Send_Recieve_Module::send_file_to_ss(QByteArray File_byteArray) {
@@ -292,4 +301,23 @@ int Send_Recieve_Module::end_recive_file() {
     file->close();
     qDebug() << "HBytes recive: " << file_rcv_bytes_count;
     return CS_OK;
+}
+
+void Send_Recieve_Module::recive_dbg_info(char *info)
+{
+    debug_log_Packet *Packet = (debug_log_Packet*)malloc(sizeof(debug_log_Packet));
+    memcpy(Packet,info,sizeof(debug_log_Packet));
+
+    qDebug() << "Recive debug data:";
+    qDebug() << "Info about " << Packet->pin_count << "pins";
+    qDebug() << "At: " << Packet->time << "ms";
+
+    for(int i = 0; i < Packet->pin_count; i++)
+    {
+        qDebug() << "Pin " << Packet->pins[i].pinNum << "have state: " << Packet->pins[i].state;
+    }
+
+    qDebug() << "~~~~~~~~~~~~~~~~~";
+
+    free(Packet);
 }
