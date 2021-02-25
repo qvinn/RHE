@@ -42,7 +42,7 @@
             bool check_fpga_connections(QString path_to_fit_rprtr);
             bool read_xml_file(bool type, QString *cur_fpga = nullptr, QList<QString> *pins_numb = nullptr, QList<QString> *pins_typ = nullptr, QList<QString> *pins_io_stndrt = nullptr);
             void add_data_to_qpoint(QList<QPoint> *lst, int val, bool is_x);
-            void pause_timer();
+//            void pause_timer();
 
             Ui::RHE_Widget *ui;
             General_Widget *gen_widg = nullptr;
@@ -58,7 +58,7 @@
             QList<QPoint> *led_width_height = nullptr;
             QString lname_fname;
             QPixmap pixmp_brd;
-            QTimer *tmr = nullptr;
+//            QTimer *tmr = nullptr;
             QList<int> *prev_vals = nullptr;
 
             bool qpf_exist = false;
@@ -69,8 +69,10 @@
             bool clr_trnsprnt = true;
             int prev_board_index;
 
-            long int cnt;
-            double debug_time;
+            bool new_debug = false;
+
+//            long int cnt;
+//            double debug_time;
 
         public slots:
             void slot_re_translate();
@@ -90,9 +92,10 @@
             void on_pshBttn_snd_frmwr_clicked();
             void on_pshBttn_chk_prj_stat_clicked();
             void on_pshBttn_ld_frmwr_clicked();
-            void slot_timer_interrupt();
+//            void slot_timer_interrupt();
             void slot_choose_board(QString jtag_code);
             void slot_accept_board(bool flg);
+            void slot_accept_debug_data(QByteArray debug_data);
             void slot_as_window(bool as_window);
 
         signals:

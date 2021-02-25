@@ -156,6 +156,7 @@ void MainWindow::initialize_ui() {
 
 void MainWindow::set_ui_text() {
     language_changed = false;
+    this->setWindowTitle(tr("Remote Hardware Education"));
     menu_file->setTitle(tr("File"));
     menu_settngs->setTitle(tr("Settings"));
     wvfrm_vwr_actn->setText(tr("Open waveform viewer"));
