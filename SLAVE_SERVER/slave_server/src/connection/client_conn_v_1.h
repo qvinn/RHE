@@ -26,8 +26,8 @@
 #define CS_ERROR 1
 #define CS_OK 0
 
-#define DATA_BUFFER 60 // 32
-#define RECIVE_BUFFER_SIZE (DATA_BUFFER+20) // 52
+#define DATA_BUFFER 60 // 60 76
+#define RECIVE_BUFFER_SIZE (DATA_BUFFER+20) //  DATA_BUFFER+4
 #define TRUE_DATA_BUFFER (DATA_BUFFER-2) // Два байта зарезервировано для определения размера передаваемых данных
 
 #define INIT_ID -2
@@ -41,6 +41,11 @@ class client_conn_v_1
         int code_op;
         char data[DATA_BUFFER];
     };
+	
+/* 	struct U_packet {
+            int code_op;    // 4 байта
+            char data[DATA_BUFFER];
+	}; */
 	
 	typedef struct s_server_get_id {
 		int id;
@@ -61,7 +66,7 @@ private:
     void reset_ID();
     int establish_socket();
     void set_client_id(int id);
-	void send_U_Packet(int sock, int id, int code_op, const char *data);
+	void send_U_Packet(int sock, int code_op, const char *data);
 	
 	int start_recive_file();
 	int rcv_new_data_for_file(char *buf);

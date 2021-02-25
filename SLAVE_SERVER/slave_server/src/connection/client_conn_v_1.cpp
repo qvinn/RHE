@@ -72,12 +72,11 @@ int client_conn_v_1::get_id_for_client()
 	char *send_buff = (char*)malloc(sizeof(struct U_packet));
 	
 	intit_conn->id = INIT_ID;
-	my_client_ID_mutex.unlock();
 	memset(intit_conn->FPGA_id,0,sizeof(intit_conn->FPGA_id));
 	memcpy(intit_conn->FPGA_id, this->FPGA_id.c_str(), this->FPGA_id.length());
 	
 	memcpy(send_buff, intit_conn, sizeof(s_server_get_id));
-	send_U_Packet(Socket, INIT_ID, SLAVE_SERVER_WANT_INIT_CONNECTION, send_buff);
+	send_U_Packet(Socket, SLAVE_SERVER_WANT_INIT_CONNECTION, send_buff);
 	
 	free(intit_conn);
 	free(send_buff);
@@ -111,11 +110,16 @@ void client_conn_v_1::wait_analize_recv_data()
 			}
 		}
         U_packet *tmp_packet = (U_packet*)malloc(sizeof(U_packet));
-        //printf("~~~~~DEBUG: recive any data\n");
         memcpy(tmp_packet,recv_buf,sizeof (U_packet));
         switch (tmp_packet->code_op) {
 			case SLAVE_SERVER_WANT_INIT_CONNECTION:
-			set_client_id(tmp_packet->id);
+/* 			set_client_id(tmp_packet->id);
+			my_client_ID_mutex.lock();
+			printf("Server want give me ID %i\n", my_client_ID);
+			my_client_ID_mutex.unlock(); */
+			int recv_id;
+			memcpy(&(recv_id), tmp_packet->data, sizeof(int));
+			set_client_id(recv_id);
 			my_client_ID_mutex.lock();
 			printf("Server want give me ID %i\n", my_client_ID);
 			my_client_ID_mutex.unlock();
@@ -163,12 +167,9 @@ void client_conn_v_1::wait_analize_recv_data()
 			{
 				end_recive_file();
 				printf("_________________________________Client FINISH sending file\n");
-				//send_U_Packet(Socket,std::string(), 0, S_SERVER_END_RCV_FILE, std::to_string(file_rcv_bytes_count));
-				//char buff[DATA_BUFFER];
 				char *buff = (char*)malloc(DATA_BUFFER);
-				sprintf(buff, "%i", file_rcv_bytes_count);
-				//send_U_Packet(Socket, 0, S_SERVER_END_RCV_FILE, std::to_string(file_rcv_bytes_count));
-				send_U_Packet(Socket, 0, S_SERVER_END_RCV_FILE, buff);
+				sprintf(buff, "%i", file_rcv_bytes_count);				
+				send_U_Packet(Socket, S_SERVER_END_RCV_FILE, buff);
 				free(buff);
 				printf("_________________________________Slave server FINISH recive file\n");
 				break;	
@@ -217,14 +218,12 @@ void client_conn_v_1::wait_analize_recv_data()
 
 void client_conn_v_1::ping_to_server()
 {
-	//send_U_Packet(Socket,std::string(), 0, PING_TO_SERVER, std::string());
-	send_U_Packet(Socket, 0, PING_TO_SERVER, NULL);
+	send_U_Packet(Socket, PING_TO_SERVER, NULL);
 }
 
 void client_conn_v_1::answer_to_client()
 {
-	//send_U_Packet(Socket,std::string(), 0, S_SERVER_ANSWER_TO_CLIENT, std::string());
-	send_U_Packet(Socket, 0, S_SERVER_ANSWER_TO_CLIENT, NULL);
+	send_U_Packet(Socket, S_SERVER_ANSWER_TO_CLIENT, NULL);
 }
 
 //-------------------PRIVATE----------------------------------------------------------------
@@ -280,11 +279,10 @@ void client_conn_v_1::set_client_id(int id)
     my_client_ID_mutex.unlock();
 }
 
-void client_conn_v_1::send_U_Packet(int sock, int id, int code_op, const char *data)
+void client_conn_v_1::send_U_Packet(int sock, int code_op, const char *data)
 {
     struct U_packet *send_packet = (struct U_packet*)malloc(sizeof(struct U_packet));	
     send_packet->code_op = code_op;
-	send_packet->id = id; // FIXME - в последующем избавиться
 
 	memset(send_packet->data,0,DATA_BUFFER); // Для надежности заполним DATA_BUFFER байт send_packet->data значениями NULL
 	if(data != NULL)
@@ -384,32 +382,25 @@ void client_conn_v_1::send_file_to_client(std::string filename)
     {
         result_string = form_2bytes_BA(std::string(file_buf));
 		std::cout << "result_string: " << result_string << "\n";
-        //send_U_Packet(Socket,"", 0, S_SERVER_START_SEND_FILE,"");
-        //send_U_Packet(Socket,"", 0, S_SERVER_SENDING_FILE, result_string);
-        //send_U_Packet(Socket,"", 0, S_SERVER_FINISH_SEND_FILE, "");
-		send_U_Packet(Socket, 0, S_SERVER_START_SEND_FILE, NULL);
-		send_U_Packet(Socket, 0, S_SERVER_SENDING_FILE, result_string.c_str());
-		send_U_Packet(Socket, 0, S_SERVER_FINISH_SEND_FILE, NULL);
+		send_U_Packet(Socket, S_SERVER_START_SEND_FILE, NULL);
+		send_U_Packet(Socket, S_SERVER_SENDING_FILE, result_string.c_str());
+		send_U_Packet(Socket, S_SERVER_FINISH_SEND_FILE, NULL);
     }else 
 	{
-		//send_U_Packet(Socket,"", 0, S_SERVER_START_SEND_FILE,"");
-		send_U_Packet(Socket, 0, S_SERVER_START_SEND_FILE, NULL);
+		send_U_Packet(Socket, S_SERVER_START_SEND_FILE, NULL);
 		
 		// Чтобы было удобней отсчитывать в цикле, определим первую посылку отдельно
 		memcpy(part_of_file,file_buf,TRUE_DATA_BUFFER);
 		result_string = form_2bytes_BA(std::string(part_of_file));
-		//send_U_Packet(Socket,"", 0, S_SERVER_SENDING_FILE, result_string);
-		send_U_Packet(Socket, 0, S_SERVER_SENDING_FILE, result_string.c_str());
+		send_U_Packet(Socket, S_SERVER_SENDING_FILE, result_string.c_str());
 		
 		for(int i = 1; i < hops + 1; i++)
         {
 			memcpy(part_of_file,(file_buf+(i*TRUE_DATA_BUFFER)),TRUE_DATA_BUFFER);
 			result_string = form_2bytes_BA(std::string(part_of_file));
-			//send_U_Packet(Socket,"", 0, S_SERVER_SENDING_FILE, result_string);
-			send_U_Packet(Socket, 0, S_SERVER_SENDING_FILE, result_string.c_str());
+			send_U_Packet(Socket, S_SERVER_SENDING_FILE, result_string.c_str());
 		}
-		//send_U_Packet(Socket,"", 0, S_SERVER_FINISH_SEND_FILE, "");
-		send_U_Packet(Socket, 0, S_SERVER_FINISH_SEND_FILE, NULL);
+		send_U_Packet(Socket, S_SERVER_FINISH_SEND_FILE, NULL);
 	}
 	
 	std::cout << "HOPS_COUNT: " << hops << "\n";
