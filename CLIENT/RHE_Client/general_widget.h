@@ -61,6 +61,7 @@
             void add_data_to_graph(QList<int> val, QList<int> *prev_vals, double time, bool val_changed);
             void add_data_to_graph_rltm(QList<int> val, QList<int> *prev_vals, double time, bool val_changed);
             void remove_data_from_graph();
+            void mouseMove(QMouseEvent *event);
 
             bool plot_re_scale = false;
             int graph_count;
@@ -72,13 +73,15 @@
             General_Widget *gen_widg = nullptr;
             QList<QCPGraph *> *graph_list = nullptr;
             QSharedPointer<QCPAxisTickerText> *textTicker = nullptr;
+            QCPItemLine *curs_ver_line = nullptr;
+            QCPItemText *curs_time = nullptr;
             Qt::WindowFlags flags;
 
             bool standalone;
 
         private slots:
             void showEvent(QShowEvent *);
-            void resizeEvent(QResizeEvent *); 
+            void resizeEvent(QResizeEvent *);
             void on_pshBttn_fl_scl_clicked();
             void on_pshBttn_clr_clicked();
             void on_chckBx_as_wndw_stateChanged(int state);

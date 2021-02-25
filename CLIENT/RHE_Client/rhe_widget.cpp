@@ -98,6 +98,8 @@ void RHE_Widget::on_pushButton_3_clicked() {
 void RHE_Widget::on_pushButton_strt_drw_clicked() {
     new_debug = true;
     snd_rcv_module->start_debug(static_cast<uint16_t>(ui->spnBx_dbg_tm->value()), static_cast<uint8_t>(ui->cmbBx_dbg_tm_tp->currentIndex()));
+    wvfrm_vwr->pshBttn_open_save_wvfrm_set_enabled(false);
+    ui->hrzntlSldr_cnt_dbg_pins->setEnabled(false);
 //    if(tmr->isActive()) {
 //        pause_timer();
 //    } else {
@@ -112,6 +114,8 @@ void RHE_Widget::on_pushButton_strt_drw_clicked() {
 
 void RHE_Widget::on_pushButton_stp_drw_clicked() {
     snd_rcv_module->stop_debug();
+    wvfrm_vwr->pshBttn_open_save_wvfrm_set_enabled(true);
+    ui->hrzntlSldr_cnt_dbg_pins->setEnabled(true);
 //    pause_timer();
 //    cnt = -1;
 //    debug_time = 0.0;
@@ -243,11 +247,13 @@ void RHE_Widget::pre_initialize_ui() {
 }
 
 void RHE_Widget::initialize_ui() {
+    ui_initialized = false;
     on_pushButton_stp_drw_clicked();
     path_to_proj->clear();
     QDir::setCurrent(qApp->applicationDirPath());
     pshBttn_snd_frmwr_set_enabled(false);
     pshBttn_chk_prj_stat_set_enabled(false);
+    ui->hrzntlSldr_cnt_dbg_pins->setValue(abs(gen_widg->get_setting("settings/DEBUG_PINS_NUMBER").toInt() - 1));
     if(gen_widg->get_setting("settings/MANUALY_LOAD_FIRMWARE").toBool() && gen_widg->get_setting("settings/ENABLE_FILE_CHEKING").toBool()) {
         pshBttn_ld_frmwr_set_enabled(false);
     }
