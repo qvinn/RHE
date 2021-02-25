@@ -158,7 +158,8 @@ void Send_Recieve_Module::ping_to_S_server() {
     send_U_Packet(my_client_ID, PING_CLIENT_TO_S_SERVER, "");
 }
 
-void Send_Recieve_Module::start_debug() {
+void Send_Recieve_Module::start_debug(uint16_t dscrt_tm, uint8_t dscrt_tm_tp) {
+    //for variable dscrt_tm_tp: 0 - seconds, 1 - miliseconds, 2 - microseconds
     send_U_Packet(my_client_ID, CLIENT_WANT_START_DEBUG, "");
 }
 

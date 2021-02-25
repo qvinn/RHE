@@ -29,7 +29,7 @@
             void wait_analize_recv_data();
             void ping_to_server();
             void ping_to_S_server();
-            void start_debug();
+            void start_debug(uint16_t dscrt_tm, uint8_t dscrt_tm_tp);
             void stop_debug();
             bool send_file_to_ss(QByteArray File_byteArray);
             void set_disconnected();

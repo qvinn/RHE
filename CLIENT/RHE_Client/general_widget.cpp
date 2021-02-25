@@ -57,6 +57,8 @@ void General_Widget::create_base_settings() {
     check_setting_exist("settings/SERVER_IP", "192.168.1.10");
     check_setting_exist("settings/VERSION", "1.0");
     check_setting_exist("settings/DEBUG_PINS_NUMBER", "10");
+    check_setting_exist("settings/DEBUG_DISCRETENESS_TIME", 1);
+    check_setting_exist("settings/DEBUG_DISCRETENESS_TIME_TYPE", 0);
 }
 
 void General_Widget::check_setting_exist(QString type, QVariant val) {

@@ -65,6 +65,7 @@
             bool fit_exist = false;
             bool path_exist = false;
             bool ui_initialized = false;
+            bool language_changed = false;
             bool board_is_on = false;
             bool clr_trnsprnt = true;
             int prev_board_index;
@@ -88,10 +89,12 @@
             void on_pushButton_stp_drw_clicked();
             void on_cmbBx_chs_brd_currentIndexChanged(int index);
             void on_hrzntlSldr_cnt_dbg_pins_valueChanged(int value);
+            void on_spnBx_dbg_tm_valueChanged(int value);
+            void on_cmbBx_dbg_tm_tp_currentIndexChanged(int index);
             void on_pshBttn_set_path_to_proj_clicked();
             void on_pshBttn_snd_frmwr_clicked();
             void on_pshBttn_chk_prj_stat_clicked();
-            void on_pshBttn_ld_frmwr_clicked();
+            void on_pshBttn_ld_frmwr_clicked();       
 //            void slot_timer_interrupt();
             void slot_choose_board(QString jtag_code);
             void slot_accept_board(bool flg);

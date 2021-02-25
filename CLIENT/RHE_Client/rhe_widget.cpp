@@ -97,7 +97,7 @@ void RHE_Widget::on_pushButton_3_clicked() {
 
 void RHE_Widget::on_pushButton_strt_drw_clicked() {
     new_debug = true;
-    snd_rcv_module->start_debug();
+    snd_rcv_module->start_debug(static_cast<uint16_t>(ui->spnBx_dbg_tm->value()), static_cast<uint8_t>(ui->cmbBx_dbg_tm_tp->currentIndex()));
 //    if(tmr->isActive()) {
 //        pause_timer();
 //    } else {
@@ -154,6 +154,18 @@ void RHE_Widget::on_hrzntlSldr_cnt_dbg_pins_valueChanged(int value) {
         wvfrm_vwr->add_graphs_to_plot();
         wvfrm_vwr->plot_re_scale = false;
         wvfrm_vwr->re_scale_graph();
+    }
+}
+
+void RHE_Widget::on_spnBx_dbg_tm_valueChanged(int value) {
+    if(ui_initialized) {
+        gen_widg->save_setting("settings/DEBUG_DISCRETENESS_TIME", value);
+    }
+}
+
+void RHE_Widget::on_cmbBx_dbg_tm_tp_currentIndexChanged(int index) {
+    if(ui_initialized && language_changed) {
+        gen_widg->save_setting("settings/DEBUG_DISCRETENESS_TIME_TYPE", index);
     }
 }
 
@@ -252,15 +264,29 @@ void RHE_Widget::initialize_ui() {
 
 void RHE_Widget::post_initialize_ui() {
     ui_initialized = true;
+    set_ui_text();
     prev_board_index = gen_widg->get_setting("settings/CURRENT_BOARD").toInt();
     ui->cmbBx_chs_brd->setCurrentIndex(prev_board_index);
     ui->hrzntlSldr_cnt_dbg_pins->setValue(gen_widg->get_setting("settings/DEBUG_PINS_NUMBER").toInt());
+    ui->spnBx_dbg_tm->setValue(gen_widg->get_setting("settings/DEBUG_DISCRETENESS_TIME").toInt());
+    ui->cmbBx_dbg_tm_tp->setCurrentIndex(gen_widg->get_setting("settings/DEBUG_DISCRETENESS_TIME_TYPE").toInt());
 }
 
 void RHE_Widget::set_ui_text() {
+    language_changed = false;
     ui->pushButton_strt_drw->setText("Start Debug");
     ui->pushButton_stp_drw->setText("Stop Debug");
     ui->lbl_FName_LName->setText(tr("Hello, ") + lname_fname);
+    if(ui->cmbBx_dbg_tm_tp->count() == 0) {
+        ui->cmbBx_dbg_tm_tp->addItem(tr("s"));
+        ui->cmbBx_dbg_tm_tp->addItem(tr("ms"));
+        ui->cmbBx_dbg_tm_tp->addItem(tr("us"));
+    } else {
+        ui->cmbBx_dbg_tm_tp->setItemText(0, tr("s"));
+        ui->cmbBx_dbg_tm_tp->setItemText(1, tr("ms"));
+        ui->cmbBx_dbg_tm_tp->setItemText(2, tr("us"));
+    }
+    language_changed = true;
 }
 
 void RHE_Widget::set_fname_lname(QString str) {
