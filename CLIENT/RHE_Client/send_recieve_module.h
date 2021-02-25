@@ -7,8 +7,8 @@
     #define CS_ERROR 1
     #define CS_OK 0
 
-    #define DATA_BUFFER 60 // 32
-    #define RECIVE_BUFFER_SIZE (DATA_BUFFER+20) // 52
+    #define DATA_BUFFER 60 // 60 76
+    #define RECIVE_BUFFER_SIZE (DATA_BUFFER+20) //  DATA_BUFFER+4
     #define TRUE_DATA_BUFFER (DATA_BUFFER-2) // Два байта зарезервировано для определения размера передаваемых данных
 
     class Send_Recieve_Module : public QObject {
@@ -19,6 +19,11 @@
             int code_op;    // 4 байта
             char data[DATA_BUFFER];
         };
+
+//        struct U_packet {
+//            int code_op;    // 4 байта
+//            char data[DATA_BUFFER];
+//        };
 
         public:
             Send_Recieve_Module(QString _server_ip, int _server_port, General_Widget *widg = nullptr);
@@ -47,12 +52,17 @@
                 int time;				// 4 байта
             } debug_log_Packet;
 
+            typedef struct info_about_new_device {
+                    int id;
+                    char FPGA_id[20];
+            } info_about_new_device;
+
         private:
             void server_disconnected();
             void close_connection();
             void reset_ID();
             bool establish_socket();
-            void send_U_Packet(int id, int code_op, QByteArray data);
+            void send_U_Packet(int code_op, QByteArray data);
             void set_client_id(int id);
             QByteArray form_2bytes_QBA(QByteArray *data);
             int start_recive_file();
