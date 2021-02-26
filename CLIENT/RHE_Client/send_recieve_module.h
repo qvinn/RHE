@@ -7,23 +7,27 @@
     #define CS_ERROR 1
     #define CS_OK 0
 
-    #define DATA_BUFFER 60 // 60 76
-    #define RECIVE_BUFFER_SIZE (DATA_BUFFER+20) //  DATA_BUFFER+4
-    #define TRUE_DATA_BUFFER (DATA_BUFFER-2) // Два байта зарезервировано для определения размера передаваемых данных
+//    #define DATA_BUFFER 60 // 60 76
+//    #define RECIVE_BUFFER_SIZE (DATA_BUFFER+20) //  DATA_BUFFER+4
+//    #define SEND_FILE_BUFFER (DATA_BUFFER-1)
+
+#define DATA_BUFFER 76 // 60 76
+#define RECIVE_BUFFER_SIZE (DATA_BUFFER+4) //  DATA_BUFFER+4
+#define SEND_FILE_BUFFER (DATA_BUFFER-1)
 
     class Send_Recieve_Module : public QObject {
         Q_OBJECT
-        struct U_packet {
-            char ip[12];    // 12 байт
-            int id;         // 4 байта
-            int code_op;    // 4 байта
-            char data[DATA_BUFFER];
-        };
-
 //        struct U_packet {
+//            char ip[12];    // 12 байт
+//            int id;         // 4 байта
 //            int code_op;    // 4 байта
 //            char data[DATA_BUFFER];
 //        };
+
+        struct U_packet {
+            int code_op;    // 4 байта
+            char data[DATA_BUFFER];
+        };
 
         public:
             Send_Recieve_Module(QString _server_ip, int _server_port, General_Widget *widg = nullptr);
@@ -40,8 +44,13 @@
             void set_disconnected();
             void set_FPGA_id(QString FPGA_id);
 
-            typedef struct pin_in_Packet{		// 2 байта
-                uint8_t pinNum;	// 1 байт
+//            typedef struct pin_in_Packet{		// 2 байта
+//                uint8_t pinNum;	// 1 байт
+//                uint8_t state;	// 1 байт
+//            } pin_in_Packet;
+
+            typedef struct pin_in_Packet{		// 48 байта
+                char pinName[5];	// 5 байт
                 uint8_t state;	// 1 байт
             } pin_in_Packet;
 
@@ -64,10 +73,11 @@
             bool establish_socket();
             void send_U_Packet(int code_op, QByteArray data);
             void set_client_id(int id);
-            QByteArray form_2bytes_QBA(QByteArray *data);
+            QByteArray form_send_file_packet(QByteArray *data);
             int start_recive_file();
             int rcv_new_data_for_file(char *buf);
             int end_recive_file();
+            void recive_dbg_info(char *info);
 
             General_Widget *gen_widg = nullptr;
             QTcpSocket *socket = nullptr;

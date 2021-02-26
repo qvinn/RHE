@@ -153,6 +153,7 @@ void Send_Recieve_Module::wait_analize_recv_data() {
 //                recive_dbg_info(tmp_packet->data);
                 QByteArray debug_data(tmp_packet->data, sizeof(debug_log_Packet));
                 emit accept_debug_data_signal(debug_data);
+                recive_dbg_info(tmp_packet->data);
 //                qDebug() << "_________________________________Slave server sending DEBUG INFO";
                 break;
             }
@@ -182,9 +183,10 @@ void Send_Recieve_Module::stop_debug() {
 }
 
 bool Send_Recieve_Module::send_file_to_ss(QByteArray File_byteArray) {
-    int hops = File_byteArray.size() / TRUE_DATA_BUFFER;
+    int hops = File_byteArray.size() / SEND_FILE_BUFFER;
     if(hops < 1) {      // Если данные помещаются в одну посылку
-        QByteArray Result_byteArray = form_2bytes_QBA(&File_byteArray);
+        //QByteArray Result_byteArray = form_2bytes_QBA(&File_byteArray);
+        QByteArray Result_byteArray = form_send_file_packet(&File_byteArray);
         send_U_Packet(CLIENT_START_SEND_FILE, "");
         send_U_Packet(CLIENT_SENDING_FILE, Result_byteArray);
         send_U_Packet(CLIENT_FINISH_SEND_FILE, "");
@@ -193,12 +195,14 @@ bool Send_Recieve_Module::send_file_to_ss(QByteArray File_byteArray) {
         QByteArray tmp_data;
         QByteArray packet;
         // Чтобы было удобней отсчитывать в цикле, определим первую посылку отдельно
-        tmp_data = File_byteArray.mid(0, TRUE_DATA_BUFFER).data();
-        packet = form_2bytes_QBA(&tmp_data);
+        tmp_data = File_byteArray.mid(0, SEND_FILE_BUFFER).data();
+        //packet = form_2bytes_QBA(&tmp_data);
+        packet = form_send_file_packet(&tmp_data);
         packets.push_back(packet);
         for(int i = 1; i < hops + 1; i++) {
-            tmp_data = File_byteArray.mid((i * TRUE_DATA_BUFFER), TRUE_DATA_BUFFER).data();
-            packet = form_2bytes_QBA(&tmp_data);
+            tmp_data = File_byteArray.mid((i * SEND_FILE_BUFFER), SEND_FILE_BUFFER).data();
+            //packet = form_2bytes_QBA(&tmp_data);
+            packet = form_send_file_packet(&tmp_data);
             packets.push_back(packet);
         }
         last_send_file_bytes = 0;
@@ -277,26 +281,11 @@ void Send_Recieve_Module::set_client_id(int id) {
     my_client_ID = id;
 }
 
-QByteArray Send_Recieve_Module::form_2bytes_QBA(QByteArray *data) {
+QByteArray Send_Recieve_Module::form_send_file_packet(QByteArray *data)
+{
     QByteArray Result_byteArray;
-    int size = data->size();
-    char str[3];
-    sprintf(str, "%i", size);
-    //printf("str: %s\n",str);
-    //printf("pos1: %i, pos2: %i\n",str[0],str[1]);
-    /*
-    * Тут можно было задать любой символ: если размер - двузначное число, то нужно, зарезервировать вторую позицию
-    * char str[3] - 3, по тому, что в третьей ячейке будет находится \0
-    */
-    // FIXME: Определять размер и записывать его в один символ, как 1 байт.
-    if(size < 10) {
-        str[1] = 'e';
-    }
-    //printf("pos1: %i, pos2: %i\n",str[0],str[1]);
-    //printf("str: %s\n",str);
-    Result_byteArray.append(str);
+    Result_byteArray.append(static_cast<int8_t>(data->size()));
     Result_byteArray.append(*data);
-    //qDebug() << Result_byteArray;
     return Result_byteArray;
 }
 
@@ -311,12 +300,7 @@ int Send_Recieve_Module::start_recive_file() {
 }
 
 int Send_Recieve_Module::rcv_new_data_for_file(char *buf) {
-    char tst[2];
-    tst[0] = buf[0];
-    tst[1] = buf[1];
-    int size = atoi(tst);
-    file_rcv_bytes_count += size;
-    file->write(buf + 2);
+    file->write(buf + sizeof (int8_t));
     return CS_OK;
 }
 
@@ -324,4 +308,23 @@ int Send_Recieve_Module::end_recive_file() {
     file->close();
     qDebug() << "HBytes recive: " << file_rcv_bytes_count;
     return CS_OK;
+}
+
+void Send_Recieve_Module::recive_dbg_info(char *info)
+{
+    debug_log_Packet *Packet = (debug_log_Packet*)malloc(sizeof(debug_log_Packet));
+    memcpy(Packet,info,sizeof(debug_log_Packet));
+
+    qDebug() << "Recive debug data:";
+    qDebug() << "Info about " << Packet->pin_count << "pins";
+    qDebug() << "At: " << Packet->time << "ms";
+
+    for(int i = 0; i < Packet->pin_count; i++)
+    {
+        qDebug() << "Pin " << Packet->pins[i].pinName << "have state: " << Packet->pins[i].state;
+    }
+
+    qDebug() << "~~~~~~~~~~~~~~~~~";
+
+    free(Packet);
 }

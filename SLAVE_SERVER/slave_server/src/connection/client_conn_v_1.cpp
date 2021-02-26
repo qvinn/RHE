@@ -41,7 +41,7 @@ client_conn_v_1::client_conn_v_1(std::string _server_ip, int _server_port, std::
 	gdb = new Debug();
 	// FIXME: Вынести конфигурацию отладки в отдельную операцию
 	std::vector<int> pins_numbers{8,9,7};
-	gdb->setup_all(pins_numbers,2000,1000);
+	gdb->setup_all(pins_numbers,2000,500);
 #endif
 }
 
@@ -190,7 +190,7 @@ void client_conn_v_1::wait_analize_recv_data()
 					printf("_________________________________DEBUG ALREADY RUN!\n");
 					break;
 				}
-				std::thread gdb_thread(&Debug::start_debug_mode_2,gdb);
+				std::thread gdb_thread(&Debug::start_debug_process,gdb);
 				gdb_thread.detach();
 				printf("_________________________________START DEBUG\n");			
 				break;	
@@ -311,7 +311,7 @@ int client_conn_v_1::start_recive_file()
 
 int client_conn_v_1::rcv_new_data_for_file(char *buf)
 {
-	char tst[2];
+/* 	char tst[2];
 	tst[0] = buf[0];
 	tst[1] = buf[1];
 	//printf("[0][1] bytes: %s\n", tst);
@@ -319,8 +319,15 @@ int client_conn_v_1::rcv_new_data_for_file(char *buf)
 	//printf("size: %d\n", size);
 	file_rcv_bytes_count += size;
 	
-	fwrite(buf+2, sizeof(char), size, fp);
+	// FIXME: Скорее всего, из-за того, что это место довольно медлеенное
+	// буффер 60+ байт передается некорректно, так пока выполняются эти действия
+	// приходит новый пакет начинается новая запись
+	fwrite(buf+2, sizeof(char), size, fp); */
 	
+	int8_t file_size;
+	memcpy(&file_size, buf,sizeof(int8_t));
+	fwrite(buf+sizeof(int8_t), sizeof(char), file_size, fp);
+	file_rcv_bytes_count += file_size;
 	return CS_OK;
 }
 
@@ -366,7 +373,7 @@ void client_conn_v_1::send_file_to_client(std::string filename)
 	std::cout << "File size: " << fileSize << "\n";
 	
 	char *file_buf = new char [fileSize];
-	char *part_of_file = new char [TRUE_DATA_BUFFER];
+	char *part_of_file = new char [SEND_FILE_BUFFER];
 	//memset(file_buf,0,fileSize);
 	//read file
 	file.read(file_buf, fileSize);
@@ -375,30 +382,35 @@ void client_conn_v_1::send_file_to_client(std::string filename)
 	std::cout << "Prepare string: " << std::string(file_buf) << "\n";
 	
 	
-	int hops = fileSize / TRUE_DATA_BUFFER;
-	std::string result_string;
+	int hops = fileSize / SEND_FILE_BUFFER;
+	//std::string result_string;
 	
 	if(hops < 1) // Если данные помещаются в одну посылку
     {
-        result_string = form_2bytes_BA(std::string(file_buf));
-		std::cout << "result_string: " << result_string << "\n";
+		char *buff = (char *)malloc(DATA_BUFFER);
+		form_send_file_packet(std::string(file_buf),buff);
 		send_U_Packet(Socket, S_SERVER_START_SEND_FILE, NULL);
-		send_U_Packet(Socket, S_SERVER_SENDING_FILE, result_string.c_str());
+		send_U_Packet(Socket, S_SERVER_SENDING_FILE, buff);
 		send_U_Packet(Socket, S_SERVER_FINISH_SEND_FILE, NULL);
+		free(buff);
     }else 
 	{
 		send_U_Packet(Socket, S_SERVER_START_SEND_FILE, NULL);
 		
 		// Чтобы было удобней отсчитывать в цикле, определим первую посылку отдельно
-		memcpy(part_of_file,file_buf,TRUE_DATA_BUFFER);
-		result_string = form_2bytes_BA(std::string(part_of_file));
-		send_U_Packet(Socket, S_SERVER_SENDING_FILE, result_string.c_str());
+		memcpy(part_of_file,file_buf,SEND_FILE_BUFFER);
+		char *buff = (char *)malloc(DATA_BUFFER);
+		form_send_file_packet(std::string(part_of_file),buff);
+		send_U_Packet(Socket, S_SERVER_SENDING_FILE, buff);
+		free(buff);
 		
 		for(int i = 1; i < hops + 1; i++)
         {
-			memcpy(part_of_file,(file_buf+(i*TRUE_DATA_BUFFER)),TRUE_DATA_BUFFER);
-			result_string = form_2bytes_BA(std::string(part_of_file));
-			send_U_Packet(Socket, S_SERVER_SENDING_FILE, result_string.c_str());
+			memcpy(part_of_file,(file_buf+(i*SEND_FILE_BUFFER)),SEND_FILE_BUFFER);
+			char *buff = (char *)malloc(DATA_BUFFER);
+			form_send_file_packet(std::string(part_of_file),buff);
+			send_U_Packet(Socket, S_SERVER_SENDING_FILE, buff);
+			free(buff);
 		}
 		send_U_Packet(Socket, S_SERVER_FINISH_SEND_FILE, NULL);
 	}
@@ -411,24 +423,11 @@ void client_conn_v_1::send_file_to_client(std::string filename)
 	delete[] part_of_file;
 }
 
-std::string client_conn_v_1::form_2bytes_BA(std::string data)
+void client_conn_v_1::form_send_file_packet(std::string data, char *data_out)
 {
-	int size = data.size();
-	char str[3];
-    sprintf(str, "%i", size);
-    //printf("str: %s\n",str);
-    //printf("pos1: %i, pos2: %i\n",str[0],str[1]);
-    /*
-    * Тут можно было задать любой символ: если размер - двузначное число, то нужно, зарезервировать вторую позицию
-    * char str[3] - 3, по тому, что в третьей ячейке будет находится \0
-    */
-	 // FIXME: Определять размер и записывать его в один символ, как 1 байт.
-	 if(size < 10){str[1] = 'e';}
-	 //printf("pos1: %i, pos2: %i\n",str[0],str[1]);
-     //printf("str: %s\n",str);
-	 std::string result_string(str);
-	 result_string.append(data);
-	 return result_string;
+	int8_t file_size = data.length();
+	memcpy(data_out, &file_size, sizeof(int8_t));
+	memcpy(data_out+sizeof(int8_t), data.c_str(), file_size);
 }
 
 

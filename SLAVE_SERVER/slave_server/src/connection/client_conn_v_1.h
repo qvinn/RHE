@@ -26,26 +26,30 @@
 #define CS_ERROR 1
 #define CS_OK 0
 
-#define DATA_BUFFER 60 // 60 76
+/* #define DATA_BUFFER 60 // 60 76
 #define RECIVE_BUFFER_SIZE (DATA_BUFFER+20) //  DATA_BUFFER+4
-#define TRUE_DATA_BUFFER (DATA_BUFFER-2) // Два байта зарезервировано для определения размера передаваемых данных
+#define SEND_FILE_BUFFER (DATA_BUFFER-1) */
+
+#define DATA_BUFFER 76 // 60 76
+#define RECIVE_BUFFER_SIZE (DATA_BUFFER+4) //  DATA_BUFFER+4
+#define SEND_FILE_BUFFER (DATA_BUFFER-1)
 
 #define INIT_ID -2
 
 class client_conn_v_1
 {
 
-    struct U_packet {
+/*     struct U_packet {
         char ip[12];
         int id;
         int code_op;
         char data[DATA_BUFFER];
-    };
+    }; */
 	
-/* 	struct U_packet {
+	struct U_packet {
             int code_op;    // 4 байта
             char data[DATA_BUFFER];
-	}; */
+	};
 	
 	typedef struct s_server_get_id {
 		int id;
@@ -72,7 +76,7 @@ private:
 	int rcv_new_data_for_file(char *buf);
 	int end_recive_file();
 	void create_OpenOCD_cfg();
-	std::string form_2bytes_BA(std::string data);
+	void form_send_file_packet(std::string data, char *data_out);
 
     std::string server_ip = "";
     int server_port = 0;

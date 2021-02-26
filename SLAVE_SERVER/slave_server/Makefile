@@ -20,9 +20,9 @@ slave_server_app:
 	mkdir -p $(BUILD_DIR_NAME)
 	$(CC) $(CFLAGS) $(DFLAGS) $(IFLAG) $(FILES) -o $(BUILD_DIR_NAME)/slave_server $(LFLAGS) -fstack-protector 
 	
-gpio_tst:
-	mkdir -p $(BUILD_DIR_NAME)
-	$(CC) -Wall $(IFLAG) -o $(BUILD_DIR_NAME)/debug_manager ./src/Debug_module/debug_class.cpp ./src/Debug_manager/DEBUG_manager.cpp -lwiringPi -lpthread
+#gpio_tst:
+	#mkdir -p $(BUILD_DIR_NAME)
+	#$(CC) -Wall $(IFLAG) -o $(BUILD_DIR_NAME)/debug_manager ./src/Debug_module/debug_class.cpp ./src/Debug_manager/DEBUG_manager.cpp -lwiringPi -lpthread
 	
 clear:
 	rm -f *.o
