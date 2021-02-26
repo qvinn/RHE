@@ -20,18 +20,12 @@ Debug::Debug()
 {
 	// Инициализируем библиотеку для работы с GPIO
 	wiringPiSetup();
-	
-	// Создадим вектор состояний
-	for(int i=0; i < PIN_MAX; i++)
-	{
-		pins.push_back(std::vector<pinState>());
-	}
 }
 
 void Debug::setup_all(std::vector<int> par_number_of_pins, int par_duration_ms, int par_discrete_delay)
 {
 	number_of_pins = par_number_of_pins;
-	duration_ms = par_duration_ms;
+	max_duration_ms = par_duration_ms;
 	discrete_delay = par_discrete_delay;
 	
 	// Сконфигурируем пины
@@ -41,34 +35,19 @@ void Debug::setup_all(std::vector<int> par_number_of_pins, int par_duration_ms, 
 	}
 }
 
+void Debug::change_settings(int par_discrete_delay, uint8_t par_time_mode)
+{
+	discrete_delay = par_discrete_delay;
+	time_mode = par_time_mode;
+	
+}
+
 void Debug::setup_sock(int _sock)
 {
 	this->sock = _sock;
 }
 
-void Debug::start_debug_mode_1()
-{
-	// Очистим записи предыдущей отладки
-	clear_LOG();
-	// Установим начальное "текущее" время для первого прохода 1ms
-	int curr_time = 1;
-	// Выполним заданное количество итераций
-	while(curr_time < duration_ms)
-	{
-		// Проанализируем состояние нужных пинов в текущей итерации
-		for(long unsigned int i=0; i < number_of_pins.size(); i++)
-		{
-			// Прочитать состояние пина
-			int state = digitalRead(number_of_pins.at(i));
-			// Сохранить состояние пина
-			pins[i].push_back(pinState{curr_time,state});
-		}
-	delay(discrete_delay);
-	curr_time = curr_time+discrete_delay;
-	}
-}
-
-void Debug::start_debug_mode_2()
+void Debug::start_debug_process()
 {
 	stop_debug_flag = 0;
 	// Очистим записи
@@ -145,26 +124,6 @@ int8_t Debug::debug_is_run()
 	stop_debug_flag_mutex.unlock();
 }
 
-void Debug::show_LOG()
-{
-	for(long unsigned int i=0; i < pins.size(); i++)
-	{
-		for(long unsigned int k=0; k < pins.at(i).size(); k++)
-		{
-			printf("Pin with num: %li, at %i ms have state: %i\n",i, pins.at(i).at(k).time,pins.at(i).at(k).state);
-		}
-	}
-	
-}
-
-void Debug::clear_LOG()
-{
-	for(long unsigned int i=0; i < pins.size(); i++)
-	{
-		pins[i] = {};
-	}
-}
-
 void Debug::send_U_Packet(int sock, int code_op, const char *data)
 {
     struct U_packet *send_packet = (struct U_packet*)malloc(sizeof(struct U_packet));	
@@ -189,40 +148,36 @@ void Debug::form_Packet(std::vector<pinState> log, int curr_time, char *data)
 {
 	debug_log_Packet *Packet = (debug_log_Packet*)malloc(sizeof(debug_log_Packet));
 	
-	Packet->time_mode = 1; // FIXME: добавить гибкое занание ед. времени (ms)
+	Packet->time_mode = time_mode; // FIXME: добавить гибкое занание ед. времени (ms)
 	Packet->time = curr_time;
 	Packet->pin_count = log.size();
-	
-/* 	pin_in_Packet tmp_pins[log.size()];
-	for(int i = 0; i < log.size(); i++)
-	{
-		tmp_pins[i] = pin_in_Packet{(uint8_t)log.at(i).pinNum,(uint8_t)log.at(i).state};
-	}
-	
-	memcpy(Packet->pins,tmp_pins,sizeof(tmp_pins)); */
-	
-	for(int i = 0; i < log.size(); i++)
+
+// Вариант реализации с именем пина в виде uint8_t
+/* 	for(int i = 0; i < log.size(); i++)
 	{
 		Packet->pins[i] = pin_in_Packet{(uint8_t)log.at(i).pinNum,(uint8_t)log.at(i).state};
-	}
+	} */
+//---------------------------------------------
+// Вариант реализации с именем пина в виде строки
 	
-/* 	printf("time_mode: %i\n",Packet->time_mode);
-	printf("curr_time: %i\n",Packet->time);
-	printf("sizeof(debug_log_Packet): %li\n",sizeof(debug_log_Packet));
+	std::string default_name("pnum");
 	for(int i = 0; i < log.size(); i++)
 	{
-		printf("Debug___ pin: %i | state: %i\n",Packet->pins[i].pinNum,Packet->pins[i].state);
-	} */
-
+		pin_in_Packet tmp_packet;
+		memcpy(tmp_packet.pinName,default_name.c_str(),default_name.length());
+		//strcpy(tmp_packet.pinName, default_name.c_str());
+		memset(tmp_packet.pinName+5,0,1);		
+		tmp_packet.state = (uint8_t)log.at(i).state;
+		Packet->pins[i] = tmp_packet;
+	}
+//---------------------------------------------
 	memcpy(data,Packet,sizeof(debug_log_Packet));
 	
-	//printf("data: %s\n",data);
-	//std::cout << "data: " << buff << "\n";
 	
 	free(Packet);	
 }
 
-void explore_byte_buff(char *data, int size)
+void Debug::explore_byte_buff(char *data, int size)
 {
 	for(int i = 0; i < size; i++)
 	{

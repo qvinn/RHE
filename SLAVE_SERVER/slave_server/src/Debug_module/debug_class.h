@@ -9,6 +9,8 @@
 
 #define PIN_MAX 8
 
+#define D_DATA_BUFFER 76
+
 /*
 * - DURATION_DEBUG_DEBUG_CLASS - По этому ключу активируется измерение выполнения кода у тех участков, у которых
 *   прописана соответствующая директива "ifdef"
@@ -39,21 +41,26 @@ class Debug {
 		int state;
 	} pinState;
 	
-	struct U_packet {
+/* 	struct U_packet {
         char ip[12];
         int id;
         int code_op;
         char data[60]; // DATA_BUFFER
-    };
+    }; */
 	
-/* 	struct U_packet {
+	struct U_packet {
             int code_op;    // 4 байта
-            char data[76];
-	}; */
+            char data[D_DATA_BUFFER];
+	};
 	
 	// Сформируем структуры данных для посылки
-	typedef struct pin_in_Packet{		// 2 байта
+/* 	typedef struct pin_in_Packet{		// 2 байта
 		uint8_t pinNum;	// 1 байт
+		uint8_t state;	// 1 байт
+	} pin_in_Packet; */
+	
+	typedef struct pin_in_Packet{		// 48 байта
+		char pinName[5];	// 5 байт
 		uint8_t state;	// 1 байт
 	} pin_in_Packet;
 	
@@ -68,28 +75,17 @@ class Debug {
 	public:
 	Debug();
 	void setup_all(std::vector<int> par_number_of_pins, int par_duration_ms, int par_discrete_delay);
+	void change_settings(int par_discrete_delay, uint8_t par_time_mode);
 	void setup_sock(int _sock);
 	
-	/*
-		* В этой вариации, процесс отладки запустится, при этом отладчик 
-		* отработает все время "duration_ms" с дискретностью "discrete_delay"
-		* при этом все данные об отладке будут записаны в лог.
-		*
-		* !!! В данный момент, не используется в основнов проекте.
-	*/
-	void start_debug_mode_1();
-	
-	void start_debug_mode_2();
+	void start_debug_process();
 	
 	void stop_debug();
 	
 	int8_t debug_is_run();
 	
 	
-	void show_LOG();
-	
 	private:
-	void clear_LOG();
 	void send_U_Packet(int sock, int code_op, const char *data);	
 	void form_Packet(std::vector<pinState> log, int curr_time, char *data);
 	
@@ -99,7 +95,9 @@ class Debug {
 	// Поле, которым задается частота анализа портов платы
 	int discrete_delay = 1;	// ms
 	// Поле, которым задается продолжительность отладки(используется в "start_debug_mode_1()")
-	int duration_ms = 500;		// ms
+	int max_duration_ms = -1;		
+	
+	uint8_t time_mode = 1; // ms
 	// Вектор, который хранит в себе текущие номера портов(WiringPi), которые анализирует плата
 	std::vector<int> number_of_pins;
 	
@@ -115,15 +113,5 @@ class Debug {
 	*/
 	int stop_debug_flag = 1;
 	std::mutex stop_debug_flag_mutex;
-	
-	// Лог для хранения состояния пинов(используется для "start_debug_mode_1()")
-	// 
-	/*
-	* Этот лог заполнияется за время работы метода "start_debug_mode_1"
-	* После окончания работы метода, данные могут быть просмотрены с помощью "show_LOG()"
-	*
-	* !!! В данный момент, не используется в основнов проекте.	
-	*/
-	std::vector<std::vector<pinState>> pins;
 		
 };
