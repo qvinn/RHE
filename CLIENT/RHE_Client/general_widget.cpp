@@ -303,17 +303,32 @@ void Waveform_Viewer_Widget::on_pshBttn_open_save_wvfrm_clicked() {
             QString str = "";
             for(int i = 0; i < cnt; i++) {
                 str.clear();
+//                for(int k = 0; k < graph_count; k++) {
+//                    if(k == 0) {
+//                        str.append(QString::number(ui->diagram->graph(k)->data()->at(i)->key) + "/");
+//                    }
+//                    str.append(QString::number(ui->diagram->graph(k)->data()->at(i)->value - (k * 2) - 1));
+//                    if(k != (graph_count - 1)) {
+//                        str.append("/");
+//                    } else {
+//                        str.append("\n");
+//                    }
+//                }
+                ////////////MENTOR-LIKE FILL///////////
                 for(int k = 0; k < graph_count; k++) {
-                    if(k == 0) {
-                        str.append(QString::number(ui->diagram->graph(k)->data()->at(i)->key) + "/");
-                    }
-                    str.append(QString::number(ui->diagram->graph(k)->data()->at(i)->value - (k * 2) - 1));
-                    if(k != (graph_count - 1)) {
-                        str.append("/");
-                    } else {
-                        str.append("\n");
+                    if(k % 2 != 0) {
+                        if(k == 1) {
+                            str.append(QString::number(ui->diagram->graph(k)->data()->at(i)->key) + "/");
+                        }
+                        str.append(QString::number(ui->diagram->graph(k)->data()->at(i)->value - k));
+                        if(k != (graph_count - 1)) {
+                            str.append("/");
+                        } else {
+                            str.append("\n");
+                        }
                     }
                 }
+                ///////////////////////////////////////
                 gen_widg->save_file(this, tr("Saving waveform"), tr("Waveform (*.wvfrm)"), &str, &fn_nm, false, static_cast<bool>(i));
             }
         }
@@ -339,6 +354,9 @@ void Waveform_Viewer_Widget::on_pshBttn_open_save_wvfrm_clicked() {
             QList<int> prev_vals;
             prev_vals.clear();
             for(int i = 0; i < graph_count; i++) {
+                ////////////MENTOR-LIKE FILL///////////
+                prev_vals.append(0);
+                ///////////////////////////////////////
                 prev_vals.append(0);
             }
             re_scale_graph();
@@ -356,6 +374,9 @@ void Waveform_Viewer_Widget::on_pshBttn_open_save_wvfrm_clicked() {
                         if(i == 0) {
                             debug_time = lst_dat.at(i).toDouble();
                         } else {
+                            ////////////MENTOR-LIKE FILL///////////
+                            vals.append(0);
+                            ///////////////////////////////////////
                             vals.append(lst_dat.at(i).toInt());
                         }
                     }
@@ -406,8 +427,12 @@ void Waveform_Viewer_Widget::add_graphs_to_plot() {
         if((i + 1) < 10) {
             tmp.append(QString::number(0));
         }
+        ////////////MENTOR-LIKE FILL///////////
         graph_list->append(ui->diagram->addGraph());
-        graph_list->at(i)->setPen(QPen(QColor(0, 255, 0), 1));
+        graph_list->at(i * 2 + 0)->setPen(QPen(QColor(0, 255, 0, 0), 1));
+        ///////////////////////////////////////
+        graph_list->append(ui->diagram->addGraph());
+        graph_list->at(i * 2 + 1)->setPen(QPen(QColor(0, 255, 0, 255), 1));         //at(i)
         (*textTicker)->addTick((i * 2 + 1), tmp.append(QString::number(i + 1)));
     }
     ui->diagram->yAxis->setTicker(*textTicker);
@@ -439,10 +464,28 @@ void Waveform_Viewer_Widget::re_scale_graph() {
 
 void Waveform_Viewer_Widget::add_data_to_graph(QList<int> val, QList<int> *prev_vals, double time, bool val_changed) {
     for(int i = 0; i < graph_list->count(); i++) {
+        ////////////MENTOR-LIKE FILL///////////
+        int shft_val = abs((i % 2) - 1);
+        ///////////////////////////////////////
         if(val_changed) {
-            graph_list->at(i)->addData(time, (1 + (i * 2) + prev_vals->at(i)));
+            ////////////MENTOR-LIKE FILL///////////
+            graph_list->at(i)->addData(time, (shft_val + i + prev_vals->at(i)));
+            ///////////////////////////////////////
+//            graph_list->at(i)->addData(time, (1 + (i * 2) + prev_vals->at(i)));
         }
-        graph_list->at(i)->addData(time, (1 + (i * 2) + val.at(i)));
+        ////////////MENTOR-LIKE FILL///////////
+        if(val.at(i) == 1) {
+            graph_list->at(i)->setBrush(QBrush(QColor(0, 255, 0, 40)));
+            if(i != 0) {
+                graph_list->at(i - 1)->setBrush(QBrush(QColor(0, 0, 255, 0)));
+                graph_list->at(i)->setChannelFillGraph(graph_list->at(i - 1));
+            }
+        } else {
+            graph_list->at(i)->setBrush(QBrush(QColor(0, 0, 255, 0)));
+        }
+        graph_list->at(i)->addData(time, (shft_val + i + val.at(i)));
+        ///////////////////////////////////////
+//        graph_list->at(i)->addData(time, (1 + (i * 2) + val.at(i)));
         prev_vals->replace(i, val.at(i));
     }
 }
@@ -453,7 +496,7 @@ void Waveform_Viewer_Widget::add_data_to_graph_rltm(QList<int> val, QList<int> *
 }
 
 void Waveform_Viewer_Widget::remove_data_from_graph() {
-    for(int i = 0; i < graph_count; i++) {
+    for(int i = 0; i < graph_list->count(); i++) {
         graph_list->at(i)->data().data()->clear();
         graph_list->at(i)->data().clear();
     }

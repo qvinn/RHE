@@ -150,6 +150,9 @@ void RHE_Widget::on_hrzntlSldr_cnt_dbg_pins_valueChanged(int value) {
 //        cnt = 0;
         prev_vals->clear();
         for(int i = 0; i < value; i++) {
+            ////////////MENTOR-LIKE FILL///////////
+            prev_vals->append(0);
+            ///////////////////////////////////////
             prev_vals->append(0);
         }
         wvfrm_vwr->remove_graphs_form_plot();
@@ -625,6 +628,9 @@ void RHE_Widget::slot_accept_debug_data(QByteArray debug_data) {
     bool val_changed = false;
     double dbg_time = (static_cast<double>(tmp_packet->time) / 1000.0);
     for(int i = 0; i < tmp_packet->pin_count; i++) {
+        ////////////MENTOR-LIKE FILL///////////
+        val.append(0);
+        ///////////////////////////////////////
         val.append(tmp_packet->pins[i].state);
         if(prev_vals->at(i) != val.at(i)) {
             val_changed = true;
