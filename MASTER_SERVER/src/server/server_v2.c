@@ -19,8 +19,11 @@
 // Предварительные настройки сервера
 #define SERVER_PORT 3425
 
-#define DATA_BUFFER 60 // 60 76
-#define RECIVE_BUFFER_SIZE (DATA_BUFFER+20) // DATA_BUFFER+20 DATA_BUFFER+4
+/* #define DATA_BUFFER 60 // 60 76
+#define RECIVE_BUFFER_SIZE (DATA_BUFFER+20) // DATA_BUFFER+20 DATA_BUFFER+4 */
+
+#define DATA_BUFFER 76 // 60 76
+#define RECIVE_BUFFER_SIZE (DATA_BUFFER+4) // DATA_BUFFER+20 DATA_BUFFER+4
 // Предварительные настройки сервера - КОНЕЦ
 
 // Вспомогательные флаги
@@ -67,17 +70,17 @@ int total_slave_servers = 0;
 // Packet Description
 
 // Универсальный пакет
-struct U_packet {
+/* struct U_packet {
 	char ip[12];
 	int id;
 	int code_op;
 	char data[DATA_BUFFER];
-};
+}; */
 
-/* struct U_packet {
+struct U_packet {
             int code_op;    // 4 байта
             char data[DATA_BUFFER];
-}; */
+};
 
 typedef struct info_about_new_device {
 		int id;
