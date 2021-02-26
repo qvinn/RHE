@@ -315,13 +315,13 @@ void Waveform_Viewer_Widget::on_pshBttn_open_save_wvfrm_clicked() {
 //                    }
 //                }
                 ////////////MENTOR-LIKE FILL///////////
-                for(int k = 0; k < graph_count; k++) {
+                for(int k = 0; k < graph_list->count(); k++) {
                     if(k % 2 != 0) {
                         if(k == 1) {
                             str.append(QString::number(ui->diagram->graph(k)->data()->at(i)->key) + "/");
                         }
                         str.append(QString::number(ui->diagram->graph(k)->data()->at(i)->value - k));
-                        if(k != (graph_count - 1)) {
+                        if(k != (graph_list->count() - 1)) {
                             str.append("/");
                         } else {
                             str.append("\n");
@@ -430,9 +430,13 @@ void Waveform_Viewer_Widget::add_graphs_to_plot() {
         ////////////MENTOR-LIKE FILL///////////
         graph_list->append(ui->diagram->addGraph());
         graph_list->at(i * 2 + 0)->setPen(QPen(QColor(0, 255, 0, 0), 1));
+        graph_list->at(i * 2 + 0)->setBrush(QBrush(QColor(0, 0, 255, 0)));
         ///////////////////////////////////////
         graph_list->append(ui->diagram->addGraph());
         graph_list->at(i * 2 + 1)->setPen(QPen(QColor(0, 255, 0, 255), 1));         //at(i)
+        ////////////MENTOR-LIKE FILL///////////
+        graph_list->at(i * 2 + 1)->setBrush(QBrush(QColor(0, 255, 0, 40)));
+        ///////////////////////////////////////
         (*textTicker)->addTick((i * 2 + 1), tmp.append(QString::number(i + 1)));
     }
     ui->diagram->yAxis->setTicker(*textTicker);
@@ -474,14 +478,8 @@ void Waveform_Viewer_Widget::add_data_to_graph(QList<int> val, QList<int> *prev_
 //            graph_list->at(i)->addData(time, (1 + (i * 2) + prev_vals->at(i)));
         }
         ////////////MENTOR-LIKE FILL///////////
-        if(val.at(i) == 1) {
-            graph_list->at(i)->setBrush(QBrush(QColor(0, 255, 0, 40)));
-            if(i != 0) {
-                graph_list->at(i - 1)->setBrush(QBrush(QColor(0, 0, 255, 0)));
-                graph_list->at(i)->setChannelFillGraph(graph_list->at(i - 1));
-            }
-        } else {
-            graph_list->at(i)->setBrush(QBrush(QColor(0, 0, 255, 0)));
+        if((val.at(i) == 1) && (i != 0)) {
+            graph_list->at(i)->setChannelFillGraph(graph_list->at(i - 1));
         }
         graph_list->at(i)->addData(time, (shft_val + i + val.at(i)));
         ///////////////////////////////////////
