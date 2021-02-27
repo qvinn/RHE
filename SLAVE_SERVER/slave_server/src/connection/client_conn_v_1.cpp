@@ -23,6 +23,7 @@
 #define S_SERVER_SENDING_DEBUG_INFO 30
 #define CLIENT_WANT_START_DEBUG 31
 #define CLIENT_WANT_STOP_DEBUG 32
+#define CLIENT_WANT_CHANGE_DEBUG_SETTINGS 33
 
 #define DATA_EXIST 1
 #define DATA_NOT_EXIST 0
@@ -41,7 +42,7 @@ client_conn_v_1::client_conn_v_1(std::string _server_ip, int _server_port, std::
 	gdb = new Debug();
 	// FIXME: Вынести конфигурацию отладки в отдельную операцию
 	std::vector<int> pins_numbers{8,9,7};
-	gdb->setup_all(pins_numbers,2000,500);
+	gdb->setup_all(pins_numbers,2000);
 #endif
 }
 
@@ -96,6 +97,7 @@ void client_conn_v_1::wait_analize_recv_data()
 		
         char recv_buf[RECIVE_BUFFER_SIZE];
         bytes_read = recv(Rcv_Socet, recv_buf, RECIVE_BUFFER_SIZE, MSG_WAITALL); // Socket | Rcv_Socet
+				
         if(bytes_read < 1)
         {
             if(bytes_read == 0)
@@ -202,6 +204,20 @@ void client_conn_v_1::wait_analize_recv_data()
 			{
 				gdb->stop_debug();
 				printf("_________________________________STOP DEBUG\n");
+				break;	
+			}
+#endif
+
+#ifdef HW_EN
+			case CLIENT_WANT_CHANGE_DEBUG_SETTINGS:
+			{
+				if(gdb->debug_is_run() == 1)
+				{
+					printf("_________________________________DEBUG ALREADY RUN!\n");
+					break;
+				}
+				gdb->change_settings(tmp_packet->data);
+				printf("_________________________________CONFIGURE DEBUG\n");
 				break;	
 			}
 #endif
@@ -428,6 +444,14 @@ void client_conn_v_1::form_send_file_packet(std::string data, char *data_out)
 	int8_t file_size = data.length();
 	memcpy(data_out, &file_size, sizeof(int8_t));
 	memcpy(data_out+sizeof(int8_t), data.c_str(), file_size);
+}
+
+void client_conn_v_1::explore_byte_buff(char *data, int size)
+{
+	for(int i = 0; i < size; i++)
+	{
+		printf("byte n: %i -> %hhx\n",i,data[i]);
+	}
 }
 
 

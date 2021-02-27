@@ -22,23 +22,50 @@ Debug::Debug()
 	wiringPiSetup();
 }
 
-void Debug::setup_all(std::vector<int> par_number_of_pins, int par_duration_ms, int par_discrete_delay)
+void Debug::setup_all(std::vector<int> _Wpi_number_of_pins, int _max_duration_ms)
 {
-	number_of_pins = par_number_of_pins;
-	max_duration_ms = par_duration_ms;
-	discrete_delay = par_discrete_delay;
+	Wpi_number_of_pins = _Wpi_number_of_pins;
+	max_duration_ms = _max_duration_ms;
 	
 	// Сконфигурируем пины
-	for(long unsigned int i=0; i < par_number_of_pins.size(); i++)
+	for(long unsigned int i=0; i < _Wpi_number_of_pins.size(); i++)
 	{
-		pinMode(par_number_of_pins.at(i), INPUT);
+		pinMode(_Wpi_number_of_pins.at(i), INPUT);
 	}
 }
 
-void Debug::change_settings(int par_discrete_delay, uint8_t par_time_mode)
+void Debug::change_settings(const char *buff)
 {
-	discrete_delay = par_discrete_delay;
-	time_mode = par_time_mode;
+	memcpy(&discrete_delay, buff, sizeof(uint16_t));
+	memcpy(&time_mode, buff+sizeof(uint16_t), sizeof(uint8_t));
+	
+	printf("discrete delay: %i\n",discrete_delay);
+	printf("time mode:");
+	switch(time_mode)
+	{
+		case 0: // s
+		{
+			time_mux = 1000000;
+			printf(" s\n");
+			break;
+		}
+		case 1: // ms
+		{
+			time_mux = 1000;
+			printf(" ms\n");
+			break;
+		}
+		case 2: // us
+		{
+			time_mux = 1;
+			printf(" us\n");
+			break;
+		}
+		default:
+		{
+			break;
+		}
+	}
 	
 }
 
@@ -69,13 +96,13 @@ void Debug::start_debug_process()
 #ifdef DURATION_DEBUG_DEBUG_CLASS
 		auto start_1 = std::chrono::high_resolution_clock::now();
 #endif
-		for(long unsigned int i=0; i < number_of_pins.size(); i++)
+		for(long unsigned int i=0; i < Wpi_number_of_pins.size(); i++)
 		{
 			// Прочитать состояние пина
-			int state = digitalRead(number_of_pins.at(i));
+			int state = digitalRead(Wpi_number_of_pins.at(i));
 			// Сохранить состояние пина
-			log.push_back(pinState{number_of_pins.at(i),curr_time,state});
-			printf("Pin with num: %i, at %i ms have state: %i\n",number_of_pins.at(i), curr_time,state);
+			log.push_back(pinState{Wpi_number_of_pins.at(i),curr_time,state});
+			printf("Pin with num: %i, at %i ms have state: %i\n", Wpi_number_of_pins.at(i), curr_time,state);
 		}
 #ifdef DURATION_DEBUG_DEBUG_CLASS
 		auto stop_1 = std::chrono::high_resolution_clock::now();
@@ -97,7 +124,8 @@ void Debug::start_debug_process()
 
 		free(buff);
 		printf("--------->End_of_iteration\n");
-	delay(discrete_delay);
+	//delay(discrete_delay);
+	usleep(discrete_delay*time_mux);
 	curr_time = curr_time+discrete_delay;
 	}
 }

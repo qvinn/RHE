@@ -74,8 +74,8 @@ class Debug {
 	
 	public:
 	Debug();
-	void setup_all(std::vector<int> par_number_of_pins, int par_duration_ms, int par_discrete_delay);
-	void change_settings(int par_discrete_delay, uint8_t par_time_mode);
+	void setup_all(std::vector<int> _Wpi_number_of_pins, int _max_duration_ms);
+	void change_settings(const char *buff); // int par_discrete_delay, uint8_t par_time_mode
 	void setup_sock(int _sock);
 	
 	void start_debug_process();
@@ -86,20 +86,43 @@ class Debug {
 	
 	
 	private:
-	void send_U_Packet(int sock, int code_op, const char *data);	
+	
+	// Метод для отправки данных в сокет
+	/*
+	* int sock - FD(номер сокета)
+	* int code_op - КОД ОПЕРАЦИИ (см. Коды операций для сервера)
+	* const char *data - данные, которые передадутся в сокет
+	*/
+	void send_U_Packet(int sock, int code_op, const char *data);
+	
+	// Метод для формирования пакета с информацией об отладке
+	/*
+	* std::vector<pinState> log - вектор, в котором хранится упорядоченная информация
+	* char *data - буфер для отправки, в котроый запишемся информация
+	*/
 	void form_Packet(std::vector<pinState> log, int curr_time, char *data);
 	
 	// Метод для отладки - предназдачен, для вывода любых данных из буфера(и двоичных тоже)
 	void explore_byte_buff(char *data, int size);
 	
 	// Поле, которым задается частота анализа портов платы
-	int discrete_delay = 1;	// ms
-	// Поле, которым задается продолжительность отладки(используется в "start_debug_mode_1()")
+	int discrete_delay = 500;	// ms (Убедиться, что time_mode = 1)
+	// Поле, которым задается продолжительность отладки
 	int max_duration_ms = -1;		
-	
+	// Поле, которым задаются единицы измерения времени
+	// s	- 0
+	// ms	- 1
+	// us	- 2
 	uint8_t time_mode = 1; // ms
+	// По скольку, базовое время - это us, то для работы с другими ед. измерения создадим
+	// поле, которые будет осуществлять выравнивание данных(например, для s - это это будет 10^6)
+	int time_mux = 1000;
+	
 	// Вектор, который хранит в себе текущие номера портов(WiringPi), которые анализирует плата
-	std::vector<int> number_of_pins;
+	std::vector<int> Wpi_number_of_pins;
+	// Вектор, который хранит в себе текущие(реальны) номера портов, которые анализирует плата
+	// Эти номера можно посмотреть в документации на FPGA
+	std::vector<std::string> Q_number_of_pins;
 	
 	// Сокет, в который будут отправляться данные
 	int sock;

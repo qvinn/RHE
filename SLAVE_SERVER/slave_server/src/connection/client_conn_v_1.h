@@ -77,6 +77,7 @@ private:
 	int end_recive_file();
 	void create_OpenOCD_cfg();
 	void form_send_file_packet(std::string data, char *data_out);
+	void explore_byte_buff(char *data, int size);
 
     std::string server_ip = "";
     int server_port = 0;
