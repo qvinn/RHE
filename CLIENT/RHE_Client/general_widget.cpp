@@ -209,33 +209,36 @@ Waveform_Viewer_Widget::Waveform_Viewer_Widget(QWidget* parent, General_Widget *
         ui->pshBttn_open_save_wvfrm->setText(tr("Save waveform"));
     }
     ui->chckBx_as_wndw->setVisible(!stndln);
+    ui->horizontalSpacer_3->changeSize(5 * static_cast<int>(!stndln), ui->horizontalSpacer_3->geometry().height());
     this->setWindowTitle(tr("Waveform Viewer"));
     textTicker = new QSharedPointer<QCPAxisTickerText>(new QCPAxisTickerText());
+//    ui->diagram->setOpenGl(true);         //qcustomplot.cpp - line 909
+    ui->diagram->selectionRect()->setPen(QPen(QColor("#FFFF0000"), 1, Qt::SolidLine));
+    ui->diagram->selectionRect()->setBrush(QBrush(QColor("#50FF0000")));
     ui->diagram->addLayer("layerCursor", 0, QCustomPlot::limAbove);
     ui->diagram->layer("layerCursor")->setMode(QCPLayer::lmBuffered);
     curs_ver_line = new QCPItemLine(ui->diagram);
     curs_time = new QCPItemText(ui->diagram);
-    curs_ver_line->setPen(QPen(QColor("#FFFFFF00"), 2, Qt::SolidLine));
-    curs_time->setPen(QPen(QColor("#FFFFFF00"), 2, Qt::SolidLine));
+    curs_ver_line->setPen(QPen(QColor("#FFFFFF00"), 1, Qt::SolidLine));
+    curs_time->setPen(QPen(QColor("#FFFFFFFF"), 1, Qt::SolidLine));
+    curs_time->setBrush(QBrush(QColor("#FFFFFF00")));
     curs_time->setPadding(QMargins(2, 2, 2, 2));
     curs_ver_line->setLayer("layerCursor");
     curs_time->setLayer("layerCursor");
     ui->diagram->layer("layerCursor")->setVisible(false);
     connect(ui->diagram->xAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(slot_xAxisChanged(QCPRange)));
     connect(ui->diagram->yAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(slot_yAxisChanged(QCPRange)));
-    connect(ui->diagram, &QCustomPlot::mouseMove, this, &Waveform_Viewer_Widget::mouseMove);
+    connect(ui->diagram, &QCustomPlot::mouseMove, this, &Waveform_Viewer_Widget::slot_mouse_move);
+    connect(ui->diagram, &QCustomPlot::mousePress, this, &Waveform_Viewer_Widget::slot_mouse_pressed);
+    connect(ui->diagram, &QCustomPlot::mouseRelease, this, &Waveform_Viewer_Widget::slot_mouse_unpressed);
     graph_list = new QList<QCPGraph *>();
     flags = this->windowFlags();
 }
 
 Waveform_Viewer_Widget::~Waveform_Viewer_Widget() {
     remove_graphs_form_plot();
-//    ui->diagram->removeItem(curs_ver_line);
-//    ui->diagram->removeItem(curs_time);
     delete graph_list;
     delete textTicker;
-//    delete curs_ver_line;
-//    delete curs_time;
     delete ui;
 }
 
@@ -246,34 +249,6 @@ void Waveform_Viewer_Widget::showEvent(QShowEvent *) {
 void Waveform_Viewer_Widget::resizeEvent(QResizeEvent *) {
     ui->verticalLayoutWidget->resize(this->width(), this->height());
     ui->diagram->resize(ui->verticalLayoutWidget->width(), ui->verticalLayoutWidget->height() - ui->horizontalLayout->geometry().height());
-}
-
-void Waveform_Viewer_Widget::mouseMove(QMouseEvent *event) {
-    if((ui->diagram->xAxis->pixelToCoord(event->pos().x()) < 0.0) || (ui->diagram->yAxis->pixelToCoord(event->pos().y()) < 0.0)  || (ui->diagram->yAxis->pixelToCoord(event->pos().y()) > ui->diagram->yAxis->range().upper) || (ui->diagram->xAxis->pixelToCoord(event->pos().x()) > ui->diagram->xAxis->range().maxRange)) {
-        if(ui->diagram->layer("layerCursor")->visible()) {
-            ui->diagram->layer("layerCursor")->setVisible(false);
-            ui->diagram->replot();
-        }
-        qApp->setOverrideCursor(QCursor(Qt::ArrowCursor));
-    } else {
-        if(!ui->diagram->layer("layerCursor")->visible()) {
-            ui->diagram->layer("layerCursor")->setVisible(true);
-        }
-        qApp->setOverrideCursor(QCursor(Qt::BlankCursor));
-        curs_time->position->setCoords(ui->diagram->xAxis->pixelToCoord(event->pos().x()), ui->diagram->yAxis->pixelToCoord(event->pos().y()));
-        curs_time->setText(QString::number(ui->diagram->xAxis->pixelToCoord(event->pos().x())));
-        curs_ver_line->start->setCoords(ui->diagram->xAxis->pixelToCoord(event->pos().x()), -QCPRange::maxRange);
-        curs_ver_line->end->setCoords(ui->diagram->xAxis->pixelToCoord(event->pos().x()), QCPRange::maxRange);
-        ui->diagram->layer("layerCursor")->replot();
-    }
-//    qDebug() << ui->diagram->xAxis->pixelToCoord(event->pos().x()) << ui->diagram->yAxis->pixelToCoord(event->pos().y());
-//    QToolTip::showText(event->globalPos(),
-//                           "xAxis=" + QString::number(ui->diagram->xAxis->pixelToCoord(event->pos().x()), 'f', 2) + "\n" +
-//                           "yAxis=" + QString::number(ui->diagram->yAxis->pixelToCoord(event->pos().y()), 'f', 2) + "\n" +
-
-//                           "xAxis2=" + QString::number(ui->diagram->xAxis2->pixelToCoord(event->pos().x()), 'f', 2) + "\n" +
-//                           "yAxis2=" + QString::number(ui->diagram->yAxis2->pixelToCoord(event->pos().y()), 'f', 2) + "\n",
-//                           this, rect());
 }
 
 void Waveform_Viewer_Widget::on_pshBttn_fl_scl_clicked() {
@@ -396,7 +371,7 @@ void Waveform_Viewer_Widget::pshBttn_open_save_wvfrm_set_enabled(bool flg) {
 }
 
 void Waveform_Viewer_Widget::initialize_ui() {
-    ui->diagram->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+    ui->diagram->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom/* | QCP::iSelectPlottables*/);
     ui->diagram->xAxis->setBasePen(QPen(QColor(100, 100, 100), 1));
     ui->diagram->yAxis->setBasePen(QPen(QColor(100, 100, 100), 1));
     ui->diagram->xAxis->setTickPen(QPen(QColor(100, 100, 100), 1));
@@ -435,7 +410,8 @@ void Waveform_Viewer_Widget::add_graphs_to_plot() {
         graph_list->append(ui->diagram->addGraph());
         graph_list->at(i * 2 + 1)->setPen(QPen(QColor(0, 255, 0, 255), 1));         //at(i)
         ////////////MENTOR-LIKE FILL///////////
-        graph_list->at(i * 2 + 1)->setBrush(QBrush(QColor(0, 255, 0, 40)));
+        graph_list->at(i * 2 + 1)->setBrush(QBrush(QColor(0, 255, 0, 60)));
+//        graph_list->at(i * 2 + 1)->setBrush(QBrush(QColor(0, 77, 0, 255)));
         ///////////////////////////////////////
         (*textTicker)->addTick((i * 2 + 1), tmp.append(QString::number(i + 1)));
     }
@@ -519,6 +495,60 @@ void Waveform_Viewer_Widget::limitAxisRange(QCPAxis *axis, const QCPRange &newRa
             fixedRange.lower = lowerBound;
         }
         axis->setRange(fixedRange);         // adapt this line to use your plot/axis
+    }
+}
+
+void Waveform_Viewer_Widget::slot_mouse_move(QMouseEvent *event) {
+    if(!zoom_pressed) {
+        ui->diagram->setSelectionRectMode(QCP::srmNone);
+        double x_coord = ui->diagram->xAxis->pixelToCoord(event->pos().x());
+        double y_coord = ui->diagram->yAxis->pixelToCoord(event->pos().y());
+        if((x_coord < 0.0) || (y_coord < 0.0) || (x_coord > ui->diagram->xAxis->range().maxRange) || (y_coord > ui->diagram->yAxis->range().upper)) {
+            if(ui->diagram->layer("layerCursor")->visible()) {
+                ui->diagram->layer("layerCursor")->setVisible(false);
+                ui->diagram->replot();
+            }
+    //        qApp->setOverrideCursor(QCursor(Qt::ArrowCursor));
+        } else {
+            if(!ui->diagram->layer("layerCursor")->visible()) {
+                ui->diagram->layer("layerCursor")->setVisible(true);
+            }
+    //        qApp->setOverrideCursor(QCursor(Qt::BlankCursor));
+            if(static_cast<int>(ui->chckBx_attch_crsr->checkState()) == 2) {
+                curs_time->position->setCoords(round(x_coord), y_coord);
+                curs_time->setText(QString::number(round(x_coord)));
+                curs_ver_line->start->setCoords(round(x_coord), -QCPRange::maxRange);
+                curs_ver_line->end->setCoords(round(x_coord), QCPRange::maxRange);
+            } else {
+                curs_time->position->setCoords(x_coord, y_coord);
+                curs_time->setText(QString::number(x_coord));
+                curs_ver_line->start->setCoords(x_coord, -QCPRange::maxRange);
+                curs_ver_line->end->setCoords(x_coord, QCPRange::maxRange);
+            }
+            ui->diagram->layer("layerCursor")->replot();
+        }
+    }
+//    qDebug() << ui->diagram->xAxis->pixelToCoord(event->pos().x()) << ui->diagram->yAxis->pixelToCoord(event->pos().y());
+//    QToolTip::showText(event->globalPos(),
+//                           "xAxis=" + QString::number(ui->diagram->xAxis->pixelToCoord(event->pos().x()), 'f', 2) + "\n" +
+//                           "yAxis=" + QString::number(ui->diagram->yAxis->pixelToCoord(event->pos().y()), 'f', 2) + "\n" +
+//                           "xAxis2=" + QString::number(ui->diagram->xAxis2->pixelToCoord(event->pos().x()), 'f', 2) + "\n" +
+//                           "yAxis2=" + QString::number(ui->diagram->yAxis2->pixelToCoord(event->pos().y()), 'f', 2) + "\n",
+//                           this, rect());
+}
+
+void Waveform_Viewer_Widget::slot_mouse_pressed(QMouseEvent *event) {
+    if(event->button() == Qt::RightButton) {
+        zoom_pressed = true;
+        ui->diagram->layer("layerCursor")->setVisible(false);
+        ui->diagram->replot();
+        ui->diagram->setSelectionRectMode(QCP::srmZoom);
+    }
+}
+
+void Waveform_Viewer_Widget::slot_mouse_unpressed(QMouseEvent *event) {
+    if(event->button() == Qt::RightButton) {
+        zoom_pressed = false;
     }
 }
 

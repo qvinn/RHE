@@ -61,7 +61,6 @@
             void add_data_to_graph(QList<int> val, QList<int> *prev_vals, double time, bool val_changed);
             void add_data_to_graph_rltm(QList<int> val, QList<int> *prev_vals, double time, bool val_changed);
             void remove_data_from_graph();
-            void mouseMove(QMouseEvent *event);
 
             bool plot_re_scale = false;
             int graph_count;
@@ -77,6 +76,7 @@
             QCPItemText *curs_time = nullptr;
             Qt::WindowFlags flags;
 
+            bool zoom_pressed = false;
             bool standalone;
 
         private slots:
@@ -86,6 +86,9 @@
             void on_pshBttn_clr_clicked();
             void on_chckBx_as_wndw_stateChanged(int state);
             void on_pshBttn_open_save_wvfrm_clicked();
+            void slot_mouse_move(QMouseEvent *event);
+            void slot_mouse_pressed(QMouseEvent *event);
+            void slot_mouse_unpressed(QMouseEvent *event);
             void slot_xAxisChanged(const QCPRange &newRange);
             void slot_yAxisChanged(const QCPRange &newRange);
 
