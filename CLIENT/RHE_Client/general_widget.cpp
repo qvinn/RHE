@@ -206,14 +206,8 @@ Waveform_Viewer_Widget::Waveform_Viewer_Widget(QWidget* parent, General_Widget *
     ui->setupUi(this);
     gen_widg = widg;
     standalone = stndln;
-    if(standalone) {
-        ui->pshBttn_open_save_wvfrm->setText(tr("Open waveform"));
-    } else {
-        ui->pshBttn_open_save_wvfrm->setText(tr("Save waveform"));
-    }
     ui->chckBx_as_wndw->setVisible(!stndln);
     ui->horizontalSpacer_3->changeSize(5 * static_cast<int>(!stndln), ui->horizontalSpacer_3->geometry().height());
-    this->setWindowTitle(tr("Waveform Viewer"));
     textTicker = new QSharedPointer<QCPAxisTickerText>(new QCPAxisTickerText());
     dyn_tckr = new QSharedPointer<QCPAxisTickerFixed>(new QCPAxisTickerFixed());
 //    ui->diagram->setOpenGl(true);         //qcustomplot.cpp - line 909
@@ -290,10 +284,10 @@ void Waveform_Viewer_Widget::on_chckBx_as_wndw_stateChanged(int state) {
 }
 
 void Waveform_Viewer_Widget::on_pshBttn_open_save_wvfrm_clicked() {
-    if(!standalone) {
-        save_waveform();
-    } else {
+    if(standalone) {
         load_waveform();
+    } else {
+        save_waveform();
     }
 }
 
@@ -351,6 +345,12 @@ void Waveform_Viewer_Widget::post_initialize_ui() {
 
 void Waveform_Viewer_Widget::set_ui_text() {
     language_changed = false;
+    this->setWindowTitle(tr("Waveform Viewer"));
+    if(standalone) {
+        ui->pshBttn_open_save_wvfrm->setText(tr("Open waveform"));
+    } else {
+        ui->pshBttn_open_save_wvfrm->setText(tr("Save waveform"));
+    }
     if(ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->count() == 0) {
         ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->addItem(tr("s"));
         ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->addItem(tr("ms"));
@@ -489,14 +489,8 @@ void Waveform_Viewer_Widget::add_data_to_graph(QList<int> val, QList<int> *prev_
             graph_list->at(i)->addData(time, (shft_val + i + prev_vals->at(i)));
         }
         if((val.at(i) == 1) && (i != 0)) {
+            graph_list->at(i)->setBrush(QBrush(QColor(0, 255, 0, 60)));
             graph_list->at(i)->setChannelFillGraph(graph_list->at(i - 1));
-        }
-        if((i % 2) == 1) {
-            if(val.at(i) == 1) {
-                graph_list->at(i)->setBrush(QBrush(QColor(0, 255, 0, 60)));
-            } else {
-                graph_list->at(i)->setBrush(QBrush(QColor(0, 255, 0, 0)));
-            }
         }
         graph_list->at(i)->addData(time, (shft_val + i + val.at(i)));
         prev_vals->replace(i, val.at(i));
