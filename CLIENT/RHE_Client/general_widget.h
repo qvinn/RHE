@@ -66,22 +66,38 @@
             int graph_count;
 
         private:
+            void post_initialize_ui();
+            void set_ui_text();
+            void load_waveform();
+            void save_waveform();
             void limitAxisRange(QCPAxis *axis, const QCPRange &newRange, const QCPRange &limitRange);
 
             Ui::Waveform_Viewer *ui;
             General_Widget *gen_widg = nullptr;
             QList<QCPGraph *> *graph_list = nullptr;
             QSharedPointer<QCPAxisTickerText> *textTicker = nullptr;
+            QSharedPointer<QCPAxisTickerFixed> *dyn_tckr = nullptr;
             QCPItemLine *curs_ver_line = nullptr;
             QCPItemText *curs_time = nullptr;
             Qt::WindowFlags flags;
 
+            double time_coef;
+            double x_tckr_step;
+
             bool zoom_pressed = false;
+            bool language_changed = false;
+            bool ui_initialized = false;
             bool standalone;
+
+        public slots:
+            void slot_re_translate();
 
         private slots:
             void showEvent(QShowEvent *);
             void resizeEvent(QResizeEvent *);
+            void on_chckBx_attch_crsr_stateChanged(int state);
+            void on_spnBx_wvfrm_vwr_dscrtnss_tm_valueChanged(int value);
+            void on_cmbBx_wvfrm_vwr_dscrtnss_tm_tp_currentIndexChanged(int index);
             void on_pshBttn_fl_scl_clicked();
             void on_pshBttn_clr_clicked();
             void on_chckBx_as_wndw_stateChanged(int state);

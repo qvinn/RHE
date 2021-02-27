@@ -32,6 +32,7 @@
             Send_Recieve_Module *snd_rcv_module = nullptr;
             RegistrationWidget *ptr_registration_widg = nullptr;
             RHE_Widget *ptr_RHE_widg = nullptr;
+            Waveform_Viewer_Widget *wvfrm_vwr = nullptr;
             QMenuBar *menu_bar = nullptr;
             QComboBox *cmbBx_lng_chs = nullptr;
             QAction *chkBx_fls_chckng_actn = nullptr;

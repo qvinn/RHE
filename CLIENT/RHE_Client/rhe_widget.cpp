@@ -16,13 +16,11 @@ RHE_Widget::RHE_Widget(QWidget *parent, General_Widget *widg, Send_Recieve_Modul
     led_width_height = new QList<QPoint>();
     wvfrm_vwr = new Waveform_Viewer_Widget(this, gen_widg, false);
     connect(wvfrm_vwr, &Waveform_Viewer_Widget::as_window_signal, this, &RHE_Widget::slot_as_window);
+    connect(gen_widg, &General_Widget::re_translate_signal, wvfrm_vwr, &Waveform_Viewer_Widget::slot_re_translate);
     connect(snd_rcv_module, &Send_Recieve_Module::choose_board_signal, this, &RHE_Widget::slot_choose_board);
     connect(snd_rcv_module, &Send_Recieve_Module::accept_board_signal, this, &RHE_Widget::slot_accept_board);
     connect(snd_rcv_module, &Send_Recieve_Module::accept_debug_data_signal, this, &RHE_Widget::slot_accept_debug_data);
     prev_vals = new QList<int>();
-//    tmr = new QTimer(this);
-//    tmr->setInterval(100);
-//    connect(tmr, &QTimer::timeout, this, &RHE_Widget::slot_timer_interrupt);
     pre_initialize_ui();
 }
 
@@ -100,25 +98,12 @@ void RHE_Widget::on_pushButton_strt_drw_clicked() {
     snd_rcv_module->start_debug(static_cast<uint16_t>(ui->spnBx_dbg_tm->value()), static_cast<uint8_t>(ui->cmbBx_dbg_tm_tp->currentIndex()));
     wvfrm_vwr->pshBttn_open_save_wvfrm_set_enabled(false);
     ui->hrzntlSldr_cnt_dbg_pins->setEnabled(false);
-//    if(tmr->isActive()) {
-//        pause_timer();
-//    } else {
-//        if(cnt == -1) {
-//            wvfrm_vwr->remove_data_from_graph();
-//        }
-//        wvfrm_vwr->pshBttn_open_save_wvfrm_set_enabled(false);
-//        tmr->setInterval(100);
-//        tmr->start();
-//    }
 }
 
 void RHE_Widget::on_pushButton_stp_drw_clicked() {
     snd_rcv_module->stop_debug();
     wvfrm_vwr->pshBttn_open_save_wvfrm_set_enabled(true);
     ui->hrzntlSldr_cnt_dbg_pins->setEnabled(true);
-//    pause_timer();
-//    cnt = -1;
-//    debug_time = 0.0;
 }
 
 void RHE_Widget::on_cmbBx_chs_brd_currentIndexChanged(int index) {
@@ -147,12 +132,9 @@ void RHE_Widget::on_hrzntlSldr_cnt_dbg_pins_valueChanged(int value) {
         ui->lcdNmbr_cnt_dbg_pins->display(value);
         gen_widg->save_setting("settings/DEBUG_PINS_NUMBER", value);
         wvfrm_vwr->plot_re_scale = true;
-//        cnt = 0;
         prev_vals->clear();
         for(int i = 0; i < value; i++) {
-            ////////////MENTOR-LIKE FILL///////////
             prev_vals->append(0);
-            ///////////////////////////////////////
             prev_vals->append(0);
         }
         wvfrm_vwr->remove_graphs_form_plot();
@@ -576,30 +558,6 @@ void RHE_Widget::add_data_to_qpoint(QList<QPoint> *lst, int val, bool is_x) {
     }
 }
 
-/*
-void RHE_Widget::pause_timer() {
-    tmr->stop();
-    wvfrm_vwr->pshBttn_open_save_wvfrm_set_enabled(true);
-}
-
-void RHE_Widget::slot_timer_interrupt() {
-    on_pushButton_strt_drw_clicked();
-    cnt++;
-    debug_time = (static_cast<double>(cnt) / 100.0);
-    QList<int> val;
-    val.clear();
-    bool val_changed = false;
-    for(int i = 0; i < ui->hrzntlSldr_cnt_dbg_pins->value(); i++) {
-        val.append(rand() % 2);
-        if(prev_vals->at(i) != val.at(i)) {
-            val_changed = true;
-        }
-    }
-    wvfrm_vwr->add_data_to_graph_rltm(val, prev_vals, debug_time, val_changed);
-    on_pushButton_strt_drw_clicked();
-}
-*/
-
 void RHE_Widget::slot_choose_board(QString jtag_code) {
     for(int i = 0; i < jtag_id_codes->count(); i++) {
         if(jtag_id_codes->at(i).compare(jtag_code, Qt::CaseInsensitive) == 0) {
@@ -628,9 +586,7 @@ void RHE_Widget::slot_accept_debug_data(QByteArray debug_data) {
     bool val_changed = false;
     double dbg_time = (static_cast<double>(tmp_packet->time) / 1000.0);
     for(int i = 0; i < tmp_packet->pin_count; i++) {
-        ////////////MENTOR-LIKE FILL///////////
         val.append(0);
-        ///////////////////////////////////////
         val.append(tmp_packet->pins[i].state);
         if(prev_vals->at(i) != val.at(i)) {
             val_changed = true;

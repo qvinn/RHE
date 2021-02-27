@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 }
 
 MainWindow::~MainWindow() {
+    delete wvfrm_vwr;
     delete ptr_registration_widg;
     delete ptr_RHE_widg;
     delete wvfrm_vwr_actn;
@@ -47,7 +48,8 @@ void MainWindow::resizeEvent(QResizeEvent *) {
 }
 
 void MainWindow::onPshBttnWvfrmVwr() {
-    Waveform_Viewer_Widget *wvfrm_vwr = new Waveform_Viewer_Widget(nullptr, gen_widg, true);    
+    wvfrm_vwr = new Waveform_Viewer_Widget(nullptr, gen_widg, true);
+    connect(gen_widg, &General_Widget::re_translate_signal, wvfrm_vwr, &Waveform_Viewer_Widget::slot_re_translate);
     wvfrm_vwr->initialize_ui();
     wvfrm_vwr->graph_count = 16;
     wvfrm_vwr->re_scale_graph();

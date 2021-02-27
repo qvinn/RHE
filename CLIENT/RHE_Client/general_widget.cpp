@@ -59,6 +59,9 @@ void General_Widget::create_base_settings() {
     check_setting_exist("settings/DEBUG_PINS_NUMBER", "10");
     check_setting_exist("settings/DEBUG_DISCRETENESS_TIME", 1);
     check_setting_exist("settings/DEBUG_DISCRETENESS_TIME_TYPE", 0);
+    check_setting_exist("settings/WVFRM_VWR_ATTCH_CRSR", 0);
+    check_setting_exist("settings/WVFRM_VWR_DISCRETENESS_TIME", 1);
+    check_setting_exist("settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE", 0);
 }
 
 void General_Widget::check_setting_exist(QString type, QVariant val) {
@@ -212,20 +215,10 @@ Waveform_Viewer_Widget::Waveform_Viewer_Widget(QWidget* parent, General_Widget *
     ui->horizontalSpacer_3->changeSize(5 * static_cast<int>(!stndln), ui->horizontalSpacer_3->geometry().height());
     this->setWindowTitle(tr("Waveform Viewer"));
     textTicker = new QSharedPointer<QCPAxisTickerText>(new QCPAxisTickerText());
+    dyn_tckr = new QSharedPointer<QCPAxisTickerFixed>(new QCPAxisTickerFixed());
 //    ui->diagram->setOpenGl(true);         //qcustomplot.cpp - line 909
-    ui->diagram->selectionRect()->setPen(QPen(QColor("#FFFF0000"), 1, Qt::SolidLine));
-    ui->diagram->selectionRect()->setBrush(QBrush(QColor("#50FF0000")));
-    ui->diagram->addLayer("layerCursor", 0, QCustomPlot::limAbove);
-    ui->diagram->layer("layerCursor")->setMode(QCPLayer::lmBuffered);
     curs_ver_line = new QCPItemLine(ui->diagram);
     curs_time = new QCPItemText(ui->diagram);
-    curs_ver_line->setPen(QPen(QColor("#FFFFFF00"), 1, Qt::SolidLine));
-    curs_time->setPen(QPen(QColor("#FFFFFFFF"), 1, Qt::SolidLine));
-    curs_time->setBrush(QBrush(QColor("#FFFFFF00")));
-    curs_time->setPadding(QMargins(2, 2, 2, 2));
-    curs_ver_line->setLayer("layerCursor");
-    curs_time->setLayer("layerCursor");
-    ui->diagram->layer("layerCursor")->setVisible(false);
     connect(ui->diagram->xAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(slot_xAxisChanged(QCPRange)));
     connect(ui->diagram->yAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(slot_yAxisChanged(QCPRange)));
     connect(ui->diagram, &QCustomPlot::mouseMove, this, &Waveform_Viewer_Widget::slot_mouse_move);
@@ -239,6 +232,7 @@ Waveform_Viewer_Widget::~Waveform_Viewer_Widget() {
     remove_graphs_form_plot();
     delete graph_list;
     delete textTicker;
+    delete dyn_tckr;
     delete ui;
 }
 
@@ -248,7 +242,32 @@ void Waveform_Viewer_Widget::showEvent(QShowEvent *) {
 
 void Waveform_Viewer_Widget::resizeEvent(QResizeEvent *) {
     ui->verticalLayoutWidget->resize(this->width(), this->height());
-    ui->diagram->resize(ui->verticalLayoutWidget->width(), ui->verticalLayoutWidget->height() - ui->horizontalLayout->geometry().height());
+    ui->diagram->resize(ui->verticalLayoutWidget->width(), (ui->verticalLayoutWidget->height() - ui->horizontalLayout->geometry().height() - ui->horizontalLayout_2->geometry().height()));
+}
+
+void Waveform_Viewer_Widget::on_chckBx_attch_crsr_stateChanged(int state) {
+    if(ui_initialized) {
+        gen_widg->save_setting("settings/WVFRM_VWR_ATTCH_CRSR", state);
+    }
+}
+
+void Waveform_Viewer_Widget::on_spnBx_wvfrm_vwr_dscrtnss_tm_valueChanged(int value) {
+    if(ui_initialized) {
+        gen_widg->save_setting("settings/WVFRM_VWR_DISCRETENESS_TIME", value);
+        time_coef = pow(1000.0, static_cast<double>(ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->currentIndex()));
+        x_tckr_step = static_cast<double>(value) / time_coef;
+        (*dyn_tckr)->setTickStep(x_tckr_step);
+        ui->diagram->xAxis->setTicker(*dyn_tckr);
+        ui->diagram->xAxis->setTickLabelRotation(-30);
+        ui->diagram->replot();
+    }
+}
+
+void Waveform_Viewer_Widget::on_cmbBx_wvfrm_vwr_dscrtnss_tm_tp_currentIndexChanged(int index) {
+    if(ui_initialized && language_changed) {
+        gen_widg->save_setting("settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE", index);
+        on_spnBx_wvfrm_vwr_dscrtnss_tm_valueChanged(ui->spnBx_wvfrm_vwr_dscrtnss_tm->value());
+    }
 }
 
 void Waveform_Viewer_Widget::on_pshBttn_fl_scl_clicked() {
@@ -272,97 +291,9 @@ void Waveform_Viewer_Widget::on_chckBx_as_wndw_stateChanged(int state) {
 
 void Waveform_Viewer_Widget::on_pshBttn_open_save_wvfrm_clicked() {
     if(!standalone) {
-        if(graph_count != 0) {
-            int cnt = ui->diagram->graph(0)->data()->size();
-            QString fn_nm = "";
-            QString str = "";
-            for(int i = 0; i < cnt; i++) {
-                str.clear();
-//                for(int k = 0; k < graph_count; k++) {
-//                    if(k == 0) {
-//                        str.append(QString::number(ui->diagram->graph(k)->data()->at(i)->key) + "/");
-//                    }
-//                    str.append(QString::number(ui->diagram->graph(k)->data()->at(i)->value - (k * 2) - 1));
-//                    if(k != (graph_count - 1)) {
-//                        str.append("/");
-//                    } else {
-//                        str.append("\n");
-//                    }
-//                }
-                ////////////MENTOR-LIKE FILL///////////
-                for(int k = 0; k < graph_list->count(); k++) {
-                    if(k % 2 != 0) {
-                        if(k == 1) {
-                            str.append(QString::number(ui->diagram->graph(k)->data()->at(i)->key) + "/");
-                        }
-                        str.append(QString::number(ui->diagram->graph(k)->data()->at(i)->value - k));
-                        if(k != (graph_list->count() - 1)) {
-                            str.append("/");
-                        } else {
-                            str.append("\n");
-                        }
-                    }
-                }
-                ///////////////////////////////////////
-                gen_widg->save_file(this, tr("Saving waveform"), tr("Waveform (*.wvfrm)"), &str, &fn_nm, false, static_cast<bool>(i));
-            }
-        }
+        save_waveform();
     } else {
-        QStringList *lst = gen_widg->load_files(false, false, tr("Choose waveform file"), tr("Waveform (*.wvfrm)"));
-        if((lst == nullptr) || (lst->count() == 0)) {
-            gen_widg->show_message_box(tr("Error"), tr("Waveform file not choosed"), 0);
-            return;
-        }
-        QFile *file = new QFile(QFileInfo(lst->at(0)).absoluteFilePath());
-        if(file->open(QFile::ReadOnly)) {
-            QString str = file->readLine();
-            file->close();
-            str.replace("\n", "");
-            QRegExp tagExp("/");
-            QStringList lst = str.split(tagExp);
-            plot_re_scale = true;
-            remove_graphs_form_plot();
-            graph_count = lst.count() - 1;
-            double debug_time = 0.0;
-            QList<int> vals;
-            vals.clear();
-            QList<int> prev_vals;
-            prev_vals.clear();
-            for(int i = 0; i < graph_count; i++) {
-                ////////////MENTOR-LIKE FILL///////////
-                prev_vals.append(0);
-                ///////////////////////////////////////
-                prev_vals.append(0);
-            }
-            re_scale_graph();
-            add_graphs_to_plot();
-            plot_re_scale = false;
-            re_scale_graph();
-            if(file->open(QIODevice::ReadOnly)) {
-                QTextStream in(file);
-                while(!in.atEnd()) {
-                    QString str_dat = in.readLine();
-                    str_dat.replace("\n", "");
-                    QRegExp tagExp("/");
-                    QStringList lst_dat = str_dat.split(tagExp);
-                    for(int i = 0; i < lst_dat.count(); i++) {
-                        if(i == 0) {
-                            debug_time = lst_dat.at(i).toDouble();
-                        } else {
-                            ////////////MENTOR-LIKE FILL///////////
-                            vals.append(0);
-                            ///////////////////////////////////////
-                            vals.append(lst_dat.at(i).toInt());
-                        }
-                    }
-                    add_data_to_graph(vals, &prev_vals, debug_time, false);
-                    vals.clear();
-                }
-                file->close();
-            }
-        }
-        delete file;
-        re_scale_graph();
+        load_waveform();
     }
 }
 
@@ -371,7 +302,7 @@ void Waveform_Viewer_Widget::pshBttn_open_save_wvfrm_set_enabled(bool flg) {
 }
 
 void Waveform_Viewer_Widget::initialize_ui() {
-    ui->diagram->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom/* | QCP::iSelectPlottables*/);
+    ui->diagram->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
     ui->diagram->xAxis->setBasePen(QPen(QColor(100, 100, 100), 1));
     ui->diagram->yAxis->setBasePen(QPen(QColor(100, 100, 100), 1));
     ui->diagram->xAxis->setTickPen(QPen(QColor(100, 100, 100), 1));
@@ -394,6 +325,121 @@ void Waveform_Viewer_Widget::initialize_ui() {
     ui->diagram->axisRect()->setBackground(axisRectGradient);
     ui->diagram->xAxis->setSubTicks(false);
     ui->diagram->yAxis->setSubTicks(false);
+    ui->diagram->selectionRect()->setPen(QPen(QColor("#FFFF0000"), 1, Qt::SolidLine));
+    ui->diagram->selectionRect()->setBrush(QBrush(QColor("#50FF0000")));
+    ui->diagram->addLayer("layerCursor", 0, QCustomPlot::limAbove);
+    ui->diagram->layer("layerCursor")->setMode(QCPLayer::lmBuffered);
+    curs_ver_line->setPen(QPen(QColor("#FFFFFF00"), 1, Qt::SolidLine));
+    curs_time->setPen(QPen(QColor("#FFFFFFFF"), 1, Qt::SolidLine));
+    curs_time->setBrush(QBrush(QColor("#FFFFFF00")));
+    curs_time->setPadding(QMargins(2, 2, 2, 2));
+    curs_ver_line->setLayer("layerCursor");
+    curs_time->setLayer("layerCursor");
+    ui->diagram->layer("layerCursor")->setVisible(false);
+    post_initialize_ui();
+}
+
+void Waveform_Viewer_Widget::post_initialize_ui() {
+    set_ui_text();
+    ui->chckBx_attch_crsr->setCheckState(static_cast<Qt::CheckState>(abs(gen_widg->get_setting("settings/WVFRM_VWR_ATTCH_CRSR").toInt() - 2)));
+    ui->spnBx_wvfrm_vwr_dscrtnss_tm->setValue(gen_widg->get_setting("settings/WVFRM_VWR_DISCRETENESS_TIME").toInt());
+    ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->setCurrentIndex(abs(gen_widg->get_setting("settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE").toInt() - 1));
+    ui_initialized = true;
+    ui->chckBx_attch_crsr->setCheckState(static_cast<Qt::CheckState>(gen_widg->get_setting("settings/WVFRM_VWR_ATTCH_CRSR").toInt()));
+    ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->setCurrentIndex(gen_widg->get_setting("settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE").toInt());
+}
+
+void Waveform_Viewer_Widget::set_ui_text() {
+    language_changed = false;
+    if(ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->count() == 0) {
+        ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->addItem(tr("s"));
+        ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->addItem(tr("ms"));
+        ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->addItem(tr("us"));
+    } else {
+        ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->setItemText(0, tr("s"));
+        ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->setItemText(1, tr("ms"));
+        ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->setItemText(2, tr("us"));
+    }
+    language_changed = true;
+}
+
+void Waveform_Viewer_Widget::load_waveform() {
+    QStringList *lst = gen_widg->load_files(false, false, tr("Choose waveform file"), tr("Waveform (*.wvfrm)"));
+    if((lst == nullptr) || (lst->count() == 0)) {
+        gen_widg->show_message_box(tr("Error"), tr("Waveform file not choosed"), 0);
+        return;
+    }
+    QFile *file = new QFile(QFileInfo(lst->at(0)).absoluteFilePath());
+    if(file->open(QFile::ReadOnly)) {
+        QString str = file->readLine();
+        file->close();
+        str.replace("\n", "");
+        QRegExp tagExp("/");
+        QStringList lst = str.split(tagExp);
+        plot_re_scale = true;
+        remove_graphs_form_plot();
+        graph_count = lst.count() - 1;
+        double debug_time = 0.0;
+        QList<int> vals;
+        vals.clear();
+        QList<int> prev_vals;
+        prev_vals.clear();
+        for(int i = 0; i < graph_count; i++) {
+            prev_vals.append(0);
+            prev_vals.append(0);
+        }
+        re_scale_graph();
+        add_graphs_to_plot();
+        plot_re_scale = false;
+        re_scale_graph();
+        if(file->open(QIODevice::ReadOnly)) {
+            QTextStream in(file);
+            while(!in.atEnd()) {
+                QString str_dat = in.readLine();
+                str_dat.replace("\n", "");
+                QRegExp tagExp("/");
+                QStringList lst_dat = str_dat.split(tagExp);
+                for(int i = 0; i < lst_dat.count(); i++) {
+                    if(i == 0) {
+                        debug_time = lst_dat.at(i).toDouble();
+                    } else {
+                        vals.append(0);
+                        vals.append(lst_dat.at(i).toInt());
+                    }
+                }
+                add_data_to_graph(vals, &prev_vals, debug_time, false);
+                vals.clear();
+            }
+            file->close();
+        }
+    }
+    delete file;
+    re_scale_graph();
+}
+
+void Waveform_Viewer_Widget::save_waveform() {
+    if(graph_count != 0) {
+        int cnt = ui->diagram->graph(0)->data()->size();
+        QString fn_nm = "";
+        QString str = "";
+        for(int i = 0; i < cnt; i++) {
+            str.clear();
+            for(int k = 0; k < graph_list->count(); k++) {
+                if(k % 2 != 0) {
+                    if(k == 1) {
+                        str.append(QString::number(ui->diagram->graph(k)->data()->at(i)->key) + "/");
+                    }
+                    str.append(QString::number(ui->diagram->graph(k)->data()->at(i)->value - k));
+                    if(k != (graph_list->count() - 1)) {
+                        str.append("/");
+                    } else {
+                        str.append("\n");
+                    }
+                }
+            }
+            gen_widg->save_file(this, tr("Saving waveform"), tr("Waveform (*.wvfrm)"), &str, &fn_nm, false, static_cast<bool>(i));
+        }
+    }
 }
 
 void Waveform_Viewer_Widget::add_graphs_to_plot() {
@@ -402,17 +448,11 @@ void Waveform_Viewer_Widget::add_graphs_to_plot() {
         if((i + 1) < 10) {
             tmp.append(QString::number(0));
         }
-        ////////////MENTOR-LIKE FILL///////////
         graph_list->append(ui->diagram->addGraph());
         graph_list->at(i * 2 + 0)->setPen(QPen(QColor(0, 255, 0, 0), 1));
         graph_list->at(i * 2 + 0)->setBrush(QBrush(QColor(0, 0, 255, 0)));
-        ///////////////////////////////////////
         graph_list->append(ui->diagram->addGraph());
-        graph_list->at(i * 2 + 1)->setPen(QPen(QColor(0, 255, 0, 255), 1));         //at(i)
-        ////////////MENTOR-LIKE FILL///////////
-        graph_list->at(i * 2 + 1)->setBrush(QBrush(QColor(0, 255, 0, 60)));
-//        graph_list->at(i * 2 + 1)->setBrush(QBrush(QColor(0, 77, 0, 255)));
-        ///////////////////////////////////////
+        graph_list->at(i * 2 + 1)->setPen(QPen(QColor(0, 255, 0, 255), 1));
         (*textTicker)->addTick((i * 2 + 1), tmp.append(QString::number(i + 1)));
     }
     ui->diagram->yAxis->setTicker(*textTicker);
@@ -444,22 +484,21 @@ void Waveform_Viewer_Widget::re_scale_graph() {
 
 void Waveform_Viewer_Widget::add_data_to_graph(QList<int> val, QList<int> *prev_vals, double time, bool val_changed) {
     for(int i = 0; i < graph_list->count(); i++) {
-        ////////////MENTOR-LIKE FILL///////////
         int shft_val = abs((i % 2) - 1);
-        ///////////////////////////////////////
         if(val_changed) {
-            ////////////MENTOR-LIKE FILL///////////
             graph_list->at(i)->addData(time, (shft_val + i + prev_vals->at(i)));
-            ///////////////////////////////////////
-//            graph_list->at(i)->addData(time, (1 + (i * 2) + prev_vals->at(i)));
         }
-        ////////////MENTOR-LIKE FILL///////////
         if((val.at(i) == 1) && (i != 0)) {
             graph_list->at(i)->setChannelFillGraph(graph_list->at(i - 1));
         }
+        if((i % 2) == 1) {
+            if(val.at(i) == 1) {
+                graph_list->at(i)->setBrush(QBrush(QColor(0, 255, 0, 60)));
+            } else {
+                graph_list->at(i)->setBrush(QBrush(QColor(0, 255, 0, 0)));
+            }
+        }
         graph_list->at(i)->addData(time, (shft_val + i + val.at(i)));
-        ///////////////////////////////////////
-//        graph_list->at(i)->addData(time, (1 + (i * 2) + val.at(i)));
         prev_vals->replace(i, val.at(i));
     }
 }
@@ -515,26 +554,20 @@ void Waveform_Viewer_Widget::slot_mouse_move(QMouseEvent *event) {
             }
     //        qApp->setOverrideCursor(QCursor(Qt::BlankCursor));
             if(static_cast<int>(ui->chckBx_attch_crsr->checkState()) == 2) {
-                curs_time->position->setCoords(round(x_coord), y_coord);
-                curs_time->setText(QString::number(round(x_coord)));
-                curs_ver_line->start->setCoords(round(x_coord), -QCPRange::maxRange);
-                curs_ver_line->end->setCoords(round(x_coord), QCPRange::maxRange);
+                double rnd_x = round(x_coord / x_tckr_step) * x_tckr_step;
+                curs_time->position->setCoords(rnd_x, y_coord);
+                curs_time->setText(QString::number(rnd_x * time_coef) + " " + ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->currentText());
+                curs_ver_line->start->setCoords(rnd_x, -QCPRange::maxRange);
+                curs_ver_line->end->setCoords(rnd_x, QCPRange::maxRange);
             } else {
                 curs_time->position->setCoords(x_coord, y_coord);
-                curs_time->setText(QString::number(x_coord));
+                curs_time->setText(QString::number(x_coord * time_coef) + " " + ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->currentText());
                 curs_ver_line->start->setCoords(x_coord, -QCPRange::maxRange);
                 curs_ver_line->end->setCoords(x_coord, QCPRange::maxRange);
             }
             ui->diagram->layer("layerCursor")->replot();
         }
     }
-//    qDebug() << ui->diagram->xAxis->pixelToCoord(event->pos().x()) << ui->diagram->yAxis->pixelToCoord(event->pos().y());
-//    QToolTip::showText(event->globalPos(),
-//                           "xAxis=" + QString::number(ui->diagram->xAxis->pixelToCoord(event->pos().x()), 'f', 2) + "\n" +
-//                           "yAxis=" + QString::number(ui->diagram->yAxis->pixelToCoord(event->pos().y()), 'f', 2) + "\n" +
-//                           "xAxis2=" + QString::number(ui->diagram->xAxis2->pixelToCoord(event->pos().x()), 'f', 2) + "\n" +
-//                           "yAxis2=" + QString::number(ui->diagram->yAxis2->pixelToCoord(event->pos().y()), 'f', 2) + "\n",
-//                           this, rect());
 }
 
 void Waveform_Viewer_Widget::slot_mouse_pressed(QMouseEvent *event) {
@@ -568,4 +601,9 @@ void Waveform_Viewer_Widget::slot_yAxisChanged(const QCPRange &newRange) {
         QCPRange limitRange(plot->property("ymin").toDouble(), plot->property("ymax").toDouble());
         limitAxisRange(axis, newRange, limitRange);
     }
+}
+
+void Waveform_Viewer_Widget::slot_re_translate() {
+    ui->retranslateUi(this);
+    set_ui_text();
 }
