@@ -25,6 +25,7 @@
 #define S_SERVER_SENDING_DEBUG_INFO 30
 #define CLIENT_WANT_START_DEBUG 31
 #define CLIENT_WANT_STOP_DEBUG 32
+#define CLIENT_WANT_CHANGE_DEBUG_SETTINGS 33
 
 
 Send_Recieve_Module::Send_Recieve_Module(QString _server_ip, int _server_port, General_Widget *widg) {
@@ -175,6 +176,19 @@ void Send_Recieve_Module::ping_to_S_server() {
 
 void Send_Recieve_Module::start_debug(uint16_t dscrt_tm, uint8_t dscrt_tm_tp) {
     //for variable dscrt_tm_tp: 0 - seconds, 1 - miliseconds, 2 - microseconds
+    qDebug() << "dscrt_tm: " << dscrt_tm;
+    qDebug() << "dscrt_tm_tp: " << dscrt_tm_tp;
+
+//    QByteArray settings;
+//    settings.append(dscrt_tm, sizeof(uint16_t));
+//    settings.append(dscrt_tm_tp, sizeof(uint8_t));
+
+    char buff[DATA_BUFFER];
+    memset(buff,0,DATA_BUFFER);
+    memcpy(buff, &dscrt_tm, sizeof(uint16_t));
+    memcpy(buff+sizeof(uint16_t), &dscrt_tm_tp, sizeof(uint8_t));
+    send_U_Packet(CLIENT_WANT_CHANGE_DEBUG_SETTINGS, QByteArray(buff,(sizeof (uint16_t) + sizeof (uint8_t))));
+    //send_U_Packet(CLIENT_WANT_CHANGE_DEBUG_SETTINGS, QByteArray(settings.data(),(sizeof (uint16_t) + sizeof (uint8_t))));
     send_U_Packet(CLIENT_WANT_START_DEBUG, "");
 }
 
