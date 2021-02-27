@@ -8,6 +8,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <vector>
 #include <mutex>          // std::mutex
 #include <thread>         // std::thread
 #include <fcntl.h>	// for open
