@@ -17,12 +17,10 @@
 #include "iniparser.h"		// for .ini parse
 
 // Предварительные настройки сервера
-#define SERVER_PORT 3425
+//#define SERVER_PORT 3425
 
-/* #define DATA_BUFFER 60 // 60 76
-#define RECIVE_BUFFER_SIZE (DATA_BUFFER+20) // DATA_BUFFER+20 DATA_BUFFER+4 */
 
-#define DATA_BUFFER 76 // 60 76
+#define DATA_BUFFER 76
 #define RECIVE_BUFFER_SIZE (DATA_BUFFER+4) // DATA_BUFFER+20 DATA_BUFFER+4
 // Предварительные настройки сервера - КОНЕЦ
 
@@ -57,6 +55,7 @@
 #define CLIENT_WANT_START_DEBUG 31
 #define CLIENT_WANT_STOP_DEBUG 32
 #define CLIENT_WANT_CHANGE_DEBUG_SETTINGS 33
+#define DEBUG_PROCESS_TIMEOUT 34
 
 // Карта code_op - КОНЕЦ
 
@@ -69,15 +68,6 @@ int total_slave_servers = 0;
 // Параметры сервера, которые считываются с .ini-файла - КОНЕЦ
 
 // Packet Description
-
-// Универсальный пакет
-/* struct U_packet {
-	char ip[12];
-	int id;
-	int code_op;
-	char data[DATA_BUFFER];
-}; */
-
 struct U_packet {
             int code_op;    // 4 байта
             char data[DATA_BUFFER];
@@ -98,7 +88,12 @@ typedef struct Chain_Pair {
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-// Метод для отправки универсального пакета
+// Метод для отправки данных в сокет
+/*
+* int sock - FD(номер сокета)
+* int code_op - КОД ОПЕРАЦИИ (см. Коды операций для сервера)
+* const char *data - данные, которые передадутся в сокет
+*/
 void send_U_Packet(int sock, int code_op, const char *data);
 
 // Метод, который вызывается, как отдельный поток - слушает конкретного клиента/slave-сервера
@@ -111,8 +106,16 @@ void recive_new_data(char *buf, int sock);
 
 // Метод, который задает клиенту или slave-серверу с id статус INIT_ID(по скольку у них у всех уникальный ID)
 // можно выполнить поочередный поиск
-void reset_Pair( int id);
+void reset_Pair(int id);
 
+// Метод, который находит пару для заданного id - и возвращает найденный id
+/*
+* По скольку все id универсальны, то не важно, какое id мы зададим, как входной парметр
+* Например, если мы, как входной пармер зададим id клиента, то метод попытается найти пару -
+* клиента, а, если наоборот, по то метод попытается найти пару - slave-сервера
+* Такая универсальность достигается путем того, что все id являются файлвыми дескрипторами(сокетами)
+* что в свою очередь обуславливает их уникальность.
+*/
 int find_pair_for(int id);
 
 std::string find_FPGA_ID_for(int id);
@@ -600,6 +603,18 @@ void recive_new_data(char *buf, int sock)
 			break;	
 		}
 		
+		case DEBUG_PROCESS_TIMEOUT:
+		{
+			// Перенаправляем запрос от slave-серверу к клиенту
+			int finded_client = find_pair_for(sock);
+			if(finded_client != ERROR)
+			{				
+				send_U_Packet(finded_client, DEBUG_PROCESS_TIMEOUT, tmp_packet->data);
+				printf("\t|___Debug procerss on Slave_server with id %i TIME_OUT\n", sock);
+			}			
+			break;	
+		}
+		
         default:
 		{
 			printf("\t|___UNKNOWN PACKET\n");
@@ -616,22 +631,40 @@ void reset_Pair( int id)
 	Chain_Pair_mutex.lock();
 	for(int i=0; i<Pairs.size(); i++)
 	{
-		if(Pairs.at(i).id_Cl == id)
+		if(Pairs.at(i).id_Cl == id) // Если отключаем Клиента
 		{
+			// Отсылаем пакет клиенту и говорим ему, что отключаем его
 			send_U_Packet(id, DROP_CONNECTION, NULL);
+			// Отсылаем slave-серверу code_op с тем, что нужно отключить отладку(если она была защена)
+			// По скольку метод find_pair_for()  потокобезопасный и мы его вызываем из такого же
+			// потокобезопасного метода, то перед вызовом выполним .unlock()
+			Chain_Pair_mutex.unlock();
+			int finded_s_server = find_pair_for(id);
+			// После работы метода вернем мьтекс в то состояние,
+			//в которм он должен быть в этот момент времени
+			Chain_Pair_mutex.lock(); 
+			if(finded_s_server != ERROR)
+			{				
+				send_U_Packet(finded_s_server, CLIENT_WANT_STOP_DEBUG, NULL);
+				printf("\t|___Client with id %i DROPED -> STOP debug process on slave-server with id %i\n", id, finded_s_server);
+			}
+			// Закрываем сокет
 			close(id);
 			printf("--->   Reset client with ID: %i\n",id);
-			
+			// Записываем в ячейку пары-связки, INIT_ID клиента
 			Pairs[i].id_Cl = INIT_ID;
-		} else if(Pairs.at(i).id_SS == id)
-		{			
+		} else if(Pairs.at(i).id_SS == id) // Если отключаем slave-сервера
+		{
+			// Отсылаем пакет клиенту и говорим ему, что отключаем его
 			send_U_Packet(Pairs.at(i).id_Cl, DROP_CONNECTION, NULL);
 			close(Pairs.at(i).id_Cl);
 			printf("--->   Reset client with ID: %i\n",Pairs.at(i).id_Cl);
+			// Отсылаем пакет slave-серверу и говорим ему, что отключаем его
 			send_U_Packet(id, DROP_CONNECTION, NULL);
 			close(id);
 			printf("--->   Reset slave_server with ID: %i\n",id);
 			
+			// Записываем в ячейку пары-связки, INIT_ID клиента и slave-сервера
 			Pairs[i].id_Cl = INIT_ID;
 			Pairs[i].id_SS = INIT_ID;
 		}

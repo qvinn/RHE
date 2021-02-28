@@ -41,13 +41,6 @@ class Debug {
 		int state;
 	} pinState;
 	
-/* 	struct U_packet {
-        char ip[12];
-        int id;
-        int code_op;
-        char data[60]; // DATA_BUFFER
-    }; */
-	
 	struct U_packet {
             int code_op;    // 4 байта
             char data[D_DATA_BUFFER];
@@ -74,18 +67,36 @@ class Debug {
 	
 	public:
 	Debug();
-	void setup_all(std::vector<int> _Wpi_number_of_pins, int _max_duration_ms);
+	
+	// Метод для инициализации начальных параметорв работы отладчка
+	void setup_all(std::vector<std::string> _Q_number_of_pins, std::vector<int> _Wpi_number_of_pins, int _max_duration_time, uint8_t _max_duration_time_mode);
+	
+	// Метод для изменния таких параметорм отладчика, как "время дискритизации" и "единицы измерения"
+	// Метод принимает только char * буффер и вычленяет из него данные
 	void change_settings(const char *buff); // int par_discrete_delay, uint8_t par_time_mode
+	
+	// Метод для установки сокета
 	void setup_sock(int _sock);
 	
+	// Метод для запуска процесса отладки
+	// Для повышения производительности, рекомендуется запускать в отдельном потоке
+	/*
+	* std::thread gdb_thread(&Debug::start_debug_process,<объект класса>);
+	* gdb_thread.detach();
+	*/
 	void start_debug_process();
 	
+	// Метод для остановки процесса отладки
 	void stop_debug();
 	
+	// Метод, который проверяет, запущен ли в текущай момент процесс отладки или нет
+	// Метод потокобесопасен, так что его можно вызывать в любой момент
 	int8_t debug_is_run();
 	
 	
 	private:
+	
+	void calculate_us_max_duration_time();
 	
 	// Метод для отправки данных в сокет
 	/*
@@ -103,20 +114,32 @@ class Debug {
 	void form_Packet(std::vector<pinState> log, int curr_time, char *data);
 	
 	// Метод для отладки - предназдачен, для вывода любых данных из буфера(и двоичных тоже)
+	// МЕТОД ДЛЯ ОТЛАДКИ
 	void explore_byte_buff(char *data, int size);
+	
+	/*
+	* По скольку, базовое время - это us, то для работы с другими ед. измерения создадим
+	* поле, которые будет осуществлять выравнивание данных(например, для s - это это будет 10^6)
+	*
+	* Поэтому, для задания времени используются пары: длительность и единицы отсчета
+	* Потом, в зависимости от выбранных ед. отсчета с помощью time_mux мы сможем получть
+	* правильное значение в us(как раз, при us: time_mux = 1)
+	*/
+	int time_mux = 1000;
+	
+	// Поле, которым задается продолжительность отладки
+	int max_duration_time = 20; // s (Убедиться, что max_duration_time_mode = 0)
+	uint8_t max_duration_time_mode = 0; // s
+	int us_max_duration_time = -1; // Уже расчитанное значение, в us
 	
 	// Поле, которым задается частота анализа портов платы
 	int discrete_delay = 500;	// ms (Убедиться, что time_mode = 1)
-	// Поле, которым задается продолжительность отладки
-	int max_duration_ms = -1;		
-	// Поле, которым задаются единицы измерения времени
+	
+	// Поле, которым задаются единицы измерения текущего времени
 	// s	- 0
 	// ms	- 1
 	// us	- 2
 	uint8_t time_mode = 1; // ms
-	// По скольку, базовое время - это us, то для работы с другими ед. измерения создадим
-	// поле, которые будет осуществлять выравнивание данных(например, для s - это это будет 10^6)
-	int time_mux = 1000;
 	
 	// Вектор, который хранит в себе текущие номера портов(WiringPi), которые анализирует плата
 	std::vector<int> Wpi_number_of_pins;
