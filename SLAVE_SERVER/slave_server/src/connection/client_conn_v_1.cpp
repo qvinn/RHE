@@ -24,6 +24,7 @@
 #define CLIENT_WANT_START_DEBUG 31
 #define CLIENT_WANT_STOP_DEBUG 32
 #define CLIENT_WANT_CHANGE_DEBUG_SETTINGS 33
+#define DEBUG_PROCESS_TIMEOUT 34
 
 #define DATA_EXIST 1
 #define DATA_NOT_EXIST 0
@@ -41,11 +42,20 @@ client_conn_v_1::client_conn_v_1(std::string _server_ip, int _server_port, std::
 #ifdef HW_EN
 	gdb = new Debug();
 	// FIXME: Вынести конфигурацию отладки в отдельную операцию
-	std::vector<int> pins_numbers{8,9,7};
-	gdb->setup_all(pins_numbers,2000);
+	//std::vector<int> pins_numbers{8,9,7};
+	//gdb->setup_all(pins_numbers,20,0);
 #endif
 }
 
+#ifdef HW_EN
+void client_conn_v_1::configure_dbg(std::vector<std::string> _Q_pinNum,
+	std::vector<int> _Wpi_pinNum,
+	int _max_duration_time,
+	uint8_t _max_duration_time_mode)
+{
+	gdb->setup_all(_Q_pinNum,_Wpi_pinNum,_max_duration_time,_max_duration_time_mode);
+}
+#endif
 //-------------------PUBLIC----------------------------------------------------------------
 
 bool client_conn_v_1::init_connection()
@@ -64,11 +74,7 @@ bool client_conn_v_1::init_connection()
 }
 
 int client_conn_v_1::get_id_for_client()
-{	
-/* 	my_client_ID_mutex.lock();	
-	send_U_Packet(Socket, my_client_ID, SLAVE_SERVER_WANT_INIT_CONNECTION, this->FPGA_id.c_str());
-	my_client_ID_mutex.unlock(); */
-	
+{		
 	s_server_get_id *intit_conn = (s_server_get_id*)malloc(sizeof(s_server_get_id));
 	char *send_buff = (char*)malloc(sizeof(struct U_packet));
 	
@@ -115,38 +121,44 @@ void client_conn_v_1::wait_analize_recv_data()
         memcpy(tmp_packet,recv_buf,sizeof (U_packet));
         switch (tmp_packet->code_op) {
 			case SLAVE_SERVER_WANT_INIT_CONNECTION:
-/* 			set_client_id(tmp_packet->id);
-			my_client_ID_mutex.lock();
-			printf("Server want give me ID %i\n", my_client_ID);
-			my_client_ID_mutex.unlock(); */
-			int recv_id;
-			memcpy(&(recv_id), tmp_packet->data, sizeof(int));
-			set_client_id(recv_id);
-			my_client_ID_mutex.lock();
-			printf("Server want give me ID %i\n", my_client_ID);
-			my_client_ID_mutex.unlock();
-			break;
+			{
+				int recv_id;
+				memcpy(&(recv_id), tmp_packet->data, sizeof(int));
+				set_client_id(recv_id);
+				my_client_ID_mutex.lock();
+				printf("_________________________________Server want give me ID %i\n", my_client_ID);
+				my_client_ID_mutex.unlock();
+				break;	
+			}
 			
 			case PING_TO_SERVER:
-			printf("_________________________________Server answer PING\n");
-			break;
+			{
+				printf("_________________________________Server answer PING\n");
+				break;	
+			}
 			
 			case DROP_CONNECTION:
-			printf("_________________________________WE ARE DROPPED\n");
-			reset_ID();
-			close(Socket);
-			break;
+			{
+				printf("_________________________________WE ARE DROPPED\n");
+				reset_ID();
+				close(Socket);
+				break;	
+			}
 			
 			case NO_MORE_PLACES:
-			printf("_________________________________Can't get ID from Server - no more places\n");
-			reset_ID();
-			close(Socket);
-			break;
+			{
+				printf("_________________________________Can't get ID from Server - no more places\n");
+				reset_ID();
+				close(Socket);
+				break;	
+			}
 			
 			case PING_CLIENT_TO_S_SERVER:
-			answer_to_client();
-			printf("_________________________________Slave server answer to slave server\n");
-			break;
+			{
+				answer_to_client();
+				printf("_________________________________Slave server answer to slave server\n");
+				break;	
+			}
 			
 			case CLIENT_START_SEND_FILE:
 			{
@@ -326,20 +338,7 @@ int client_conn_v_1::start_recive_file()
 }
 
 int client_conn_v_1::rcv_new_data_for_file(char *buf)
-{
-/* 	char tst[2];
-	tst[0] = buf[0];
-	tst[1] = buf[1];
-	//printf("[0][1] bytes: %s\n", tst);
-	int size = atoi(tst);
-	//printf("size: %d\n", size);
-	file_rcv_bytes_count += size;
-	
-	// FIXME: Скорее всего, из-за того, что это место довольно медлеенное
-	// буффер 60+ байт передается некорректно, так пока выполняются эти действия
-	// приходит новый пакет начинается новая запись
-	fwrite(buf+2, sizeof(char), size, fp); */
-	
+{	
 	int8_t file_size;
 	memcpy(&file_size, buf,sizeof(int8_t));
 	fwrite(buf+sizeof(int8_t), sizeof(char), file_size, fp);
