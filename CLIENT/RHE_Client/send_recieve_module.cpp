@@ -26,6 +26,7 @@
 #define CLIENT_WANT_START_DEBUG 31
 #define CLIENT_WANT_STOP_DEBUG 32
 #define CLIENT_WANT_CHANGE_DEBUG_SETTINGS 33
+#define DEBUG_PROCESS_TIMEOUT 34
 
 
 Send_Recieve_Module::Send_Recieve_Module(QString _server_ip, int _server_port, General_Widget *widg) {
@@ -156,6 +157,15 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 emit accept_debug_data_signal(debug_data);
                 recive_dbg_info(tmp_packet->data);
 //                qDebug() << "_________________________________Slave server sending DEBUG INFO";
+                break;
+            }
+            case DEBUG_PROCESS_TIMEOUT: {
+                qDebug() << "_________________________________Debug process TIMEOUT";
+                int max_duration;
+                uint8_t tm_tp;
+                memcpy(&max_duration, tmp_packet->data, sizeof(int));
+                memcpy(&tm_tp, tmp_packet->data+sizeof(int), sizeof(uint8_t));
+                qDebug() << "Max Debug time: " << max_duration << "(timemode " << tm_tp << ")";
                 break;
             }
             default: {
@@ -331,7 +341,7 @@ void Send_Recieve_Module::recive_dbg_info(char *info)
 
     qDebug() << "Recive debug data:";
     qDebug() << "Info about " << Packet->pin_count << "pins";
-    qDebug() << "At: " << Packet->time << "ms";
+    qDebug() << "At: " << Packet->time << "units";
 
     for(int i = 0; i < Packet->pin_count; i++)
     {
