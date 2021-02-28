@@ -251,6 +251,7 @@ void Waveform_Viewer_Widget::on_spnBx_wvfrm_vwr_dscrtnss_tm_valueChanged(int val
         time_coef = pow(1000.0, static_cast<double>(ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->currentIndex()));
         x_tckr_step = static_cast<double>(value) / time_coef;
         (*dyn_tckr)->setTickStep(x_tckr_step);
+        (*dyn_tckr)->setScaleStrategy(QCPAxisTickerFixed::ssMultiples);
         ui->diagram->xAxis->setTicker(*dyn_tckr);
         ui->diagram->xAxis->setTickLabelRotation(-30);
         ui->diagram->replot();
@@ -534,19 +535,23 @@ void Waveform_Viewer_Widget::limitAxisRange(QCPAxis *axis, const QCPRange &newRa
 void Waveform_Viewer_Widget::slot_mouse_move(QMouseEvent *event) {
     if(!zoom_pressed) {
         ui->diagram->setSelectionRectMode(QCP::srmNone);
+        double top = ui->diagram->yAxis->pixelToCoord(ui->diagram->yAxis->axisRect()->top());
+        double bottom = ui->diagram->yAxis->pixelToCoord(ui->diagram->yAxis->axisRect()->bottom());
+        double left = ui->diagram->xAxis->pixelToCoord(ui->diagram->xAxis->axisRect()->left());
+        double right = ui->diagram->xAxis->pixelToCoord(ui->diagram->xAxis->axisRect()->right());
         double x_coord = ui->diagram->xAxis->pixelToCoord(event->pos().x());
         double y_coord = ui->diagram->yAxis->pixelToCoord(event->pos().y());
-        if((x_coord < 0.0) || (y_coord < 0.0) || (x_coord > ui->diagram->xAxis->range().maxRange) || (y_coord > ui->diagram->yAxis->range().upper)) {
+        if((x_coord < left) || (y_coord < bottom) || (x_coord > right) || (y_coord > top)) {
             if(ui->diagram->layer("layerCursor")->visible()) {
                 ui->diagram->layer("layerCursor")->setVisible(false);
                 ui->diagram->replot();
             }
-    //        qApp->setOverrideCursor(QCursor(Qt::ArrowCursor));
+            qApp->setOverrideCursor(QCursor(Qt::ArrowCursor));
         } else {
             if(!ui->diagram->layer("layerCursor")->visible()) {
                 ui->diagram->layer("layerCursor")->setVisible(true);
             }
-    //        qApp->setOverrideCursor(QCursor(Qt::BlankCursor));
+            qApp->setOverrideCursor(QCursor(Qt::BlankCursor));
             if(static_cast<int>(ui->chckBx_attch_crsr->checkState()) == 2) {
                 double rnd_x = round(x_coord / x_tckr_step) * x_tckr_step;
                 curs_time->position->setCoords(rnd_x, y_coord);
