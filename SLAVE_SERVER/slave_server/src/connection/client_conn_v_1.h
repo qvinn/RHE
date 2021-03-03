@@ -50,8 +50,8 @@ public:
     client_conn_v_1(std::string _server_ip, int _server_port, std::string _FPGA_id);
 	
 #ifdef HW_EN
-	void configure_dbg(std::vector<std::string> _Q_pinNum,
-		std::vector<int> _Wpi_pinNum,
+	void configure_dbg(std::vector<std::string> _Debug_out_pinName,
+		std::vector<int> _Debug_out_Wpi_pinNum,
 		int _max_duration_time,
 		uint8_t _max_duration_time_mode);
 #endif	
