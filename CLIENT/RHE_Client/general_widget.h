@@ -51,7 +51,7 @@
         Q_OBJECT
         public:
             Waveform_Viewer_Widget(QWidget* parent = nullptr, General_Widget *widg = nullptr, bool stndln = false);
-            ~Waveform_Viewer_Widget();
+            ~Waveform_Viewer_Widget() override;
 
             void pshBttn_open_save_wvfrm_set_enabled(bool flg);
             void initialize_ui();
@@ -85,16 +85,21 @@
             double x_tckr_step;
 
             bool zoom_pressed = false;
+            bool drag_pressed = false;
+            bool drag_graph = false;
             bool language_changed = false;
             bool ui_initialized = false;
             bool standalone;
+
+            int coef;
 
         public slots:
             void slot_re_translate();
 
         private slots:
-            void showEvent(QShowEvent *);
-            void resizeEvent(QResizeEvent *);
+            void showEvent(QShowEvent *) override;
+            void leaveEvent(QEvent *) override;
+            void resizeEvent(QResizeEvent *) override;
             void on_chckBx_attch_crsr_stateChanged(int state);
             void on_spnBx_wvfrm_vwr_dscrtnss_tm_valueChanged(int value);
             void on_cmbBx_wvfrm_vwr_dscrtnss_tm_tp_currentIndexChanged(int index);

@@ -234,6 +234,12 @@ void Waveform_Viewer_Widget::showEvent(QShowEvent *) {
     resizeEvent(nullptr);
 }
 
+void Waveform_Viewer_Widget::leaveEvent(QEvent *) {
+    ui->diagram->layer("layerCursor")->setVisible(false);
+    ui->diagram->replot();
+    qApp->setOverrideCursor(QCursor(Qt::ArrowCursor));
+}
+
 void Waveform_Viewer_Widget::resizeEvent(QResizeEvent *) {
     ui->verticalLayoutWidget->resize(this->width(), this->height());
     ui->diagram->resize(ui->verticalLayoutWidget->width(), (ui->verticalLayoutWidget->height() - ui->horizontalLayout->geometry().height() - ui->horizontalLayout_2->geometry().height()));
@@ -253,7 +259,6 @@ void Waveform_Viewer_Widget::on_spnBx_wvfrm_vwr_dscrtnss_tm_valueChanged(int val
         (*dyn_tckr)->setTickStep(x_tckr_step);
         (*dyn_tckr)->setScaleStrategy(QCPAxisTickerFixed::ssMultiples);
         ui->diagram->xAxis->setTicker(*dyn_tckr);
-        ui->diagram->xAxis->setTickLabelRotation(-30);
         ui->diagram->replot();
     }
 }
@@ -297,7 +302,7 @@ void Waveform_Viewer_Widget::pshBttn_open_save_wvfrm_set_enabled(bool flg) {
 }
 
 void Waveform_Viewer_Widget::initialize_ui() {
-    ui->diagram->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+    ui->diagram->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom/* | QCP::iSelectAxes*/);     //iSelectAxes
     ui->diagram->xAxis->setBasePen(QPen(QColor(100, 100, 100), 1));
     ui->diagram->yAxis->setBasePen(QPen(QColor(100, 100, 100), 1));
     ui->diagram->xAxis->setTickPen(QPen(QColor(100, 100, 100), 1));
@@ -320,6 +325,11 @@ void Waveform_Viewer_Widget::initialize_ui() {
     ui->diagram->axisRect()->setBackground(axisRectGradient);
     ui->diagram->xAxis->setSubTicks(false);
     ui->diagram->yAxis->setSubTicks(false);
+    //////////////////////////////////////////////////////////////////////////////////
+//    ui->diagram->xAxis->setSelectableParts(QCPAxis::spNone);
+//    ui->diagram->yAxis->setSelectableParts(QCPAxis::spTickLabels);
+//    ui->diagram->yAxis->setSelectedTickLabelColor(QColor("#FF00FF50"));
+    //////////////////////////////////////////////////////////////////////////////////
     ui->diagram->selectionRect()->setPen(QPen(QColor("#FFFF0000"), 1, Qt::SolidLine));
     ui->diagram->selectionRect()->setBrush(QBrush(QColor("#50FF0000")));
     ui->diagram->addLayer("layerCursor", 0, QCustomPlot::limAbove);
@@ -397,19 +407,21 @@ void Waveform_Viewer_Widget::load_waveform() {
             QTextStream in(file);
             while(!in.atEnd()) {
                 QString str_dat = in.readLine();
-                str_dat.replace("\n", "");
-                QRegExp tagExp("/");
-                QStringList lst_dat = str_dat.split(tagExp);
-                for(int i = 0; i < lst_dat.count(); i++) {
-                    if(i == 0) {
-                        debug_time = lst_dat.at(i).toDouble();
-                    } else {
-                        vals.append(0);
-                        vals.append(lst_dat.at(i).toInt());
+                if(!str.contains("time")) {
+                    str_dat.replace("\n", "");
+                    QRegExp tagExp("/");
+                    QStringList lst_dat = str_dat.split(tagExp);
+                    for(int i = 0; i < lst_dat.count(); i++) {
+                        if(i == 0) {
+                            debug_time = lst_dat.at(i).toDouble();
+                        } else {
+                            vals.append(0);
+                            vals.append(lst_dat.at(i).toInt());
+                        }
                     }
+                    add_data_to_graph(vals, &prev_vals, debug_time, false);
+                    vals.clear();
                 }
-                add_data_to_graph(vals, &prev_vals, debug_time, false);
-                vals.clear();
             }
             file->close();
         }
@@ -423,6 +435,19 @@ void Waveform_Viewer_Widget::save_waveform() {
         int cnt = ui->diagram->graph(0)->data()->size();
         QString fn_nm = "";
         QString str = "";
+        for(int i = 0; i < graph_list->count(); i++) {
+            if(i == 0) {
+                str.append("time/");
+            }
+            str.append("pin_" + QString::number(i + 1));
+            if(i != (graph_list->count() - 1)) {
+                str.append("/");
+            } else {
+                str.append("\n");
+            }
+        }
+        gen_widg->save_file(this, tr("Saving waveform"), tr("Waveform (*.wvfrm)"), &str, &fn_nm, false, false);
+        str.clear();
         for(int i = 0; i < cnt; i++) {
             str.clear();
             for(int k = 0; k < graph_list->count(); k++) {
@@ -438,7 +463,7 @@ void Waveform_Viewer_Widget::save_waveform() {
                     }
                 }
             }
-            gen_widg->save_file(this, tr("Saving waveform"), tr("Waveform (*.wvfrm)"), &str, &fn_nm, false, static_cast<bool>(i));
+            gen_widg->save_file(this, tr("Saving waveform"), tr("Waveform (*.wvfrm)"), &str, &fn_nm, false, true);
         }
     }
 }
@@ -533,15 +558,100 @@ void Waveform_Viewer_Widget::limitAxisRange(QCPAxis *axis, const QCPRange &newRa
 }
 
 void Waveform_Viewer_Widget::slot_mouse_move(QMouseEvent *event) {
-    if(!zoom_pressed) {
+    double x_coord = ui->diagram->xAxis->pixelToCoord(event->pos().x());
+    double y_coord = ui->diagram->yAxis->pixelToCoord(event->pos().y());
+    double top = ui->diagram->yAxis->pixelToCoord(ui->diagram->yAxis->axisRect()->top());
+    double bottom = ui->diagram->yAxis->pixelToCoord(ui->diagram->yAxis->axisRect()->bottom());
+    double left = ui->diagram->xAxis->pixelToCoord(ui->diagram->xAxis->axisRect()->left());
+    if((x_coord < left) && (y_coord > bottom) && (y_coord < top)) {
+        if(ui->diagram->layer("layerCursor")->visible()) {
+            ui->diagram->layer("layerCursor")->setVisible(false);
+            ui->diagram->replot();
+        }
+        qApp->setOverrideCursor(QCursor(Qt::ArrowCursor));
+        if(drag_pressed) {
+            double rnd_y = round(y_coord / 2.0) * 2.0 - 1.0;
+            if(rnd_y < 1.0) {
+                rnd_y = 1.0;
+            }
+            int int_cur_y = static_cast<int>(rnd_y);
+            if(!drag_graph) {
+                coef = int_cur_y;
+                drag_graph = true;
+            } else {
+                if(int_cur_y != coef) {
+                    QList<double> time;
+                    time.clear();
+                    QList<int> prev_vals;
+                    prev_vals.clear();
+                    QList<QList<int>*> vals;
+                    vals.clear();
+                    if(graph_list->count() != 0) {
+                        for(int i = 0; i < graph_list->at(0)->data()->size(); i++) {
+                            prev_vals.append(0);
+                            QList<int> *val = new QList<int>();
+                            val->clear();
+                            vals.append(val);
+                        }
+                        for(int i = 0; i < graph_list->at(0)->data()->size(); i++) {
+                            for(int k = 0; k < graph_list->count(); k++) {
+                                if(k == 0) {
+                                    time.append(graph_list->at(k)->data()->at(i)->key);
+                                }
+                                if(k == coef) {
+                                    vals.at(i)->append(abs((static_cast<int>(graph_list->at(int_cur_y)->data()->at(i)->value) % 2) - 1));
+                                } else if(k == int_cur_y) {
+                                    vals.at(i)->append(abs((static_cast<int>(graph_list->at(coef)->data()->at(i)->value) % 2) - 1));
+                                } else {
+                                    vals.at(i)->append(abs((static_cast<int>(graph_list->at(k)->data()->at(i)->value) % 2) - 1));
+                                }
+                            }
+                        }
+                    }
+                    QList<QString> old_ticks = (*textTicker)->ticks().values();
+                    (*textTicker)->clear();
+                    ui->diagram->yAxis->ticker().clear();
+//                    plot_re_scale = true;
+//                    int old_graph_count = graph_count;
+                    remove_data_from_graph();
+//                    remove_graphs_form_plot();
+//                    if(vals.count() != 0) {
+//                        graph_count = vals.at(0)->count() / 2;
+//                    } else {
+//                        graph_count = old_graph_count;
+//                    }
+//                    re_scale_graph();
+//                    add_graphs_to_plot();
+//                    plot_re_scale = false;
+                    int new_coef = ((coef - 1) / 2);
+                    int new_cur_y = ((int_cur_y - 1) / 2);
+                    for(int i = 0; i < old_ticks.count(); i++) {
+                        if(i == new_coef) {
+                            (*textTicker)->addTick((i * 2 + 1), old_ticks.at(new_cur_y));
+                        } else if(i == new_cur_y) {
+                            (*textTicker)->addTick((i * 2 + 1), old_ticks.at(new_coef));
+                        } else {
+                            (*textTicker)->addTick((i * 2 + 1), old_ticks.at(i));
+                        }
+                    }
+                    ui->diagram->yAxis->setTicker(*textTicker);
+//                    re_scale_graph();
+                    for(int i = 0; i < time.count(); i++) {
+                        add_data_to_graph(*vals.at(i), &prev_vals, time.at(i), false);
+                    }
+                    ui->diagram->replot();
+                    coef = int_cur_y;
+                    while(vals.count() != 0) {
+                        delete vals.at(vals.count() - 1);
+                        vals.removeAt(vals.count() - 1);
+                    }
+                }
+            }
+        }
+    } else if(!zoom_pressed) {
         ui->diagram->setSelectionRectMode(QCP::srmNone);
-        double top = ui->diagram->yAxis->pixelToCoord(ui->diagram->yAxis->axisRect()->top());
-        double bottom = ui->diagram->yAxis->pixelToCoord(ui->diagram->yAxis->axisRect()->bottom());
-        double left = ui->diagram->xAxis->pixelToCoord(ui->diagram->xAxis->axisRect()->left());
         double right = ui->diagram->xAxis->pixelToCoord(ui->diagram->xAxis->axisRect()->right());
-        double x_coord = ui->diagram->xAxis->pixelToCoord(event->pos().x());
-        double y_coord = ui->diagram->yAxis->pixelToCoord(event->pos().y());
-        if((x_coord < left) || (y_coord < bottom) || (x_coord > right) || (y_coord > top)) {
+        if((x_coord <= left) || (y_coord <= bottom) || (x_coord >= right) || (y_coord >= top)) {
             if(ui->diagram->layer("layerCursor")->visible()) {
                 ui->diagram->layer("layerCursor")->setVisible(false);
                 ui->diagram->replot();
@@ -575,12 +685,17 @@ void Waveform_Viewer_Widget::slot_mouse_pressed(QMouseEvent *event) {
         ui->diagram->layer("layerCursor")->setVisible(false);
         ui->diagram->replot();
         ui->diagram->setSelectionRectMode(QCP::srmZoom);
+    } else if(event->button() == Qt::LeftButton) {
+        drag_pressed = true;
     }
 }
 
 void Waveform_Viewer_Widget::slot_mouse_unpressed(QMouseEvent *event) {
     if(event->button() == Qt::RightButton) {
         zoom_pressed = false;
+    } else if(event->button() == Qt::LeftButton) {
+        drag_pressed = false;
+        drag_graph = false;
     }
 }
 
