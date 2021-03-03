@@ -23,18 +23,37 @@ Debug::Debug()
 	wiringPiSetup();
 }
 
-void Debug::setup_all(std::vector<std::string> _Q_number_of_pins, std::vector<int> _Wpi_number_of_pins, int _max_duration_time, uint8_t _max_duration_time_mode)
+void Debug::setup_all(std::vector<std::string> _debug_input_pinName, std::vector<int> _debug_input_Wpi_pinNum, int _max_duration_time, uint8_t _max_duration_time_mode)
 {
-	Q_number_of_pins = _Q_number_of_pins;
-	Wpi_number_of_pins = _Wpi_number_of_pins;
+
+
+	/*
+	* Проверим количество "input" портов ввода-вывода
+	* На данный момент, алгоритм такой, что состояние всех портов ввода-вывода
+	* формируются в один пакет. Поэтому, перед тем, как инициализировать отладчик, мы 
+	* должны убедиться в том, что размера буффера хватит на все порты ввода-вывода
+	* Буффер для данных(DATA_BUFFER) = 76 байт,из них 6 байт - общая информация о всех портах в 
+	* текущем пакете. На один порт приходится 6 байт. Поэтому, максимально количество портов
+	* ввода-вывода будет: (76 - 6) / 6 = 11
+	*/
+	
+	if(_debug_input_pinName.size() > 11)
+	{
+		printf("\n!!!\nCANT ANALIZE MORE, THAN 11 PINS\n!!!\n");
+		printf("11 pins can't be sended in one debug-packet - please amount less, than 11 or change algorithm\n");
+		exit(0);
+	}
+	
+	debug_input_pinName = _debug_input_pinName;
+	debug_input_Wpi_pinNum = _debug_input_Wpi_pinNum;
 	max_duration_time = _max_duration_time;
 	max_duration_time_mode = _max_duration_time_mode;
 	calculate_us_max_duration_time();
 	
 	// Сконфигурируем пины
-	for(long unsigned int i=0; i < Wpi_number_of_pins.size(); i++)
+	for(long unsigned int i=0; i < debug_input_Wpi_pinNum.size(); i++)
 	{
-		pinMode(Wpi_number_of_pins.at(i), INPUT);
+		pinMode(debug_input_Wpi_pinNum.at(i), INPUT);
 	}
 }
 
@@ -102,13 +121,13 @@ void Debug::start_debug_process()
 #ifdef DURATION_DEBUG_DEBUG_CLASS
 		auto start_1 = std::chrono::high_resolution_clock::now();
 #endif
-		for(long unsigned int i=0; i < Wpi_number_of_pins.size(); i++)
+		for(long unsigned int i=0; i < debug_input_Wpi_pinNum.size(); i++)
 		{
 			// Прочитать состояние пина
-			int state = digitalRead(Wpi_number_of_pins.at(i));
+			int state = digitalRead(debug_input_Wpi_pinNum.at(i));
 			// Сохранить состояние пина
-			log.push_back(pinState{Wpi_number_of_pins.at(i),curr_time,state});
-			//printf("Pin with num: %i, at %i ms have state: %i\n", Wpi_number_of_pins.at(i), curr_time,state);
+			log.push_back(pinState{debug_input_Wpi_pinNum.at(i),curr_time,state});
+			//printf("Pin with num: %i, at %i ms have state: %i\n", debug_input_Wpi_pinNum.at(i), curr_time,state);
 		}
 #ifdef DURATION_DEBUG_DEBUG_CLASS
 		auto stop_1 = std::chrono::high_resolution_clock::now();
@@ -243,7 +262,7 @@ void Debug::form_Packet(std::vector<pinState> log, int curr_time, char *data)
 	{
 		pin_in_Packet tmp_packet;
 		//memcpy(tmp_packet.pinName,default_name.c_str(),default_name.length());
-		memcpy(tmp_packet.pinName,Q_number_of_pins.at(i).c_str(),Q_number_of_pins.at(i).length());
+		memcpy(tmp_packet.pinName,debug_input_pinName.at(i).c_str(),debug_input_pinName.at(i).length());
 		//memset(tmp_packet.pinName+5,0,1);		
 		tmp_packet.state = (uint8_t)log.at(i).state;
 		Packet->pins[i] = tmp_packet;
@@ -253,6 +272,23 @@ void Debug::form_Packet(std::vector<pinState> log, int curr_time, char *data)
 	
 	
 	free(Packet);	
+}
+
+void Debug::create_IDT(char *buf)
+{
+	uint8_t buf_size = debug_input_Wpi_pinNum.size();
+	memcpy(buf,&buf_size,sizeof(uint8_t));
+	int hop = 5; // bytes
+	for(int i = 0; i < buf_size; i++)
+	{
+		memcpy(buf+hop,debug_input_pinName.at(i).c_str(),debug_input_pinName.at(i).length());
+		hop+=5;
+	}
+}
+
+void Debug::create_ODT(char *buf)
+{
+	
 }
 
 void Debug::explore_byte_buff(char *data, int size)

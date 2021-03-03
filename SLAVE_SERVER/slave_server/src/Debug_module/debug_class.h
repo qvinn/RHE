@@ -52,16 +52,16 @@ class Debug {
 		uint8_t state;	// 1 байт
 	} pin_in_Packet; */
 	
-	typedef struct pin_in_Packet{		// 48 байта
-		char pinName[5];	// 5 байт
-		uint8_t state;	// 1 байт
+	typedef struct pin_in_Packet{		// 6 байт
+		char pinName[5];				// 5 байт
+		uint8_t state;					// 1 байт
 	} pin_in_Packet;
 	
-	typedef struct debug_log_Packet{ // 24 байта
-		uint8_t pin_count;	// 1 байт
-		uint8_t time_mode;	// 1 байт
-		pin_in_Packet pins[PIN_MAX];	// 16 байт
-		int time;				// 4 байта
+	typedef struct debug_log_Packet{ 	// 54 байта
+		uint8_t pin_count;				// 1 байт
+		uint8_t time_mode;				// 1 байт
+		pin_in_Packet pins[PIN_MAX];	// 6 байт * PIN_MAX = 48 байт
+		int time;						// 4 байта
 	} debug_log_Packet;
 	// Сформируем структуры данных для посылки - КОНЕЦ
 	
@@ -92,6 +92,10 @@ class Debug {
 	// Метод, который проверяет, запущен ли в текущай момент процесс отладки или нет
 	// Метод потокобесопасен, так что его можно вызывать в любой момент
 	int8_t debug_is_run();
+	
+	void create_IDT(char *buf);
+	
+	void create_ODT(char *buf);
 	
 	
 	private:
@@ -142,10 +146,10 @@ class Debug {
 	uint8_t time_mode = 1; // ms
 	
 	// Вектор, который хранит в себе текущие номера портов(WiringPi), которые анализирует плата
-	std::vector<int> Wpi_number_of_pins;
+	std::vector<int> debug_input_Wpi_pinNum;
 	// Вектор, который хранит в себе текущие(реальны) номера портов, которые анализирует плата
 	// Эти номера можно посмотреть в документации на FPGA
-	std::vector<std::string> Q_number_of_pins;
+	std::vector<std::string> debug_input_pinName;
 	
 	// Сокет, в который будут отправляться данные
 	int sock;

@@ -66,6 +66,7 @@
                     char FPGA_id[20];
             } info_about_new_device;
 
+
         private:
             void server_disconnected();
             void close_connection();
@@ -78,6 +79,7 @@
             int rcv_new_data_for_file(char *buf);
             int end_recive_file();
             void recive_dbg_info(char *info);
+            void debug_table_parser(char *buff);
 
             General_Widget *gen_widg = nullptr;
             QTcpSocket *socket = nullptr;

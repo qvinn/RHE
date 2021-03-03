@@ -56,6 +56,10 @@
 #define CLIENT_WANT_STOP_DEBUG 32
 #define CLIENT_WANT_CHANGE_DEBUG_SETTINGS 33
 #define DEBUG_PROCESS_TIMEOUT 34
+#define CLIENT_WANT_IDT 35 // IDT - Input Debug Table
+#define CLIENT_WANT_ODT 36 // ODT - Output Debug Table
+#define S_SERVER_SEND_IDT 37 // IDT - Input Debug Table
+#define S_SERVER_SEND_ODT 38 // ODT - Output Debug Table
 
 // Карта code_op - КОНЕЦ
 
@@ -611,6 +615,54 @@ void recive_new_data(char *buf, int sock)
 			{				
 				send_U_Packet(finded_client, DEBUG_PROCESS_TIMEOUT, tmp_packet->data);
 				printf("\t|___Debug procerss on Slave_server with id %i TIME_OUT\n", sock);
+			}			
+			break;	
+		}
+		
+		case CLIENT_WANT_IDT:
+		{
+			// Перенаправляем запрос от клиента к slave-серверу
+			int finded_s_server = find_pair_for(sock);
+			if(finded_s_server != ERROR)
+			{				
+				send_U_Packet(finded_s_server, CLIENT_WANT_IDT, NULL);
+				printf("\t|___Client with id %i want get IDT from slave-server with id %i\n", sock, finded_s_server);
+			}			
+			break;	
+		}
+		
+		case CLIENT_WANT_ODT:
+		{
+			// Перенаправляем запрос от клиента к slave-серверу
+			int finded_s_server = find_pair_for(sock);
+			if(finded_s_server != ERROR)
+			{				
+				send_U_Packet(finded_s_server, CLIENT_WANT_ODT, NULL);
+				printf("\t|___Client with id %i want get ODT from slave-server with id %i\n", sock, finded_s_server);
+			}			
+			break;	
+		}
+		
+		case S_SERVER_SEND_IDT:
+		{
+			// Перенаправляем запрос от slave-серверу к клиенту
+			int finded_client = find_pair_for(sock);
+			if(finded_client != ERROR)
+			{				
+				send_U_Packet(finded_client, S_SERVER_SEND_IDT, tmp_packet->data);
+				printf("\t|___Slave_server with id %i send IDT to client with id %i\n", sock, finded_client);
+			}			
+			break;	
+		}
+		
+		case S_SERVER_SEND_ODT:
+		{
+			// Перенаправляем запрос от slave-серверу к клиенту
+			int finded_client = find_pair_for(sock);
+			if(finded_client != ERROR)
+			{				
+				send_U_Packet(finded_client, S_SERVER_SEND_ODT, tmp_packet->data);
+				printf("\t|___Slave_server with id %i send IDT to client with id %i\n", sock, finded_client);
 			}			
 			break;	
 		}
