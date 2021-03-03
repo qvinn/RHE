@@ -27,6 +27,10 @@
 #define CLIENT_WANT_STOP_DEBUG 32
 #define CLIENT_WANT_CHANGE_DEBUG_SETTINGS 33
 #define DEBUG_PROCESS_TIMEOUT 34
+#define CLIENT_WANT_IDT 35 // IDT - Input Debug Table
+#define CLIENT_WANT_ODT 36 // ODT - Output Debug Table
+#define S_SERVER_SEND_IDT 37 // IDT - Input Debug Table
+#define S_SERVER_SEND_ODT 38 // ODT - Output Debug Table
 
 
 Send_Recieve_Module::Send_Recieve_Module(QString _server_ip, int _server_port, General_Widget *widg) {
@@ -76,21 +80,17 @@ void Send_Recieve_Module::wait_analize_recv_data() {
     while(socket->bytesAvailable()) {
         QByteArray recv = socket->read(RECIVE_BUFFER_SIZE);
         U_packet *tmp_packet = reinterpret_cast<U_packet *>(recv.data());
-//        char recv_buf[RECIVE_BUFFER_SIZE];
-//        socket->read(recv_buf, RECIVE_BUFFER_SIZE);
-//        U_packet *tmp_packet = (U_packet*)malloc(sizeof(U_packet));
-//        memcpy(tmp_packet,recv_buf, sizeof (U_packet));
         switch(tmp_packet->code_op) {
             case CLIENT_WANT_INIT_CONNECTION: {
-                //qDebug() << "Server want give me ID: " << my_client_ID;
-                //qDebug() << "Attach to FPGA with ID: " << tmp_packet->data;
-                //set_client_id(tmp_packet->id);
-                //emit choose_board_signal(tmp_packet->data);
                 info_about_new_device *info = reinterpret_cast<info_about_new_device *>(tmp_packet->data);
                 qDebug() << "Server want give me ID: " << info->id;
                 qDebug() << "Attach to FPGA with ID: " << info->FPGA_id;
                 set_client_id(info->id);
                 emit choose_board_signal(info->FPGA_id);
+                // Как только мы получили ID и убедились в том, что соединение установено успешно, запросим таблицы с инофрмацией
+                // о портах ввода-вывода на slave-serverе
+                send_U_Packet(CLIENT_WANT_IDT, "");
+                send_U_Packet(CLIENT_WANT_ODT, "");
                 break;
             }
             case PING_TO_SERVER: {
@@ -166,6 +166,12 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 memcpy(&max_duration, tmp_packet->data, sizeof(int));
                 memcpy(&tm_tp, tmp_packet->data+sizeof(int), sizeof(uint8_t));
                 qDebug() << "Max Debug time: " << max_duration << "(timemode " << tm_tp << ")";
+                break;
+            }            
+            case S_SERVER_SEND_IDT: {
+                qDebug() << "_________________________________Recive IDT";
+                debug_table_parser(tmp_packet->data);
+
                 break;
             }
             default: {
@@ -351,4 +357,21 @@ void Send_Recieve_Module::recive_dbg_info(char *info)
     qDebug() << "~~~~~~~~~~~~~~~~~";
 
     free(Packet);
+}
+
+void Send_Recieve_Module::debug_table_parser(char *buff)
+{
+    int pin_count;
+    QVector<QString> piNames;
+    memcpy(&pin_count,buff,sizeof(uint8_t));
+    int hop = 5; // bytes
+    char tpm_str[5];
+    for(int i = 0; i < pin_count; i++)
+    {
+        memcpy(tpm_str,buff+hop,5);
+        piNames.push_back(tpm_str);
+        hop+=5;
+    }
+
+    qDebug() << "PiNames:" << piNames;
 }
