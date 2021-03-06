@@ -29,6 +29,8 @@
 #define CLIENT_WANT_ODT 36 // ODT - Output Debug Table
 #define S_SERVER_SEND_IDT 37 // IDT - Input Debug Table
 #define S_SERVER_SEND_ODT 38 // ODT - Output Debug Table
+#define CLIENT_WANT_GET_TIMEOUT_INFO 39
+#define S_SERVER_SEND_TIMEOUT_INFO 40
 
 #define DATA_EXIST 1
 #define DATA_NOT_EXIST 0
@@ -54,10 +56,17 @@ client_conn_v_1::client_conn_v_1(std::string _server_ip, int _server_port, std::
 #ifdef HW_EN
 void client_conn_v_1::configure_dbg(std::vector<std::string> _debug_input_pinName,
 	std::vector<int> _debug_input_Wpi_pinNum,
+	std::vector<std::string> _debug_output_pinName,
+	std::vector<int> _debug_output_Wpi_pinNum,
 	int _max_duration_time,
 	uint8_t _max_duration_time_mode)
 {
-	gdb->setup_all(_debug_input_pinName,_debug_input_Wpi_pinNum,_max_duration_time,_max_duration_time_mode);
+	gdb->setup_all(_debug_input_pinName,
+		_debug_input_Wpi_pinNum,
+		_debug_output_pinName,
+		_debug_output_Wpi_pinNum,
+		_max_duration_time,
+		_max_duration_time_mode);
 }
 #endif
 //-------------------PUBLIC----------------------------------------------------------------
@@ -254,8 +263,25 @@ void client_conn_v_1::wait_analize_recv_data()
 #ifdef HW_EN
 			case CLIENT_WANT_ODT:
 			{
-				
-				//printf("_________________________________SEND ODT\n");
+				char *buff = (char*)malloc(DATA_BUFFER);
+				memset(buff,0,DATA_BUFFER);
+				gdb->create_ODT(buff);
+				send_U_Packet(Socket, S_SERVER_SEND_ODT, buff);
+				free(buff);
+				printf("_________________________________SEND ODT\n");
+				break;	
+			}
+#endif
+
+#ifdef HW_EN
+			case CLIENT_WANT_GET_TIMEOUT_INFO:
+			{
+				char *buff = (char*)malloc(DATA_BUFFER);
+				memset(buff,0,DATA_BUFFER);
+				gdb->form_time_out_info(buff);
+				send_U_Packet(Socket, S_SERVER_SEND_TIMEOUT_INFO, buff);
+				free(buff);
+				printf("_________________________________SEND TIMEOUT_INFO\n");
 				break;	
 			}
 #endif

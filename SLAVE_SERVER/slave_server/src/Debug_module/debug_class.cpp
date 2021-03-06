@@ -23,7 +23,12 @@ Debug::Debug()
 	wiringPiSetup();
 }
 
-void Debug::setup_all(std::vector<std::string> _debug_input_pinName, std::vector<int> _debug_input_Wpi_pinNum, int _max_duration_time, uint8_t _max_duration_time_mode)
+void Debug::setup_all(std::vector<std::string> _debug_input_pinName,
+	std::vector<int> _debug_input_Wpi_pinNum,
+	std::vector<std::string> _debug_output_pinName,
+	std::vector<int> _debug_output_Wpi_pinNum,
+	int _max_duration_time,
+	uint8_t _max_duration_time_mode)
 {
 
 
@@ -46,14 +51,21 @@ void Debug::setup_all(std::vector<std::string> _debug_input_pinName, std::vector
 	
 	debug_input_pinName = _debug_input_pinName;
 	debug_input_Wpi_pinNum = _debug_input_Wpi_pinNum;
+	debug_output_pinName = _debug_output_pinName;
+	debug_output_Wpi_pinNum = _debug_output_Wpi_pinNum;
 	max_duration_time = _max_duration_time;
 	max_duration_time_mode = _max_duration_time_mode;
 	calculate_us_max_duration_time();
 	
 	// Сконфигурируем пины
-	for(long unsigned int i=0; i < debug_input_Wpi_pinNum.size(); i++)
+	for(int i=0; i < debug_input_Wpi_pinNum.size(); i++) // long unsigned 
 	{
 		pinMode(debug_input_Wpi_pinNum.at(i), INPUT);
+	}
+	
+	for(int i=0; i < debug_output_Wpi_pinNum.size(); i++) // long unsigned 
+	{
+		pinMode(debug_output_Wpi_pinNum.at(i), OUTPUT);
 	}
 }
 
@@ -105,7 +117,7 @@ void Debug::start_debug_process()
 	// Очистим записи
 	std::vector<pinState> log;
 	// Установим начальное "текущее" время для первого прохода 1 условная единица
-	int curr_time = 1;
+	int curr_time = 0; // 1
 	// Выполним заданное количество итераций
 	while(1)
 	{
@@ -159,8 +171,9 @@ void Debug::start_debug_process()
 			// остановлен и по какой причине
 			char report_buff[DATA_BUFFER];
 			memset(report_buff,0,DATA_BUFFER);
-			memcpy(report_buff, &max_duration_time, sizeof(int));
-			memcpy(report_buff+sizeof(int), &max_duration_time_mode, sizeof(uint8_t));			
+			//memcpy(report_buff, &max_duration_time, sizeof(int));
+			//memcpy(report_buff+sizeof(int), &max_duration_time_mode, sizeof(uint8_t));
+			form_time_out_info(report_buff);
 			send_U_Packet(sock, DEBUG_PROCESS_TIMEOUT, report_buff);
 			printf("--------->Debug process TIMEOUT\n");
 			stop_debug();
@@ -278,7 +291,7 @@ void Debug::create_IDT(char *buf)
 {
 	uint8_t buf_size = debug_input_Wpi_pinNum.size();
 	memcpy(buf,&buf_size,sizeof(uint8_t));
-	int hop = 5; // bytes
+	int hop = 1; // bytes // Изначально = 1, т.к. нужно пропусть первое поле uint8_t
 	for(int i = 0; i < buf_size; i++)
 	{
 		memcpy(buf+hop,debug_input_pinName.at(i).c_str(),debug_input_pinName.at(i).length());
@@ -288,7 +301,35 @@ void Debug::create_IDT(char *buf)
 
 void Debug::create_ODT(char *buf)
 {
-	
+	uint8_t buf_size = debug_output_Wpi_pinNum.size();
+	memcpy(buf,&buf_size,sizeof(uint8_t));
+	int hop = 1; // bytes // Изначально = 1, т.к. нужно пропусть первое поле uint8_t
+	uint8_t tmp_num;
+	for(int i = 0; i < buf_size; i++)
+	{
+		memcpy(buf+hop,debug_output_pinName.at(i).c_str(),debug_output_pinName.at(i).length());
+		hop += 5;
+		tmp_num = debug_output_Wpi_pinNum.at(i);
+		memcpy(buf+hop,&tmp_num, sizeof(uint8_t));
+		hop+=1;
+	}
+}
+
+void Debug::set_pinStates(char *buf)
+{
+	set_state_Packet *set_pins = (set_state_Packet*)malloc(sizeof(set_state_Packet));
+	memcpy(set_pins, buf, sizeof(set_state_Packet));
+	for(int i = 0; i < set_pins->pin_count; i++)
+	{
+		digitalWrite(set_pins->pins[i].pinNum, set_pins->pins[i].state);
+	}
+	free(set_pins);
+}
+
+void Debug::form_time_out_info(char *buf)
+{
+	memcpy(buf, &max_duration_time, sizeof(int));
+	memcpy(buf+sizeof(int), &max_duration_time_mode, sizeof(uint8_t));
 }
 
 void Debug::explore_byte_buff(char *data, int size)

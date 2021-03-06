@@ -47,11 +47,7 @@ class Debug {
 	};
 	
 	// Сформируем структуры данных для посылки
-/* 	typedef struct pin_in_Packet{		// 2 байта
-		uint8_t pinNum;	// 1 байт
-		uint8_t state;	// 1 байт
-	} pin_in_Packet; */
-	
+	// Пара структур для анализа состояния портам ввода-вывода
 	typedef struct pin_in_Packet{		// 6 байт
 		char pinName[5];				// 5 байт
 		uint8_t state;					// 1 байт
@@ -63,13 +59,24 @@ class Debug {
 		pin_in_Packet pins[PIN_MAX];	// 6 байт * PIN_MAX = 48 байт
 		int time;						// 4 байта
 	} debug_log_Packet;
+	
+	// Пара структур для задания состояния портам ввода-вывода
+	typedef struct set_state{		// 2 байта
+		uint8_t pinNum;	// 1 байт
+		uint8_t state;	// 1 байт
+	} set_state;
+	
+	typedef struct set_state_Packet{ 	// 17 байт
+		uint8_t pin_count;				// 1 байт
+		set_state pins[PIN_MAX];	// 2 байт * PIN_MAX = 16 байт
+	} set_state_Packet;
 	// Сформируем структуры данных для посылки - КОНЕЦ
 	
 	public:
 	Debug();
 	
 	// Метод для инициализации начальных параметорв работы отладчка
-	void setup_all(std::vector<std::string> _Q_number_of_pins, std::vector<int> _Wpi_number_of_pins, int _max_duration_time, uint8_t _max_duration_time_mode);
+	void setup_all(std::vector<std::string> _debug_input_pinName, std::vector<int> _debug_input_Wpi_pinNum, std::vector<std::string> _debug_output_pinName, std::vector<int> _debug_output_Wpi_pinNum, int _max_duration_time, uint8_t _max_duration_time_mode);
 	
 	// Метод для изменния таких параметорм отладчика, как "время дискритизации" и "единицы измерения"
 	// Метод принимает только char * буффер и вычленяет из него данные
@@ -93,13 +100,23 @@ class Debug {
 	// Метод потокобесопасен, так что его можно вызывать в любой момент
 	int8_t debug_is_run();
 	
+	// Метод для формирования Input debug table(Таблица с названиями портов ввода-вывода)
 	void create_IDT(char *buf);
 	
+	// Метод для формирования Output debug table(Таблица с названиями портов ввода-вывода)
 	void create_ODT(char *buf);
+	
+	// Метод для задани портам ввода-вывода необхохимых состояний
+	// Метод принимает в себя буффер и разбирает его, как структуру "set_state_Packet"
+	void set_pinStates(char *buf);
+	
+	// Метод для формирования пакета в котором будет описана максимальная длительности отладки
+	void form_time_out_info(char *buf);
 	
 	
 	private:
 	
+	// Метод, который выполняет расчет параметра "us_max_duration_time"
 	void calculate_us_max_duration_time();
 	
 	// Метод для отправки данных в сокет
@@ -150,6 +167,14 @@ class Debug {
 	// Вектор, который хранит в себе текущие(реальны) номера портов, которые анализирует плата
 	// Эти номера можно посмотреть в документации на FPGA
 	std::vector<std::string> debug_input_pinName;
+	
+	// Вектор, который хранит в себе текущие номера портов(WiringPi), на которых плата может 
+	// генерировать уровни(высокий и низкий)
+	std::vector<int> debug_output_Wpi_pinNum;
+	// Вектор, который хранит в себе текущие(реальны) номера портов, на которые будут подаваться
+	// сигналы с мини-пк
+	// Эти номера можно посмотреть в документации на FPGA
+	std::vector<std::string> debug_output_pinName;
 	
 	// Сокет, в который будут отправляться данные
 	int sock;
