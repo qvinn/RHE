@@ -31,6 +31,8 @@
 #define CLIENT_WANT_ODT 36 // ODT - Output Debug Table
 #define S_SERVER_SEND_IDT 37 // IDT - Input Debug Table
 #define S_SERVER_SEND_ODT 38 // ODT - Output Debug Table
+#define CLIENT_WANT_GET_TIMEOUT_INFO 39
+#define S_SERVER_SEND_TIMEOUT_INFO 40
 
 
 Send_Recieve_Module::Send_Recieve_Module(QString _server_ip, int _server_port, General_Widget *widg) {
@@ -87,6 +89,8 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 qDebug() << "Attach to FPGA with ID: " << info->FPGA_id;
                 set_client_id(info->id);
                 emit choose_board_signal(info->FPGA_id);
+                // Запросим информацию о максимальном допустимом врмени отладки
+                send_U_Packet(CLIENT_WANT_GET_TIMEOUT_INFO, ""); // обработка в S_SERVER_SEND_TIMEOUT_INFO
                 // Как только мы получили ID и убедились в том, что соединение установено успешно, запросим таблицы с инофрмацией
                 // о портах ввода-вывода на slave-serverе
                 send_U_Packet(CLIENT_WANT_IDT, "");
@@ -170,8 +174,23 @@ void Send_Recieve_Module::wait_analize_recv_data() {
             }            
             case S_SERVER_SEND_IDT: {
                 qDebug() << "_________________________________Recive IDT";
-                debug_table_parser(tmp_packet->data);
+                I_debug_table_parser(tmp_packet->data);
 
+                break;
+            }
+            case S_SERVER_SEND_ODT: {
+                qDebug() << "_________________________________Recive ODT";
+                O_debug_table_parser(tmp_packet->data);
+
+                break;
+            }
+            case S_SERVER_SEND_TIMEOUT_INFO: {
+                qDebug() << "_________________________________Recive TIME_OUT_INFO";
+                int max_duration;
+                uint8_t tm_tp;
+                memcpy(&max_duration, tmp_packet->data, sizeof(int));
+                memcpy(&tm_tp, tmp_packet->data+sizeof(int), sizeof(uint8_t));
+                qDebug() << "INFO: Max Debug time: " << max_duration << "(timemode " << tm_tp << ")";
                 break;
             }
             default: {
@@ -359,19 +378,44 @@ void Send_Recieve_Module::recive_dbg_info(char *info)
     free(Packet);
 }
 
-void Send_Recieve_Module::debug_table_parser(char *buff)
+void Send_Recieve_Module::I_debug_table_parser(char *buff)
 {
+    // Формат посылки: |1 байт - количество пинов|_|5 байт имя пина|_|5 байт имя пина|...столько имен, сколько "количество пинов"
     int pin_count;
-    QVector<QString> piNames;
+    QList<QString> pinNames;
     memcpy(&pin_count,buff,sizeof(uint8_t));
-    int hop = 5; // bytes
+    int hop = 1; // byte
     char tpm_str[5];
     for(int i = 0; i < pin_count; i++)
     {
         memcpy(tpm_str,buff+hop,5);
-        piNames.push_back(tpm_str);
+        pinNames.push_back(tpm_str);
         hop+=5;
     }
 
-    qDebug() << "PiNames:" << piNames;
+    qDebug() << "FPGA PiNames:" << pinNames;
+}
+
+void Send_Recieve_Module::O_debug_table_parser(char *buff)
+{
+    // Формат посылки: |1 байт - количество пинов|_|5 байт имя пина|_|1 байт - WiPi номер|_|5 байт имя пина|_|1 байт - WiPi номер|...столько имен, сколько "количество пинов"
+    int pin_count;
+    QList<QString> pinNames;
+    QList<int> pinNums;
+    memcpy(&pin_count,buff,sizeof(uint8_t));
+    int hop = 1; // byte
+    char tpm_str[5];
+    int tmp_num;
+    for(int i = 0; i < pin_count; i++)
+    {
+        memcpy(tpm_str,buff+hop,5);
+        pinNames.push_back(tpm_str);
+        hop += 5;
+        memcpy(&tmp_num,buff+hop,1);
+        pinNums.push_back(tmp_num);
+        hop+=1;
+    }
+
+    qDebug() << "FPGA PiNames:" << pinNames;
+    qDebug() << "WiPi piNums:" << pinNums;
 }
