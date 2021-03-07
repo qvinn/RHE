@@ -17,9 +17,11 @@ RHE_Widget::RHE_Widget(QWidget *parent, General_Widget *widg, Send_Recieve_Modul
     wvfrm_vwr = new Waveform_Viewer_Widget(this, gen_widg, false);
     connect(wvfrm_vwr, &Waveform_Viewer_Widget::as_window_signal, this, &RHE_Widget::slot_as_window);
     connect(gen_widg, &General_Widget::re_translate_signal, wvfrm_vwr, &Waveform_Viewer_Widget::slot_re_translate);
+    connect(snd_rcv_module, &Send_Recieve_Module::end_debugging_signal, this, &RHE_Widget::on_pushButton_stp_drw_clicked);
     connect(snd_rcv_module, &Send_Recieve_Module::choose_board_signal, this, &RHE_Widget::slot_choose_board);
     connect(snd_rcv_module, &Send_Recieve_Module::accept_board_signal, this, &RHE_Widget::slot_accept_board);
     connect(snd_rcv_module, &Send_Recieve_Module::accept_debug_data_signal, this, &RHE_Widget::slot_accept_debug_data);
+    connect(snd_rcv_module, &Send_Recieve_Module::accept_input_data_table_signal, this, &RHE_Widget::slot_accept_input_data_table);
     prev_vals = new QList<int>();
     pre_initialize_ui();
 }
@@ -94,16 +96,20 @@ void RHE_Widget::on_pushButton_3_clicked() {
 }
 
 void RHE_Widget::on_pushButton_strt_drw_clicked() {
+    wvfrm_vwr->debugging = true;
     new_debug = true;
     snd_rcv_module->start_debug(static_cast<uint16_t>(ui->spnBx_dbg_tm->value()), static_cast<uint8_t>(ui->cmbBx_dbg_tm_tp->currentIndex()));
     wvfrm_vwr->pshBttn_open_save_wvfrm_set_enabled(false);
+    ui->pushButton_strt_drw->setEnabled(false);
     ui->hrzntlSldr_cnt_dbg_pins->setEnabled(false);
 }
 
 void RHE_Widget::on_pushButton_stp_drw_clicked() {
     snd_rcv_module->stop_debug();
     wvfrm_vwr->pshBttn_open_save_wvfrm_set_enabled(true);
+    ui->pushButton_strt_drw->setEnabled(true);
     ui->hrzntlSldr_cnt_dbg_pins->setEnabled(true);
+    wvfrm_vwr->debugging = false;
 }
 
 void RHE_Widget::on_cmbBx_chs_brd_currentIndexChanged(int index) {
@@ -579,20 +585,62 @@ void RHE_Widget::slot_accept_debug_data(QByteArray debug_data) {
     if(new_debug) {
         new_debug = false;
         wvfrm_vwr->remove_data_from_graph();
-        ui->hrzntlSldr_cnt_dbg_pins->setValue(tmp_packet->pin_count);
     }
     QList<int> val;
     val.clear();
+    QList<QString> pin_names = *wvfrm_vwr->get_pin_names();
+    QList<QPoint> nmd_pin_pos;
+    nmd_pin_pos.clear();
+    for(int i = 0; i < pin_names.count(); i++) {
+        for(int k = 0; k < tmp_packet->pin_count; k++) {
+            QString tmp_str(tmp_packet->pins[k].pinName);
+            if((pin_names.at(i).compare(tmp_str, Qt::CaseInsensitive) == 0)) {
+                nmd_pin_pos.append(QPoint(i, k));
+                break;
+             }
+        }
+    }
     bool val_changed = false;
-    double dbg_time = (static_cast<double>(tmp_packet->time) / 1000.0);
-    for(int i = 0; i < tmp_packet->pin_count; i++) {
+    double dbg_time = (static_cast<double>(tmp_packet->time) * pow(1000.0, tmp_packet->time_mode));
+    for(int i = 0; i < wvfrm_vwr->graph_count; i++) {
         val.append(0);
-        val.append(tmp_packet->pins[i].state);
-        if(prev_vals->at(i) != val.at(i)) {
+        if(nmd_pin_pos.count() == 0) {
+            if(i >= tmp_packet->pin_count) {
+                val.append(0);
+            } else {
+                val.append(tmp_packet->pins[i].state);
+            }
+        } else {
+            int tmp = 0;
+            for(int k = 0; k < nmd_pin_pos.count(); k++) {
+                if(i == nmd_pin_pos.at(k).x()) {
+                    val.append(tmp_packet->pins[nmd_pin_pos.at(k).y()].state);
+                    break;
+                } else {
+                    tmp++;
+                }
+            }
+            if(tmp == nmd_pin_pos.count()) {
+                val.append(0);
+            }
+        }
+        if(prev_vals->at(val.count() - 1) != val.at(val.count() - 1)) {
             val_changed = true;
         }
     }
     wvfrm_vwr->add_data_to_graph_rltm(val, prev_vals, dbg_time, val_changed);
+}
+
+void RHE_Widget::slot_accept_input_data_table(QByteArray input_data_table) {
+    int pin_count;
+    memcpy(&pin_count, input_data_table.data(), sizeof(uint8_t));
+    int hop = 5; // bytes
+    wvfrm_vwr->remove_pin_names();
+    for(int i = 0; i < pin_count; i++) {
+        wvfrm_vwr->add_pin_names(QByteArray((input_data_table.data() + (hop * (i + 1))), 5));
+    }
+    wvfrm_vwr->change_pin_names();
+    wvfrm_vwr->re_scale_graph();
 }
 
 void RHE_Widget::slot_as_window(bool as_window) {

@@ -153,25 +153,26 @@ void Send_Recieve_Module::wait_analize_recv_data() {
             }
             case S_SERVER_SENDING_DEBUG_INFO: {
 //                recive_dbg_info(tmp_packet->data);
-                QByteArray debug_data(tmp_packet->data, sizeof(debug_log_Packet));
-                emit accept_debug_data_signal(debug_data);
-                recive_dbg_info(tmp_packet->data);
+//                QByteArray debug_data(tmp_packet->data, sizeof(debug_log_Packet));
+                emit accept_debug_data_signal(QByteArray(tmp_packet->data, sizeof(debug_log_Packet)));
+//                recive_dbg_info(tmp_packet->data);
 //                qDebug() << "_________________________________Slave server sending DEBUG INFO";
                 break;
             }
             case DEBUG_PROCESS_TIMEOUT: {
                 qDebug() << "_________________________________Debug process TIMEOUT";
-                int max_duration;
-                uint8_t tm_tp;
-                memcpy(&max_duration, tmp_packet->data, sizeof(int));
-                memcpy(&tm_tp, tmp_packet->data+sizeof(int), sizeof(uint8_t));
-                qDebug() << "Max Debug time: " << max_duration << "(timemode " << tm_tp << ")";
+//                int max_duration;
+//                uint8_t tm_tp;
+//                memcpy(&max_duration, tmp_packet->data, sizeof(int));
+//                memcpy(&tm_tp, tmp_packet->data+sizeof(int), sizeof(uint8_t));
+//                qDebug() << "Max Debug time: " << max_duration << "(timemode " << tm_tp << ")";
+                emit end_debugging_signal();
                 break;
             }            
             case S_SERVER_SEND_IDT: {
                 qDebug() << "_________________________________Recive IDT";
-                debug_table_parser(tmp_packet->data);
-
+//                debug_table_parser(QByteArray(tmp_packet->data, sizeof(tmp_packet->data)));
+                emit accept_input_data_table_signal(QByteArray(tmp_packet->data, sizeof(tmp_packet->data)));
                 break;
             }
             default: {
@@ -192,8 +193,8 @@ void Send_Recieve_Module::ping_to_S_server() {
 
 void Send_Recieve_Module::start_debug(uint16_t dscrt_tm, uint8_t dscrt_tm_tp) {
     //for variable dscrt_tm_tp: 0 - seconds, 1 - miliseconds, 2 - microseconds
-    qDebug() << "dscrt_tm: " << dscrt_tm;
-    qDebug() << "dscrt_tm_tp: " << dscrt_tm_tp;
+//    qDebug() << "dscrt_tm: " << dscrt_tm;
+//    qDebug() << "dscrt_tm_tp: " << dscrt_tm_tp;
 
 //    QByteArray settings;
 //    settings.append(dscrt_tm, sizeof(uint16_t));
@@ -340,38 +341,35 @@ int Send_Recieve_Module::end_recive_file() {
     return CS_OK;
 }
 
-void Send_Recieve_Module::recive_dbg_info(char *info)
-{
-    debug_log_Packet *Packet = (debug_log_Packet*)malloc(sizeof(debug_log_Packet));
-    memcpy(Packet,info,sizeof(debug_log_Packet));
+//void Send_Recieve_Module::recive_dbg_info(char *info)
+//{
+//    debug_log_Packet *Packet = (debug_log_Packet*)malloc(sizeof(debug_log_Packet));
+//    memcpy(Packet,info,sizeof(debug_log_Packet));
 
-    qDebug() << "Recive debug data:";
-    qDebug() << "Info about " << Packet->pin_count << "pins";
-    qDebug() << "At: " << Packet->time << "units";
+//    qDebug() << "Recive debug data:";
+//    qDebug() << "Info about " << Packet->pin_count << "pins";
+//    qDebug() << "At: " << Packet->time << "units";
 
-    for(int i = 0; i < Packet->pin_count; i++)
-    {
-        qDebug() << "Pin " << Packet->pins[i].pinName << "have state: " << Packet->pins[i].state;
-    }
+//    for(int i = 0; i < Packet->pin_count; i++)
+//    {
+//        qDebug() << "Pin " << Packet->pins[i].pinName << "have state: " << Packet->pins[i].state;
+//    }
 
-    qDebug() << "~~~~~~~~~~~~~~~~~";
+//    qDebug() << "~~~~~~~~~~~~~~~~~";
 
-    free(Packet);
-}
+//    free(Packet);
+//}
 
-void Send_Recieve_Module::debug_table_parser(char *buff)
-{
-    int pin_count;
-    QVector<QString> piNames;
-    memcpy(&pin_count,buff,sizeof(uint8_t));
-    int hop = 5; // bytes
-    char tpm_str[5];
-    for(int i = 0; i < pin_count; i++)
-    {
-        memcpy(tpm_str,buff+hop,5);
-        piNames.push_back(tpm_str);
-        hop+=5;
-    }
+//void Send_Recieve_Module::debug_table_parser(QByteArray debug_data)
+//{
+//    int pin_count;
+//    QList<QString> pinNames;
+//    memcpy(&pin_count,debug_data.data(),sizeof(uint8_t));
+//    int hop = 5; // bytes
+//    for(int i = 0; i < pin_count; i++)
+//    {
+//        pinNames.append(QByteArray(debug_data.data()+(hop * (i + 1)), 5));
+//    }
 
-    qDebug() << "PiNames:" << piNames;
-}
+//    qDebug() << "PiNames:" << pinNames;
+//}

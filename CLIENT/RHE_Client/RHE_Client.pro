@@ -16,7 +16,8 @@ SOURCES += \
     qcustomplot.cpp \
     registration_widget.cpp \
     rhe_widget.cpp \
-    send_recieve_module.cpp
+    send_recieve_module.cpp \
+    waveform_viewer_widget.cpp
 
 FORMS += \
     mainwindow.ui \
@@ -30,7 +31,8 @@ HEADERS += \
     qcustomplot.h \
     registration_widget.h \
     rhe_widget.h \
-    send_recieve_module.h
+    send_recieve_module.h \
+    waveform_viewer_widget.h
 
 TRANSLATIONS += Language/RHE_Client_en.ts \
                 Language/RHE_Client_ua.ts \

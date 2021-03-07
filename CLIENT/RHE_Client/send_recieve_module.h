@@ -78,8 +78,8 @@
             int start_recive_file();
             int rcv_new_data_for_file(char *buf);
             int end_recive_file();
-            void recive_dbg_info(char *info);
-            void debug_table_parser(char *buff);
+//            void recive_dbg_info(char *info);
+//            void debug_table_parser(QByteArray debug_data);
 
             General_Widget *gen_widg = nullptr;
             QTcpSocket *socket = nullptr;
@@ -95,9 +95,11 @@
 
         signals:
             void logout_signal();
+            void end_debugging_signal();
             void choose_board_signal(QString jtag_code);
             void accept_board_signal(bool flg);
             void accept_debug_data_signal(QByteArray debug_data);
+            void accept_input_data_table_signal(QByteArray input_data_table);
             void show_message_box_signal(QString str1, QString str2, int type);
     };
 

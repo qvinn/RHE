@@ -6,7 +6,7 @@
     #include <QDirIterator>
     #include <QResizeEvent>
     #include <QXmlStreamReader>
-    #include "general_widget.h"
+    #include "waveform_viewer_widget.h"
     #include "send_recieve_module.h"
 
     QT_BEGIN_NAMESPACE
@@ -65,10 +65,9 @@
             bool ui_initialized = false;
             bool language_changed = false;
             bool board_is_on = false;
+            bool new_debug = false;
             bool clr_trnsprnt = true;
             int prev_board_index;
-
-            bool new_debug = false;
 
         public slots:
             void slot_re_translate();
@@ -93,6 +92,7 @@
             void slot_choose_board(QString jtag_code);
             void slot_accept_board(bool flg);
             void slot_accept_debug_data(QByteArray debug_data);
+            void slot_accept_input_data_table(QByteArray input_data_table);
             void slot_as_window(bool as_window);
 
         signals:
