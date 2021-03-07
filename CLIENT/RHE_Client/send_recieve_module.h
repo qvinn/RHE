@@ -78,8 +78,9 @@
             int start_recive_file();
             int rcv_new_data_for_file(char *buf);
             int end_recive_file();
-//            void recive_dbg_info(char *info);
-//            void debug_table_parser(QByteArray debug_data);
+            void recive_dbg_info(char *info);
+            void I_debug_table_parser(char *buff);
+            void O_debug_table_parser(char *buff);
 
             General_Widget *gen_widg = nullptr;
             QTcpSocket *socket = nullptr;

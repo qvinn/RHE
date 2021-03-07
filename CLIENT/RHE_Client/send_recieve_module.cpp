@@ -31,6 +31,8 @@
 #define CLIENT_WANT_ODT 36 // ODT - Output Debug Table
 #define S_SERVER_SEND_IDT 37 // IDT - Input Debug Table
 #define S_SERVER_SEND_ODT 38 // ODT - Output Debug Table
+#define CLIENT_WANT_GET_TIMEOUT_INFO 39
+#define S_SERVER_SEND_TIMEOUT_INFO 40
 
 
 Send_Recieve_Module::Send_Recieve_Module(QString _server_ip, int _server_port, General_Widget *widg) {
@@ -87,6 +89,8 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 qDebug() << "Attach to FPGA with ID: " << info->FPGA_id;
                 set_client_id(info->id);
                 emit choose_board_signal(info->FPGA_id);
+                // Запросим информацию о максимальном допустимом врмени отладки
+                send_U_Packet(CLIENT_WANT_GET_TIMEOUT_INFO, ""); // обработка в S_SERVER_SEND_TIMEOUT_INFO
                 // Как только мы получили ID и убедились в том, что соединение установено успешно, запросим таблицы с инофрмацией
                 // о портах ввода-вывода на slave-serverе
                 send_U_Packet(CLIENT_WANT_IDT, "");
@@ -152,7 +156,6 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 break;
             }
             case S_SERVER_SENDING_DEBUG_INFO: {
-//                recive_dbg_info(tmp_packet->data);
 //                QByteArray debug_data(tmp_packet->data, sizeof(debug_log_Packet));
                 emit accept_debug_data_signal(QByteArray(tmp_packet->data, sizeof(debug_log_Packet)));
 //                recive_dbg_info(tmp_packet->data);
@@ -160,7 +163,7 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 break;
             }
             case DEBUG_PROCESS_TIMEOUT: {
-                qDebug() << "_________________________________Debug process TIMEOUT";
+//                qDebug() << "_________________________________Debug process TIMEOUT";
 //                int max_duration;
 //                uint8_t tm_tp;
 //                memcpy(&max_duration, tmp_packet->data, sizeof(int));
@@ -171,8 +174,24 @@ void Send_Recieve_Module::wait_analize_recv_data() {
             }            
             case S_SERVER_SEND_IDT: {
                 qDebug() << "_________________________________Recive IDT";
-//                debug_table_parser(QByteArray(tmp_packet->data, sizeof(tmp_packet->data)));
+//                I_debug_table_parser(tmp_packet->data);
                 emit accept_input_data_table_signal(QByteArray(tmp_packet->data, sizeof(tmp_packet->data)));
+
+                break;
+            }
+            case S_SERVER_SEND_ODT: {
+                qDebug() << "_________________________________Recive ODT";
+                O_debug_table_parser(tmp_packet->data);
+
+                break;
+            }
+            case S_SERVER_SEND_TIMEOUT_INFO: {
+                qDebug() << "_________________________________Recive TIME_OUT_INFO";
+                int max_duration;
+                uint8_t tm_tp;
+                memcpy(&max_duration, tmp_packet->data, sizeof(int));
+                memcpy(&tm_tp, tmp_packet->data+sizeof(int), sizeof(uint8_t));
+                qDebug() << "INFO: Max Debug time: " << max_duration << "(timemode " << tm_tp << ")";
                 break;
             }
             default: {
@@ -193,8 +212,8 @@ void Send_Recieve_Module::ping_to_S_server() {
 
 void Send_Recieve_Module::start_debug(uint16_t dscrt_tm, uint8_t dscrt_tm_tp) {
     //for variable dscrt_tm_tp: 0 - seconds, 1 - miliseconds, 2 - microseconds
-//    qDebug() << "dscrt_tm: " << dscrt_tm;
-//    qDebug() << "dscrt_tm_tp: " << dscrt_tm_tp;
+    qDebug() << "dscrt_tm: " << dscrt_tm;
+    qDebug() << "dscrt_tm_tp: " << dscrt_tm_tp;
 
 //    QByteArray settings;
 //    settings.append(dscrt_tm, sizeof(uint16_t));
@@ -341,35 +360,63 @@ int Send_Recieve_Module::end_recive_file() {
     return CS_OK;
 }
 
-//void Send_Recieve_Module::recive_dbg_info(char *info)
-//{
-//    debug_log_Packet *Packet = (debug_log_Packet*)malloc(sizeof(debug_log_Packet));
-//    memcpy(Packet,info,sizeof(debug_log_Packet));
+void Send_Recieve_Module::recive_dbg_info(char *info)
+{
+    debug_log_Packet *Packet = (debug_log_Packet*)malloc(sizeof(debug_log_Packet));
+    memcpy(Packet,info,sizeof(debug_log_Packet));
 
-//    qDebug() << "Recive debug data:";
-//    qDebug() << "Info about " << Packet->pin_count << "pins";
-//    qDebug() << "At: " << Packet->time << "units";
+    qDebug() << "Recive debug data:";
+    qDebug() << "Info about " << Packet->pin_count << "pins";
+    qDebug() << "At: " << Packet->time << "units";
 
-//    for(int i = 0; i < Packet->pin_count; i++)
-//    {
-//        qDebug() << "Pin " << Packet->pins[i].pinName << "have state: " << Packet->pins[i].state;
-//    }
+    for(int i = 0; i < Packet->pin_count; i++)
+    {
+        qDebug() << "Pin " << Packet->pins[i].pinName << "have state: " << Packet->pins[i].state;
+    }
 
-//    qDebug() << "~~~~~~~~~~~~~~~~~";
+    qDebug() << "~~~~~~~~~~~~~~~~~";
 
-//    free(Packet);
-//}
+    free(Packet);
+}
 
-//void Send_Recieve_Module::debug_table_parser(QByteArray debug_data)
-//{
-//    int pin_count;
-//    QList<QString> pinNames;
-//    memcpy(&pin_count,debug_data.data(),sizeof(uint8_t));
-//    int hop = 5; // bytes
-//    for(int i = 0; i < pin_count; i++)
-//    {
-//        pinNames.append(QByteArray(debug_data.data()+(hop * (i + 1)), 5));
-//    }
+void Send_Recieve_Module::I_debug_table_parser(char *buff)
+{
+    // Формат посылки: |1 байт - количество пинов|_|5 байт имя пина|_|5 байт имя пина|...столько имен, сколько "количество пинов"
+    int pin_count;
+    QList<QString> pinNames;
+    memcpy(&pin_count,buff,sizeof(uint8_t));
+    int hop = 1; // byte
+    char tpm_str[5];
+    for(int i = 0; i < pin_count; i++)
+    {
+        memcpy(tpm_str,buff+hop,5);
+        pinNames.push_back(tpm_str);
+        hop+=5;
+    }
 
-//    qDebug() << "PiNames:" << pinNames;
-//}
+    qDebug() << "FPGA PiNames:" << pinNames;
+}
+
+void Send_Recieve_Module::O_debug_table_parser(char *buff)
+{
+    // Формат посылки: |1 байт - количество пинов|_|5 байт имя пина|_|1 байт - WiPi номер|_|5 байт имя пина|_|1 байт - WiPi номер|...столько имен, сколько "количество пинов"
+    int pin_count;
+    QList<QString> pinNames;
+    QList<int> pinNums;
+    memcpy(&pin_count,buff,sizeof(uint8_t));
+    int hop = 1; // byte
+    char tpm_str[5];
+    int tmp_num;
+    for(int i = 0; i < pin_count; i++)
+    {
+        memcpy(tpm_str,buff+hop,5);
+        pinNames.push_back(tpm_str);
+        hop += 5;
+        memcpy(&tmp_num,buff+hop,1);
+        pinNums.push_back(tmp_num);
+        hop+=1;
+    }
+
+    qDebug() << "FPGA PiNames:" << pinNames;
+    qDebug() << "WiPi piNums:" << pinNums;
+}

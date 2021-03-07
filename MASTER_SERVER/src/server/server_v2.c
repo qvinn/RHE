@@ -60,6 +60,8 @@
 #define CLIENT_WANT_ODT 36 // ODT - Output Debug Table
 #define S_SERVER_SEND_IDT 37 // IDT - Input Debug Table
 #define S_SERVER_SEND_ODT 38 // ODT - Output Debug Table
+#define CLIENT_WANT_GET_TIMEOUT_INFO 39
+#define S_SERVER_SEND_TIMEOUT_INFO 40
 
 // Карта code_op - КОНЕЦ
 
@@ -122,9 +124,15 @@ void reset_Pair(int id);
 */
 int find_pair_for(int id);
 
+// Метод, который находит и возвращает FPGA_id для выбранного подключенного устройства
 std::string find_FPGA_ID_for(int id);
 
-int change_FPGA(int curr_client_id,std::string FPGA_id);
+// Метод нахтдит для клиента плату с конкретным FPGA_id
+/*
+* int curr_client_id	- ID клиента, которому необходимо сменить плату
+* std::string FPGA_id	- FPGA_id платы, которую хочет выбрать клиент
+*/
+int change_FPGA(int curr_client_id, std::string FPGA_id);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -663,6 +671,30 @@ void recive_new_data(char *buf, int sock)
 			{				
 				send_U_Packet(finded_client, S_SERVER_SEND_ODT, tmp_packet->data);
 				printf("\t|___Slave_server with id %i send IDT to client with id %i\n", sock, finded_client);
+			}			
+			break;	
+		}
+		
+		case CLIENT_WANT_GET_TIMEOUT_INFO:
+		{
+			// Перенаправляем запрос от клиента к slave-серверу
+			int finded_s_server = find_pair_for(sock);
+			if(finded_s_server != ERROR)
+			{				
+				send_U_Packet(finded_s_server, CLIENT_WANT_GET_TIMEOUT_INFO, NULL);
+				printf("\t|___Client with id %i want get TIME_OUT info from slave-server with id %i\n", sock, finded_s_server);
+			}			
+			break;	
+		}
+		
+		case S_SERVER_SEND_TIMEOUT_INFO:
+		{
+			// Перенаправляем запрос от slave-серверу к клиенту
+			int finded_client = find_pair_for(sock);
+			if(finded_client != ERROR)
+			{				
+				send_U_Packet(finded_client, S_SERVER_SEND_TIMEOUT_INFO, tmp_packet->data);
+				printf("\t|___Slave_server with id %i GET_TIME_OUT to client with id %i\n", sock, finded_client);
 			}			
 			break;	
 		}
