@@ -20,6 +20,7 @@ RHE_Widget::RHE_Widget(QWidget *parent, General_Widget *widg, Send_Recieve_Modul
     connect(snd_rcv_module, &Send_Recieve_Module::end_debugging_signal, this, &RHE_Widget::on_pushButton_stp_drw_clicked);
     connect(snd_rcv_module, &Send_Recieve_Module::choose_board_signal, this, &RHE_Widget::slot_choose_board);
     connect(snd_rcv_module, &Send_Recieve_Module::accept_board_signal, this, &RHE_Widget::slot_accept_board);
+    connect(snd_rcv_module, &Send_Recieve_Module::accept_debug_time_limit_signal, this, &RHE_Widget::slot_accept_debug_time_limit);
     connect(snd_rcv_module, &Send_Recieve_Module::accept_debug_data_signal, this, &RHE_Widget::slot_accept_debug_data);
     connect(snd_rcv_module, &Send_Recieve_Module::accept_input_data_table_signal, this, &RHE_Widget::slot_accept_input_data_table);
     prev_vals = new QList<int>();
@@ -96,20 +97,24 @@ void RHE_Widget::on_pushButton_3_clicked() {
 }
 
 void RHE_Widget::on_pushButton_strt_drw_clicked() {
-    wvfrm_vwr->debugging = true;
     new_debug = true;
     snd_rcv_module->start_debug(static_cast<uint16_t>(ui->spnBx_dbg_tm->value()), static_cast<uint8_t>(ui->cmbBx_dbg_tm_tp->currentIndex()));
+    wvfrm_vwr->debugging = true;
     wvfrm_vwr->pshBttn_open_save_wvfrm_set_enabled(false);
     ui->pushButton_strt_drw->setEnabled(false);
     ui->hrzntlSldr_cnt_dbg_pins->setEnabled(false);
+    ui->spnBx_dbg_tm->setEnabled(false);
+    ui->cmbBx_dbg_tm_tp->setEnabled(false);
 }
 
 void RHE_Widget::on_pushButton_stp_drw_clicked() {
     snd_rcv_module->stop_debug();
+    wvfrm_vwr->debugging = false;
     wvfrm_vwr->pshBttn_open_save_wvfrm_set_enabled(true);
     ui->pushButton_strt_drw->setEnabled(true);
     ui->hrzntlSldr_cnt_dbg_pins->setEnabled(true);
-    wvfrm_vwr->debugging = false;
+    ui->spnBx_dbg_tm->setEnabled(true);
+    ui->cmbBx_dbg_tm_tp->setEnabled(true);
 }
 
 void RHE_Widget::on_cmbBx_chs_brd_currentIndexChanged(int index) {
@@ -143,7 +148,7 @@ void RHE_Widget::on_hrzntlSldr_cnt_dbg_pins_valueChanged(int value) {
             prev_vals->append(0);
             prev_vals->append(0);
         }
-        wvfrm_vwr->remove_graphs_form_plot();
+        wvfrm_vwr->remove_graphs_from_plot();
         wvfrm_vwr->graph_count = value;
         wvfrm_vwr->re_scale_graph();
         wvfrm_vwr->add_graphs_to_plot();
@@ -271,8 +276,8 @@ void RHE_Widget::post_initialize_ui() {
 
 void RHE_Widget::set_ui_text() {
     language_changed = false;
-    ui->pushButton_strt_drw->setText("Start Debug");
-    ui->pushButton_stp_drw->setText("Stop Debug");
+    ui->pushButton_strt_drw->setText(tr("Start Debug"));
+    ui->pushButton_stp_drw->setText(tr("Stop Debug"));
     ui->lbl_FName_LName->setText(tr("Hello, ") + lname_fname);
     if(ui->cmbBx_dbg_tm_tp->count() == 0) {
         ui->cmbBx_dbg_tm_tp->addItem(tr("s"));
@@ -283,6 +288,7 @@ void RHE_Widget::set_ui_text() {
         ui->cmbBx_dbg_tm_tp->setItemText(1, tr("ms"));
         ui->cmbBx_dbg_tm_tp->setItemText(2, tr("us"));
     }
+    ui->lbl_dbg_tm_tp_lmt->setText(ui->cmbBx_dbg_tm_tp->itemText(dbg_tm_tp_lmt));
     language_changed = true;
 }
 
@@ -578,6 +584,12 @@ void RHE_Widget::slot_accept_board(bool flg) {
     } else {
         emit ui->cmbBx_chs_brd->setCurrentIndex(prev_board_index);
     }
+}
+
+void RHE_Widget::slot_accept_debug_time_limit(int time, int time_type) {
+    ui->lcdNmbr_dbg_tm_lmt->display(time);
+    dbg_tm_tp_lmt = time_type;
+    ui->lbl_dbg_tm_tp_lmt->setText(ui->cmbBx_dbg_tm_tp->itemText(time_type));
 }
 
 void RHE_Widget::slot_accept_debug_data(QByteArray debug_data) {

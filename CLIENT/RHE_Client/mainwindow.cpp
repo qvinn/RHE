@@ -5,7 +5,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->setupUi(this);
     QDir::setCurrent(qApp->applicationDirPath());
     gen_widg = new General_Widget();
-    snd_rcv_module = new Send_Recieve_Module(gen_widg->get_setting("settings/SERVER_IP").toString().toLatin1().data(), 3425, gen_widg);
+    snd_rcv_module = new Send_Recieve_Module(gen_widg->get_setting("settings/SERVER_IP").toString(), gen_widg->get_setting("settings/SERVER_PORT").toInt(), gen_widg);
     ptr_registration_widg = new RegistrationWidget(this, gen_widg, snd_rcv_module);
     ptr_RHE_widg = new RHE_Widget(this, gen_widg, snd_rcv_module);
     ui->stackedWidget->addWidget(ptr_registration_widg);
@@ -23,7 +23,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 }
 
 MainWindow::~MainWindow() {
-    delete wvfrm_vwr;
     delete ptr_registration_widg;
     delete ptr_RHE_widg;
     delete wvfrm_vwr_actn;
@@ -50,6 +49,7 @@ void MainWindow::resizeEvent(QResizeEvent *) {
 void MainWindow::onPshBttnWvfrmVwr() {
     wvfrm_vwr = new Waveform_Viewer_Widget(nullptr, gen_widg, true);
     connect(gen_widg, &General_Widget::re_translate_signal, wvfrm_vwr, &Waveform_Viewer_Widget::slot_re_translate);
+    connect(wvfrm_vwr, &Waveform_Viewer_Widget::waveform_viewer_closed_signal, this, &MainWindow::slot_waveform_viewer_closed);
     wvfrm_vwr->initialize_ui();
     wvfrm_vwr->graph_count = 16;
     wvfrm_vwr->re_scale_graph();
@@ -231,6 +231,10 @@ void MainWindow::slot_re_size() {
     QSize cur_size = this->size();
     this->resize(this->minimumSize());
     this->resize(cur_size);
+}
+
+void MainWindow::slot_waveform_viewer_closed() {
+    delete wvfrm_vwr;
 }
 
 void MainWindow::slot_re_translate() {

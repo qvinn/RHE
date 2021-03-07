@@ -19,7 +19,7 @@
             void pshBttn_open_save_wvfrm_set_enabled(bool flg);
             void initialize_ui();
             void add_graphs_to_plot();
-            void remove_graphs_form_plot();
+            void remove_graphs_from_plot();
             void re_scale_graph();
             void add_data_to_graph(QList<int> val, QList<int> *prev_vals, double time, bool val_changed);
             void add_data_to_graph_rltm(QList<int> val, QList<int> *prev_vals, double time, bool val_changed);
@@ -72,6 +72,7 @@
             void showEvent(QShowEvent *) override;
             void leaveEvent(QEvent *) override;
             void resizeEvent(QResizeEvent *) override;
+            void closeEvent(QCloseEvent *) override;
             void on_chckBx_attch_crsr_stateChanged(int state);
             void on_spnBx_wvfrm_vwr_dscrtnss_tm_valueChanged(int value);
             void on_cmbBx_wvfrm_vwr_dscrtnss_tm_tp_currentIndexChanged(int index);
@@ -87,6 +88,7 @@
 
         signals:
             void as_window_signal(bool as_window);
+            void waveform_viewer_closed_signal();
     };
 
 #endif // WAVEFORM_VIEWER_WIDGET_H

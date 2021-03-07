@@ -54,6 +54,7 @@ void General_Widget::create_base_settings() {
     check_setting_exist("settings/PATH_TO_DATA", "data/");
     check_setting_exist("settings/BOARDS_LIST_FILENAME", "Boards_List.xml");
     check_setting_exist("settings/SERVER_IP", "192.168.1.10");
+    check_setting_exist("settings/SERVER_PORT", 3425);
     check_setting_exist("settings/VERSION", "1.0");
     check_setting_exist("settings/DEBUG_PINS_NUMBER", "10");
     check_setting_exist("settings/DEBUG_DISCRETENESS_TIME", 1);

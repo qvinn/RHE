@@ -67,7 +67,9 @@
             bool board_is_on = false;
             bool new_debug = false;
             bool clr_trnsprnt = true;
+
             int prev_board_index;
+            int dbg_tm_tp_lmt = 0;
 
         public slots:
             void slot_re_translate();
@@ -91,6 +93,7 @@
             void on_pshBttn_ld_frmwr_clicked();       
             void slot_choose_board(QString jtag_code);
             void slot_accept_board(bool flg);
+            void slot_accept_debug_time_limit(int time, int time_type);
             void slot_accept_debug_data(QByteArray debug_data);
             void slot_accept_input_data_table(QByteArray input_data_table);
             void slot_as_window(bool as_window);

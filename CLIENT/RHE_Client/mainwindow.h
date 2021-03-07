@@ -61,6 +61,7 @@
             void onChkBxLdMnlFrmwrStateChanged();
             void onCmbBxLngChsCurrentIndexChanged(int index);
             void slot_re_size();
+            void slot_waveform_viewer_closed();
     };
 
 #endif // MAINWINDOW_H

@@ -24,7 +24,7 @@ Waveform_Viewer_Widget::Waveform_Viewer_Widget(QWidget* parent, General_Widget *
 }
 
 Waveform_Viewer_Widget::~Waveform_Viewer_Widget() {
-    remove_graphs_form_plot();
+    remove_graphs_from_plot();
     delete graph_list;
     delete textTicker;
     delete pin_names;
@@ -46,6 +46,12 @@ void Waveform_Viewer_Widget::leaveEvent(QEvent *) {
 void Waveform_Viewer_Widget::resizeEvent(QResizeEvent *) {
     ui->verticalLayoutWidget->resize(this->width(), this->height());
     ui->diagram->resize(ui->verticalLayoutWidget->width(), (ui->verticalLayoutWidget->height() - ui->horizontalLayout->geometry().height() - ui->horizontalLayout_2->geometry().height()));
+}
+
+void Waveform_Viewer_Widget::closeEvent(QCloseEvent *) {
+    if(standalone) {
+        emit waveform_viewer_closed_signal();
+    }
 }
 
 void Waveform_Viewer_Widget::on_chckBx_attch_crsr_stateChanged(int state) {
@@ -191,7 +197,7 @@ void Waveform_Viewer_Widget::load_waveform() {
         QRegExp tagExp("/");
         QStringList lst = str.split(tagExp);
         plot_re_scale = true;
-        remove_graphs_form_plot();
+        remove_graphs_from_plot();
         graph_count = lst.count() - 1;
         double debug_time = 0.0;
         QList<int> vals;
@@ -295,7 +301,7 @@ void Waveform_Viewer_Widget::add_graphs_to_plot() {
     on_pshBttn_clr_clicked();
 }
 
-void Waveform_Viewer_Widget::remove_graphs_form_plot() {
+void Waveform_Viewer_Widget::remove_graphs_from_plot() {
     graph_list->clear();
     graph_count = 0;
     while(ui->diagram->graphCount() != 0) {

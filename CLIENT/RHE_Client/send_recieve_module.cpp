@@ -191,6 +191,7 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 uint8_t tm_tp;
                 memcpy(&max_duration, tmp_packet->data, sizeof(int));
                 memcpy(&tm_tp, tmp_packet->data+sizeof(int), sizeof(uint8_t));
+                emit accept_debug_time_limit_signal(max_duration, tm_tp);
                 qDebug() << "INFO: Max Debug time: " << max_duration << "(timemode " << tm_tp << ")";
                 break;
             }

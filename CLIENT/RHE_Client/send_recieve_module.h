@@ -99,6 +99,7 @@
             void end_debugging_signal();
             void choose_board_signal(QString jtag_code);
             void accept_board_signal(bool flg);
+            void accept_debug_time_limit_signal(int time, int time_type);
             void accept_debug_data_signal(QByteArray debug_data);
             void accept_input_data_table_signal(QByteArray input_data_table);
             void show_message_box_signal(QString str1, QString str2, int type);
