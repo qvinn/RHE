@@ -208,13 +208,19 @@ void Waveform_Viewer_Widget::load_waveform() {
         re_scale_graph();
         if(file->open(QIODevice::ReadOnly)) {
             QTextStream in(file);
+            remove_pin_names();
+            bool rename_pins = true;
             while(!in.atEnd()) {
                 QString str_dat = in.readLine();
-                if(!str.contains("time")) {
-                    str_dat.replace("\n", "");
-                    QRegExp tagExp("/");
-                    QStringList lst_dat = str_dat.split(tagExp);
-                    for(int i = 0; i < lst_dat.count(); i++) {
+                str_dat.replace("\n", "");
+                QRegExp tagExp("/");
+                QStringList lst_dat = str_dat.split(tagExp);
+                for(int i = 0; i < lst_dat.count(); i++) {
+                    if(str_dat.contains("time")) {
+                        if(i != 0) {
+                            pin_names->append(lst_dat.at(i));
+                        }
+                    } else {
                         if(i == 0) {
                             debug_time = lst_dat.at(i).toDouble();
                         } else {
@@ -222,6 +228,12 @@ void Waveform_Viewer_Widget::load_waveform() {
                             vals.append(lst_dat.at(i).toInt());
                         }
                     }
+                }
+                if(rename_pins || str_dat.contains("time")) {
+                    rename_pins = false;
+                    change_pin_names();
+                }
+                if(!str_dat.contains("time")) {
                     add_data_to_graph(vals, &prev_vals, debug_time, false);
                     vals.clear();
                 }
@@ -238,12 +250,12 @@ void Waveform_Viewer_Widget::save_waveform() {
         int cnt = ui->diagram->graph(0)->data()->size();
         QString fn_nm = "";
         QString str = "";
-        for(int i = 0; i < graph_list->count(); i++) {
+        for(int i = 0; i < graph_count; i++) {
             if(i == 0) {
                 str.append("time/");
             }
-            str.append("pin_" + QString::number(i + 1));
-            if(i != (graph_list->count() - 1)) {
+            str.append(pin_names->at(i));
+            if(i != (graph_count - 1)) {
                 str.append("/");
             } else {
                 str.append("\n");

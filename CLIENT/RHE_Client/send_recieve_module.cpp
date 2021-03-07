@@ -163,7 +163,7 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 break;
             }
             case DEBUG_PROCESS_TIMEOUT: {
-//                qDebug() << "_________________________________Debug process TIMEOUT";
+                qDebug() << "_________________________________Debug process TIMEOUT";
 //                int max_duration;
 //                uint8_t tm_tp;
 //                memcpy(&max_duration, tmp_packet->data, sizeof(int));

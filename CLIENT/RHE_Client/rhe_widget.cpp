@@ -637,7 +637,7 @@ void RHE_Widget::slot_accept_input_data_table(QByteArray input_data_table) {
     int hop = 5; // bytes
     wvfrm_vwr->remove_pin_names();
     for(int i = 0; i < pin_count; i++) {
-        wvfrm_vwr->add_pin_names(QByteArray((input_data_table.data() + (hop * (i + 1))), 5));
+        wvfrm_vwr->add_pin_names(QByteArray((input_data_table.data() + ((hop * i) + 1)), 5));
     }
     wvfrm_vwr->change_pin_names();
     wvfrm_vwr->re_scale_graph();
