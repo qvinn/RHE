@@ -383,7 +383,7 @@ void Send_Recieve_Module::recive_dbg_info(char *info)
 void Send_Recieve_Module::I_debug_table_parser(char *buff)
 {
     // Формат посылки: |1 байт - количество пинов|_|5 байт имя пина|_|5 байт имя пина|...столько имен, сколько "количество пинов"
-    int pin_count;
+    int pin_count = 0;
     QList<QString> pinNames;
     memcpy(&pin_count,buff,sizeof(uint8_t));
     int hop = 1; // byte
@@ -401,7 +401,7 @@ void Send_Recieve_Module::I_debug_table_parser(char *buff)
 void Send_Recieve_Module::O_debug_table_parser(char *buff)
 {
     // Формат посылки: |1 байт - количество пинов|_|5 байт имя пина|_|1 байт - WiPi номер|_|5 байт имя пина|_|1 байт - WiPi номер|...столько имен, сколько "количество пинов"
-    int pin_count;
+    int pin_count = 0;;
     QList<QString> pinNames;
     QList<int> pinNums;
     memcpy(&pin_count,buff,sizeof(uint8_t));

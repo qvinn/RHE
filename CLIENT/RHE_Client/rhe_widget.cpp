@@ -679,7 +679,7 @@ void RHE_Widget::slot_accept_debug_data(QByteArray debug_data) {
 }
 
 void RHE_Widget::slot_accept_input_data_table(QByteArray input_data_table) {
-    int pin_count;
+    int pin_count = 0;
     memcpy(&pin_count, input_data_table.data(), sizeof(uint8_t));
     int hop = 5; // bytes
     wvfrm_vwr->remove_pin_names();
@@ -691,7 +691,7 @@ void RHE_Widget::slot_accept_input_data_table(QByteArray input_data_table) {
 }
 
 void RHE_Widget::slot_accept_output_data_table(QByteArray output_data_table) {
-    int pin_count;
+    int pin_count = 0;
     int hop = 5; // bytes
 //    QList<QString> pinNames;
 //    QList<int> pinNums;
@@ -721,11 +721,10 @@ void RHE_Widget::slot_accept_output_data_table(QByteArray output_data_table) {
         QHBoxLayout *h_layout = new QHBoxLayout();
         inpt_hbxs->append(h_layout);
         ui->verticalLayout_4->addLayout(h_layout);
-        QFont font("Tahoma", 10, QFont::Bold);
         QLabel *pin_name = new QLabel();
         pin_name->setText(QByteArray((output_data_table.data() + ((hop * i) + 1 + i)), 5));
         pin_name->setFixedSize(40, 21);
-        pin_name->setFont(font);
+        pin_name->setFont(ui->lbl_chs_brd->font());
         inpt_lbls->append(pin_name);
         h_layout->addWidget(pin_name);
         QSlider *sldr = new QSlider();
@@ -740,7 +739,7 @@ void RHE_Widget::slot_accept_output_data_table(QByteArray output_data_table) {
         QLCDNumber *lcd_val = new QLCDNumber();
         lcd_val->setDecMode();
         lcd_val->setDigitCount(1);
-        lcd_val->setFont(font);
+        lcd_val->setFont(ui->lbl_chs_brd->font());
         lcd_val->setFixedSize(20, 21);
         lcd_val->display(0);
         lcd_val->setPalette(ui->lcdNmbr_dbg_tm_lmt->palette());
