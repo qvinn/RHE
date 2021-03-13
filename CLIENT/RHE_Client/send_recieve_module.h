@@ -11,9 +11,13 @@
 //    #define RECIVE_BUFFER_SIZE (DATA_BUFFER+20) //  DATA_BUFFER+4
 //    #define SEND_FILE_BUFFER (DATA_BUFFER-1)
 
-#define DATA_BUFFER 76 // 60 76
-#define RECIVE_BUFFER_SIZE (DATA_BUFFER+4) //  DATA_BUFFER+4
-#define SEND_FILE_BUFFER (DATA_BUFFER-1)
+    #define DATA_BUFFER 76 // 60 76
+    #define RECIVE_BUFFER_SIZE (DATA_BUFFER+4) //  DATA_BUFFER+4
+    #define SEND_FILE_BUFFER (DATA_BUFFER-1)
+
+    #define CLIENT_START_SEND_FILE 18
+    #define CLIENT_SENDING_FILE 19
+    #define CLIENT_FINISH_SEND_FILE 20
 
     class Send_Recieve_Module : public QObject {
         Q_OBJECT
@@ -40,7 +44,7 @@
             void ping_to_S_server();
             void start_debug(uint16_t dscrt_tm, uint8_t dscrt_tm_tp);
             void stop_debug();
-            bool send_file_to_ss(QByteArray File_byteArray);
+            bool send_file_to_ss(QByteArray File_byteArray, int strt_sndng_val, int cntns_sndng_val, int end_sndng_val);
             void set_disconnected();
             void set_FPGA_id(QString FPGA_id);
 
@@ -65,7 +69,6 @@
                     int id;
                     char FPGA_id[20];
             } info_about_new_device;
-
 
         private:
             void server_disconnected();

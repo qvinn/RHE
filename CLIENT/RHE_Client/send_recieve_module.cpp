@@ -10,9 +10,6 @@
 #define NO_MORE_PLACES 15
 #define PING_CLIENT_TO_S_SERVER 16
 #define S_SERVER_ANSWER_TO_CLIENT 17
-#define CLIENT_START_SEND_FILE 18
-#define CLIENT_SENDING_FILE 19
-#define CLIENT_FINISH_SEND_FILE 20
 #define CLIENT_WANT_CLOSE_CONNECTION 21
 #define S_SERVER_END_RCV_FILE 22
 #define FLASH_FPGA 23
@@ -236,14 +233,14 @@ void Send_Recieve_Module::stop_debug() {
     send_U_Packet(CLIENT_WANT_STOP_DEBUG, "");
 }
 
-bool Send_Recieve_Module::send_file_to_ss(QByteArray File_byteArray) {
+bool Send_Recieve_Module::send_file_to_ss(QByteArray File_byteArray, int strt_sndng_val, int cntns_sndng_val, int end_sndng_val) {
     int hops = File_byteArray.size() / SEND_FILE_BUFFER;
     if(hops < 1) {      // Если данные помещаются в одну посылку
         //QByteArray Result_byteArray = form_2bytes_QBA(&File_byteArray);
         QByteArray Result_byteArray = form_send_file_packet(&File_byteArray);
-        send_U_Packet(CLIENT_START_SEND_FILE, "");
-        send_U_Packet(CLIENT_SENDING_FILE, Result_byteArray);
-        send_U_Packet(CLIENT_FINISH_SEND_FILE, "");
+        send_U_Packet(/*CLIENT_START_SEND_FILE*/strt_sndng_val, "");
+        send_U_Packet(/*CLIENT_SENDING_FILE*/cntns_sndng_val, Result_byteArray);
+        send_U_Packet(/*CLIENT_FINISH_SEND_FILE*/end_sndng_val, "");
     } else {
         QVector<QByteArray> packets;
         QByteArray tmp_data;

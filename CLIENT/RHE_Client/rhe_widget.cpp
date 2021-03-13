@@ -235,7 +235,7 @@ void RHE_Widget::on_pshBttn_snd_frmwr_clicked() {
         return;
     }
     if(svf_file->open(QIODevice::ReadOnly)) {
-        snd_rcv_module->send_file_to_ss(svf_file->readAll());
+        snd_rcv_module->send_file_to_ss(svf_file->readAll(), CLIENT_START_SEND_FILE, CLIENT_SENDING_FILE, CLIENT_FINISH_SEND_FILE);
         svf_file->close();
     }
 }

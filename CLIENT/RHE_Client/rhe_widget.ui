@@ -1350,7 +1350,7 @@ QPushButton:hover{
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>10</height>
+           <height>7</height>
           </size>
          </property>
         </spacer>
@@ -2229,7 +2229,7 @@ QPushButton:hover{
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>15</height>
+           <height>7</height>
           </size>
          </property>
         </spacer>
@@ -2512,7 +2512,7 @@ QPushButton:hover{
 }</string>
          </property>
          <property name="text">
-          <string>Send  Sequence Of Signals File</string>
+          <string>Send Sequence Of Signals File</string>
          </property>
          <property name="autoDefault">
           <bool>false</bool>
