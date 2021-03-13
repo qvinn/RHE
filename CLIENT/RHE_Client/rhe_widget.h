@@ -50,12 +50,17 @@
             QString *path_to_proj = nullptr;
             QString *prev_path_to_proj = nullptr;
             QFile *svf_file = nullptr;
+            QFile *csv_file = nullptr;
             QList<QString> *pixmp_names = nullptr;
             QList<QString> *jtag_id_codes = nullptr;
             QList<QString> *led_colors = nullptr;
             QList<QPoint> *led_x_y = nullptr;
             QList<QPoint> *led_width_height = nullptr;
             QList<int> *prev_vals = nullptr;
+            QList<QHBoxLayout*> *inpt_hbxs = nullptr;
+            QList<QLabel*> *inpt_lbls = nullptr;
+            QList<QSlider*> *inpt_sldrs = nullptr;
+            QList<QLCDNumber*> *inpt_stts = nullptr;
             QString lname_fname;
             QPixmap pixmp_brd;
 
@@ -83,6 +88,7 @@
             void on_pushButton_3_clicked();
             void on_pushButton_strt_drw_clicked();
             void on_pushButton_stp_drw_clicked();
+            void on_pshBttn_snd_sgnls_sqnc_clicked();
             void on_cmbBx_chs_brd_currentIndexChanged(int index);
             void on_hrzntlSldr_cnt_dbg_pins_valueChanged(int value);
             void on_spnBx_dbg_tm_valueChanged(int value);
@@ -90,15 +96,19 @@
             void on_pshBttn_set_path_to_proj_clicked();
             void on_pshBttn_snd_frmwr_clicked();
             void on_pshBttn_chk_prj_stat_clicked();
-            void on_pshBttn_ld_frmwr_clicked();       
+            void on_pshBttn_ld_frmwr_clicked();
+            void slot_input_val_changed(int val);
             void slot_choose_board(QString jtag_code);
             void slot_accept_board(bool flg);
             void slot_accept_debug_time_limit(int time, int time_type);
             void slot_accept_debug_data(QByteArray debug_data);
             void slot_accept_input_data_table(QByteArray input_data_table);
+            void slot_accept_output_data_table(QByteArray output_data_table);
             void slot_as_window(bool as_window);
 
-        signals:
+            void on_pshBttn_chs_sgnls_sqnc_clicked();
+
+    signals:
             void resize_signal();
     };
 

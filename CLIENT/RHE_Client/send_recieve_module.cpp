@@ -146,6 +146,8 @@ void Send_Recieve_Module::wait_analize_recv_data() {
             }
             case SUCCESS_CHANGE_FPGA: {
                 emit accept_board_signal(true);
+                send_U_Packet(CLIENT_WANT_IDT, "");
+                send_U_Packet(CLIENT_WANT_ODT, "");
                 qDebug() << "_________________________________Client change FPGA Successfuly";
                 break;
             }
@@ -181,7 +183,8 @@ void Send_Recieve_Module::wait_analize_recv_data() {
             }
             case S_SERVER_SEND_ODT: {
                 qDebug() << "_________________________________Recive ODT";
-                O_debug_table_parser(tmp_packet->data);
+//                O_debug_table_parser(tmp_packet->data);
+                emit accept_output_data_table_signal(QByteArray(tmp_packet->data, sizeof(tmp_packet->data)));
 
                 break;
             }

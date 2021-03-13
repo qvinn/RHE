@@ -9,6 +9,11 @@ RHE_Widget::RHE_Widget(QWidget *parent, General_Widget *widg, Send_Recieve_Modul
     path_to_proj = new QString("");
     prev_path_to_proj = new QString("");
     svf_file = new QFile();
+    csv_file = new QFile();
+    inpt_hbxs = new QList<QHBoxLayout*>();
+    inpt_lbls = new QList<QLabel*>();
+    inpt_sldrs = new QList<QSlider*>();
+    inpt_stts = new QList<QLCDNumber*>();
     pixmp_names = new QList<QString>();
     jtag_id_codes = new QList<QString>();
     led_colors = new QList<QString>();
@@ -23,11 +28,16 @@ RHE_Widget::RHE_Widget(QWidget *parent, General_Widget *widg, Send_Recieve_Modul
     connect(snd_rcv_module, &Send_Recieve_Module::accept_debug_time_limit_signal, this, &RHE_Widget::slot_accept_debug_time_limit);
     connect(snd_rcv_module, &Send_Recieve_Module::accept_debug_data_signal, this, &RHE_Widget::slot_accept_debug_data);
     connect(snd_rcv_module, &Send_Recieve_Module::accept_input_data_table_signal, this, &RHE_Widget::slot_accept_input_data_table);
+    connect(snd_rcv_module, &Send_Recieve_Module::accept_output_data_table_signal, this, &RHE_Widget::slot_accept_output_data_table);
     prev_vals = new QList<int>();
     pre_initialize_ui();
 }
 
 RHE_Widget::~RHE_Widget() {
+    delete inpt_hbxs;
+    delete inpt_lbls;
+    delete inpt_sldrs;
+    delete inpt_stts;
     delete pixmp_names;
     delete led_x_y;
     delete led_width_height;
@@ -35,6 +45,7 @@ RHE_Widget::~RHE_Widget() {
     delete jtag_id_codes;
     delete path_to_proj;
     delete prev_path_to_proj;
+    delete csv_file;
     delete svf_file;
     delete wvfrm_vwr;
     delete prev_vals;
@@ -115,6 +126,23 @@ void RHE_Widget::on_pushButton_stp_drw_clicked() {
     ui->hrzntlSldr_cnt_dbg_pins->setEnabled(true);
     ui->spnBx_dbg_tm->setEnabled(true);
     ui->cmbBx_dbg_tm_tp->setEnabled(true);
+}
+
+void RHE_Widget::on_pshBttn_chs_sgnls_sqnc_clicked() {
+    QString str = gen_widg->load_file_path(tr("Choose csv-file with sequence of signals"), tr("Comma-Separated Values files (*.csv)"));
+    if(str.length() != 0) {
+        csv_file->setFileName(str);
+        ui->pshBttn_snd_sgnls_sqnc->setEnabled(true);
+    } else {
+        gen_widg->show_message_box("", tr("File with sequence of signals not choosed"), 0);
+    }
+}
+
+void RHE_Widget::on_pshBttn_snd_sgnls_sqnc_clicked() {
+    if(csv_file->open(QIODevice::ReadOnly)) {
+//        snd_rcv_module->send_file_to_ss(csv_file->readAll());
+        csv_file->close();
+    }
 }
 
 void RHE_Widget::on_cmbBx_chs_brd_currentIndexChanged(int index) {
@@ -249,6 +277,7 @@ void RHE_Widget::initialize_ui() {
     QDir::setCurrent(qApp->applicationDirPath());
     pshBttn_snd_frmwr_set_enabled(false);
     pshBttn_chk_prj_stat_set_enabled(false);
+    ui->pshBttn_snd_sgnls_sqnc->setEnabled(false);
     ui->hrzntlSldr_cnt_dbg_pins->setValue(abs(gen_widg->get_setting("settings/DEBUG_PINS_NUMBER").toInt() - 1));
     if(gen_widg->get_setting("settings/MANUALY_LOAD_FIRMWARE").toBool() && gen_widg->get_setting("settings/ENABLE_FILE_CHEKING").toBool()) {
         pshBttn_ld_frmwr_set_enabled(false);
@@ -570,6 +599,12 @@ void RHE_Widget::add_data_to_qpoint(QList<QPoint> *lst, int val, bool is_x) {
     }
 }
 
+void RHE_Widget::slot_input_val_changed(int val) {
+    int pos = (val - (val % 2)) / 2;
+    inpt_stts->at(pos)->display(val % 2);
+    //send packet with output states for RaspberryPi
+}
+
 void RHE_Widget::slot_choose_board(QString jtag_code) {
     for(int i = 0; i < jtag_id_codes->count(); i++) {
         if(jtag_id_codes->at(i).compare(jtag_code, Qt::CaseInsensitive) == 0) {
@@ -653,6 +688,65 @@ void RHE_Widget::slot_accept_input_data_table(QByteArray input_data_table) {
     }
     wvfrm_vwr->change_pin_names();
     wvfrm_vwr->re_scale_graph();
+}
+
+void RHE_Widget::slot_accept_output_data_table(QByteArray output_data_table) {
+    int pin_count;
+    int hop = 5; // bytes
+//    QList<QString> pinNames;
+//    QList<int> pinNums;
+    memcpy(&pin_count, output_data_table.data(), sizeof(uint8_t));
+    while(ui->verticalLayout_4->count() != 0) {
+        while(ui->verticalLayout_4->itemAt(0)->layout()->count() != 0) {
+            ui->verticalLayout_4->itemAt(0)->layout()->removeWidget(ui->verticalLayout_4->itemAt(0)->layout()->takeAt(0)->widget());
+        }
+        ui->verticalLayout_4->removeItem(ui->verticalLayout_4->itemAt(0));
+    }
+    while(inpt_stts->count() != 0) {
+        delete inpt_stts->at(0);
+        delete inpt_hbxs->at(0);
+        delete inpt_lbls->at(0);
+        delete inpt_sldrs->at(0);
+        inpt_hbxs->removeAt(0);
+        inpt_lbls->removeAt(0);
+        inpt_sldrs->removeAt(0);
+        inpt_stts->removeAt(0);
+    }
+    ui->verticalLayout_4->update();
+    for(int i = 0; i < pin_count; i++) {
+//        pinNames.append(QByteArray((output_data_table.data() + ((hop * i) + 1 + i)), 5));
+//        int val;
+//        memcpy(&val, (output_data_table.data() + ((hop * i) + 6 + i)), 1);
+//        pinNums.append(val);
+        QHBoxLayout *h_layout = new QHBoxLayout();
+        inpt_hbxs->append(h_layout);
+        ui->verticalLayout_4->addLayout(h_layout);
+        QFont font("Tahoma", 10, QFont::Bold);
+        QLabel *pin_name = new QLabel();
+        pin_name->setText(QByteArray((output_data_table.data() + ((hop * i) + 1 + i)), 5));
+        pin_name->setFixedSize(40, 21);
+        pin_name->setFont(font);
+        inpt_lbls->append(pin_name);
+        h_layout->addWidget(pin_name);
+        QSlider *sldr = new QSlider();
+        sldr->setOrientation(Qt::Horizontal);
+        sldr->setMinimum(i * 2);
+        sldr->setMaximum(i * 2 + 1);
+        sldr->setSingleStep(1);
+        sldr->setFixedSize(140, 21);
+        connect(sldr, &QSlider::valueChanged, this, &RHE_Widget::slot_input_val_changed);
+        inpt_sldrs->append(sldr);
+        h_layout->addWidget(sldr);
+        QLCDNumber *lcd_val = new QLCDNumber();
+        lcd_val->setDecMode();
+        lcd_val->setDigitCount(1);
+        lcd_val->setFont(font);
+        lcd_val->setFixedSize(20, 21);
+        lcd_val->display(0);
+        lcd_val->setPalette(ui->lcdNmbr_dbg_tm_lmt->palette());
+        inpt_stts->append(lcd_val);
+        h_layout->addWidget(lcd_val);
+    }
 }
 
 void RHE_Widget::slot_as_window(bool as_window) {
