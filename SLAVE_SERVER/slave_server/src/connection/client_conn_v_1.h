@@ -81,6 +81,11 @@ public:
 	// Метод для отправки файла клиенту
 	void send_file_to_client(std::string filename);
 
+// PUBLIC только для отладки
+#ifdef HW_EN
+	Debug *gdb;
+#endif
+
 private:
 
 	// Метод для оброса ID в начальное состояние
@@ -101,15 +106,17 @@ private:
 	*/
 	void send_U_Packet(int sock, int code_op, const char *data);
 	
-	// Метод для начала приема файла - имеется ввиду фалйа прошивки
-	// На данный момент, slave-сервер принимает только файл firmware
-	int start_recive_file();
+	// Метод для начала приема файла фалйа прошивки
+	int start_recive_fw_file();
 	
-	// Метод для получения нового "куска" файла
-	int rcv_new_data_for_file(char *buf);
+	// Метод для начала приема файла фалйа отладки
+	int start_recive_dsq_file();
 	
-	// Метод для окончания записи в фал (метод закрывает *fp)
-	int end_recive_file();
+	// Метод для получения нового "куска" файла прошивки
+	int rcv_new_data_for_file(FILE *fp, char *buf);
+	
+	// Метод для окончания записи в фал прошивки (метод закрывает *fp)
+	int end_recive_file(FILE *fp);
 	
 	// Метод для создания файла-конфигурации для OpenOCD
 	void create_OpenOCD_cfg();
@@ -138,14 +145,16 @@ private:
     std::mutex my_client_ID_mutex;
 	
 	// Байты, которые инкрементируются при приеме файла-firmware
-	// После онончания приема фалйы, это чилсо отправляется клиенту и если
+	// После онончания приема фалйа, это чилсо отправляется клиенту и если
 	// эти числа совпадут, то тогда клиент отправит пакет с code_op "загруть файл в плату"
 	int file_rcv_bytes_count = 0;
 	
-	FILE *fp;
-#ifdef HW_EN
+	FILE *fw_fp;	// firmware file pointer
+	FILE *dsq_fp;	// debug file pointer
+	
+/* #ifdef HW_EN
 	Debug *gdb;
-#endif
+#endif */
 	
 };
 

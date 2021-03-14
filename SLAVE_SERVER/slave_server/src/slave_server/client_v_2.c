@@ -1,7 +1,7 @@
 #include "client_conn_v_1.h"
 
 #include <iostream>
-#include <sstream> // for csv reader
+#include <sstream> // for file reader
 using namespace std;
 
 // Параметры slave-сервера, которые считываются с .ini-файла
@@ -160,6 +160,16 @@ int main(int argc, char *argv[])
 		} else if(cmd == "sendfile")
         {
 			client->send_file_to_client("debug_result.txt");
+		} else if(cmd == "read_dfile")
+        {
+#ifdef HW_EN
+		client->gdb->test_read_dfile();
+#endif
+		} else if(cmd == "run_d_file")
+        {
+#ifdef HW_EN
+		client->gdb->test_run_dfile();
+#endif
 		} else if(cmd == "")
         {
 			
@@ -187,12 +197,12 @@ void pinMap_read(std::string filename, std::vector<std::string> *_debug_pinName,
 			{
 				switch(column_count)
 				{
-					case 1:
+					case 1: // Первая колонка: значение имени порта ввода-вывода
 					{
 						_debug_pinName->push_back(word);
 						break;
 					}
-					case 2:
+					case 2: // Вторая колонка: номер WiPi порта ввода-вывода
 					{
 						_debug_Wpi_pinNum->push_back(std::stoi(word));
 						break;

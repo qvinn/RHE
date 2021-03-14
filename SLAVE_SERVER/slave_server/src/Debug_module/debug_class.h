@@ -62,15 +62,31 @@ class Debug {
 	
 	// Пара структур для задания состояния портам ввода-вывода
 	typedef struct set_state{		// 2 байта
-		uint8_t pinNum;	// 1 байт
-		uint8_t state;	// 1 байт
+		uint8_t pinNum;				// 1 байт
+		uint8_t state;				// 1 байт
 	} set_state;
 	
 	typedef struct set_state_Packet{ 	// 17 байт
 		uint8_t pin_count;				// 1 байт
-		set_state pins[PIN_MAX];	// 2 байт * PIN_MAX = 16 байт
+		set_state pins[PIN_MAX];		// 2 байт * PIN_MAX = 16 байт
 	} set_state_Packet;
-	// Сформируем структуры данных для посылки - КОНЕЦ
+	
+	// Опишем структуру данных, в которой удобно будет задавать состояния после прочтения
+	// информации из файла (размеры не описаны, так как не используется в посылках)
+	typedef struct debug_seq_row{
+		std::vector<set_state> pin_states;
+		int delay;
+	} debug_seq_row;		
+	
+	// Структура, которая описывает всю таблицу файла-отладки
+	typedef struct debug_seq{
+		// Вектор, который хранит в себе всю информацию о таблице отладки, полученную из файла отладки
+		std::vector<debug_seq_row> debug_seq_vec;
+		uint8_t time_mode;
+	} debug_seq;
+	
+	//
+	// Сформируем структуры данных для посылки - КОНЕЦ	
 	
 	public:
 	Debug();
@@ -112,6 +128,10 @@ class Debug {
 	
 	// Метод для формирования пакета в котором будет описана максимальная длительности отладки
 	void form_time_out_info(char *buf);
+	
+	int test_read_dfile();
+	
+	void test_run_dfile();
 	
 	
 	private:
@@ -188,5 +208,43 @@ class Debug {
 	*/
 	int stop_debug_flag = 1;
 	std::mutex stop_debug_flag_mutex;
+	
+	/*
+	* В отладчике также предусмотрена функция выполнения "отладчного файла" - это такой файл,
+	* который содержит в себе последовтедьность состояний поротов ввода-вывода
+	* Отладочный файл имеет такую структу:
+	* DELAY				PIN_1	PIN_2	...	PIN_N
+	* delay n_units		state	state		state
+	* delay n_units		state	state		state
+	* delay n_units		state	state		state
+	* delay n_units		state	state		state
+	* ...
+	* Под n_units подразумеваются условные единицы, которые пользователь определит сам(s|ms|us)
+	* Условные единицы должны прийти в поле DELAY(s = 0 | ms = 1 | us = 2)
+	*/
+	
+	FILE *debug_fp;
+	// Байты, которые инкрементируются при приеме файла-отладки
+	// После онончания приема фалйа, это чилсо отправляется клиенту и если
+	// эти числа совпадут, то тогда клиент отправит пакет с code_op "загруть файл в плату"
+	int dfile_rcv_bytes_count = 0;
+	
+	// Метод для начала приема файла отладки
+	int start_recive_dfile();
+	
+	// Метод для получения нового "куска" файла отладки
+	void rcv_new_data_for_dfile(char *buf);
+	
+	// Метод для окончания записи в фал отладки(метод закрывает *debug_fp)
+	void end_recive_dfile();
+	
+	// Структура, которая содержит описание всей таблицы файла-отладки
+	debug_seq d_seq_table;
+	
+	int pinName2WpiNum(std::string pinName);
+	
+	int fill_debug_seq();
+	
+	void run_dfile();
 		
 };

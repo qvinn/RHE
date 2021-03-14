@@ -25,17 +25,21 @@
 #define CLIENT_WANT_STOP_DEBUG 32
 #define CLIENT_WANT_CHANGE_DEBUG_SETTINGS 33
 #define DEBUG_PROCESS_TIMEOUT 34
-#define CLIENT_WANT_IDT 35 // IDT - Input Debug Table
-#define CLIENT_WANT_ODT 36 // ODT - Output Debug Table
-#define S_SERVER_SEND_IDT 37 // IDT - Input Debug Table
-#define S_SERVER_SEND_ODT 38 // ODT - Output Debug Table
+#define CLIENT_WANT_IDT 35				// IDT - Input Debug Table
+#define CLIENT_WANT_ODT 36				// ODT - Output Debug Table
+#define S_SERVER_SEND_IDT 37			// IDT - Input Debug Table
+#define S_SERVER_SEND_ODT 38			// ODT - Output Debug Table
 #define CLIENT_WANT_GET_TIMEOUT_INFO 39
 #define S_SERVER_SEND_TIMEOUT_INFO 40
+#define CLIENT_START_SEND_DSQ_FILE 41   // DSQ_FILE -  Debug sequence file
+#define CLIENT_SENDING_DSQ_FILE 42      // DSQ_FILE -  Debug sequence file
+#define CLIENT_FINISH_SEND_DSQ_FILE 43  // DSQ_FILE -  Debug sequence file
+#define S_SERVER_END_RCV_DSQ_FILE 44	// DSQ_FILE -  Debug sequence file
+#define RUN_DSQ_FILE 45 // DSQ_FILE -  Debug sequence file
 
 #define DATA_EXIST 1
 #define DATA_NOT_EXIST 0
 
-//#include <iostream>
 
 client_conn_v_1::client_conn_v_1(std::string _server_ip, int _server_port, std::string _FPGA_id)
 {
@@ -47,9 +51,6 @@ client_conn_v_1::client_conn_v_1(std::string _server_ip, int _server_port, std::
 	
 #ifdef HW_EN
 	gdb = new Debug();
-	// FIXME: Вынести конфигурацию отладки в отдельную операцию
-	//std::vector<int> pins_numbers{8,9,7};
-	//gdb->setup_all(pins_numbers,20,0);
 #endif
 }
 
@@ -175,7 +176,7 @@ void client_conn_v_1::wait_analize_recv_data()
 			
 			case CLIENT_START_SEND_FILE:
 			{
-				if(start_recive_file()!= CS_ERROR)
+				if(start_recive_fw_file()!= CS_ERROR)
 				{
 					printf("_________________________________Client START sending file\n");
 				}
@@ -185,14 +186,14 @@ void client_conn_v_1::wait_analize_recv_data()
 			case CLIENT_SENDING_FILE:
 			{
 				printf("data: %s\n",tmp_packet->data);
-				rcv_new_data_for_file(tmp_packet->data);
+				rcv_new_data_for_file(fw_fp, tmp_packet->data);
 				printf("_________________________________Client sending file\n");
 				break;	
 			}
 			
 			case CLIENT_FINISH_SEND_FILE:
 			{
-				end_recive_file();
+				end_recive_file(fw_fp);
 				printf("_________________________________Client FINISH sending file\n");
 				char *buff = (char*)malloc(DATA_BUFFER);
 				sprintf(buff, "%i", file_rcv_bytes_count);				
@@ -285,6 +286,46 @@ void client_conn_v_1::wait_analize_recv_data()
 				break;	
 			}
 #endif
+			
+			case CLIENT_START_SEND_DSQ_FILE:
+			{
+				if(start_recive_dsq_file()!= CS_ERROR)
+				{
+					printf("_________________________________Client START sending dsq_file\n");
+				}
+				break;	
+			}
+			
+			case CLIENT_SENDING_DSQ_FILE:
+			{
+				printf("data: %s\n",tmp_packet->data);
+				rcv_new_data_for_file(dsq_fp,tmp_packet->data);
+				printf("_________________________________Client sending dsq_file\n");
+				break;	
+			}
+			
+			case CLIENT_FINISH_SEND_DSQ_FILE:
+			{
+				end_recive_file(dsq_fp);
+				printf("_________________________________Client FINISH sending dsq_file\n");
+				/* char *buff = (char*)malloc(DATA_BUFFER);
+				sprintf(buff, "%i", file_rcv_bytes_count);				
+				send_U_Packet(Socket, S_SERVER_END_RCV_FILE, buff);
+				free(buff); */
+				if(gdb->test_read_dfile() != -1)
+				{
+					send_U_Packet(Socket, S_SERVER_END_RCV_DSQ_FILE, NULL);
+					printf("_________________________________Slave server FINISH recive file\n");
+				}
+				break;	
+			}
+			
+			case RUN_DSQ_FILE:
+			{
+				gdb->test_run_dfile();
+				printf("_________________________________Client RUN DSQ_file\n");
+				break;	
+			}
 			
 			default:
 			{
@@ -379,9 +420,9 @@ void client_conn_v_1::send_U_Packet(int sock, int code_op, const char *data)
     free(send_buf);
 }
 
-int client_conn_v_1::start_recive_file()
+int client_conn_v_1::start_recive_fw_file()
 {
-	if ((fp=fopen("any_project.svf", "wb"))==NULL)
+	if ((fw_fp=fopen("any_project.svf", "wb"))==NULL)
 	{		
 		return CS_ERROR;
 	}
@@ -389,17 +430,28 @@ int client_conn_v_1::start_recive_file()
 	return CS_OK;
 }
 
-int client_conn_v_1::rcv_new_data_for_file(char *buf)
+int client_conn_v_1::start_recive_dsq_file()
+{
+	if ((fw_fp=fopen("debug_seq.txt", "wb"))==NULL)
+	{		
+		return CS_ERROR;
+	}
+	return CS_OK;
+}
+
+int client_conn_v_1::rcv_new_data_for_file(FILE *fp, char *buf)
 {	
 	int8_t file_size;
 	memcpy(&file_size, buf,sizeof(int8_t));
+	//fwrite(buf+sizeof(int8_t), sizeof(char), file_size, fw_fp);
 	fwrite(buf+sizeof(int8_t), sizeof(char), file_size, fp);
 	file_rcv_bytes_count += file_size;
 	return CS_OK;
 }
 
-int client_conn_v_1::end_recive_file()
+int client_conn_v_1::end_recive_file(FILE *fp)
 {
+	//fclose(fw_fp);
 	fclose(fp);
 	printf("Bytes recive: %i\n", file_rcv_bytes_count);
 	return CS_OK;
