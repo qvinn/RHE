@@ -2,34 +2,8 @@
 
 #define INIT_ID -1
 
-#define CLIENT_WANT_INIT_CONNECTION 10
-#define SEND_FILE 11
-#define SLAVE_SERVER_WANT_INIT_CONNECTION 12
-#define PING_TO_SERVER 13
-#define DROP_CONNECTION 14
-#define NO_MORE_PLACES 15
-#define PING_CLIENT_TO_S_SERVER 16
-#define S_SERVER_ANSWER_TO_CLIENT 17
-#define CLIENT_WANT_CLOSE_CONNECTION 21
-#define S_SERVER_END_RCV_FILE 22
-#define FLASH_FPGA 23
-#define SET_FPGA_ID 24
-#define S_SERVER_START_SEND_FILE 25
-#define S_SERVER_SENDING_FILE 26
-#define S_SERVER_FINISH_SEND_FILE 27
-#define SUCCESS_CHANGE_FPGA 28
-#define NOT_SUCCESS_CHANGE_FPGA 29
-#define S_SERVER_SENDING_DEBUG_INFO 30
-#define CLIENT_WANT_START_DEBUG 31
-#define CLIENT_WANT_STOP_DEBUG 32
-#define CLIENT_WANT_CHANGE_DEBUG_SETTINGS 33
-#define DEBUG_PROCESS_TIMEOUT 34
-#define CLIENT_WANT_IDT 35 // IDT - Input Debug Table
-#define CLIENT_WANT_ODT 36 // ODT - Output Debug Table
-#define S_SERVER_SEND_IDT 37 // IDT - Input Debug Table
-#define S_SERVER_SEND_ODT 38 // ODT - Output Debug Table
-#define CLIENT_WANT_GET_TIMEOUT_INFO 39
-#define S_SERVER_SEND_TIMEOUT_INFO 40
+
+
 
 
 Send_Recieve_Module::Send_Recieve_Module(QString _server_ip, int _server_port, General_Widget *widg) {
@@ -62,8 +36,6 @@ bool Send_Recieve_Module::init_connection() {
 }
 
 int Send_Recieve_Module::get_id_for_client() {
-    //send_U_Packet(my_client_ID, CLIENT_WANT_INIT_CONNECTION, "");
-
     char *send_buff = (char*)malloc(DATA_BUFFER);
 
     int init_id = INIT_ID;
@@ -193,6 +165,10 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 memcpy(&tm_tp, tmp_packet->data+sizeof(int), sizeof(uint8_t));
                 emit accept_debug_time_limit_signal(max_duration, tm_tp);
                 qDebug() << "INFO: Max Debug time: " << max_duration << "(timemode " << tm_tp << ")";
+                break;
+            }
+            case S_SERVER_END_RCV_DSQ_FILE: {
+                qDebug() << "_________________________________Send DSQ file SUCCESS!";
                 break;
             }
             default: {

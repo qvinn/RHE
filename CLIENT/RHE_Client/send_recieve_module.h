@@ -7,26 +7,50 @@
     #define CS_ERROR 1
     #define CS_OK 0
 
-//    #define DATA_BUFFER 60 // 60 76
-//    #define RECIVE_BUFFER_SIZE (DATA_BUFFER+20) //  DATA_BUFFER+4
-//    #define SEND_FILE_BUFFER (DATA_BUFFER-1)
-
-    #define DATA_BUFFER 76 // 60 76
-    #define RECIVE_BUFFER_SIZE (DATA_BUFFER+4) //  DATA_BUFFER+4
+    #define DATA_BUFFER 76
+    #define RECIVE_BUFFER_SIZE (DATA_BUFFER+4)
     #define SEND_FILE_BUFFER (DATA_BUFFER-1)
 
+    #define CLIENT_WANT_INIT_CONNECTION 10
+    #define SEND_FILE 11
+    #define SLAVE_SERVER_WANT_INIT_CONNECTION 12
+    #define PING_TO_SERVER 13
+    #define DROP_CONNECTION 14
+    #define NO_MORE_PLACES 15
+    #define PING_CLIENT_TO_S_SERVER 16
+    #define S_SERVER_ANSWER_TO_CLIENT 17
     #define CLIENT_START_SEND_FILE 18
     #define CLIENT_SENDING_FILE 19
     #define CLIENT_FINISH_SEND_FILE 20
+    #define CLIENT_WANT_CLOSE_CONNECTION 21
+    #define S_SERVER_END_RCV_FILE 22
+    #define FLASH_FPGA 23
+    #define SET_FPGA_ID 24
+    #define S_SERVER_START_SEND_FILE 25
+    #define S_SERVER_SENDING_FILE 26
+    #define S_SERVER_FINISH_SEND_FILE 27
+    #define SUCCESS_CHANGE_FPGA 28
+    #define NOT_SUCCESS_CHANGE_FPGA 29
+    #define S_SERVER_SENDING_DEBUG_INFO 30
+    #define CLIENT_WANT_START_DEBUG 31
+    #define CLIENT_WANT_STOP_DEBUG 32
+    #define CLIENT_WANT_CHANGE_DEBUG_SETTINGS 33
+    #define DEBUG_PROCESS_TIMEOUT 34
+    #define CLIENT_WANT_IDT 35 // IDT - Input Debug Table
+    #define CLIENT_WANT_ODT 36 // ODT - Output Debug Table
+    #define S_SERVER_SEND_IDT 37 // IDT - Input Debug Table
+    #define S_SERVER_SEND_ODT 38 // ODT - Output Debug Table
+    #define CLIENT_WANT_GET_TIMEOUT_INFO 39
+    #define S_SERVER_SEND_TIMEOUT_INFO 40
+    #define CLIENT_START_SEND_DSQ_FILE 41   // DSQ_FILE -  Debug sequence file
+    #define CLIENT_SENDING_DSQ_FILE 42      // DSQ_FILE -  Debug sequence file
+    #define CLIENT_FINISH_SEND_DSQ_FILE 43  // DSQ_FILE -  Debug sequence file
+    #define S_SERVER_END_RCV_DSQ_FILE 44	// DSQ_FILE -  Debug sequence file
+    #define RUN_DSQ_FILE 45                 // DSQ_FILE -  Debug sequence file
+
 
     class Send_Recieve_Module : public QObject {
         Q_OBJECT
-//        struct U_packet {
-//            char ip[12];    // 12 байт
-//            int id;         // 4 байта
-//            int code_op;    // 4 байта
-//            char data[DATA_BUFFER];
-//        };
 
         struct U_packet {
             int code_op;    // 4 байта
