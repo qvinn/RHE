@@ -62,6 +62,11 @@
 #define S_SERVER_SEND_ODT 38 // ODT - Output Debug Table
 #define CLIENT_WANT_GET_TIMEOUT_INFO 39
 #define S_SERVER_SEND_TIMEOUT_INFO 40
+#define CLIENT_START_SEND_DSQ_FILE 41   // DSQ_FILE -  Debug sequence file
+#define CLIENT_SENDING_DSQ_FILE 42      // DSQ_FILE -  Debug sequence file
+#define CLIENT_FINISH_SEND_DSQ_FILE 43  // DSQ_FILE -  Debug sequence file
+#define S_SERVER_END_RCV_DSQ_FILE 44	// DSQ_FILE -  Debug sequence file
+#define RUN_DSQ_FILE 45 // DSQ_FILE -  Debug sequence file
 
 // Карта code_op - КОНЕЦ
 
@@ -695,6 +700,67 @@ void recive_new_data(char *buf, int sock)
 			{				
 				send_U_Packet(finded_client, S_SERVER_SEND_TIMEOUT_INFO, tmp_packet->data);
 				printf("\t|___Slave_server with id %i GET_TIME_OUT to client with id %i\n", sock, finded_client);
+			}			
+			break;	
+		}
+		
+		case CLIENT_START_SEND_DSQ_FILE:
+		{
+			// Перенаправляем запрос от клиента к slave-серверу
+			int finded_s_server = find_pair_for(sock);
+			if(finded_s_server != ERROR)
+			{				
+				send_U_Packet(finded_s_server, CLIENT_START_SEND_DSQ_FILE, NULL);
+				printf("\t|___Client with id %i START sending dsq_file to slave-server with id %i\n", sock, finded_s_server);
+			}			
+			break;	
+		}
+		
+		case CLIENT_SENDING_DSQ_FILE:
+		{
+			// Перенаправляем запрос от клиента к slave-серверу
+			int finded_s_server = find_pair_for(sock);
+			if(finded_s_server != ERROR)
+			{
+				//printf("data: %s\n",tmp_packet->data);				
+				send_U_Packet(finded_s_server, CLIENT_SENDING_DSQ_FILE, tmp_packet->data);
+				printf("\t|___Client with id %i SENDING dsq_file to slave-server with id %i\n", sock, finded_s_server);
+			}			
+			break;	
+		}
+		
+		case CLIENT_FINISH_SEND_DSQ_FILE:
+		{
+			// Перенаправляем запрос от клиента к slave-серверу
+			int finded_s_server = find_pair_for(sock);
+			if(finded_s_server != ERROR)
+			{				
+				send_U_Packet(finded_s_server, CLIENT_FINISH_SEND_DSQ_FILE, NULL);
+				printf("\t|___Client with id %i FINISH send dsq_file to slave-server with id %i\n", sock, finded_s_server);
+			}			
+			break;	
+		}
+		
+		case S_SERVER_END_RCV_DSQ_FILE:
+		{
+			// Перенаправляем запрос от slave-серверу к клиенту
+			int finded_client = find_pair_for(sock);
+			if(finded_client != ERROR)
+			{				
+				send_U_Packet(finded_client, S_SERVER_END_RCV_DSQ_FILE, NULL);
+				printf("\t|___Slave_server with id %i END RCV DSQ file from client with id %i\n", sock, finded_client);
+			}			
+			break;	
+		}
+		
+		case RUN_DSQ_FILE:
+		{
+			// Перенаправляем запрос от клиента к slave-серверу
+			int finded_s_server = find_pair_for(sock);
+			if(finded_s_server != ERROR)
+			{				
+				send_U_Packet(finded_s_server, RUN_DSQ_FILE, NULL);
+				printf("\t|___Client with id %i RUN DSQ file on slave-server with id %i\n", sock, finded_s_server);
 			}			
 			break;	
 		}
