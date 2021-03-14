@@ -2,10 +2,6 @@
 
 #define INIT_ID -1
 
-
-
-
-
 Send_Recieve_Module::Send_Recieve_Module(QString _server_ip, int _server_port, General_Widget *widg) {
     this->server_ip = _server_ip;
     this->server_port = _server_port;
@@ -169,6 +165,7 @@ void Send_Recieve_Module::wait_analize_recv_data() {
             }
             case S_SERVER_END_RCV_DSQ_FILE: {
                 qDebug() << "_________________________________Send DSQ file SUCCESS!";
+                emit sequence_file_recieved_signal(true);
                 break;
             }
             default: {
@@ -207,6 +204,10 @@ void Send_Recieve_Module::start_debug(uint16_t dscrt_tm, uint8_t dscrt_tm_tp) {
 
 void Send_Recieve_Module::stop_debug() {
     send_U_Packet(CLIENT_WANT_STOP_DEBUG, "");
+}
+
+void Send_Recieve_Module::start_sequence_of_signals() {
+    send_U_Packet(RUN_DSQ_FILE, "");
 }
 
 bool Send_Recieve_Module::send_file_to_ss(QByteArray File_byteArray, int strt_sndng_val, int cntns_sndng_val, int end_sndng_val) {

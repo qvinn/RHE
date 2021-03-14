@@ -48,7 +48,6 @@
     #define S_SERVER_END_RCV_DSQ_FILE 44	// DSQ_FILE -  Debug sequence file
     #define RUN_DSQ_FILE 45                 // DSQ_FILE -  Debug sequence file
 
-
     class Send_Recieve_Module : public QObject {
         Q_OBJECT
 
@@ -68,6 +67,7 @@
             void ping_to_S_server();
             void start_debug(uint16_t dscrt_tm, uint8_t dscrt_tm_tp);
             void stop_debug();
+            void start_sequence_of_signals();
             bool send_file_to_ss(QByteArray File_byteArray, int strt_sndng_val, int cntns_sndng_val, int end_sndng_val);
             void set_disconnected();
             void set_FPGA_id(QString FPGA_id);
@@ -123,6 +123,7 @@
 
         signals:
             void logout_signal();
+            void sequence_file_recieved_signal(bool flg);
             void end_debugging_signal();
             void choose_board_signal(QString jtag_code);
             void accept_board_signal(bool flg);

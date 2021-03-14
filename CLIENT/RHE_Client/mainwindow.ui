@@ -7,13 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>861</width>
-    <height>600</height>
+    <height>660</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>604</width>
-    <height>570</height>
+    <height>660</height>
    </size>
   </property>
   <property name="palette">
@@ -115,7 +115,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>569</y>
+      <y>630</y>
       <width>861</width>
       <height>31</height>
      </rect>
@@ -747,7 +747,7 @@ QPushButton:hover{
       <x>0</x>
       <y>0</y>
       <width>861</width>
-      <height>571</height>
+      <height>631</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -764,7 +764,7 @@ QPushButton:hover{
      <item>
       <widget class="QStackedWidget" name="stackedWidget">
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="registartion_page"/>
        <widget class="QWidget" name="rhe_widget_page"/>

@@ -11,6 +11,7 @@ RHE_Widget::RHE_Widget(QWidget *parent, General_Widget *widg, Send_Recieve_Modul
     svf_file = new QFile();
     csv_file = new QFile();
     inpt_hbxs = new QList<QHBoxLayout*>();
+    inpt_spcrs = new QList<QSpacerItem*>();
     inpt_lbls = new QList<QLabel*>();
     inpt_sldrs = new QList<QSlider*>();
     inpt_stts = new QList<QLCDNumber*>();
@@ -22,6 +23,7 @@ RHE_Widget::RHE_Widget(QWidget *parent, General_Widget *widg, Send_Recieve_Modul
     wvfrm_vwr = new Waveform_Viewer_Widget(this, gen_widg, false);
     connect(wvfrm_vwr, &Waveform_Viewer_Widget::as_window_signal, this, &RHE_Widget::slot_as_window);
     connect(gen_widg, &General_Widget::re_translate_signal, wvfrm_vwr, &Waveform_Viewer_Widget::slot_re_translate);
+    connect(snd_rcv_module, &Send_Recieve_Module::sequence_file_recieved_signal, this, &RHE_Widget::pshBttn_strt_sgnls_sqnc_set_enabled);
     connect(snd_rcv_module, &Send_Recieve_Module::end_debugging_signal, this, &RHE_Widget::on_pushButton_stp_drw_clicked);
     connect(snd_rcv_module, &Send_Recieve_Module::choose_board_signal, this, &RHE_Widget::slot_choose_board);
     connect(snd_rcv_module, &Send_Recieve_Module::accept_board_signal, this, &RHE_Widget::slot_accept_board);
@@ -35,6 +37,7 @@ RHE_Widget::RHE_Widget(QWidget *parent, General_Widget *widg, Send_Recieve_Modul
 
 RHE_Widget::~RHE_Widget() {
     delete inpt_hbxs;
+    delete inpt_spcrs;
     delete inpt_lbls;
     delete inpt_sldrs;
     delete inpt_stts;
@@ -94,7 +97,7 @@ void RHE_Widget::on_pushButton_clicked() {
         clr_trnsprnt = false;
         showEvent(nullptr);
         if(clr_trnsprnt) {
-            on_cmbBx_chs_brd_currentIndexChanged(ui->cmbBx_chs_brd->currentIndex());
+            change_board_pixmap();
         }
     }
 }
@@ -133,6 +136,7 @@ void RHE_Widget::on_pshBttn_chs_sgnls_sqnc_clicked() {
     if(str.length() != 0) {
         csv_file->setFileName(str);
         ui->pshBttn_snd_sgnls_sqnc->setEnabled(true);
+        pshBttn_strt_sgnls_sqnc_set_enabled(false);
     } else {
         gen_widg->show_message_box("", tr("File with sequence of signals not choosed"), 0);
     }
@@ -140,9 +144,13 @@ void RHE_Widget::on_pshBttn_chs_sgnls_sqnc_clicked() {
 
 void RHE_Widget::on_pshBttn_snd_sgnls_sqnc_clicked() {
     if(csv_file->open(QIODevice::ReadOnly)) {
-//        snd_rcv_module->send_file_to_ss(csv_file->readAll());
+        snd_rcv_module->send_file_to_ss(csv_file->readAll(), CLIENT_START_SEND_DSQ_FILE, CLIENT_SENDING_DSQ_FILE, CLIENT_FINISH_SEND_DSQ_FILE);
         csv_file->close();
     }
+}
+
+void RHE_Widget::on_pshBttn_strt_sgnls_sqnc_clicked() {
+    snd_rcv_module->start_sequence_of_signals();
 }
 
 void RHE_Widget::on_cmbBx_chs_brd_currentIndexChanged(int index) {
@@ -153,16 +161,7 @@ void RHE_Widget::on_cmbBx_chs_brd_currentIndexChanged(int index) {
         if(gen_widg->get_setting("settings/MANUALY_LOAD_FIRMWARE").toBool() && gen_widg->get_setting("settings/ENABLE_FILE_CHEKING").toBool()) {
             pshBttn_ld_frmwr_set_enabled(false);
         }
-        if(pixmp_names->at(index).count() == 0) {
-            ui->label->clear();
-            QPixmap tmp;
-            pixmp_brd.swap(tmp);
-        } else {
-            if(pixmp_brd.load(qApp->applicationDirPath() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString() + pixmp_names->at(index))){
-                showEvent(nullptr);
-                ui->label->setPixmap(pixmp_brd.scaled(ui->label->size(), Qt::KeepAspectRatio));
-            }
-        }
+        change_board_pixmap();
     }
 }
 
@@ -264,6 +263,10 @@ void RHE_Widget::pshBttn_snd_frmwr_set_enabled(bool flag) {
     ui->pshBttn_snd_frmwr->setEnabled(flag);
 }
 
+void RHE_Widget::pshBttn_strt_sgnls_sqnc_set_enabled(bool flag) {
+    ui->pshBttn_strt_sgnls_sqnc->setEnabled(flag);
+}
+
 void RHE_Widget::pre_initialize_ui() {
     wvfrm_vwr->initialize_ui();
     ui->verticalLayout_3->addWidget(wvfrm_vwr);
@@ -278,6 +281,7 @@ void RHE_Widget::initialize_ui() {
     pshBttn_snd_frmwr_set_enabled(false);
     pshBttn_chk_prj_stat_set_enabled(false);
     ui->pshBttn_snd_sgnls_sqnc->setEnabled(false);
+    pshBttn_strt_sgnls_sqnc_set_enabled(false);
     ui->hrzntlSldr_cnt_dbg_pins->setValue(abs(gen_widg->get_setting("settings/DEBUG_PINS_NUMBER").toInt() - 1));
     if(gen_widg->get_setting("settings/MANUALY_LOAD_FIRMWARE").toBool() && gen_widg->get_setting("settings/ENABLE_FILE_CHEKING").toBool()) {
         pshBttn_ld_frmwr_set_enabled(false);
@@ -325,6 +329,19 @@ void RHE_Widget::set_fname_lname(QString str) {
     lname_fname.clear();
     lname_fname.append(str);
     set_ui_text();
+}
+
+void RHE_Widget::change_board_pixmap() {
+    if(pixmp_names->at(ui->cmbBx_chs_brd->currentIndex()).count() == 0) {
+        ui->label->clear();
+        QPixmap tmp;
+        pixmp_brd.swap(tmp);
+    } else {
+        if(pixmp_brd.load(qApp->applicationDirPath() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString() + pixmp_names->at(ui->cmbBx_chs_brd->currentIndex()))){
+            showEvent(nullptr);
+            ui->label->setPixmap(pixmp_brd.scaled(ui->label->size(), Qt::KeepAspectRatio));
+        }
+    }
 }
 
 void RHE_Widget::check_is_proj_folder(bool folder_exist) {
@@ -696,18 +713,22 @@ void RHE_Widget::slot_accept_output_data_table(QByteArray output_data_table) {
 //    QList<QString> pinNames;
 //    QList<int> pinNums;
     memcpy(&pin_count, output_data_table.data(), sizeof(uint8_t));
-    while(ui->verticalLayout_4->count() != 0) {
-        while(ui->verticalLayout_4->itemAt(0)->layout()->count() != 0) {
-            ui->verticalLayout_4->itemAt(0)->layout()->removeWidget(ui->verticalLayout_4->itemAt(0)->layout()->takeAt(0)->widget());
+    while(ui->verticalLayout_4->itemAt(0) != 0) {
+        while(ui->verticalLayout_4->itemAt(0)->layout()->takeAt(0) != 0) {
+            ui->verticalLayout_4->itemAt(0)->layout()->removeItem(ui->verticalLayout_4->itemAt(0)->layout()->takeAt(0));
         }
         ui->verticalLayout_4->removeItem(ui->verticalLayout_4->itemAt(0));
     }
     while(inpt_stts->count() != 0) {
         delete inpt_stts->at(0);
+        delete inpt_spcrs->first();
+        delete inpt_spcrs->last();
         delete inpt_hbxs->at(0);
         delete inpt_lbls->at(0);
         delete inpt_sldrs->at(0);
         inpt_hbxs->removeAt(0);
+        inpt_spcrs->removeFirst();
+        inpt_spcrs->removeLast();
         inpt_lbls->removeAt(0);
         inpt_sldrs->removeAt(0);
         inpt_stts->removeAt(0);
@@ -727,15 +748,21 @@ void RHE_Widget::slot_accept_output_data_table(QByteArray output_data_table) {
         pin_name->setFont(ui->lbl_chs_brd->font());
         inpt_lbls->append(pin_name);
         h_layout->addWidget(pin_name);
+        QSpacerItem *hrzntl_1 = new QSpacerItem(20, 20, QSizePolicy::Preferred, QSizePolicy::Minimum);
+        inpt_spcrs->append(hrzntl_1);
+        h_layout->addSpacerItem(hrzntl_1);
         QSlider *sldr = new QSlider();
         sldr->setOrientation(Qt::Horizontal);
         sldr->setMinimum(i * 2);
         sldr->setMaximum(i * 2 + 1);
         sldr->setSingleStep(1);
-        sldr->setFixedSize(140, 21);
+        sldr->setFixedSize(100, 21);
         connect(sldr, &QSlider::valueChanged, this, &RHE_Widget::slot_input_val_changed);
         inpt_sldrs->append(sldr);
         h_layout->addWidget(sldr);
+        QSpacerItem *hrzntl_2 = new QSpacerItem(10, 10, QSizePolicy::Preferred, QSizePolicy::Minimum);
+        inpt_spcrs->append(hrzntl_2);
+        h_layout->addSpacerItem(hrzntl_2);
         QLCDNumber *lcd_val = new QLCDNumber();
         lcd_val->setDecMode();
         lcd_val->setDigitCount(1);

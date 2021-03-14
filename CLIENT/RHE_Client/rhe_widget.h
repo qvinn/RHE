@@ -38,6 +38,7 @@
             void pre_initialize_ui();
             void post_initialize_ui();
             void set_ui_text();
+            void change_board_pixmap();
             void check_is_proj_folder(bool folder_exist);
             bool check_fpga_connections(QString path_to_fit_rprtr);
             bool read_xml_file(bool type, QString *cur_fpga = nullptr, QList<QString> *pins_numb = nullptr, QList<QString> *pins_typ = nullptr, QList<QString> *pins_io_stndrt = nullptr);
@@ -59,6 +60,7 @@
             QList<int> *prev_vals = nullptr;
             QList<QHBoxLayout*> *inpt_hbxs = nullptr;
             QList<QLabel*> *inpt_lbls = nullptr;
+            QList<QSpacerItem*> *inpt_spcrs = nullptr;
             QList<QSlider*> *inpt_sldrs = nullptr;
             QList<QLCDNumber*> *inpt_stts = nullptr;
             QString lname_fname;
@@ -88,7 +90,9 @@
             void on_pushButton_3_clicked();
             void on_pushButton_strt_drw_clicked();
             void on_pushButton_stp_drw_clicked();
+            void on_pshBttn_chs_sgnls_sqnc_clicked();
             void on_pshBttn_snd_sgnls_sqnc_clicked();
+            void on_pshBttn_strt_sgnls_sqnc_clicked();
             void on_cmbBx_chs_brd_currentIndexChanged(int index);
             void on_hrzntlSldr_cnt_dbg_pins_valueChanged(int value);
             void on_spnBx_dbg_tm_valueChanged(int value);
@@ -97,6 +101,7 @@
             void on_pshBttn_snd_frmwr_clicked();
             void on_pshBttn_chk_prj_stat_clicked();
             void on_pshBttn_ld_frmwr_clicked();
+            void pshBttn_strt_sgnls_sqnc_set_enabled(bool flag);
             void slot_input_val_changed(int val);
             void slot_choose_board(QString jtag_code);
             void slot_accept_board(bool flg);
@@ -104,11 +109,9 @@
             void slot_accept_debug_data(QByteArray debug_data);
             void slot_accept_input_data_table(QByteArray input_data_table);
             void slot_accept_output_data_table(QByteArray output_data_table);
-            void slot_as_window(bool as_window);
+            void slot_as_window(bool as_window); 
 
-            void on_pshBttn_chs_sgnls_sqnc_clicked();
-
-    signals:
+        signals:
             void resize_signal();
     };
 
