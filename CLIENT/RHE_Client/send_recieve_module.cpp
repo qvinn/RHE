@@ -234,13 +234,13 @@ bool Send_Recieve_Module::send_file_to_ss(QByteArray File_byteArray, int strt_sn
             packets.push_back(packet);
         }
         last_send_file_bytes = 0;
-        send_U_Packet(CLIENT_START_SEND_FILE, "");
+        send_U_Packet(/*CLIENT_START_SEND_FILE*/strt_sndng_val, "");
         for(int i = 0; i < packets.size(); i++) {
             //qDebug() << "SEND BUFF " << packets.at(i).data() << endl;
-            send_U_Packet(CLIENT_SENDING_FILE, packets.at(i));
+            send_U_Packet(/*CLIENT_SENDING_FILE*/cntns_sndng_val, packets.at(i));
         }
         last_send_file_bytes = File_byteArray.length();
-        send_U_Packet(CLIENT_FINISH_SEND_FILE, "");
+        send_U_Packet(/*CLIENT_FINISH_SEND_FILE*/end_sndng_val, "");
         qDebug() << "BYTES SEND: " << File_byteArray.length();
         qDebug() << "HOPS_COUNT: " << packets.size() + 1;
     }
