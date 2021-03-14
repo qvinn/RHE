@@ -315,14 +315,16 @@ void client_conn_v_1::wait_analize_recv_data()
 				if(gdb->test_read_dfile() != -1)
 				{
 					send_U_Packet(Socket, S_SERVER_END_RCV_DSQ_FILE, NULL);
-					printf("_________________________________Slave server FINISH recive file\n");
+					printf("_________________________________Slave server FINISH dsq_recive file\n");
 				}
 				break;	
 			}
 			
 			case RUN_DSQ_FILE:
 			{
-				gdb->test_run_dfile();
+				//gdb->test_run_dfile();
+				std::thread gdb_dsq_thread(&Debug::test_run_dfile,gdb);
+				gdb_dsq_thread.detach();
 				printf("_________________________________Client RUN DSQ_file\n");
 				break;	
 			}
@@ -432,10 +434,11 @@ int client_conn_v_1::start_recive_fw_file()
 
 int client_conn_v_1::start_recive_dsq_file()
 {
-	if ((fw_fp=fopen("debug_seq.txt", "wb"))==NULL)
+	if ((dsq_fp=fopen("debug_seq.txt", "wb"))==NULL)
 	{		
 		return CS_ERROR;
 	}
+	file_rcv_bytes_count = 0;
 	return CS_OK;
 }
 
