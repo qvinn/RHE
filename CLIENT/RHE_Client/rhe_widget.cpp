@@ -113,22 +113,12 @@ void RHE_Widget::on_pushButton_3_clicked() {
 void RHE_Widget::on_pushButton_strt_drw_clicked() {
     new_debug = true;
     snd_rcv_module->start_debug(static_cast<uint16_t>(ui->spnBx_dbg_tm->value()), static_cast<uint8_t>(ui->cmbBx_dbg_tm_tp->currentIndex()));
-    wvfrm_vwr->debugging = true;
-    wvfrm_vwr->pshBttn_open_save_wvfrm_set_enabled(false);
-    ui->pushButton_strt_drw->setEnabled(false);
-    ui->hrzntlSldr_cnt_dbg_pins->setEnabled(false);
-    ui->spnBx_dbg_tm->setEnabled(false);
-    ui->cmbBx_dbg_tm_tp->setEnabled(false);
+    set_button_state_debug(true);
 }
 
 void RHE_Widget::on_pushButton_stp_drw_clicked() {
     snd_rcv_module->stop_debug();
-    wvfrm_vwr->debugging = false;
-    wvfrm_vwr->pshBttn_open_save_wvfrm_set_enabled(true);
-    ui->pushButton_strt_drw->setEnabled(true);
-    ui->hrzntlSldr_cnt_dbg_pins->setEnabled(true);
-    ui->spnBx_dbg_tm->setEnabled(true);
-    ui->cmbBx_dbg_tm_tp->setEnabled(true);
+    set_button_state_debug(false);
 }
 
 void RHE_Widget::on_pshBttn_chs_sgnls_sqnc_clicked() {
@@ -342,6 +332,18 @@ void RHE_Widget::change_board_pixmap() {
             ui->label->setPixmap(pixmp_brd.scaled(ui->label->size(), Qt::KeepAspectRatio));
         }
     }
+}
+
+void RHE_Widget::set_button_state_debug(bool flg) {
+    wvfrm_vwr->debugging = flg;
+    wvfrm_vwr->pshBttn_open_save_wvfrm_set_enabled(!flg);
+    ui->pushButton_strt_drw->setEnabled(!flg);
+    ui->hrzntlSldr_cnt_dbg_pins->setEnabled(!flg);
+    ui->spnBx_dbg_tm->setEnabled(!flg);
+    ui->cmbBx_dbg_tm_tp->setEnabled(!flg);
+    pshBttn_chk_prj_stat_set_enabled(!flg);
+    pshBttn_ld_frmwr_set_enabled(!flg);
+    pshBttn_snd_frmwr_set_enabled(!flg && svf_exist);
 }
 
 void RHE_Widget::check_is_proj_folder(bool folder_exist) {
@@ -665,7 +667,7 @@ void RHE_Widget::slot_accept_debug_data(QByteArray debug_data) {
         }
     }
     bool val_changed = false;
-    double dbg_time = (static_cast<double>(tmp_packet->time) * pow(1000.0, tmp_packet->time_mode));
+    double dbg_time = (static_cast<double>(tmp_packet->time) / pow(1000.0, tmp_packet->time_mode));
     for(int i = 0; i < wvfrm_vwr->graph_count; i++) {
         val.append(0);
         if(nmd_pin_pos.count() == 0) {
@@ -703,14 +705,12 @@ void RHE_Widget::slot_accept_input_data_table(QByteArray input_data_table) {
     for(int i = 0; i < pin_count; i++) {
         wvfrm_vwr->add_pin_names(QByteArray((input_data_table.data() + ((hop * i) + 1)), 5));
     }
-    wvfrm_vwr->change_pin_names();
-    wvfrm_vwr->re_scale_graph();
+    ui->hrzntlSldr_cnt_dbg_pins->setValue(pin_count);
 }
 
 void RHE_Widget::slot_accept_output_data_table(QByteArray output_data_table) {
     int pin_count = 0;
     int hop = 5; // bytes
-//    QList<QString> pinNames;
 //    QList<int> pinNums;
     memcpy(&pin_count, output_data_table.data(), sizeof(uint8_t));
     while(ui->verticalLayout_4->itemAt(0) != 0) {
@@ -735,15 +735,16 @@ void RHE_Widget::slot_accept_output_data_table(QByteArray output_data_table) {
     }
     ui->verticalLayout_4->update();
     for(int i = 0; i < pin_count; i++) {
-//        pinNames.append(QByteArray((output_data_table.data() + ((hop * i) + 1 + i)), 5));
 //        int val;
 //        memcpy(&val, (output_data_table.data() + ((hop * i) + 6 + i)), 1);
 //        pinNums.append(val);
+        QString pin_name_str = QByteArray((output_data_table.data() + ((hop * i) + 1 + i)), 5);
         QHBoxLayout *h_layout = new QHBoxLayout();
         inpt_hbxs->append(h_layout);
         ui->verticalLayout_4->addLayout(h_layout);
         QLabel *pin_name = new QLabel();
-        pin_name->setText(QByteArray((output_data_table.data() + ((hop * i) + 1 + i)), 5));
+        pin_name->setText(pin_name_str);
+        wvfrm_vwr->add_pin_names(pin_name_str);
         pin_name->setFixedSize(40, 21);
         pin_name->setFont(ui->lbl_chs_brd->font());
         inpt_lbls->append(pin_name);
@@ -773,6 +774,7 @@ void RHE_Widget::slot_accept_output_data_table(QByteArray output_data_table) {
         inpt_stts->append(lcd_val);
         h_layout->addWidget(lcd_val);
     }
+    ui->hrzntlSldr_cnt_dbg_pins->setValue(ui->hrzntlSldr_cnt_dbg_pins->value() + pin_count);
 }
 
 void RHE_Widget::slot_as_window(bool as_window) {

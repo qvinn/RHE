@@ -39,6 +39,7 @@
             void post_initialize_ui();
             void set_ui_text();
             void change_board_pixmap();
+            void set_button_state_debug(bool flg);
             void check_is_proj_folder(bool folder_exist);
             bool check_fpga_connections(QString path_to_fit_rprtr);
             bool read_xml_file(bool type, QString *cur_fpga = nullptr, QList<QString> *pins_numb = nullptr, QList<QString> *pins_typ = nullptr, QList<QString> *pins_io_stndrt = nullptr);
