@@ -112,9 +112,16 @@ class Debug {
 	// Метод для остановки процесса отладки
 	void stop_debug();
 	
+	// Метод для остановки процесса генерации импульсов
+	void stop_d_seq();
+	
 	// Метод, который проверяет, запущен ли в текущай момент процесс отладки или нет
 	// Метод потокобесопасен, так что его можно вызывать в любой момент
 	int8_t debug_is_run();
+	
+	// Метод, который проверяет, запущен ли в текущай момент процесс генерации иимпульсов или нет
+	// Метод потокобесопасен, так что его можно вызывать в любой момент
+	int8_t dsq_is_run();
 	
 	// Метод для формирования Input debug table(Таблица с названиями портов ввода-вывода)
 	void create_IDT(char *buf);
@@ -129,9 +136,9 @@ class Debug {
 	// Метод для формирования пакета в котором будет описана максимальная длительности отладки
 	void form_time_out_info(char *buf);
 	
-	int test_read_dfile();
+	int public_read_dfile();
 	
-	void test_run_dfile();
+	void public_run_dfile();
 	
 	
 	private:
@@ -152,7 +159,7 @@ class Debug {
 	* std::vector<pinState> log - вектор, в котором хранится упорядоченная информация
 	* char *data - буфер для отправки, в котроый запишемся информация
 	*/
-	void form_Packet(std::vector<pinState> log, int curr_time, char *data);
+	void form_Packet(std::vector<std::string> pinNames, std::vector<pinState> log, int curr_time, char *data);
 	
 	// Метод для отладки - предназдачен, для вывода любых данных из буфера(и двоичных тоже)
 	// МЕТОД ДЛЯ ОТЛАДКИ
@@ -246,5 +253,14 @@ class Debug {
 	int fill_debug_seq();
 	
 	void run_dfile();
+	
+	int stop_dsqrun_flag = 1;
+	std::mutex stop_dsqrun_flag_mutex;
+	
+	int global_time;
+	std::mutex global_time_mutex;
+	
+	int get_global_time();
+	void set_global_time(int val);
 		
 };

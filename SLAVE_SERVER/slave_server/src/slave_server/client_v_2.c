@@ -163,12 +163,12 @@ int main(int argc, char *argv[])
 		} else if(cmd == "read_dfile")
         {
 #ifdef HW_EN
-		client->gdb->test_read_dfile();
+		client->gdb->public_read_dfile();
 #endif
 		} else if(cmd == "run_d_file")
         {
 #ifdef HW_EN
-		client->gdb->test_run_dfile();
+		client->gdb->public_run_dfile();
 #endif
 		} else if(cmd == "")
         {
