@@ -1,30 +1,35 @@
 #include "waveform_viewer_widget.h"
 #include "ui_waveform_viewer.h"
+#include "ui_dialog_select_displayable_pins.h"
 
-Waveform_Viewer_Widget::Waveform_Viewer_Widget(QWidget* parent, General_Widget *widg, bool stndln) : QWidget(parent), ui(new Ui::Waveform_Viewer) {
+Waveform_Viewer_Widget::Waveform_Viewer_Widget(QWidget *parent, General_Widget *widg, bool stndln) : QWidget(parent), ui(new Ui::Waveform_Viewer) {
     ui->setupUi(this);
     gen_widg = widg;
     standalone = stndln;
     ui->chckBx_as_wndw->setVisible(!stndln);
-    ui->horizontalSpacer_3->changeSize(5 * static_cast<int>(!stndln), ui->horizontalSpacer_3->geometry().height());
     textTicker = new QSharedPointer<QCPAxisTickerText>(new QCPAxisTickerText());
     dyn_tckr = new QSharedPointer<QCPAxisTickerFixed>(new QCPAxisTickerFixed());
 //    ui->diagram->setOpenGl(true);         //qcustomplot.cpp - line 909
     curs_ver_line = new QCPItemLine(ui->diagram);
     curs_time = new QCPItemText(ui->diagram);
-    connect(ui->diagram->xAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(slot_xAxisChanged(QCPRange)));
-    connect(ui->diagram->yAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(slot_yAxisChanged(QCPRange)));
+    connect(ui->diagram->xAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(slot_x_axis_changed(QCPRange)));
+    connect(ui->diagram->yAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(slot_y_axis_changed(QCPRange)));
     connect(ui->diagram, &QCustomPlot::mouseMove, this, &Waveform_Viewer_Widget::slot_mouse_move);
     connect(ui->diagram, &QCustomPlot::mousePress, this, &Waveform_Viewer_Widget::slot_mouse_pressed);
     connect(ui->diagram, &QCustomPlot::mouseRelease, this, &Waveform_Viewer_Widget::slot_mouse_unpressed);
     graph_list = new QList<QCPGraph *>();
     pin_names = new QList<QString>();
     pin_names_board = new QList<QString>();
+    svd_vals = new QList<QList<int>*>();
+    svd_dbg_time = new QList<double>();
     flags = this->windowFlags();
 }
 
 Waveform_Viewer_Widget::~Waveform_Viewer_Widget() {
     remove_graphs_from_plot();
+    remove_saved_vals_list();
+    delete svd_dbg_time;
+    delete svd_vals;
     delete graph_list;
     delete textTicker;
     delete pin_names;
@@ -87,6 +92,10 @@ void Waveform_Viewer_Widget::on_pshBttn_clr_clicked() {
     remove_data_from_graph();
 }
 
+void Waveform_Viewer_Widget::on_pshBttn_slct_dsplbl_pins_clicked() {
+    select_displayable_pins();
+}
+
 void Waveform_Viewer_Widget::on_chckBx_as_wndw_stateChanged(int state) {
     if(state == 2) {
         this->setWindowFlags(Qt::Window | Qt::WindowMinMaxButtonsHint | Qt::WindowTitleHint);
@@ -120,18 +129,18 @@ void Waveform_Viewer_Widget::initialize_ui() {
     ui->diagram->yAxis->grid()->setPen(QPen(QColor(100, 100, 100), 1, Qt::SolidLine));
     ui->diagram->xAxis->setTickLabelColor(Qt::white);
     ui->diagram->yAxis->setTickLabelColor(Qt::white);
-    QLinearGradient plotGradient;
-    plotGradient.setStart(0, 0);
-    plotGradient.setFinalStop(0, 350);
-    plotGradient.setColorAt(0, QColor(0, 0, 0));
-    plotGradient.setColorAt(1, QColor(0, 0, 0));
-    ui->diagram->setBackground(plotGradient);
-    QLinearGradient axisRectGradient;
-    axisRectGradient.setStart(0, 0);
-    axisRectGradient.setFinalStop(0, 350);
-    axisRectGradient.setColorAt(0, QColor(0, 0, 0));
-    axisRectGradient.setColorAt(1, QColor(0, 0, 0));
-    ui->diagram->axisRect()->setBackground(axisRectGradient);
+    QLinearGradient plot_gradient;
+    plot_gradient.setStart(0, 0);
+    plot_gradient.setFinalStop(0, 350);
+    plot_gradient.setColorAt(0, QColor(0, 0, 0));
+    plot_gradient.setColorAt(1, QColor(0, 0, 0));
+    ui->diagram->setBackground(plot_gradient);
+    QLinearGradient axis_rect_gradient;
+    axis_rect_gradient.setStart(0, 0);
+    axis_rect_gradient.setFinalStop(0, 350);
+    axis_rect_gradient.setColorAt(0, QColor(0, 0, 0));
+    axis_rect_gradient.setColorAt(1, QColor(0, 0, 0));
+    ui->diagram->axisRect()->setBackground(axis_rect_gradient);
     ui->diagram->xAxis->setSubTicks(false);
     ui->diagram->yAxis->setSubTicks(false);
     //////////////////////////////////////////////////////////////////////////////////
@@ -194,11 +203,14 @@ void Waveform_Viewer_Widget::load_waveform() {
         QString str = file->readLine();
         file->close();
         str.replace("\n", "");
-        QRegExp tagExp("/");
-        QStringList lst = str.split(tagExp);
+        QRegExp tag_exp("/");
+        QStringList lst = str.split(tag_exp);
         plot_re_scale = true;
+        remove_data_from_saved_vals_list();
+        remove_saved_vals_list();
         remove_graphs_from_plot();
         graph_count = lst.count() - 1;
+        add_saved_vals_list(graph_count);
         double debug_time = 0.0;
         QList<int> vals;
         vals.clear();
@@ -224,7 +236,8 @@ void Waveform_Viewer_Widget::load_waveform() {
                 for(int i = 0; i < lst_dat.count(); i++) {
                     if(str_dat.contains("time")) {
                         if(i != 0) {
-                            pin_names->append(lst_dat.at(i));
+//                            pin_names->append(lst_dat.at(i));
+                            add_pin_names(lst_dat.at(i));
                         }
                     } else {
                         if(i == 0) {
@@ -240,6 +253,7 @@ void Waveform_Viewer_Widget::load_waveform() {
                     change_pin_names();
                 }
                 if(!str_dat.contains("time")) {
+                    add_data_to_saved_vals_list(vals, &prev_vals, debug_time, false);
                     add_data_to_graph(vals, &prev_vals, debug_time, false);
                     vals.clear();
                 }
@@ -359,6 +373,10 @@ QList<QString>* Waveform_Viewer_Widget::get_pin_names() {
     return pin_names;
 }
 
+int Waveform_Viewer_Widget::get_all_pins_count() {
+    return pin_names_board->count();
+}
+
 void Waveform_Viewer_Widget::remove_pin_names() {
     pin_names->clear();
     pin_names_board->clear();
@@ -388,24 +406,106 @@ void Waveform_Viewer_Widget::change_pin_names() {
     ui->diagram->yAxis->setTicker(*textTicker);
 }
 
-void Waveform_Viewer_Widget::limitAxisRange(QCPAxis *axis, const QCPRange &newRange, const QCPRange &limitRange) {
-    auto lowerBound = limitRange.lower;
-    auto upperBound = limitRange.upper;
-    QCPRange fixedRange(newRange);
-    if(fixedRange.lower < lowerBound) {     // code assumes upperBound > lowerBound
-        fixedRange.lower = lowerBound;
-        fixedRange.upper = lowerBound + newRange.size();
-        if((fixedRange.upper > upperBound) || (qFuzzyCompare(newRange.size(), upperBound-lowerBound))) {
-            fixedRange.upper = upperBound;
+void Waveform_Viewer_Widget::add_saved_vals_list(int cnt) {
+    for(int i = 0; i < cnt; i++) {
+        QList<int> *val = new QList<int>();
+        val->clear();
+        svd_vals->append(val);
+    }
+}
+
+void Waveform_Viewer_Widget::remove_saved_vals_list() {
+    while(svd_vals->count() != 0) {
+        delete svd_vals->at(0);
+        svd_vals->removeAt(0);
+    }
+}
+
+void Waveform_Viewer_Widget::add_data_to_saved_vals_list(QList<int> val, QList<int> *prev_vals, double time, bool val_changed) {
+    svd_dbg_time->append(time);
+    if(val_changed) {
+        svd_dbg_time->append(time);
+    }
+    for(int i = 0; i < svd_vals->count(); i++) {
+        if(val_changed) {
+            svd_vals->at(i)->append(prev_vals->at((i * 2) + 1));
         }
-        axis->setRange(fixedRange);         // adapt this line to use your plot/axis
-    } else if(fixedRange.upper > upperBound) {
-        fixedRange.upper = upperBound;
-        fixedRange.lower = upperBound - newRange.size();
-        if((fixedRange.lower < lowerBound) || (qFuzzyCompare(newRange.size(), upperBound-lowerBound))) {
-            fixedRange.lower = lowerBound;
+        svd_vals->at(i)->append(val.at((i * 2) + 1));
+    }
+}
+
+void Waveform_Viewer_Widget::remove_data_from_saved_vals_list() {
+    for(int i = 0; i < svd_vals->count(); i++) {
+        svd_vals->at(i)->clear();
+    }
+    svd_dbg_time->clear();
+}
+
+void Waveform_Viewer_Widget::select_displayable_pins() {
+    QStringList avlbl_pins, dsplbl_pins;
+    avlbl_pins.append(*pin_names_board);
+    bool flag = true;
+    while(flag) {
+        for(int k = 0; k < pin_names->count(); k++) {
+            int cnt = 0;
+            bool skp = false;
+            for(int i = 0; i < avlbl_pins.count(); i++) {
+                if(pin_names->at(k).compare(avlbl_pins.at(i), Qt::CaseInsensitive)) {
+                    avlbl_pins.removeAt(i);
+                    skp = true;
+                    break;
+                } else {
+                    cnt++;
+                }
+            }
+            if(skp) {
+                break;
+            } else if((cnt == pin_names->count()) || (avlbl_pins.count() == 0)) {
+                flag = false;
+                break;
+            }
         }
-        axis->setRange(fixedRange);         // adapt this line to use your plot/axis
+    }
+    dsplbl_pins.append(*pin_names);
+    Dialog_Select_Displayable_Pins pins_select_dialog(avlbl_pins, dsplbl_pins, nullptr);
+    pins_select_dialog.setWindowFlag(Qt::WindowStaysOnTopHint);
+    int dlgCase = pins_select_dialog.exec();
+    if(dlgCase == 1) {  //ok
+
+        QList<int> prev_vals;
+        prev_vals.clear();
+        for(int i = 0; i < graph_list->count(); i++) {
+            prev_vals.append(0);
+        }
+
+        QStringList slct_map_lst = pins_select_dialog.get_displayable_pins();
+        QStringList tmp = slct_map_lst;
+
+//        for(int )
+
+        qDebug()<<"Slot Select Pins finished.";
+
+    }
+}
+
+void Waveform_Viewer_Widget::limit_axis_range(QCPAxis *axis, const QCPRange &new_range, const QCPRange &limit_range) {
+    auto lower_bound = limit_range.lower;
+    auto upper_bound = limit_range.upper;
+    QCPRange fixed_range(new_range);
+    if(fixed_range.lower < lower_bound) {     // code assumes upperBound > lowerBound
+        fixed_range.lower = lower_bound;
+        fixed_range.upper = lower_bound + new_range.size();
+        if((fixed_range.upper > upper_bound) || (qFuzzyCompare(new_range.size(), (upper_bound - lower_bound)))) {
+            fixed_range.upper = upper_bound;
+        }
+        axis->setRange(fixed_range);         // adapt this line to use your plot/axis
+    } else if(fixed_range.upper > upper_bound) {
+        fixed_range.upper = upper_bound;
+        fixed_range.lower = upper_bound - new_range.size();
+        if((fixed_range.lower < lower_bound) || (qFuzzyCompare(new_range.size(), (upper_bound - lower_bound)))) {
+            fixed_range.lower = lower_bound;
+        }
+        axis->setRange(fixed_range);         // adapt this line to use your plot/axis
     }
 }
 
@@ -449,35 +549,24 @@ void Waveform_Viewer_Widget::slot_mouse_move(QMouseEvent *event) {
                 drag_graph = true;
             } else {
                 if(int_cur_y != coef) {
-                    QList<double> time;
-                    time.clear();
                     QList<int> prev_vals;
                     prev_vals.clear();
                     for(int i = 0; i < graph_list->count(); i++) {
                         prev_vals.append(0);
                     }
-                    QList<QList<int>*> vals;
-                    vals.clear();
-                    if(graph_list->count() != 0) {
-                        for(int i = 0; i < graph_list->at(0)->data()->size(); i++) {
-                            QList<int> *val = new QList<int>();
-                            val->clear();
-                            vals.append(val);
-                        }
-                        for(int i = 0; i < graph_list->at(0)->data()->size(); i++) {
-                            for(int k = 0; k < graph_list->count(); k++) {
-                                if(k == 0) {
-                                    time.append(graph_list->at(k)->data()->at(i)->key);
-                                }
-                                if(k == coef) {
-                                    vals.at(i)->append(abs((static_cast<int>(graph_list->at(int_cur_y)->data()->at(i)->value) % 2) - 1));
-                                } else if(k == int_cur_y) {
-                                    vals.at(i)->append(abs((static_cast<int>(graph_list->at(coef)->data()->at(i)->value) % 2) - 1));
-                                } else {
-                                    vals.at(i)->append(abs((static_cast<int>(graph_list->at(k)->data()->at(i)->value) % 2) - 1));
-                                }
+                    svd_vals->swap(((coef - 1) / 2), ((int_cur_y - 1) / 2));
+                    QList<QList<int>> tmp_vals_frm_svd;
+                    for(int i = 0; i < svd_vals->at(0)->count(); i++) {
+                        QList<int> new_lst;
+                        new_lst.clear();
+                        for(int k = 0; k < svd_vals->count() * 2; k++) {
+                            if(k % 2 == 0) {
+                                new_lst.append(0);
+                            } else {
+                                new_lst.append(svd_vals->at((k - 1) / 2)->at(i));
                             }
                         }
+                        tmp_vals_frm_svd.append(new_lst);
                     }
                     QList<QString> old_ticks = (*textTicker)->ticks().values();
                     remove_data_from_graph();
@@ -494,15 +583,14 @@ void Waveform_Viewer_Widget::slot_mouse_move(QMouseEvent *event) {
                         }
                     }
                     change_pin_names();
-                    for(int i = 0; i < time.count(); i++) {
-                        add_data_to_graph(*vals.at(i), &prev_vals, time.at(i), false);
+                    for(int i = 0; i < pin_names->count(); i++) {
+                        pin_names_board->replace(i, pin_names->at(i));
+                    }
+                    for(int i = 0; i < svd_dbg_time->count(); i++) {
+                        add_data_to_graph(tmp_vals_frm_svd.at(i), &prev_vals, svd_dbg_time->at(i), false);
                     }
                     ui->diagram->replot();
                     coef = int_cur_y;
-                    while(vals.count() != 0) {
-                        delete vals.at(vals.count() - 1);
-                        vals.removeAt(vals.count() - 1);
-                    }
                 }
             }
         }
@@ -561,25 +649,114 @@ void Waveform_Viewer_Widget::slot_mouse_unpressed(QMouseEvent *event) {
     }
 }
 
-void Waveform_Viewer_Widget::slot_xAxisChanged(const QCPRange &newRange) {
+void Waveform_Viewer_Widget::slot_x_axis_changed(const QCPRange &new_range) {
     if(!plot_re_scale) {
         QCPAxis *axis = qobject_cast<QCPAxis *>(QObject::sender());
         QCustomPlot *plot = axis->parentPlot();
-        QCPRange limitRange(plot->property("xmin").toDouble(), plot->property("xmax").toDouble());
-        limitAxisRange(axis, newRange, limitRange);
+        QCPRange limit_range(plot->property("xmin").toDouble(), plot->property("xmax").toDouble());
+        limit_axis_range(axis, new_range, limit_range);
     }
 }
 
-void Waveform_Viewer_Widget::slot_yAxisChanged(const QCPRange &newRange) {
+void Waveform_Viewer_Widget::slot_y_axis_changed(const QCPRange &new_range) {
     if(!plot_re_scale) {
         QCPAxis *axis = qobject_cast<QCPAxis *>(QObject::sender());
         QCustomPlot *plot = axis->parentPlot();
-        QCPRange limitRange(plot->property("ymin").toDouble(), plot->property("ymax").toDouble());
-        limitAxisRange(axis, newRange, limitRange);
+        QCPRange limit_range(plot->property("ymin").toDouble(), plot->property("ymax").toDouble());
+        limit_axis_range(axis, new_range, limit_range);
     }
 }
 
 void Waveform_Viewer_Widget::slot_re_translate() {
     ui->retranslateUi(this);
     set_ui_text();
+}
+
+////////////////////////////////////////////////////DIALOG SELECT DISPLAYABLE PINS///////////////////////////////////////////////////
+Dialog_Select_Displayable_Pins::Dialog_Select_Displayable_Pins(QStringList avlbl_pins, QStringList dsplbl_pins, QWidget *parent) : QDialog(parent), ui(new Ui::Dialog_Select_Displayable_Pins) {
+    ui->setupUi(this);
+    available_pins_model = new QStringListModel(this);
+    available_pins_model->setStringList(avlbl_pins);
+    ui->listView_All->setModel(available_pins_model);
+    ui->listView_All->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    displayable_pins_model = new QStringListModel(this);
+    displayable_pins_model->setStringList(dsplbl_pins);
+    ui->listView_Sel->setModel(displayable_pins_model);
+    ui->listView_Sel->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    connect(ui->listView_All->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(available_pins_selection_changed(const QItemSelection &)));
+    this->setWindowTitle(tr("Select pins for display"));
+    this->setFixedSize(600, 300);
+    this->updateGeometry();
+    connect(ui->listView_Sel->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(displayable_pins_selection_changed(const QItemSelection &)));
+    ui->pushButton_Ok->setText(tr("OK"));
+    ui->listView_All->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->listView_All->selectionModel()->clearSelection();
+    ui->listView_Sel->selectionModel()->clearSelection();
+    ui->pushButton_Del->setEnabled(false);
+    ui->pushButton_Add->setEnabled(false);
+}
+
+Dialog_Select_Displayable_Pins::~Dialog_Select_Displayable_Pins() {
+    delete available_pins_model;
+    delete displayable_pins_model;
+    delete ui;
+}
+
+void Dialog_Select_Displayable_Pins::on_pushButton_Ok_clicked() {
+    QDialog::done(1);
+}
+
+void Dialog_Select_Displayable_Pins::on_pushButton_Cancell_clicked() {
+    QDialog::done(0);
+}
+
+void Dialog_Select_Displayable_Pins::on_pushButton_Add_clicked() {
+    int row = displayable_pins_model->rowCount();
+    displayable_pins_model->insertRows(row,1);
+    displayable_pins_model->setData(displayable_pins_model->index(row), available_pins_model->data(available_pins_model->index(ui->listView_All->currentIndex().row())));
+    ui->listView_All->selectionModel()->clearSelection();
+    QStringList lst = available_pins_model->stringList();
+    lst.removeAt(ui->listView_All->currentIndex().row());
+    available_pins_model->setStringList(lst);
+    ui->listView_All->setModel(available_pins_model);
+    ui->listView_Sel->setFocus();
+    ui->listView_Sel->selectionModel()->select(displayable_pins_model->index(row), QItemSelectionModel::ClearAndSelect);
+}
+
+void Dialog_Select_Displayable_Pins::on_pushButton_Del_clicked() {
+    QStringList lst = available_pins_model->stringList();
+    lst.append(displayable_pins_model->stringList().at(ui->listView_Sel->currentIndex().row()));
+    available_pins_model->setStringList(lst);
+    ui->listView_All->setModel(available_pins_model);
+    displayable_pins_model->removeRows(ui->listView_Sel->currentIndex().row(), 1);
+    ui->listView_Sel->selectionModel()->clearSelection();
+    if(displayable_pins_model->rowCount() == 0) {
+        ui->pushButton_Del->setEnabled(false);
+    }
+}
+
+void Dialog_Select_Displayable_Pins::displayable_pins_selection_changed(const QItemSelection &sel) {
+    Q_UNUSED(sel)
+    ui->pushButton_Del->setEnabled(true);
+    ui->listView_All->selectionModel()->clearSelection();
+}
+
+void Dialog_Select_Displayable_Pins::available_pins_selection_changed(const QItemSelection &sel) {
+    if(sel.indexes().count() > 0) {
+        QModelIndex index = sel.indexes().first();
+        QString pin_name = available_pins_model->data(index).toString();
+        ui->listView_Sel->selectionModel()->clearSelection();
+        ui->pushButton_Del->setEnabled(false);
+        if(displayable_pins_model->stringList().contains(pin_name)) {
+            ui->pushButton_Add->setEnabled(false);
+        } else {
+            ui->pushButton_Add->setEnabled(true);
+        }
+    } else {
+        ui->pushButton_Add->setEnabled(false);
+    }
+}
+
+QStringList Dialog_Select_Displayable_Pins::get_displayable_pins() {
+    return displayable_pins_model->stringList();
 }

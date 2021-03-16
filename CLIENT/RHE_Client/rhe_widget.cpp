@@ -161,7 +161,7 @@ void RHE_Widget::on_hrzntlSldr_cnt_dbg_pins_valueChanged(int value) {
         gen_widg->save_setting("settings/DEBUG_PINS_NUMBER", value);
         wvfrm_vwr->plot_re_scale = true;
         prev_vals->clear();
-        for(int i = 0; i < value; i++) {
+        for(int i = 0; i < wvfrm_vwr->get_all_pins_count(); i++) {
             prev_vals->append(0);
             prev_vals->append(0);
         }
@@ -668,11 +668,11 @@ void RHE_Widget::slot_accept_debug_data(QByteArray debug_data) {
     }
     bool val_changed = false;
     double dbg_time = (static_cast<double>(tmp_packet->time) / pow(1000.0, tmp_packet->time_mode));
-    for(int i = 0; i < wvfrm_vwr->graph_count; i++) {
+    for(int i = 0; i < wvfrm_vwr->get_all_pins_count(); i++) {
         val.append(0);
         if(nmd_pin_pos.count() == 0) {
             if(i >= tmp_packet->pin_count) {
-                val.append(0);
+                val.append(prev_vals->at(i));           //0
             } else {
                 val.append(tmp_packet->pins[i].state);
             }
@@ -694,6 +694,7 @@ void RHE_Widget::slot_accept_debug_data(QByteArray debug_data) {
             val_changed = true;
         }
     }
+    wvfrm_vwr->add_data_to_saved_vals_list(val, prev_vals, dbg_time, val_changed);
     wvfrm_vwr->add_data_to_graph_rltm(val, prev_vals, dbg_time, val_changed);
 }
 
@@ -706,6 +707,9 @@ void RHE_Widget::slot_accept_input_data_table(QByteArray input_data_table) {
         wvfrm_vwr->add_pin_names(QByteArray((input_data_table.data() + ((hop * i) + 1)), 5));
     }
     ui->hrzntlSldr_cnt_dbg_pins->setValue(pin_count);
+    wvfrm_vwr->remove_data_from_saved_vals_list();
+    wvfrm_vwr->remove_saved_vals_list();
+    wvfrm_vwr->add_saved_vals_list(pin_count);
 }
 
 void RHE_Widget::slot_accept_output_data_table(QByteArray output_data_table) {
@@ -734,6 +738,7 @@ void RHE_Widget::slot_accept_output_data_table(QByteArray output_data_table) {
         inpt_stts->removeAt(0);
     }
     ui->verticalLayout_4->update();
+    wvfrm_vwr->add_saved_vals_list(pin_count);
     for(int i = 0; i < pin_count; i++) {
 //        int val;
 //        memcpy(&val, (output_data_table.data() + ((hop * i) + 6 + i)), 1);
@@ -775,6 +780,7 @@ void RHE_Widget::slot_accept_output_data_table(QByteArray output_data_table) {
         h_layout->addWidget(lcd_val);
     }
     ui->hrzntlSldr_cnt_dbg_pins->setValue(ui->hrzntlSldr_cnt_dbg_pins->value() + pin_count);
+    ui->hrzntlSldr_cnt_dbg_pins->setMaximum(ui->hrzntlSldr_cnt_dbg_pins->value());
 }
 
 void RHE_Widget::slot_as_window(bool as_window) {

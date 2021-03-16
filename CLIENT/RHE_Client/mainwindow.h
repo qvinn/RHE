@@ -43,6 +43,7 @@
             QMenu *menu_file = nullptr;
             QMenu *menu_settngs = nullptr;
             QWidgetAction *cmbBx_lng_chs_actn = nullptr;
+            QTimer *tmr = nullptr;
 
             bool ui_initialized = false;
             bool language_changed = false;
@@ -52,6 +53,7 @@
 
         private slots:
             void resizeEvent(QResizeEvent *) override;
+            void closeEvent(QCloseEvent *) override;
             void on_button_login_logout_clicked();
             void on_button_register_clicked();
             void onPshBttnWvfrmVwr();
@@ -62,6 +64,7 @@
             void onCmbBxLngChsCurrentIndexChanged(int index);
             void slot_re_size();
             void slot_waveform_viewer_closed();
+            void slot_timer_timeout();
     };
 
 #endif // MAINWINDOW_H

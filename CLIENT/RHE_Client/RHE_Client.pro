@@ -20,6 +20,7 @@ SOURCES += \
     waveform_viewer_widget.cpp
 
 FORMS += \
+    dialog_select_displayable_pins.ui \
     mainwindow.ui \
     registration_widget.ui \
     rhe_widget.ui \

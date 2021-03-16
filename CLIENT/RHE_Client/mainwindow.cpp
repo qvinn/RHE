@@ -20,9 +20,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(gen_widg, &General_Widget::re_translate_signal, ptr_RHE_widg, &RHE_Widget::slot_re_translate);
     connect(snd_rcv_module, &Send_Recieve_Module::logout_signal, this, &MainWindow::logout);
     gen_widg->change_current_locale();
+    tmr = new QTimer(this);
+    connect(tmr, &QTimer::timeout, this, &MainWindow::slot_timer_timeout);
+    tmr->stop();
 }
 
 MainWindow::~MainWindow() {
+    disconnect(tmr, &QTimer::timeout, this, &MainWindow::slot_timer_timeout);
+    slot_timer_timeout();
+    delete tmr;
     delete ptr_registration_widg;
     delete ptr_RHE_widg;
     delete wvfrm_vwr_actn;
@@ -44,6 +50,10 @@ void MainWindow::resizeEvent(QResizeEvent *) {
     ui->horizontalLayoutWidget->setGeometry(0, (this->height() - ui->horizontalLayoutWidget->height()), this->width(), ui->horizontalLayoutWidget->height());
     ui->verticalLayoutWidget->resize(this->width(), (this->height() - ui->horizontalLayoutWidget->height()));
     ui->stackedWidget->setGeometry(0, (menu_bar->height() + ui->line_1->height()), this->width(), (ui->verticalLayoutWidget->height() - menu_bar->height() - (2 * ui->line_1->height())));
+}
+
+void MainWindow::closeEvent(QCloseEvent *) {
+    onPshBttnExt();
 }
 
 void MainWindow::onPshBttnWvfrmVwr() {
@@ -234,7 +244,19 @@ void MainWindow::slot_re_size() {
 }
 
 void MainWindow::slot_waveform_viewer_closed() {
-    delete wvfrm_vwr;
+    tmr->setInterval(100);
+    tmr->start();
+}
+
+void MainWindow::slot_timer_timeout() {
+    tmr->stop();
+    if(wvfrm_vwr != nullptr) {
+        disconnect(gen_widg, &General_Widget::re_translate_signal, wvfrm_vwr, &Waveform_Viewer_Widget::slot_re_translate);
+        disconnect(wvfrm_vwr, &Waveform_Viewer_Widget::waveform_viewer_closed_signal, this, &MainWindow::slot_waveform_viewer_closed);
+        wvfrm_vwr->hide();
+        delete wvfrm_vwr;
+        wvfrm_vwr = nullptr;
+    }
 }
 
 void MainWindow::slot_re_translate() {
