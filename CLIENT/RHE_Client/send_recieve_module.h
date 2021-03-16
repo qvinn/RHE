@@ -47,6 +47,8 @@
     #define CLIENT_FINISH_SEND_DSQ_FILE 43  // DSQ_FILE -  Debug sequence file
     #define S_SERVER_END_RCV_DSQ_FILE 44	// DSQ_FILE -  Debug sequence file
     #define RUN_DSQ_FILE 45                 // DSQ_FILE -  Debug sequence file
+    #define STOP_DSQ_FILE 46                // DSQ_FILE -  Debug sequence file
+    #define S_SERVER_SENDING_DSQ_INFO 47	// DSQ_FILE -  Debug sequence file
 
     class Send_Recieve_Module : public QObject {
         Q_OBJECT
