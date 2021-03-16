@@ -126,7 +126,7 @@ void Send_Recieve_Module::wait_analize_recv_data() {
 //                QByteArray debug_data(tmp_packet->data, sizeof(debug_log_Packet));
                 emit accept_debug_data_signal(QByteArray(tmp_packet->data, sizeof(debug_log_Packet)));
 //                recive_dbg_info(tmp_packet->data);
-//                qDebug() << "_________________________________Slave server sending DEBUG INFO";
+                qDebug() << "_________________________________Slave server sending DEBUG INFO";
                 break;
             }
             case DEBUG_PROCESS_TIMEOUT: {
@@ -166,6 +166,12 @@ void Send_Recieve_Module::wait_analize_recv_data() {
             case S_SERVER_END_RCV_DSQ_FILE: {
                 qDebug() << "_________________________________Send DSQ file SUCCESS!";
                 emit sequence_file_recieved_signal(true);
+                break;
+            }
+            case S_SERVER_SENDING_DSQ_INFO: {
+                emit accept_debug_data_signal(QByteArray(tmp_packet->data, sizeof(debug_log_Packet)));
+                qDebug() << "_________________________________Slave server sending DSQ INFO";
+                recive_dbg_info(tmp_packet->data);
                 break;
             }
             default: {

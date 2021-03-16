@@ -35,7 +35,9 @@
 #define CLIENT_SENDING_DSQ_FILE 42      // DSQ_FILE -  Debug sequence file
 #define CLIENT_FINISH_SEND_DSQ_FILE 43  // DSQ_FILE -  Debug sequence file
 #define S_SERVER_END_RCV_DSQ_FILE 44	// DSQ_FILE -  Debug sequence file
-#define RUN_DSQ_FILE 45 // DSQ_FILE -  Debug sequence file
+#define RUN_DSQ_FILE 45					// DSQ_FILE -  Debug sequence file
+#define STOP_DSQ_FILE 46                // DSQ_FILE -  Debug sequence file
+#define S_SERVER_SENDING_DSQ_INFO 47	// DSQ_FILE -  Debug sequence file
 
 #define DATA_EXIST 1
 #define DATA_NOT_EXIST 0
@@ -220,7 +222,16 @@ void client_conn_v_1::wait_analize_recv_data()
 				}
 				std::thread gdb_thread(&Debug::start_debug_process,gdb);
 				gdb_thread.detach();
-				printf("_________________________________START DEBUG\n");			
+				printf("_________________________________START DEBUG\n");
+				
+				/* if(gdb->dsq_is_run() == 1)
+				{
+					printf("_________________________________DSQ ALREADY RUN!\n");
+					break;
+				}
+				std::thread gdb_dsq_thread(&Debug::test_run_dfile,gdb);
+				gdb_dsq_thread.detach();
+				printf("_________________________________Client RUN DSQ_file\n"); */
 				break;	
 			}
 #endif
@@ -230,6 +241,8 @@ void client_conn_v_1::wait_analize_recv_data()
 			{
 				gdb->stop_debug();
 				printf("_________________________________STOP DEBUG\n");
+				gdb->stop_d_seq();
+				printf("_________________________________STOP DSQ\n");
 				break;	
 			}
 #endif
@@ -286,7 +299,8 @@ void client_conn_v_1::wait_analize_recv_data()
 				break;	
 			}
 #endif
-			
+
+#ifdef HW_EN
 			case CLIENT_START_SEND_DSQ_FILE:
 			{
 				if(start_recive_dsq_file()!= CS_ERROR)
@@ -295,7 +309,9 @@ void client_conn_v_1::wait_analize_recv_data()
 				}
 				break;	
 			}
-			
+#endif
+
+#ifdef HW_EN
 			case CLIENT_SENDING_DSQ_FILE:
 			{
 				printf("data: %s\n",tmp_packet->data);
@@ -303,7 +319,8 @@ void client_conn_v_1::wait_analize_recv_data()
 				printf("_________________________________Client sending dsq_file\n");
 				break;	
 			}
-			
+#endif
+
 			case CLIENT_FINISH_SEND_DSQ_FILE:
 			{
 				end_recive_file(dsq_fp);
@@ -312,23 +329,42 @@ void client_conn_v_1::wait_analize_recv_data()
 				sprintf(buff, "%i", file_rcv_bytes_count);				
 				send_U_Packet(Socket, S_SERVER_END_RCV_FILE, buff);
 				free(buff); */
-				if(gdb->test_read_dfile() != -1)
+				if(gdb->public_read_dfile() != -1)
 				{
 					send_U_Packet(Socket, S_SERVER_END_RCV_DSQ_FILE, NULL);
 					printf("_________________________________Slave server FINISH dsq_recive file\n");
 				}
 				break;	
 			}
-			
+
+#ifdef HW_EN
 			case RUN_DSQ_FILE:
 			{
-				//gdb->test_run_dfile();
-				std::thread gdb_dsq_thread(&Debug::test_run_dfile,gdb);
+				if(gdb->debug_is_run() != 1)
+				{
+					printf("_________________________________START DEBUG FIRSTLY!\n");
+					break;
+				}
+				if(gdb->dsq_is_run() == 1)
+				{
+					printf("_________________________________DSQ ALREADY RUN!\n");
+					break;
+				}
+				std::thread gdb_dsq_thread(&Debug::public_run_dfile,gdb);
 				gdb_dsq_thread.detach();
 				printf("_________________________________Client RUN DSQ_file\n");
 				break;	
 			}
-			
+#endif
+
+#ifdef HW_EN
+			case STOP_DSQ_FILE:
+			{
+				gdb->stop_d_seq();
+				printf("_________________________________STOP DSQ\n");
+				break;	
+			}
+#endif
 			default:
 			{
 				printf("\t|___UNKNOWN PACKET\n");
