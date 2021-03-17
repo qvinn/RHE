@@ -663,7 +663,7 @@ void RHE_Widget::slot_accept_debug_data(QByteArray debug_data) {
             if((pin_names.at(i).compare(tmp_str, Qt::CaseInsensitive) == 0)) {
                 nmd_pin_pos.append(QPoint(i, k));
                 break;
-             }
+            }
         }
     }
     bool val_changed = false;
@@ -672,7 +672,7 @@ void RHE_Widget::slot_accept_debug_data(QByteArray debug_data) {
         val.append(0);
         if(nmd_pin_pos.count() == 0) {
             if(i >= tmp_packet->pin_count) {
-                val.append(prev_vals->at(i));           //0
+                val.append(prev_vals->at((2 * i) + 1));           //0
             } else {
                 val.append(tmp_packet->pins[i].state);
             }
@@ -687,7 +687,7 @@ void RHE_Widget::slot_accept_debug_data(QByteArray debug_data) {
                 }
             }
             if(tmp == nmd_pin_pos.count()) {
-                val.append(0);
+                val.append(prev_vals->at((2 * i) + 1));         //0
             }
         }
         if(prev_vals->at(val.count() - 1) != val.at(val.count() - 1)) {
