@@ -61,9 +61,7 @@ void MainWindow::onPshBttnWvfrmVwr() {
     connect(gen_widg, &General_Widget::re_translate_signal, wvfrm_vwr, &Waveform_Viewer_Widget::slot_re_translate);
     connect(wvfrm_vwr, &Waveform_Viewer_Widget::waveform_viewer_closed_signal, this, &MainWindow::slot_waveform_viewer_closed);
     wvfrm_vwr->initialize_ui();
-    wvfrm_vwr->graph_count = 16;
-    wvfrm_vwr->re_scale_graph();
-    wvfrm_vwr->add_graphs_to_plot();
+    wvfrm_vwr->remove_all_data();
     wvfrm_vwr->show();
 }
 

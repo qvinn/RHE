@@ -16,13 +16,15 @@
             Waveform_Viewer_Widget(QWidget *parent = nullptr, General_Widget *widg = nullptr, bool stndln = false);
             ~Waveform_Viewer_Widget() override;
 
+            void pshBttn_slct_dsplbl_pins_set_enabled(bool flg);
             void pshBttn_open_save_wvfrm_set_enabled(bool flg);
             void initialize_ui();
             void add_graphs_to_plot();
+            QList<QCPGraph *>* get_graphs_list();
             void remove_graphs_from_plot();
             void re_scale_graph();
-            void add_data_to_graph(QList<int> val, QList<int> *prev_vals, double time, bool val_changed);
-            void add_data_to_graph_rltm(QList<int> val, QList<int> *prev_vals, double time, bool val_changed);
+            void add_data_to_graph(QList<int> val, QList<int> *prev_vals, double time, bool val_changed, QList<bool> *drw_lst = nullptr);
+            void add_data_to_graph_rltm(QList<int> val, QList<int> *prev_vals, double time, bool val_changed, QList<bool> *drw_lst = nullptr);
             void remove_data_from_graph();
             void add_pin_names(QString pin_name);
             QList<QString>* get_pin_names();
@@ -33,6 +35,7 @@
             void remove_saved_vals_list();
             void add_data_to_saved_vals_list(QList<int> val, QList<int> *prev_vals, double time, bool val_changed);
             void remove_data_from_saved_vals_list();
+            void remove_all_data();
 
             bool plot_re_scale = false;
             bool debugging = false;
@@ -44,6 +47,7 @@
             void set_ui_text();
             void load_waveform();
             void save_waveform();
+            void draw_data_on_graph(QList<int> val, QList<int> *prev_vals, double time, bool val_changed, int i);
             void select_displayable_pins();
             void limit_axis_range(QCPAxis *axis, const QCPRange &new_range, const QCPRange &limit_range);
             bool mouse_inside_object(double x_coord, double y_coord, bool graph_drawing_rect);
@@ -69,6 +73,7 @@
             bool drag_graph = false;
             bool language_changed = false;
             bool ui_initialized = false;
+            bool add_names = true;
             bool standalone;
 
             int coef;
@@ -115,8 +120,11 @@
             ~Dialog_Select_Displayable_Pins() override;
 
             QStringList get_displayable_pins();
+            QStringList get_available_pins();
 
         private:
+            void replace_selected_pin(QStringListModel *recv_model, QStringListModel *sndr_model, QListView *recv_view, QListView *sndr_view, QPushButton *sndr_button);
+
             Ui::Dialog_Select_Displayable_Pins *ui;
             QStringListModel *available_pins_model;
             QStringListModel *displayable_pins_model;
