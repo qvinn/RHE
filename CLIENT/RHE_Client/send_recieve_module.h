@@ -53,6 +53,8 @@
     #define S_SERVER_CANT_READ_DSQ_FILE 49	// DSQ_FILE -  Debug sequence file
     #define CLIENT_WANT_SET_PINSTATE 50
     #define CLIENT_WANT_FLASH_ALL_SYNC 51
+    #define S_SERVER_END_DSQ 52
+    #define S_SERVER_SUCCESS_FLASH_FPGA 53
 
     class Send_Recieve_Module : public QObject {
         Q_OBJECT
