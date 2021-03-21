@@ -49,6 +49,9 @@
     #define RUN_DSQ_FILE 45                 // DSQ_FILE -  Debug sequence file
     #define STOP_DSQ_FILE 46                // DSQ_FILE -  Debug sequence file
     #define S_SERVER_SENDING_DSQ_INFO 47	// DSQ_FILE -  Debug sequence file
+    #define CLIENT_WANT_START_SYNC_DEBUG_DSQ 48 // DSQ_FILE -  Debug sequence file
+    #define S_SERVER_CANT_READ_DSQ_FILE 49	// DSQ_FILE -  Debug sequence file
+    #define CLIENT_WANT_SET_PINSTATE 50
 
     class Send_Recieve_Module : public QObject {
         Q_OBJECT

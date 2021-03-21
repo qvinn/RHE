@@ -174,6 +174,11 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 recive_dbg_info(tmp_packet->data);
                 break;
             }
+
+            case S_SERVER_CANT_READ_DSQ_FILE: {
+                qDebug() << "_________________________________S_SERVER_CANT_READ_DSQ_FILE!";
+                break;
+            }
             default: {
                 qDebug() << "_________________________________UNKNOWN PACKET";
                 break;
