@@ -41,6 +41,7 @@
 #define CLIENT_WANT_START_SYNC_DEBUG_DSQ 48 // DSQ_FILE -  Debug sequence file
 #define S_SERVER_CANT_READ_DSQ_FILE 49	// DSQ_FILE -  Debug sequence file
 #define CLIENT_WANT_SET_PINSTATE 50
+#define CLIENT_WANT_FLASH_ALL_SYNC 51
 
 #define DATA_EXIST 1
 #define DATA_NOT_EXIST 0
@@ -207,14 +208,16 @@ void client_conn_v_1::wait_analize_recv_data()
 				printf("_________________________________Slave server FINISH recive file\n");
 				break;	
 			}
-			
+
+#ifdef HW_EN
 			case FLASH_FPGA:
 			{
 				printf("_________________________________FLASH FPGA\n");
 				system("openocd -f OpenOCD_run.cfg");				
 				break;	
 			}
-			
+#endif
+
 #ifdef HW_EN
 			case CLIENT_WANT_START_DEBUG:
 			{
@@ -402,6 +405,34 @@ void client_conn_v_1::wait_analize_recv_data()
 				std::thread pin_state_thread(&Debug::set_pinStates,gdb,gdb->buf2set_state_Packet(tmp_packet->data));
 				pin_state_thread.detach();
 				printf("_________________________________\n");
+				break;	
+			}
+#endif
+
+
+#ifdef HW_EN
+			case CLIENT_WANT_FLASH_ALL_SYNC:
+			{
+				printf("_________________________________FLASH FPGA\n");
+				system("openocd -f OpenOCD_run.cfg");
+				// Сразу запускаем сканирование пинов
+				if(gdb->debug_is_run() == 1)
+				{
+					printf("_________________________________DEBUG ALREADY RUN!\n");
+					break;
+				}
+				std::thread gdb_thread(&Debug::start_debug_process,gdb);
+				gdb_thread.detach();
+				printf("_________________________________START DEBUG\n");
+				// Сразу запускаем генерацию уровней из файла
+				if(gdb->dsq_is_run() == 1)
+				{
+					printf("_________________________________DSQ ALREADY RUN!\n");
+					break;
+				}
+				std::thread gdb_dsq_thread(&Debug::public_run_dfile,gdb);
+				gdb_dsq_thread.detach();
+				printf("_________________________________Client RUN DSQ_file\n");
 				break;	
 			}
 #endif
