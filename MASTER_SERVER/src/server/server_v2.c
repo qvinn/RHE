@@ -69,6 +69,9 @@
 #define RUN_DSQ_FILE 45					// DSQ_FILE -  Debug sequence file
 #define STOP_DSQ_FILE 46                // DSQ_FILE -  Debug sequence file
 #define S_SERVER_SENDING_DSQ_INFO 47	// DSQ_FILE -  Debug sequence file
+#define CLIENT_WANT_START_SYNC_DEBUG_DSQ 48 // DSQ_FILE -  Debug sequence file
+#define S_SERVER_CANT_READ_DSQ_FILE 49	// DSQ_FILE -  Debug sequence file
+#define CLIENT_WANT_SET_PINSTATE 50
 
 
 // Карта code_op - КОНЕЦ
@@ -788,6 +791,42 @@ void recive_new_data(char *buf, int sock)
 			{				
 				send_U_Packet(finded_client, S_SERVER_SENDING_DSQ_INFO, tmp_packet->data);
 				printf("\t|___Slave_server with id %i SENDING dsq info to client with id %i\n", sock, finded_client);
+			}			
+			break;	
+		}
+		
+		case CLIENT_WANT_START_SYNC_DEBUG_DSQ:
+		{
+			// Перенаправляем запрос от клиента к slave-серверу
+			int finded_s_server = find_pair_for(sock);
+			if(finded_s_server != ERROR)
+			{				
+				send_U_Packet(finded_s_server, CLIENT_WANT_START_SYNC_DEBUG_DSQ, NULL);
+				printf("\t|___Client with id %i START sync DEBUG+DSQ on slave-server with id %i\n", sock, finded_s_server);
+			}			
+			break;	
+		}
+			
+		case S_SERVER_CANT_READ_DSQ_FILE:
+		{
+			// Перенаправляем запрос от slave-серверу к клиенту
+			int finded_client = find_pair_for(sock);
+			if(finded_client != ERROR)
+			{				
+				send_U_Packet(finded_client, S_SERVER_CANT_READ_DSQ_FILE, NULL);
+				printf("\t|___Slave_server with id %i CANT READ DSQ file from client with id %i\n", sock, finded_client);
+			}			
+			break;	
+		}
+				
+		case CLIENT_WANT_SET_PINSTATE:
+		{
+			// Перенаправляем запрос от клиента к slave-серверу
+			int finded_s_server = find_pair_for(sock);
+			if(finded_s_server != ERROR)
+			{				
+				send_U_Packet(finded_s_server, CLIENT_WANT_SET_PINSTATE, tmp_packet->data);
+				printf("\t|___Client with id %i SET PINSTATE on slave-server with id %i\n", sock, finded_s_server);
 			}			
 			break;	
 		}
