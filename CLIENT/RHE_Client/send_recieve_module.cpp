@@ -126,7 +126,7 @@ void Send_Recieve_Module::wait_analize_recv_data() {
 //                QByteArray debug_data(tmp_packet->data, sizeof(debug_log_Packet));
                 emit accept_debug_data_signal(QByteArray(tmp_packet->data, sizeof(debug_log_Packet)));
 //                recive_dbg_info(tmp_packet->data);
-                qDebug() << "_________________________________Slave server sending DEBUG INFO";
+//                qDebug() << "_________________________________Slave server sending DEBUG INFO";
                 break;
             }
             case DEBUG_PROCESS_TIMEOUT: {

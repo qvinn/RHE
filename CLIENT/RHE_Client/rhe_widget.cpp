@@ -155,25 +155,6 @@ void RHE_Widget::on_cmbBx_chs_brd_currentIndexChanged(int index) {
     }
 }
 
-void RHE_Widget::on_hrzntlSldr_cnt_dbg_pins_valueChanged(int value) {
-    if(ui_initialized) {
-        ui->lcdNmbr_cnt_dbg_pins->display(value);
-        gen_widg->save_setting("settings/DEBUG_PINS_NUMBER", value);
-        wvfrm_vwr->plot_re_scale = true;
-        prev_vals->clear();
-        for(int i = 0; i < wvfrm_vwr->get_all_pins_count(); i++) {
-            prev_vals->append(0);
-            prev_vals->append(0);
-        }
-        wvfrm_vwr->remove_graphs_from_plot();
-        wvfrm_vwr->graph_count = value;
-        wvfrm_vwr->re_scale_graph();
-        wvfrm_vwr->add_graphs_to_plot();
-        wvfrm_vwr->plot_re_scale = false;
-        wvfrm_vwr->re_scale_graph();
-    }
-}
-
 void RHE_Widget::on_spnBx_dbg_tm_valueChanged(int value) {
     if(ui_initialized) {
         gen_widg->save_setting("settings/DEBUG_DISCRETENESS_TIME", value);
@@ -272,7 +253,6 @@ void RHE_Widget::initialize_ui() {
     pshBttn_chk_prj_stat_set_enabled(false);
     ui->pshBttn_snd_sgnls_sqnc->setEnabled(false);
     pshBttn_strt_sgnls_sqnc_set_enabled(false);
-    ui->hrzntlSldr_cnt_dbg_pins->setValue(abs(gen_widg->get_setting("settings/DEBUG_PINS_NUMBER").toInt() - 1));
     if(gen_widg->get_setting("settings/MANUALY_LOAD_FIRMWARE").toBool() && gen_widg->get_setting("settings/ENABLE_FILE_CHEKING").toBool()) {
         pshBttn_ld_frmwr_set_enabled(false);
     }
@@ -292,7 +272,7 @@ void RHE_Widget::post_initialize_ui() {
     set_ui_text();
     prev_board_index = gen_widg->get_setting("settings/CURRENT_BOARD").toInt();
     ui->cmbBx_chs_brd->setCurrentIndex(prev_board_index);
-    ui->hrzntlSldr_cnt_dbg_pins->setValue(gen_widg->get_setting("settings/DEBUG_PINS_NUMBER").toInt());
+    change_cnt_of_dbg_pins(16);
     ui->spnBx_dbg_tm->setValue(gen_widg->get_setting("settings/DEBUG_DISCRETENESS_TIME").toInt());
     ui->cmbBx_dbg_tm_tp->setCurrentIndex(gen_widg->get_setting("settings/DEBUG_DISCRETENESS_TIME_TYPE").toInt());
 }
@@ -321,6 +301,21 @@ void RHE_Widget::set_fname_lname(QString str) {
     set_ui_text();
 }
 
+void RHE_Widget::change_cnt_of_dbg_pins(int value) {
+    wvfrm_vwr->plot_re_scale = true;
+    prev_vals->clear();
+    for(int i = 0; i < wvfrm_vwr->get_all_pins_count(); i++) {
+        prev_vals->append(0);
+        prev_vals->append(0);
+    }
+    wvfrm_vwr->remove_graphs_from_plot();
+    wvfrm_vwr->graph_count = value;
+    wvfrm_vwr->re_scale_graph();
+    wvfrm_vwr->add_graphs_to_plot();
+    wvfrm_vwr->plot_re_scale = false;
+    wvfrm_vwr->re_scale_graph();
+}
+
 void RHE_Widget::change_board_pixmap() {
     if(pixmp_names->at(ui->cmbBx_chs_brd->currentIndex()).count() == 0) {
         ui->label->clear();
@@ -336,9 +331,9 @@ void RHE_Widget::change_board_pixmap() {
 
 void RHE_Widget::set_button_state_debug(bool flg) {
     wvfrm_vwr->debugging = flg;
+    wvfrm_vwr->pshBttn_slct_dsplbl_pins_set_enabled(!flg);
     wvfrm_vwr->pshBttn_open_save_wvfrm_set_enabled(!flg);
     ui->pushButton_strt_drw->setEnabled(!flg);
-    ui->hrzntlSldr_cnt_dbg_pins->setEnabled(!flg);
     ui->spnBx_dbg_tm->setEnabled(!flg);
     ui->cmbBx_dbg_tm_tp->setEnabled(!flg);
     pshBttn_chk_prj_stat_set_enabled(!flg);
@@ -650,7 +645,12 @@ void RHE_Widget::slot_accept_debug_data(QByteArray debug_data) {
     Send_Recieve_Module::debug_log_Packet *tmp_packet = reinterpret_cast<Send_Recieve_Module::debug_log_Packet *>(debug_data.data());
     if(new_debug) {
         new_debug = false;
-        wvfrm_vwr->remove_data_from_graph();
+        wvfrm_vwr->remove_all_data();
+        prev_vals->clear();
+        for(int i = 0; i < wvfrm_vwr->get_all_pins_count(); i++) {
+            prev_vals->append(0);
+            prev_vals->append(0);
+        }
     }
     QList<int> val;
     val.clear();
@@ -668,26 +668,69 @@ void RHE_Widget::slot_accept_debug_data(QByteArray debug_data) {
     }
     bool val_changed = false;
     double dbg_time = (static_cast<double>(tmp_packet->time) / pow(1000.0, tmp_packet->time_mode));
+    QList<bool> *draw_lst = new QList<bool>();
+    draw_lst->clear();
     for(int i = 0; i < wvfrm_vwr->get_all_pins_count(); i++) {
         val.append(0);
+        draw_lst->append(false);
         if(nmd_pin_pos.count() == 0) {
             if(i >= tmp_packet->pin_count) {
                 val.append(prev_vals->at((2 * i) + 1));           //0
+                draw_lst->append(false);
+//                if(wvfrm_vwr->get_graphs_list()->at((i * 2) + 1)->data()->size() != 0) {
+//                    int last = (wvfrm_vwr->get_graphs_list()->at((i * 2) + 1)->data()->size() - 1);
+//                    double key_val = (wvfrm_vwr->get_graphs_list()->at((i * 2) + 1)->data()->at(last)->key);
+//                    if(dbg_time < key_val) {
+//                        for(int l = last; l > -1; l--) {
+//                            double key = (wvfrm_vwr->get_graphs_list()->at((i * 2) + 1)->data()->at(l)->key);
+//                            if(dbg_time >= key) {
+//                                val.append((wvfrm_vwr->get_graphs_list()->at((i * 2) + 1)->data()->at(l)->value) - ((i * 2) + 1));
+//                                break;
+//                            }
+//                        }
+//                    } else {
+//                        val.append(prev_vals->at((2 * i) + 1));         //0
+//                    }
+//                } else {
+//                    val.append(prev_vals->at((2 * i) + 1));         //0
+//                }
             } else {
                 val.append(tmp_packet->pins[i].state);
+                draw_lst->replace(draw_lst->count() - 1, true);
+                draw_lst->append(true);
             }
         } else {
             int tmp = 0;
             for(int k = 0; k < nmd_pin_pos.count(); k++) {
                 if(i == nmd_pin_pos.at(k).x()) {
                     val.append(tmp_packet->pins[nmd_pin_pos.at(k).y()].state);
+                    draw_lst->replace(draw_lst->count() - 1, true);
+                    draw_lst->append(true);
                     break;
                 } else {
                     tmp++;
                 }
             }
             if(tmp == nmd_pin_pos.count()) {
-                val.append(prev_vals->at((2 * i) + 1));         //0
+                //val.append(prev_vals->at((2 * i) + 1));         //0
+//                if(wvfrm_vwr->get_graphs_list()->at((i * 2) + 1)->data()->size() != 0) {
+//                    int last = (wvfrm_vwr->get_graphs_list()->at((i * 2) + 1)->data()->size() - 1);
+//                    double key_val = static_cast<double>(wvfrm_vwr->get_graphs_list()->at((i * 2) + 1)->data()->at(last)->key);
+//                    if(dbg_time < key_val) {
+//                        for(int l = last; l > -1; l--) {
+//                            double key = (wvfrm_vwr->get_graphs_list()->at((i * 2) + 1)->data()->at(l)->key);
+//                            if(dbg_time >= key) {
+//                                val.append((wvfrm_vwr->get_graphs_list()->at((i * 2) + 1)->data()->at(l)->value) - ((i * 2) + 1));
+//                                break;
+//                            }
+//                        }
+//                    } else {
+//                        val.append(prev_vals->at((2 * i) + 1));         //0
+//                    }
+//                } else {
+                    val.append(prev_vals->at((2 * i) + 1));         //0
+//                }
+                draw_lst->append(false);
             }
         }
         if(prev_vals->at(val.count() - 1) != val.at(val.count() - 1)) {
@@ -695,7 +738,9 @@ void RHE_Widget::slot_accept_debug_data(QByteArray debug_data) {
         }
     }
     wvfrm_vwr->add_data_to_saved_vals_list(val, prev_vals, dbg_time, val_changed);
-    wvfrm_vwr->add_data_to_graph_rltm(val, prev_vals, dbg_time, val_changed);
+    wvfrm_vwr->add_data_to_graph_rltm(val, prev_vals, dbg_time, val_changed, draw_lst);
+    draw_lst->clear();
+    delete draw_lst;
 }
 
 void RHE_Widget::slot_accept_input_data_table(QByteArray input_data_table) {
@@ -706,8 +751,8 @@ void RHE_Widget::slot_accept_input_data_table(QByteArray input_data_table) {
     for(int i = 0; i < pin_count; i++) {
         wvfrm_vwr->add_pin_names(QByteArray((input_data_table.data() + ((hop * i) + 1)), 5));
     }
-    ui->hrzntlSldr_cnt_dbg_pins->setValue(pin_count);
-    wvfrm_vwr->remove_data_from_saved_vals_list();
+    change_cnt_of_dbg_pins(pin_count);
+    wvfrm_vwr->remove_all_data();
     wvfrm_vwr->remove_saved_vals_list();
     wvfrm_vwr->add_saved_vals_list(pin_count);
 }
@@ -779,8 +824,7 @@ void RHE_Widget::slot_accept_output_data_table(QByteArray output_data_table) {
         inpt_stts->append(lcd_val);
         h_layout->addWidget(lcd_val);
     }
-    ui->hrzntlSldr_cnt_dbg_pins->setValue(ui->hrzntlSldr_cnt_dbg_pins->value() + pin_count);
-    ui->hrzntlSldr_cnt_dbg_pins->setMaximum(ui->hrzntlSldr_cnt_dbg_pins->value());
+    change_cnt_of_dbg_pins(wvfrm_vwr->graph_count + pin_count);
 }
 
 void RHE_Widget::slot_as_window(bool as_window) {

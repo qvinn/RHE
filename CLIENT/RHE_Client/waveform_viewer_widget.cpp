@@ -61,13 +61,21 @@ void Waveform_Viewer_Widget::closeEvent(QCloseEvent *) {
 
 void Waveform_Viewer_Widget::on_chckBx_attch_crsr_stateChanged(int state) {
     if(ui_initialized) {
-        gen_widg->save_setting("settings/WVFRM_VWR_ATTCH_CRSR", state);
+        if(standalone) {
+            gen_widg->save_setting("settings/WVFRM_VWR_ATTCH_CRSR_STANDALONE", state);
+        } else {
+            gen_widg->save_setting("settings/WVFRM_VWR_ATTCH_CRSR", state);
+        }
     }
 }
 
 void Waveform_Viewer_Widget::on_spnBx_wvfrm_vwr_dscrtnss_tm_valueChanged(int value) {
     if(ui_initialized) {
-        gen_widg->save_setting("settings/WVFRM_VWR_DISCRETENESS_TIME", value);
+        if(standalone) {
+            gen_widg->save_setting("settings/WVFRM_VWR_DISCRETENESS_TIME_STANDALONE", value);
+        } else {
+            gen_widg->save_setting("settings/WVFRM_VWR_DISCRETENESS_TIME", value);
+        }
         time_coef = pow(1000.0, static_cast<double>(ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->currentIndex()));
         x_tckr_step = static_cast<double>(value) / time_coef;
         (*dyn_tckr)->setTickStep(x_tckr_step);
@@ -79,7 +87,11 @@ void Waveform_Viewer_Widget::on_spnBx_wvfrm_vwr_dscrtnss_tm_valueChanged(int val
 
 void Waveform_Viewer_Widget::on_cmbBx_wvfrm_vwr_dscrtnss_tm_tp_currentIndexChanged(int index) {
     if(ui_initialized && language_changed) {
-        gen_widg->save_setting("settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE", index);
+        if(standalone) {
+            gen_widg->save_setting("settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE_STANDALONE", index);
+        } else {
+            gen_widg->save_setting("settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE", index);
+        }
         on_spnBx_wvfrm_vwr_dscrtnss_tm_valueChanged(ui->spnBx_wvfrm_vwr_dscrtnss_tm->value());
     }
 }
@@ -89,7 +101,7 @@ void Waveform_Viewer_Widget::on_pshBttn_fl_scl_clicked() {
 }
 
 void Waveform_Viewer_Widget::on_pshBttn_clr_clicked() {
-    remove_data_from_graph();
+    remove_all_data();
 }
 
 void Waveform_Viewer_Widget::on_pshBttn_slct_dsplbl_pins_clicked() {
@@ -113,6 +125,10 @@ void Waveform_Viewer_Widget::on_pshBttn_open_save_wvfrm_clicked() {
     } else {
         save_waveform();
     }
+}
+
+void Waveform_Viewer_Widget::pshBttn_slct_dsplbl_pins_set_enabled(bool flg) {
+    ui->pshBttn_slct_dsplbl_pins->setEnabled(flg);
 }
 
 void Waveform_Viewer_Widget::pshBttn_open_save_wvfrm_set_enabled(bool flg) {
@@ -164,12 +180,23 @@ void Waveform_Viewer_Widget::initialize_ui() {
 
 void Waveform_Viewer_Widget::post_initialize_ui() {
     set_ui_text();
-    ui->chckBx_attch_crsr->setCheckState(static_cast<Qt::CheckState>(abs(gen_widg->get_setting("settings/WVFRM_VWR_ATTCH_CRSR").toInt() - 2)));
-    ui->spnBx_wvfrm_vwr_dscrtnss_tm->setValue(gen_widg->get_setting("settings/WVFRM_VWR_DISCRETENESS_TIME").toInt());
-    ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->setCurrentIndex(abs(gen_widg->get_setting("settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE").toInt() - 1));
+    if(standalone) {
+        ui->chckBx_attch_crsr->setCheckState(static_cast<Qt::CheckState>(abs(gen_widg->get_setting("settings/WVFRM_VWR_ATTCH_CRSR_STANDALONE").toInt() - 2)));
+        ui->spnBx_wvfrm_vwr_dscrtnss_tm->setValue(gen_widg->get_setting("settings/WVFRM_VWR_DISCRETENESS_TIME_STANDALONE").toInt());
+        ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->setCurrentIndex(abs(gen_widg->get_setting("settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE_STANDALONE").toInt() - 1));
+    } else {
+        ui->chckBx_attch_crsr->setCheckState(static_cast<Qt::CheckState>(abs(gen_widg->get_setting("settings/WVFRM_VWR_ATTCH_CRSR").toInt() - 2)));
+        ui->spnBx_wvfrm_vwr_dscrtnss_tm->setValue(gen_widg->get_setting("settings/WVFRM_VWR_DISCRETENESS_TIME").toInt());
+        ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->setCurrentIndex(abs(gen_widg->get_setting("settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE").toInt() - 1));
+    }
     ui_initialized = true;
-    ui->chckBx_attch_crsr->setCheckState(static_cast<Qt::CheckState>(gen_widg->get_setting("settings/WVFRM_VWR_ATTCH_CRSR").toInt()));
-    ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->setCurrentIndex(gen_widg->get_setting("settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE").toInt());
+    if(standalone) {
+        ui->chckBx_attch_crsr->setCheckState(static_cast<Qt::CheckState>(gen_widg->get_setting("settings/WVFRM_VWR_ATTCH_CRSR_STANDALONE").toInt()));
+        ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->setCurrentIndex(gen_widg->get_setting("settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE_STANDALONE").toInt());
+    } else {
+        ui->chckBx_attch_crsr->setCheckState(static_cast<Qt::CheckState>(gen_widg->get_setting("settings/WVFRM_VWR_ATTCH_CRSR").toInt()));
+        ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->setCurrentIndex(gen_widg->get_setting("settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE").toInt());
+    }
 }
 
 void Waveform_Viewer_Widget::set_ui_text() {
@@ -205,6 +232,7 @@ void Waveform_Viewer_Widget::load_waveform() {
         str.replace("\n", "");
         QRegExp tag_exp("/");
         QStringList lst = str.split(tag_exp);
+        add_names = true;
         plot_re_scale = true;
         remove_data_from_saved_vals_list();
         remove_saved_vals_list();
@@ -236,7 +264,6 @@ void Waveform_Viewer_Widget::load_waveform() {
                 for(int i = 0; i < lst_dat.count(); i++) {
                     if(str_dat.contains("time")) {
                         if(i != 0) {
-//                            pin_names->append(lst_dat.at(i));
                             add_pin_names(lst_dat.at(i));
                         }
                     } else {
@@ -312,7 +339,10 @@ void Waveform_Viewer_Widget::add_graphs_to_plot() {
         graph_list->at(i * 2 + 1)->setPen(QPen(QColor(0, 255, 0, 255), 1));
     }
     change_pin_names();
-    on_pshBttn_clr_clicked();
+}
+
+QList<QCPGraph *>* Waveform_Viewer_Widget::get_graphs_list() {
+    return graph_list;
 }
 
 void Waveform_Viewer_Widget::remove_graphs_from_plot() {
@@ -336,24 +366,40 @@ void Waveform_Viewer_Widget::re_scale_graph() {
     ui->diagram->setProperty("ymax", ui->diagram->yAxis->range().upper);
 }
 
-void Waveform_Viewer_Widget::add_data_to_graph(QList<int> val, QList<int> *prev_vals, double time, bool val_changed) {
-    for(int i = 0; i < graph_list->count(); i++) {
-        int shft_val = abs((i % 2) - 1);
-        if(val_changed) {
-            graph_list->at(i)->addData(time, (shft_val + i + prev_vals->at(i)));
+void Waveform_Viewer_Widget::add_data_to_graph(QList<int> val, QList<int> *prev_vals, double time, bool val_changed, QList<bool> *drw_lst) {
+    for(int i = 0; i < /*graph_list->count()*/pin_names_board->count() * 2; i++) {
+//        if(i < graph_list->count()) {
+//            if(drw_lst == nullptr) {
+//                draw_data_on_graph(val, prev_vals, time, val_changed, i);
+//            } else if(drw_lst->at(i)) {
+//                draw_data_on_graph(val, prev_vals, time, val_changed, i);
+//            }
+//        }
+        if(i < graph_list->count()) {
+            draw_data_on_graph(val, prev_vals, time, val_changed, i);
         }
-        if((val.at(i) == 1) && (i != 0)) {
-            graph_list->at(i)->setBrush(QBrush(QColor(0, 255, 0, 60)));
-            graph_list->at(i)->setChannelFillGraph(graph_list->at(i - 1));
+        if(i < prev_vals->count()) {
+            (*prev_vals).replace(i, val.at(i));
         }
-        graph_list->at(i)->addData(time, (shft_val + i + val.at(i)));
-        prev_vals->replace(i, val.at(i));
     }
 }
 
-void Waveform_Viewer_Widget::add_data_to_graph_rltm(QList<int> val, QList<int> *prev_vals, double time, bool val_changed) {
-    add_data_to_graph(val, prev_vals, time, val_changed);
+void Waveform_Viewer_Widget::add_data_to_graph_rltm(QList<int> val, QList<int> *prev_vals, double time, bool val_changed, QList<bool> *drw_lst) {
+    add_data_to_graph(val, prev_vals, time, val_changed, drw_lst);
     ui->diagram->replot();
+}
+
+void Waveform_Viewer_Widget::draw_data_on_graph(QList<int> val, QList<int> *prev_vals, double time, bool val_changed, int i) {
+    int shft_val = abs((i % 2) - 1);
+    if(val_changed) {
+        graph_list->at(i)->addData(time, (shft_val + i + prev_vals->at(i)));
+    }
+    if((val.at(i) == 1) && (i != 0)) {
+        graph_list->at(i)->setBrush(QBrush(QColor(0, 255, 0, 60)));
+        graph_list->at(i)->setChannelFillGraph(graph_list->at(i - 1));
+    }
+    graph_list->at(i)->addData(time, (shft_val + i + val.at(i)));
+//    (*prev_vals).replace(i, val.at(i));
 }
 
 void Waveform_Viewer_Widget::remove_data_from_graph() {
@@ -370,7 +416,7 @@ void Waveform_Viewer_Widget::add_pin_names(QString pin_name) {
 }
 
 QList<QString>* Waveform_Viewer_Widget::get_pin_names() {
-    return pin_names;
+    return pin_names_board;
 }
 
 int Waveform_Viewer_Widget::get_all_pins_count() {
@@ -393,7 +439,7 @@ void Waveform_Viewer_Widget::change_pin_names() {
             tmp.append(QString::number(0));
         }
         if((tmp_lst.count() == 0) || (i >= tmp_lst.count())) {
-            if((pin_names_board->count() == 0) || (i >= pin_names_board->count())) {
+            if((pin_names_board->count() == 0) || (i >= pin_names_board->count()) || !add_names) {
                 pin_names->append(tmp.append(QString::number(i + 1)));
             } else {
                 pin_names->append(pin_names_board->at(i));
@@ -441,50 +487,141 @@ void Waveform_Viewer_Widget::remove_data_from_saved_vals_list() {
     svd_dbg_time->clear();
 }
 
+void Waveform_Viewer_Widget::remove_all_data() {
+    remove_data_from_graph();
+    remove_data_from_saved_vals_list();
+    svd_dbg_time->clear();
+    add_names = true;
+    if(standalone) {
+        plot_re_scale = true;
+        remove_saved_vals_list();
+        remove_pin_names();
+        remove_graphs_from_plot();
+        graph_count = 16;
+        re_scale_graph();
+        add_graphs_to_plot();
+        *pin_names_board = *pin_names;
+        plot_re_scale = false;
+    }
+    re_scale_graph();
+}
+
 void Waveform_Viewer_Widget::select_displayable_pins() {
     QStringList avlbl_pins, dsplbl_pins;
     avlbl_pins.append(*pin_names_board);
-    bool flag = true;
-    while(flag) {
-        for(int k = 0; k < pin_names->count(); k++) {
-            int cnt = 0;
-            bool skp = false;
-            for(int i = 0; i < avlbl_pins.count(); i++) {
-                if(pin_names->at(k).compare(avlbl_pins.at(i), Qt::CaseInsensitive)) {
-                    avlbl_pins.removeAt(i);
-                    skp = true;
+    if(add_names) {
+        bool flag = true;
+        while(flag) {
+            for(int k = 0; k < pin_names->count(); k++) {
+                int cnt = 0;
+                bool skp = false;
+                for(int i = 0; i < avlbl_pins.count(); i++) {
+                    if(pin_names->at(k).compare(avlbl_pins.at(i), Qt::CaseInsensitive) == 0) {
+                        avlbl_pins.removeAt(i);
+                        skp = true;
+                        break;
+                    } else {
+                        cnt++;
+                    }
+                }
+                if(skp) {
                     break;
-                } else {
-                    cnt++;
+                } else if(((pin_names->count() + avlbl_pins.count()) == pin_names_board->count()) || (avlbl_pins.count() == 0)) {
+                    flag = false;
+                    break;
                 }
             }
-            if(skp) {
-                break;
-            } else if((cnt == pin_names->count()) || (avlbl_pins.count() == 0)) {
-                flag = false;
-                break;
-            }
         }
+        dsplbl_pins.append(*pin_names);
     }
-    dsplbl_pins.append(*pin_names);
     Dialog_Select_Displayable_Pins pins_select_dialog(avlbl_pins, dsplbl_pins, nullptr);
     pins_select_dialog.setWindowFlag(Qt::WindowStaysOnTopHint);
     int dlgCase = pins_select_dialog.exec();
-    if(dlgCase == 1) {  //ok
-
+    if(dlgCase == 1) {
+        QStringList dsplbl_pins_lst = pins_select_dialog.get_displayable_pins();
+        if((dsplbl_pins_lst.count() == 0) && (svd_vals->count() == 0)) {
+            return;
+        }
+        QList<QPoint> graph_pos;
+        graph_pos.clear();
+        for(int i = 0; i < dsplbl_pins_lst.count(); i++) {
+            for(int k = 0; k < pin_names_board->count(); k++) {
+                if(dsplbl_pins_lst.at(i).compare(pin_names_board->at(k), Qt::CaseInsensitive) == 0) {
+                    graph_pos.append(QPoint(i, k));
+                }
+            }
+        }
+        QStringList avlbl_pins_lst = pins_select_dialog.get_available_pins();
+        for(int i = 0; i < avlbl_pins_lst.count(); i++) {
+            for(int k = 0; k < pin_names_board->count(); k++) {
+                if(avlbl_pins_lst.at(i).compare(pin_names_board->at(k), Qt::CaseInsensitive) == 0) {
+                    graph_pos.append(QPoint(i + dsplbl_pins_lst.count(), k));
+                }
+            }
+        }
+        QList<QList<int> *> *new_svd_vals = new QList<QList<int> *>();
+        QList<QString> *new_pin_names_board = new QList<QString>();
+        new_svd_vals->clear();
+        new_pin_names_board->clear();
+        for(int i = 0; i < graph_pos.count(); i++) {
+            if(svd_vals->count() != 0) {
+                new_svd_vals->append(svd_vals->at(graph_pos.at(i).y()));
+            }
+            new_pin_names_board->append(pin_names_board->at(graph_pos.at(i).y()));
+        }
+        *svd_vals = *new_svd_vals;
+        *pin_names_board = *new_pin_names_board;
+        new_svd_vals->clear();
+        new_pin_names_board->clear();
+        delete new_svd_vals;
+        delete new_pin_names_board;
+        remove_data_from_graph();
+        plot_re_scale = true;
+        remove_graphs_from_plot();
+        if(dsplbl_pins_lst.count() == 0) {
+            graph_count = pin_names_board->count();
+        } else {
+            graph_count = dsplbl_pins_lst.count();
+        }
+        re_scale_graph();
+        *pin_names = dsplbl_pins_lst;
+        add_names = static_cast<bool>(pin_names->count());
+        add_graphs_to_plot();
+        plot_re_scale = false;
         QList<int> prev_vals;
         prev_vals.clear();
         for(int i = 0; i < graph_list->count(); i++) {
             prev_vals.append(0);
         }
-
-        QStringList slct_map_lst = pins_select_dialog.get_displayable_pins();
-        QStringList tmp = slct_map_lst;
-
-//        for(int )
-
-        qDebug()<<"Slot Select Pins finished.";
-
+        QList<QList<int>> tmp_vals_frm_svd;
+        if(svd_vals->count() != 0) {
+            for(int i = 0; i < svd_vals->at(0)->count(); i++) {
+                QList<int> new_lst;
+                new_lst.clear();
+                for(int k = 0; k < svd_vals->count(); k++) {
+                    if(k < dsplbl_pins_lst.count()) {
+                        new_lst.append(0);
+                        new_lst.append(svd_vals->at(k)->at(i));
+                    }
+                }
+                if(new_lst.count() != 0) {
+                    tmp_vals_frm_svd.append(new_lst);
+                }
+            }
+        }
+        if(tmp_vals_frm_svd.count() != 0) {
+            for(int i = 0; i < svd_dbg_time->count(); i++) {
+                bool val_changed = false;
+                for(int k = 0; k < tmp_vals_frm_svd.at(i).count(); k++) {
+                    if(tmp_vals_frm_svd.at(i).at(k) != prev_vals.at(k)) {
+                        val_changed = true;
+                        break;
+                    }
+                }
+                add_data_to_graph(tmp_vals_frm_svd.at(i), &prev_vals, svd_dbg_time->at(i), val_changed);
+            }
+        }
+        ui->diagram->replot();
     }
 }
 
@@ -551,22 +688,24 @@ void Waveform_Viewer_Widget::slot_mouse_move(QMouseEvent *event) {
                 if(int_cur_y != coef) {
                     QList<int> prev_vals;
                     prev_vals.clear();
-                    for(int i = 0; i < graph_list->count(); i++) {
-                        prev_vals.append(0);
-                    }
-                    svd_vals->swap(((coef - 1) / 2), ((int_cur_y - 1) / 2));
                     QList<QList<int>> tmp_vals_frm_svd;
-                    for(int i = 0; i < svd_vals->at(0)->count(); i++) {
-                        QList<int> new_lst;
-                        new_lst.clear();
-                        for(int k = 0; k < svd_vals->count() * 2; k++) {
-                            if(k % 2 == 0) {
+                    if((svd_vals->count() != 0) && add_names) {
+                        svd_vals->swap(((coef - 1) / 2), ((int_cur_y - 1) / 2));
+                        for(int i = 0; i < svd_vals->at(0)->count(); i++) {
+                            QList<int> new_lst;
+                            new_lst.clear();
+                            for(int k = 0; k < svd_vals->count(); k++) {
                                 new_lst.append(0);
-                            } else {
-                                new_lst.append(svd_vals->at((k - 1) / 2)->at(i));
+                                new_lst.append(svd_vals->at(k)->at(i));
+                                if(tmp_vals_frm_svd.count() == 0) {
+                                    prev_vals.append(0);
+                                    prev_vals.append(0);
+                                }
+                            }
+                            if(new_lst.count() != 0) {
+                                tmp_vals_frm_svd.append(new_lst);
                             }
                         }
-                        tmp_vals_frm_svd.append(new_lst);
                     }
                     QList<QString> old_ticks = (*textTicker)->ticks().values();
                     remove_data_from_graph();
@@ -583,11 +722,25 @@ void Waveform_Viewer_Widget::slot_mouse_move(QMouseEvent *event) {
                         }
                     }
                     change_pin_names();
-                    for(int i = 0; i < pin_names->count(); i++) {
-                        pin_names_board->replace(i, pin_names->at(i));
+                    if(pin_names_board->count() == 0) {
+                        *pin_names_board = *pin_names;
                     }
-                    for(int i = 0; i < svd_dbg_time->count(); i++) {
-                        add_data_to_graph(tmp_vals_frm_svd.at(i), &prev_vals, svd_dbg_time->at(i), false);
+                    if(add_names) {
+                        for(int i = 0; i < pin_names->count(); i++) {
+                            pin_names_board->replace(i, pin_names->at(i));
+                        }
+                    }
+                    if(tmp_vals_frm_svd.count() != 0) {
+                        for(int i = 0; i < svd_dbg_time->count(); i++) {
+                            bool val_changed = false;
+                            for(int k = 0; k < tmp_vals_frm_svd.at(i).count(); k++) {
+                                if(tmp_vals_frm_svd.at(i).at(k) != prev_vals.at(k)) {
+                                    val_changed = true;
+                                    break;
+                                }
+                            }
+                            add_data_to_graph(tmp_vals_frm_svd.at(i), &prev_vals, svd_dbg_time->at(i), val_changed);
+                        }
                     }
                     ui->diagram->replot();
                     coef = int_cur_y;
@@ -711,27 +864,22 @@ void Dialog_Select_Displayable_Pins::on_pushButton_Cancell_clicked() {
 }
 
 void Dialog_Select_Displayable_Pins::on_pushButton_Add_clicked() {
-    int row = displayable_pins_model->rowCount();
-    displayable_pins_model->insertRows(row,1);
-    displayable_pins_model->setData(displayable_pins_model->index(row), available_pins_model->data(available_pins_model->index(ui->listView_All->currentIndex().row())));
-    ui->listView_All->selectionModel()->clearSelection();
-    QStringList lst = available_pins_model->stringList();
-    lst.removeAt(ui->listView_All->currentIndex().row());
-    available_pins_model->setStringList(lst);
-    ui->listView_All->setModel(available_pins_model);
-    ui->listView_Sel->setFocus();
-    ui->listView_Sel->selectionModel()->select(displayable_pins_model->index(row), QItemSelectionModel::ClearAndSelect);
+    replace_selected_pin(displayable_pins_model, available_pins_model, ui->listView_Sel, ui->listView_All, ui->pushButton_Add);
 }
 
 void Dialog_Select_Displayable_Pins::on_pushButton_Del_clicked() {
-    QStringList lst = available_pins_model->stringList();
-    lst.append(displayable_pins_model->stringList().at(ui->listView_Sel->currentIndex().row()));
-    available_pins_model->setStringList(lst);
-    ui->listView_All->setModel(available_pins_model);
-    displayable_pins_model->removeRows(ui->listView_Sel->currentIndex().row(), 1);
-    ui->listView_Sel->selectionModel()->clearSelection();
-    if(displayable_pins_model->rowCount() == 0) {
-        ui->pushButton_Del->setEnabled(false);
+    replace_selected_pin(available_pins_model, displayable_pins_model, ui->listView_All, ui->listView_Sel, ui->pushButton_Del);
+}
+
+void Dialog_Select_Displayable_Pins::replace_selected_pin(QStringListModel *recv_model, QStringListModel *sndr_model, QListView *recv_view, QListView *sndr_view, QPushButton *sndr_button) {
+    QStringList lst = recv_model->stringList();
+    lst.append(sndr_model->stringList().at(sndr_view->currentIndex().row()));
+    recv_model->setStringList(lst);
+    recv_view->setModel(recv_model);
+    sndr_model->removeRows(sndr_view->currentIndex().row(), 1);
+    if(sndr_model->rowCount() == 0) {
+        sndr_view->selectionModel()->clearSelection();
+        sndr_button->setEnabled(false);
     }
 }
 
@@ -760,3 +908,8 @@ void Dialog_Select_Displayable_Pins::available_pins_selection_changed(const QIte
 QStringList Dialog_Select_Displayable_Pins::get_displayable_pins() {
     return displayable_pins_model->stringList();
 }
+
+QStringList Dialog_Select_Displayable_Pins::get_available_pins() {
+    return available_pins_model->stringList();
+}
+

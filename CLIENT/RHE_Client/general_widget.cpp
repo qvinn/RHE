@@ -56,12 +56,14 @@ void General_Widget::create_base_settings() {
     check_setting_exist("settings/SERVER_IP", "192.168.1.10");
     check_setting_exist("settings/SERVER_PORT", 3425);
     check_setting_exist("settings/VERSION", "1.0");
-    check_setting_exist("settings/DEBUG_PINS_NUMBER", "10");
     check_setting_exist("settings/DEBUG_DISCRETENESS_TIME", 1);
     check_setting_exist("settings/DEBUG_DISCRETENESS_TIME_TYPE", 0);
     check_setting_exist("settings/WVFRM_VWR_ATTCH_CRSR", 0);
     check_setting_exist("settings/WVFRM_VWR_DISCRETENESS_TIME", 1);
     check_setting_exist("settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE", 0);
+    check_setting_exist("settings/WVFRM_VWR_ATTCH_CRSR_STANDALONE", 0);
+    check_setting_exist("settings/WVFRM_VWR_DISCRETENESS_TIME_STANDALONE", 1);
+    check_setting_exist("settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE_STANDALONE", 0);
 }
 
 void General_Widget::check_setting_exist(QString type, QVariant val) {

@@ -38,6 +38,7 @@
             void pre_initialize_ui();
             void post_initialize_ui();
             void set_ui_text();
+            void change_cnt_of_dbg_pins(int value);
             void change_board_pixmap();
             void set_button_state_debug(bool flg);
             void check_is_proj_folder(bool folder_exist);
@@ -95,7 +96,6 @@
             void on_pshBttn_snd_sgnls_sqnc_clicked();
             void on_pshBttn_strt_sgnls_sqnc_clicked();
             void on_cmbBx_chs_brd_currentIndexChanged(int index);
-            void on_hrzntlSldr_cnt_dbg_pins_valueChanged(int value);
             void on_spnBx_dbg_tm_valueChanged(int value);
             void on_cmbBx_dbg_tm_tp_currentIndexChanged(int index);
             void on_pshBttn_set_path_to_proj_clicked();
