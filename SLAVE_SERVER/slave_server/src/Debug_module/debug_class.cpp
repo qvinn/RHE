@@ -22,6 +22,7 @@
 #define S_SERVER_SENDING_DSQ_INFO 47	// DSQ_FILE -  Debug sequence file
 #define S_SERVER_CANT_READ_DSQ_FILE 49	// DSQ_FILE -  Debug sequence file
 #define CLIENT_WANT_SET_PINSTATE 50
+#define S_SERVER_END_DSQ 52
 
 Debug::Debug()
 {
@@ -668,6 +669,8 @@ void Debug::run_dfile()
 				digitalWrite(debug_output_Wpi_pinNum.at(i), 0);
 			}
 			
+			send_U_Packet(sock, S_SERVER_END_DSQ , NULL);
+			
 			/*
 			* Проверим, что находится в буффере, который хранит сохраненные состояния 
 			* установленные в ручном режиме
@@ -712,6 +715,7 @@ void Debug::run_dfile()
 	}
 	
 	stop_d_seq();
+	send_U_Packet(sock, S_SERVER_END_DSQ , NULL);
 
 	/*
 	* Проверим, что находится в буффере, который хранит сохраненные состояния 

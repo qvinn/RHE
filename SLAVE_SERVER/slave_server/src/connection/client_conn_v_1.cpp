@@ -42,6 +42,8 @@
 #define S_SERVER_CANT_READ_DSQ_FILE 49	// DSQ_FILE -  Debug sequence file
 #define CLIENT_WANT_SET_PINSTATE 50
 #define CLIENT_WANT_FLASH_ALL_SYNC 51
+#define S_SERVER_END_DSQ 52
+#define S_SERVER_SUCCESS_FLASH_FPGA 53
 
 #define DATA_EXIST 1
 #define DATA_NOT_EXIST 0
@@ -213,7 +215,8 @@ void client_conn_v_1::wait_analize_recv_data()
 			case FLASH_FPGA:
 			{
 				printf("_________________________________FLASH FPGA\n");
-				system("openocd -f OpenOCD_run.cfg");				
+				system("openocd -f OpenOCD_run.cfg");
+				send_U_Packet(Socket, S_SERVER_SUCCESS_FLASH_FPGA, NULL);
 				break;	
 			}
 #endif
@@ -415,6 +418,8 @@ void client_conn_v_1::wait_analize_recv_data()
 			{
 				printf("_________________________________FLASH FPGA\n");
 				system("openocd -f OpenOCD_run.cfg");
+				send_U_Packet(Socket, S_SERVER_SUCCESS_FLASH_FPGA, NULL);
+				
 				// Сразу запускаем сканирование пинов
 				if(gdb->debug_is_run() == 1)
 				{
