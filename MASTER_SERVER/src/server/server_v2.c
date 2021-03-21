@@ -73,6 +73,8 @@
 #define S_SERVER_CANT_READ_DSQ_FILE 49	// DSQ_FILE -  Debug sequence file
 #define CLIENT_WANT_SET_PINSTATE 50
 #define CLIENT_WANT_FLASH_ALL_SYNC 51
+#define S_SERVER_END_DSQ 52
+#define S_SERVER_SUCCESS_FLASH_FPGA 53
 
 
 // Карта code_op - КОНЕЦ
@@ -840,6 +842,30 @@ void recive_new_data(char *buf, int sock)
 			{				
 				send_U_Packet(finded_s_server, CLIENT_WANT_FLASH_ALL_SYNC, NULL);
 				printf("\t|___Client with id %i FLASH_SYNC on slave-server with id %i\n", sock, finded_s_server);
+			}			
+			break;	
+		}
+				
+		case S_SERVER_END_DSQ:
+		{
+			// Перенаправляем запрос от slave-серверу к клиенту
+			int finded_client = find_pair_for(sock);
+			if(finded_client != ERROR)
+			{				
+				send_U_Packet(finded_client, S_SERVER_END_DSQ, NULL);
+				printf("\t|___Slave_server with id %i END RUN DSQ file from client with id %i\n", sock, finded_client);
+			}			
+			break;	
+		}
+		
+		case S_SERVER_SUCCESS_FLASH_FPGA:
+		{
+			// Перенаправляем запрос от slave-серверу к клиенту
+			int finded_client = find_pair_for(sock);
+			if(finded_client != ERROR)
+			{				
+				send_U_Packet(finded_client, S_SERVER_SUCCESS_FLASH_FPGA, NULL);
+				printf("\t|___Slave_server with id %i SUCCESS FLASH FPGA on client with id %i\n", sock, finded_client);
 			}			
 			break;	
 		}
