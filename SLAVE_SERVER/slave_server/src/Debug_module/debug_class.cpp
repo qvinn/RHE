@@ -20,6 +20,8 @@
 #define S_SERVER_SENDING_DEBUG_INFO 30
 #define DEBUG_PROCESS_TIMEOUT 34
 #define S_SERVER_SENDING_DSQ_INFO 47	// DSQ_FILE -  Debug sequence file
+#define S_SERVER_CANT_READ_DSQ_FILE 49	// DSQ_FILE -  Debug sequence file
+#define CLIENT_WANT_SET_PINSTATE 50
 
 Debug::Debug()
 {
@@ -122,8 +124,8 @@ void Debug::start_debug_process()
 	// Очистим записи
 	int curr_time_mux = time_mux;
 	std::vector<pinState> log;
-	// Установим начальное "текущее" время для первого прохода 1 условная единица
-	int curr_time = 0; // 1
+	// Установим начальное "текущее" время для первого прохода 0 условных единиц
+	int curr_time = 0;
 	// Выполним заданное количество итераций
 	while(1)
 	{
@@ -158,7 +160,7 @@ void Debug::start_debug_process()
 			auto start_2 = std::chrono::high_resolution_clock::now();
 		#endif
 		char *buff = (char*)malloc(sizeof(debug_log_Packet));
-		form_Packet(debug_input_pinName,log,curr_time,buff);
+		form_Packet(debug_input_pinName,log,curr_time,time_mode,buff);
 		send_U_Packet(sock, S_SERVER_SENDING_DEBUG_INFO, buff);
 		#ifdef DURATION_DEBUG_DEBUG_CLASS
 			auto stop_2 = std::chrono::high_resolution_clock::now();
@@ -178,15 +180,15 @@ void Debug::start_debug_process()
 			// остановлен и по какой причине
 			char report_buff[DATA_BUFFER];
 			memset(report_buff,0,DATA_BUFFER);
-			//memcpy(report_buff, &max_duration_time, sizeof(int));
-			//memcpy(report_buff+sizeof(int), &max_duration_time_mode, sizeof(uint8_t));
 			form_time_out_info(report_buff);
 			send_U_Packet(sock, DEBUG_PROCESS_TIMEOUT, report_buff);
 			printf("--------->Debug process TIMEOUT\n");
 			stop_debug();
 			stop_d_seq();
+			stop_pinstate_process();
 			printf("--------->DEBUG STOPPED\n");
 			printf("--------->DSQ STOPPED\n");
+			printf("--------->PINSTATE STOPPED\n");
 		}
 	}
 }
@@ -205,13 +207,20 @@ void Debug::stop_d_seq()
 	stop_dsqrun_flag_mutex.unlock();
 }
 
+void Debug::stop_pinstate_process()
+{
+	stop_pinstate_flag_mutex.lock();
+	stop_pinstate_flag = 1;
+	stop_pinstate_flag_mutex.unlock();
+}
+
 int8_t Debug::debug_is_run()
 {
 	stop_debug_flag_mutex.lock();
 	if(stop_debug_flag == 0)
 	{
 		stop_debug_flag_mutex.unlock();
-		return 1;
+		return 1; // Процесс запущен
 	} else 
 	{
 		stop_debug_flag_mutex.unlock();
@@ -226,13 +235,28 @@ int8_t Debug::dsq_is_run()
 	if(stop_dsqrun_flag == 0)
 	{
 		stop_dsqrun_flag_mutex.unlock();
-		return 1;
+		return 1; // Процесс запущен
 	} else 
 	{
 		stop_dsqrun_flag_mutex.unlock();
 		return 0;
 	}
 	stop_dsqrun_flag_mutex.unlock();
+}
+
+int8_t Debug::pin_state_proc_is_run()
+{
+	stop_pinstate_flag_mutex.lock();
+	if(stop_pinstate_flag == 0)
+	{
+		stop_pinstate_flag_mutex.unlock();
+		return 1; // Процесс запущен
+	} else 
+	{
+		stop_pinstate_flag_mutex.unlock();
+		return 0;
+	}
+	stop_pinstate_flag_mutex.unlock();
 }
 
 void Debug::calculate_us_max_duration_time()
@@ -286,14 +310,14 @@ void Debug::send_U_Packet(int sock, int code_op, const char *data)
     free(send_buf);
 }
 
-void Debug::form_Packet(std::vector<std::string> pinNames, std::vector<pinState> log, int curr_time, char *data)
+void Debug::form_Packet(std::vector<std::string> pinNames, std::vector<pinState> log, int curr_time, uint8_t _time_mode, char *data)
 {
 	debug_log_Packet *Packet = (debug_log_Packet*)malloc(sizeof(debug_log_Packet));
 	memset(Packet,0,sizeof(debug_log_Packet));
-	Packet->time_mode = time_mode;
+	Packet->time_mode = _time_mode;
 	Packet->time = curr_time;
 	Packet->pin_count = log.size();
-
+	
 	for(int i = 0; i < log.size(); i++)
 	{
 		pin_in_Packet tmp_packet;
@@ -338,15 +362,55 @@ void Debug::create_ODT(char *buf)
 	}
 }
 
-void Debug::set_pinStates(char *buf)
+Debug::set_state_Packet Debug::buf2set_state_Packet(char *buf)
 {
 	set_state_Packet *set_pins = (set_state_Packet*)malloc(sizeof(set_state_Packet));
 	memcpy(set_pins, buf, sizeof(set_state_Packet));
-	for(int i = 0; i < set_pins->pin_count; i++)
-	{
-		digitalWrite(set_pins->pins[i].pinNum, set_pins->pins[i].state);
-	}
+	set_state_Packet tmp_pack = *set_pins;
 	free(set_pins);
+	return tmp_pack;
+}
+
+void Debug::set_pinStates(set_state_Packet _pin_state)
+{	
+	// Сохраним принятый пакет для возможного дальнейшего восстановления
+	set_state_Packet_buff = _pin_state;
+	stop_pinstate_flag = 0;
+	std::vector<pinState> log;
+	int curr_time_mux = time_mux;
+	int curr_udelay = discrete_delay * curr_time_mux; // Задержка в us
+	int global_time_state = get_global_time();
+	global_time_state = global_time_state * curr_time_mux; // Получаем реальное время в us
+	// Установим необходимое состояние на все порты генератора
+	for(int i = 0; i < _pin_state.pin_count; i++)
+	{
+		digitalWrite(_pin_state.pins[i].pinNum, _pin_state.pins[i].state);
+	}
+	
+	while(1)
+	{
+		stop_pinstate_flag_mutex.lock();
+		if(stop_dsqrun_flag == 1) // Если взвелся влаг остановки  -> прекратить работу потока
+		{
+			stop_pinstate_flag_mutex.unlock();
+			return;
+		}
+		stop_pinstate_flag_mutex.unlock();
+		log = {};
+		// Сформировать и отвравить пакет клиенту		
+		for(int i = 0; i < _pin_state.pin_count; i++)
+		{
+			log.push_back(pinState{debug_output_Wpi_pinNum.at(i),(global_time_state/curr_time_mux),_pin_state.pins[i].state});
+		}	
+		
+		char *buff = (char*)malloc(sizeof(debug_log_Packet));
+		form_Packet(debug_output_pinName,log,(global_time_state/curr_time_mux), time_mode, buff);
+		send_U_Packet(sock, S_SERVER_SENDING_DSQ_INFO , buff); // Проверить правильность работы пакета
+		free(buff);
+		
+		usleep(curr_udelay);
+		global_time_state = global_time_state + curr_udelay;
+	}		
 }
 
 void Debug::form_time_out_info(char *buf)
@@ -372,6 +436,26 @@ void Debug::public_run_dfile()
 {
 	run_dfile();
 	printf("Run <public_run_dfile> done\n");
+}
+
+int Debug::same_int_checker(std::vector<int> vec)
+{
+	int curr_element;
+	int counter = 0;
+	for(int i = 0; i < vec.size(); i++)
+	{
+		curr_element = vec.at(i);
+		counter = 0;
+		for(int k = 0; k < vec.size(); k++)
+		{
+			if(vec.at(k) == curr_element)
+			{
+				counter++;
+				if(counter > 1){return -1;}
+			}
+		}
+	}
+	return 0;
 }
 
 void Debug::explore_byte_buff(char *data, int size)
@@ -426,8 +510,8 @@ int Debug::pinName2WpiNum(std::string pinName)
 	}
 	
 	// Отладка символов в строке
-/* 	for(int n=0; n<pinName.length();++n)
-	{
+	/* 	for(int n=0; n<pinName.length();++n)
+		{
 		char c = pinName[n];
 		printf("%i\n",c);
 	} */
@@ -443,7 +527,7 @@ int Debug::fill_debug_seq()
 	std::string file_name("debug_seq.txt");
 	std::ifstream file(file_name);
 	int column_count = 1;
-	std::vector<int8_t> tmp_vec_pin_nums;
+	std::vector<int> tmp_vec_pin_nums; // int8_t
 	uint8_t curr_pinNum; // Переменная для временного хранения номера текущего порта
 	uint8_t curr_state; // Переменная для временного хранения состояния текущего порта
 	if(file.good())
@@ -466,7 +550,15 @@ int Debug::fill_debug_seq()
 				{
 					tmp_vec_pin_nums.push_back(tmpPinNum);
 				} else
+				{					
+					send_U_Packet(sock, S_SERVER_CANT_READ_DSQ_FILE, NULL);
+					printf("Can't read file: debug_seq.txt -> check pin names\n");
+					
+					return -1;
+				}
+				if(same_int_checker(tmp_vec_pin_nums) == -1)
 				{
+					send_U_Packet(sock, S_SERVER_CANT_READ_DSQ_FILE, NULL);
 					printf("Can't read file: debug_seq.txt -> check pin names\n");
 					return -1;
 				}
@@ -519,6 +611,16 @@ void Debug::run_dfile()
 		printf("Nothing to RUN for DSQ\n");
 		return;
 	}
+	
+	// Если в текущий момент времени запущен процесс генерации уровней в ручном режиме
+	if(pin_state_proc_is_run() == 1)
+	{
+		// Остановим процесс генерации пакетов для портов, которые мы установили в ручном режиме
+		stop_pinstate_process();
+		// Состояния были сохранны при запусге того потока
+		printf("Pinstate process STOPPED -> states SAVED\n");
+	}
+
 	stop_dsqrun_flag = 0;
 	int from_debug_time_mux = time_mux; // "умножитель" времени, который используется в отладчике
 	int dfile_time_mux; // "умножитель" времени, который используется в файле dsq
@@ -565,6 +667,18 @@ void Debug::run_dfile()
 			{
 				digitalWrite(debug_output_Wpi_pinNum.at(i), 0);
 			}
+			
+			/*
+			* Проверим, что находится в буффере, который хранит сохраненные состояния 
+			* установленные в ручном режиме
+			* Если в этом буффере обнаружены порты, то установим те состояния,
+			* которые были сохранены
+			*/
+			if(set_state_Packet_buff.pin_count > 1)
+			{
+				std::thread pin_state_thread(&Debug::set_pinStates,this,set_state_Packet_buff);
+				pin_state_thread.detach();
+			}
 			return;
 		}
 		stop_dsqrun_flag_mutex.unlock();
@@ -575,12 +689,14 @@ void Debug::run_dfile()
 			curr_pinNum = d_seq_table.debug_seq_vec.at(i).pin_states.at(k).pinNum;
 			curr_state = d_seq_table.debug_seq_vec.at(i).pin_states.at(k).state;
 			digitalWrite(curr_pinNum,curr_state);
-			log.push_back(pinState{curr_pinNum,(global_time_state/from_debug_time_mux),curr_state});
-		//printf("Pin with num: %i, at %i unit have state: %i\n", curr_pinNum, (global_time_state/from_debug_time_mux),curr_state);
+			//log.push_back(pinState{curr_pinNum,(global_time_state/from_debug_time_mux),curr_state});
+			log.push_back(pinState{curr_pinNum,(global_time_state/dfile_time_mux),curr_state});
+			//printf("Pin with num: %i, at %i unit have state: %i\n", curr_pinNum, (global_time_state/from_debug_time_mux),curr_state);
 		}
 		// Выполним отравку пакета с состояниями портов
 		char *buff = (char*)malloc(sizeof(debug_log_Packet));
-		form_Packet(debug_output_pinName,log,(global_time_state/from_debug_time_mux),buff);
+		//form_Packet(debug_output_pinName,log,(global_time_state/from_debug_time_mux),buff);
+		form_Packet(debug_output_pinName,log,(global_time_state/dfile_time_mux),dfile_time_mux,buff);
 		send_U_Packet(sock, S_SERVER_SENDING_DSQ_INFO , buff);
 		free(buff);
 		// Выполним задержку между переключением состояний
@@ -589,8 +705,6 @@ void Debug::run_dfile()
 		global_time_state = global_time_state+(curr_delay*dfile_time_mux); // Прибавляем реальное время в us
 	}
 	
-	// FIXME: Добавить ограничение на максимально возможное время отладки
-	
 	// После анализа всех состояних, все порты должны выдавать LOW
 	for(int i=0; i < debug_output_Wpi_pinNum.size(); i++) 
 	{
@@ -598,8 +712,20 @@ void Debug::run_dfile()
 	}
 	
 	stop_d_seq();
+
+	/*
+	* Проверим, что находится в буффере, который хранит сохраненные состояния 
+	* установленные в ручном режиме
+	* Если в этом буффере обнаружены порты, то установим те состояния,
+	* которые были сохранены
+	*/
+	if(set_state_Packet_buff.pin_count > 1)
+	{
+		std::thread pin_state_thread(&Debug::set_pinStates,this,set_state_Packet_buff);
+		pin_state_thread.detach();
+	}
 }
-	
+
 int Debug::get_global_time()
 {
 	int ret_val;
@@ -608,7 +734,7 @@ int Debug::get_global_time()
 	global_time_mutex.unlock();
 	return ret_val;
 }
-	
+
 void Debug::set_global_time(int val)
 {
 	global_time_mutex.lock();

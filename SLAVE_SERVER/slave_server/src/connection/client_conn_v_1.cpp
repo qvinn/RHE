@@ -38,6 +38,9 @@
 #define RUN_DSQ_FILE 45					// DSQ_FILE -  Debug sequence file
 #define STOP_DSQ_FILE 46                // DSQ_FILE -  Debug sequence file
 #define S_SERVER_SENDING_DSQ_INFO 47	// DSQ_FILE -  Debug sequence file
+#define CLIENT_WANT_START_SYNC_DEBUG_DSQ 48 // DSQ_FILE -  Debug sequence file
+#define S_SERVER_CANT_READ_DSQ_FILE 49	// DSQ_FILE -  Debug sequence file
+#define CLIENT_WANT_SET_PINSTATE 50
 
 #define DATA_EXIST 1
 #define DATA_NOT_EXIST 0
@@ -223,15 +226,6 @@ void client_conn_v_1::wait_analize_recv_data()
 				std::thread gdb_thread(&Debug::start_debug_process,gdb);
 				gdb_thread.detach();
 				printf("_________________________________START DEBUG\n");
-				
-				/* if(gdb->dsq_is_run() == 1)
-				{
-					printf("_________________________________DSQ ALREADY RUN!\n");
-					break;
-				}
-				std::thread gdb_dsq_thread(&Debug::test_run_dfile,gdb);
-				gdb_dsq_thread.detach();
-				printf("_________________________________Client RUN DSQ_file\n"); */
 				break;	
 			}
 #endif
@@ -243,6 +237,8 @@ void client_conn_v_1::wait_analize_recv_data()
 				printf("_________________________________STOP DEBUG\n");
 				gdb->stop_d_seq();
 				printf("_________________________________STOP DSQ\n");
+				gdb->stop_pinstate_process();
+				printf("_________________________________STOP PINSTATE PROC\n");
 				break;	
 			}
 #endif
@@ -365,6 +361,51 @@ void client_conn_v_1::wait_analize_recv_data()
 				break;	
 			}
 #endif
+
+#ifdef HW_EN
+			case CLIENT_WANT_START_SYNC_DEBUG_DSQ:
+			{
+				if(gdb->debug_is_run() == 1)
+				{
+					printf("_________________________________DEBUG ALREADY RUN!\n");
+					break;
+				}
+				std::thread gdb_thread(&Debug::start_debug_process,gdb);
+				gdb_thread.detach();
+				printf("_________________________________START DEBUG\n");
+				
+				if(gdb->dsq_is_run() == 1)
+				{
+					printf("_________________________________DSQ ALREADY RUN!\n");
+					break;
+				}
+				std::thread gdb_dsq_thread(&Debug::public_run_dfile,gdb);
+				gdb_dsq_thread.detach();
+				printf("_________________________________Client RUN DSQ_file\n");
+				break;	
+			}
+#endif
+			
+#ifdef HW_EN
+			case CLIENT_WANT_SET_PINSTATE:
+			{
+				if(gdb->debug_is_run() != 1)
+				{
+					printf("_________________________________START DEBUG FIRSTLY!\n");
+					break;
+				}
+				if(gdb->dsq_is_run() == 1)
+				{
+					printf("_________________________________STOP DSQ FIRSTLY!\n");
+					break;
+				}
+				std::thread pin_state_thread(&Debug::set_pinStates,gdb,gdb->buf2set_state_Packet(tmp_packet->data));
+				pin_state_thread.detach();
+				printf("_________________________________\n");
+				break;	
+			}
+#endif
+
 			default:
 			{
 				printf("\t|___UNKNOWN PACKET\n");

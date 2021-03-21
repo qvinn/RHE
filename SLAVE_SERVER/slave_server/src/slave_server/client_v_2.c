@@ -113,6 +113,18 @@ int main(int argc, char *argv[])
 	}
 	printf("\n");
 	
+	// Выполним проверку на то, нет ли повтотряющихся номеров портов среди INPUT и OUTPUT	
+	if(Debug::same_int_checker(debug_input_Wpi_pinNum) == -1)
+	{
+		printf("ERR:DETECTED SAME PINUM AT INPUT PINS LIST!\n");
+		return 0;
+	}
+	if(Debug::same_int_checker(debug_output_Wpi_pinNum) == -1)
+	{
+		printf("ERR:DETECTED SAME PINUM AT OUTPUT PINS LIST!\n");
+		return 0;
+	}
+	
 	// Выполним проверку на то, нет ли коллизий между портами, которые будут INPUT и OUTPUT
 	for(int i = 0; i < debug_input_Wpi_pinNum.size(); i++)
 	{
@@ -120,7 +132,7 @@ int main(int argc, char *argv[])
 		{
 			if(debug_input_Wpi_pinNum.at(i) == debug_output_Wpi_pinNum.at(k))
 			{
-				printf("DETECTED COLLISION with INPUT pin %i and OUTPUT pin %i\n",
+				printf("ERR:DETECTED COLLISION with INPUT pin %i and OUTPUT pin %i\n",
 					debug_input_Wpi_pinNum.at(i),
 					debug_output_Wpi_pinNum.at(k));
 					return 0;
