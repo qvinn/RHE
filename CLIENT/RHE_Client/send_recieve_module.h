@@ -52,6 +52,7 @@
     #define CLIENT_WANT_START_SYNC_DEBUG_DSQ 48 // DSQ_FILE -  Debug sequence file
     #define S_SERVER_CANT_READ_DSQ_FILE 49	// DSQ_FILE -  Debug sequence file
     #define CLIENT_WANT_SET_PINSTATE 50
+    #define CLIENT_WANT_FLASH_ALL_SYNC 51
 
     class Send_Recieve_Module : public QObject {
         Q_OBJECT
@@ -77,17 +78,12 @@
             void set_disconnected();
             void set_FPGA_id(QString FPGA_id);
 
-//            typedef struct pin_in_Packet{		// 2 байта
-//                uint8_t pinNum;	// 1 байт
-//                uint8_t state;	// 1 байт
-//            } pin_in_Packet;
-
-            typedef struct pin_in_Packet{		// 48 байта
+            typedef struct pin_in_Packet {		// 48 байта
                 char pinName[5];	// 5 байт
                 uint8_t state;	// 1 байт
             } pin_in_Packet;
 
-            typedef struct debug_log_Packet{ // 24 байта
+            typedef struct debug_log_Packet { // 24 байта
                 uint8_t pin_count;	// 1 байт
                 uint8_t time_mode;	// 1 байт
                 pin_in_Packet pins[8];	// 16 байт
@@ -98,6 +94,17 @@
                     int id;
                     char FPGA_id[20];
             } info_about_new_device;
+
+            // Пара структур для задания состояния портам ввода-вывода
+            typedef struct set_state {		// 2 байта
+                uint8_t pinNum;				// 1 байт
+                uint8_t state;				// 1 байт
+            } set_state;
+
+            typedef struct set_state_Packet { 	// 17 байт
+                uint8_t pin_count;				// 1 байт
+                set_state pins[8];              // 2 байт * PIN_MAX = 16 байт
+            } set_state_Packet;
 
         private:
             void server_disconnected();
