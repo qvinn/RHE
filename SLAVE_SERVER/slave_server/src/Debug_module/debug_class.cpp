@@ -696,7 +696,7 @@ void Debug::run_dfile()
 		// Выполним отравку пакета с состояниями портов
 		char *buff = (char*)malloc(sizeof(debug_log_Packet));
 		//form_Packet(debug_output_pinName,log,(global_time_state/from_debug_time_mux),buff);
-		form_Packet(debug_output_pinName,log,(global_time_state/dfile_time_mux),dfile_time_mux,buff);
+		form_Packet(debug_output_pinName,log,(global_time_state/dfile_time_mux),d_seq_table.time_mode,buff);
 		send_U_Packet(sock, S_SERVER_SENDING_DSQ_INFO , buff);
 		free(buff);
 		// Выполним задержку между переключением состояний
