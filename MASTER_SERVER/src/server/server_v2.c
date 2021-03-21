@@ -72,6 +72,7 @@
 #define CLIENT_WANT_START_SYNC_DEBUG_DSQ 48 // DSQ_FILE -  Debug sequence file
 #define S_SERVER_CANT_READ_DSQ_FILE 49	// DSQ_FILE -  Debug sequence file
 #define CLIENT_WANT_SET_PINSTATE 50
+#define CLIENT_WANT_FLASH_ALL_SYNC 51
 
 
 // Карта code_op - КОНЕЦ
@@ -827,6 +828,18 @@ void recive_new_data(char *buf, int sock)
 			{				
 				send_U_Packet(finded_s_server, CLIENT_WANT_SET_PINSTATE, tmp_packet->data);
 				printf("\t|___Client with id %i SET PINSTATE on slave-server with id %i\n", sock, finded_s_server);
+			}			
+			break;	
+		}			
+		
+		case CLIENT_WANT_FLASH_ALL_SYNC:
+		{
+			// Перенаправляем запрос от клиента к slave-серверу
+			int finded_s_server = find_pair_for(sock);
+			if(finded_s_server != ERROR)
+			{				
+				send_U_Packet(finded_s_server, CLIENT_WANT_FLASH_ALL_SYNC, NULL);
+				printf("\t|___Client with id %i FLASH_SYNC on slave-server with id %i\n", sock, finded_s_server);
 			}			
 			break;	
 		}
