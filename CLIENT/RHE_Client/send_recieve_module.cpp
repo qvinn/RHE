@@ -87,9 +87,10 @@ void Send_Recieve_Module::wait_analize_recv_data() {
             case S_SERVER_END_RCV_FILE: {
                 qDebug() << "_________________________________Slave server end recive file";
                 qDebug() << "Slave server recive bytese" << atoi(tmp_packet->data);
-                if(atoi(tmp_packet->data) == last_send_file_bytes) {
-                    send_U_Packet(FLASH_FPGA, "");
-                }
+//                if(atoi(tmp_packet->data) == last_send_file_bytes) {
+//                    send_U_Packet(FLASH_FPGA, "");
+//                }
+                emit firmware_file_recieved_signal();
                 break;
             }
             case S_SERVER_START_SEND_FILE: {
@@ -124,7 +125,7 @@ void Send_Recieve_Module::wait_analize_recv_data() {
             }
             case S_SERVER_SENDING_DEBUG_INFO: {
 //                QByteArray debug_data(tmp_packet->data, sizeof(debug_log_Packet));
-                emit accept_debug_data_signal(QByteArray(tmp_packet->data, sizeof(debug_log_Packet)));
+                emit accept_debug_data_signal(QByteArray(tmp_packet->data, sizeof(debug_log_Packet)), true);
 //                recive_dbg_info(tmp_packet->data);
 //                qDebug() << "_________________________________Slave server sending DEBUG INFO";
                 break;
@@ -169,7 +170,7 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 break;
             }
             case S_SERVER_SENDING_DSQ_INFO: {
-                emit accept_debug_data_signal(QByteArray(tmp_packet->data, sizeof(debug_log_Packet)));
+                emit accept_debug_data_signal(QByteArray(tmp_packet->data, sizeof(debug_log_Packet)), false);
                 qDebug() << "_________________________________Slave server sending DSQ INFO";
                 recive_dbg_info(tmp_packet->data);
                 break;
@@ -177,6 +178,16 @@ void Send_Recieve_Module::wait_analize_recv_data() {
 
             case S_SERVER_CANT_READ_DSQ_FILE: {
                 qDebug() << "_________________________________S_SERVER_CANT_READ_DSQ_FILE!";
+                break;
+            }
+            case S_SERVER_END_DSQ: {
+                emit end_sequence_of_signals_signal();
+                qDebug() << "_________________________________S_SERVER END DSQ";
+                break;
+            }
+            case S_SERVER_SUCCESS_FLASH_FPGA: {
+                emit fpga_flashed_signal();
+                qDebug() << "_________________________________S_SERVER SUCCESS FLASH FPGA";
                 break;
             }
             default: {
@@ -195,10 +206,10 @@ void Send_Recieve_Module::ping_to_S_server() {
     send_U_Packet(PING_CLIENT_TO_S_SERVER, "");
 }
 
-void Send_Recieve_Module::start_debug(uint16_t dscrt_tm, uint8_t dscrt_tm_tp) {
+void Send_Recieve_Module::start_debug(uint16_t dscrt_tm, uint8_t dscrt_tm_tp, int flag) {
     //for variable dscrt_tm_tp: 0 - seconds, 1 - miliseconds, 2 - microseconds
-    qDebug() << "dscrt_tm: " << dscrt_tm;
-    qDebug() << "dscrt_tm_tp: " << dscrt_tm_tp;
+//    qDebug() << "dscrt_tm: " << dscrt_tm;
+//    qDebug() << "dscrt_tm_tp: " << dscrt_tm_tp;
 
 //    QByteArray settings;
 //    settings.append(dscrt_tm, sizeof(uint16_t));
@@ -210,7 +221,7 @@ void Send_Recieve_Module::start_debug(uint16_t dscrt_tm, uint8_t dscrt_tm_tp) {
     memcpy(buff+sizeof(uint16_t), &dscrt_tm_tp, sizeof(uint8_t));
     send_U_Packet(CLIENT_WANT_CHANGE_DEBUG_SETTINGS, QByteArray(buff,(sizeof (uint16_t) + sizeof (uint8_t))));
     //send_U_Packet(CLIENT_WANT_CHANGE_DEBUG_SETTINGS, QByteArray(settings.data(),(sizeof (uint16_t) + sizeof (uint8_t))));
-    send_U_Packet(CLIENT_WANT_START_DEBUG, "");
+    send_U_Packet(flag, "");
 }
 
 void Send_Recieve_Module::stop_debug() {
@@ -266,6 +277,14 @@ void Send_Recieve_Module::set_disconnected() {
 
 void Send_Recieve_Module::set_FPGA_id(QString FPGA_id) {
     send_U_Packet(SET_FPGA_ID, FPGA_id.toLatin1());
+}
+
+void Send_Recieve_Module::flash_FPGA() {
+    send_U_Packet(FLASH_FPGA, "");
+}
+
+void Send_Recieve_Module::send_swtches_states(QByteArray data) {
+    send_U_Packet(CLIENT_WANT_SET_PINSTATE, data);
 }
 
 //-------------------PRIVATE----------------------------------------------------------------

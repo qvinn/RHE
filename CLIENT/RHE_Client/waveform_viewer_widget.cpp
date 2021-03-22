@@ -233,6 +233,7 @@ void Waveform_Viewer_Widget::load_waveform() {
         QRegExp tag_exp("/");
         QStringList lst = str.split(tag_exp);
         add_names = true;
+        debug_show = true;
         plot_re_scale = true;
         remove_data_from_saved_vals_list();
         remove_saved_vals_list();
@@ -293,16 +294,16 @@ void Waveform_Viewer_Widget::load_waveform() {
 }
 
 void Waveform_Viewer_Widget::save_waveform() {
-    if(graph_count != 0) {
-        int cnt = ui->diagram->graph(0)->data()->size();
+    if(svd_dbg_time->count() != 0) {
+        int cnt = svd_dbg_time->count();
         QString fn_nm = "";
         QString str = "";
-        for(int i = 0; i < graph_count; i++) {
+        for(int i = 0; i < pin_names->count(); i++) {
             if(i == 0) {
                 str.append("time/");
             }
             str.append(pin_names->at(i));
-            if(i != (graph_count - 1)) {
+            if(i != (pin_names->count() - 1)) {
                 str.append("/");
             } else {
                 str.append("\n");
@@ -312,21 +313,21 @@ void Waveform_Viewer_Widget::save_waveform() {
         str.clear();
         for(int i = 0; i < cnt; i++) {
             str.clear();
-            for(int k = 0; k < graph_list->count(); k++) {
-                if(k % 2 != 0) {
-                    if(k == 1) {
-                        str.append(QString::number(ui->diagram->graph(k)->data()->at(i)->key) + "/");
-                    }
-                    str.append(QString::number(ui->diagram->graph(k)->data()->at(i)->value - k));
-                    if(k != (graph_list->count() - 1)) {
-                        str.append("/");
-                    } else {
-                        str.append("\n");
-                    }
+            for(int k = 0; k < svd_vals->count(); k++) {
+                if(k == 0) {
+                    str.append(QString::number(svd_dbg_time->at(i)) + "/");
+                }
+                str.append(QString::number(svd_vals->at(k)->at(i)));
+                if(k != (svd_vals->count() - 1)) {
+                    str.append("/");
+                } else {
+                    str.append("\n");
                 }
             }
             gen_widg->save_file(this, tr("Saving waveform"), tr("Waveform (*.wvfrm)"), &str, &fn_nm, false, true);
         }
+    } else {
+        gen_widg->show_message_box("", tr("No data for saving"), 0);
     }
 }
 
@@ -367,16 +368,14 @@ void Waveform_Viewer_Widget::re_scale_graph() {
 }
 
 void Waveform_Viewer_Widget::add_data_to_graph(QList<int> val, QList<int> *prev_vals, double time, bool val_changed, QList<bool> *drw_lst) {
-    for(int i = 0; i < /*graph_list->count()*/pin_names_board->count() * 2; i++) {
-//        if(i < graph_list->count()) {
+    for(int i = 0; i < pin_names_board->count() * 2; i++) {
+        if((i < graph_list->count()) && debug_show) {
+            draw_data_on_graph(val, prev_vals, time, val_changed, i);
 //            if(drw_lst == nullptr) {
 //                draw_data_on_graph(val, prev_vals, time, val_changed, i);
 //            } else if(drw_lst->at(i)) {
 //                draw_data_on_graph(val, prev_vals, time, val_changed, i);
 //            }
-//        }
-        if(i < graph_list->count()) {
-            draw_data_on_graph(val, prev_vals, time, val_changed, i);
         }
         if(i < prev_vals->count()) {
             (*prev_vals).replace(i, val.at(i));
@@ -399,7 +398,6 @@ void Waveform_Viewer_Widget::draw_data_on_graph(QList<int> val, QList<int> *prev
         graph_list->at(i)->setChannelFillGraph(graph_list->at(i - 1));
     }
     graph_list->at(i)->addData(time, (shft_val + i + val.at(i)));
-//    (*prev_vals).replace(i, val.at(i));
 }
 
 void Waveform_Viewer_Widget::remove_data_from_graph() {
@@ -509,7 +507,7 @@ void Waveform_Viewer_Widget::remove_all_data() {
 void Waveform_Viewer_Widget::select_displayable_pins() {
     QStringList avlbl_pins, dsplbl_pins;
     avlbl_pins.append(*pin_names_board);
-    if(add_names) {
+    if(add_names && debug_show) {
         bool flag = true;
         while(flag) {
             for(int k = 0; k < pin_names->count(); k++) {
@@ -544,6 +542,7 @@ void Waveform_Viewer_Widget::select_displayable_pins() {
         }
         QList<QPoint> graph_pos;
         graph_pos.clear();
+        debug_show = static_cast<bool>(dsplbl_pins_lst.count());
         for(int i = 0; i < dsplbl_pins_lst.count(); i++) {
             for(int k = 0; k < pin_names_board->count(); k++) {
                 if(dsplbl_pins_lst.at(i).compare(pin_names_board->at(k), Qt::CaseInsensitive) == 0) {
@@ -840,8 +839,8 @@ Dialog_Select_Displayable_Pins::Dialog_Select_Displayable_Pins(QStringList avlbl
     this->setWindowTitle(tr("Select pins for display"));
     this->setFixedSize(600, 300);
     this->updateGeometry();
-    connect(ui->listView_Sel->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(displayable_pins_selection_changed(const QItemSelection &)));
     ui->pushButton_Ok->setText(tr("OK"));
+    connect(ui->listView_Sel->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(displayable_pins_selection_changed(const QItemSelection &)));
     ui->listView_All->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->listView_All->selectionModel()->clearSelection();
     ui->listView_Sel->selectionModel()->clearSelection();
@@ -884,7 +883,7 @@ void Dialog_Select_Displayable_Pins::replace_selected_pin(QStringListModel *recv
 }
 
 void Dialog_Select_Displayable_Pins::displayable_pins_selection_changed(const QItemSelection &sel) {
-    Q_UNUSED(sel)
+    Q_UNUSED(sel);
     ui->pushButton_Del->setEnabled(true);
     ui->listView_All->selectionModel()->clearSelection();
 }
@@ -912,4 +911,3 @@ QStringList Dialog_Select_Displayable_Pins::get_displayable_pins() {
 QStringList Dialog_Select_Displayable_Pins::get_available_pins() {
     return available_pins_model->stringList();
 }
-

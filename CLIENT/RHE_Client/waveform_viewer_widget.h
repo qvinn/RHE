@@ -39,6 +39,7 @@
 
             bool plot_re_scale = false;
             bool debugging = false;
+            bool debug_show = true;
 
             int graph_count;
 

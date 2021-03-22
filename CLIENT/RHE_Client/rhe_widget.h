@@ -40,6 +40,7 @@
             void set_ui_text();
             void change_cnt_of_dbg_pins(int value);
             void change_board_pixmap();
+            void set_enable_board_power_led(bool flg);
             void set_button_state_debug(bool flg);
             void check_is_proj_folder(bool folder_exist);
             bool check_fpga_connections(QString path_to_fit_rprtr);
@@ -60,6 +61,7 @@
             QList<QPoint> *led_x_y = nullptr;
             QList<QPoint> *led_width_height = nullptr;
             QList<int> *prev_vals = nullptr;
+            QList<int> *pi_pins_nums = nullptr;
             QList<QHBoxLayout*> *inpt_hbxs = nullptr;
             QList<QLabel*> *inpt_lbls = nullptr;
             QList<QSpacerItem*> *inpt_spcrs = nullptr;
@@ -76,6 +78,8 @@
             bool board_is_on = false;
             bool new_debug = false;
             bool clr_trnsprnt = true;
+            bool sqnc_of_sgnls_file_sended = false;
+            bool sqnc_of_sgnls_strtd = false;
 
             int prev_board_index;
             int dbg_tm_tp_lmt = 0;
@@ -87,14 +91,15 @@
             void showEvent(QShowEvent *) override;
             void paintEvent(QPaintEvent *) override;
             void resizeEvent(QResizeEvent *) override;
-            void on_pushButton_clicked();
             void on_pushButton_2_clicked();
             void on_pushButton_3_clicked();
-            void on_pushButton_strt_drw_clicked();
-            void on_pushButton_stp_drw_clicked();
+            void on_pshBttn_strt_dbg_clicked();
+            void on_pshBttn_stp_dbg_clicked();
+            void on_chckBx_strt_dbg_aftr_flsh_stateChanged(int state);
             void on_pshBttn_chs_sgnls_sqnc_clicked();
             void on_pshBttn_snd_sgnls_sqnc_clicked();
             void on_pshBttn_strt_sgnls_sqnc_clicked();
+            void on_chckBx_strt_sqnc_of_sgn_with_dbg_stateChanged(int state);
             void on_cmbBx_chs_brd_currentIndexChanged(int index);
             void on_spnBx_dbg_tm_valueChanged(int value);
             void on_cmbBx_dbg_tm_tp_currentIndexChanged(int index);
@@ -103,14 +108,19 @@
             void on_pshBttn_chk_prj_stat_clicked();
             void on_pshBttn_ld_frmwr_clicked();
             void pshBttn_strt_sgnls_sqnc_set_enabled(bool flag);
+            void scrll_area_sgnls_set_enabled(bool flag);
             void slot_input_val_changed(int val);
             void slot_choose_board(QString jtag_code);
             void slot_accept_board(bool flg);
             void slot_accept_debug_time_limit(int time, int time_type);
-            void slot_accept_debug_data(QByteArray debug_data);
+            void slot_accept_debug_data(QByteArray debug_data, bool is_inpt_dat);
             void slot_accept_input_data_table(QByteArray input_data_table);
             void slot_accept_output_data_table(QByteArray output_data_table);
-            void slot_as_window(bool as_window); 
+            void slot_firmware_file_sended();
+            void slot_sequence_of_signals_file_sended(bool flg);
+            void slot_fpga_flashed();
+            void slot_end_sequence_of_signals();
+            void slot_as_window(bool as_window);    
 
         signals:
             void resize_signal();

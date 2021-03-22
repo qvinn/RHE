@@ -73,12 +73,14 @@
             void wait_analize_recv_data();
             void ping_to_server();
             void ping_to_S_server();
-            void start_debug(uint16_t dscrt_tm, uint8_t dscrt_tm_tp);
+            void start_debug(uint16_t dscrt_tm, uint8_t dscrt_tm_tp, int flag);
             void stop_debug();
             void start_sequence_of_signals();
             bool send_file_to_ss(QByteArray File_byteArray, int strt_sndng_val, int cntns_sndng_val, int end_sndng_val);
             void set_disconnected();
             void set_FPGA_id(QString FPGA_id);
+            void flash_FPGA();
+            void send_swtches_states(QByteArray data);
 
             typedef struct pin_in_Packet {		// 48 байта
                 char pinName[5];	// 5 байт
@@ -137,12 +139,15 @@
 
         signals:
             void logout_signal();
+            void firmware_file_recieved_signal();
             void sequence_file_recieved_signal(bool flg);
+            void fpga_flashed_signal();
             void end_debugging_signal();
+            void end_sequence_of_signals_signal();
             void choose_board_signal(QString jtag_code);
             void accept_board_signal(bool flg);
             void accept_debug_time_limit_signal(int time, int time_type);
-            void accept_debug_data_signal(QByteArray debug_data);
+            void accept_debug_data_signal(QByteArray debug_data, bool is_inpt_dat);
             void accept_input_data_table_signal(QByteArray input_data_table);
             void accept_output_data_table_signal(QByteArray output_data_table);
             void show_message_box_signal(QString str1, QString str2, int type);
