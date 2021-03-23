@@ -40,12 +40,14 @@
             bool plot_re_scale = false;
             bool debugging = false;
             bool debug_show = true;
+            bool as_window = false;
 
             int graph_count;
 
         private:
             void post_initialize_ui();
             void set_ui_text();
+            void change_margin(int val);
             void load_waveform();
             void save_waveform();
             void draw_data_on_graph(QList<int> val, QList<int> *prev_vals, double time, bool val_changed, int i);
@@ -103,7 +105,7 @@
             void on_pshBttn_slct_dsplbl_pins_clicked();
 
     signals:
-            void as_window_signal(bool as_window);
+            void as_window_signal();
             void waveform_viewer_closed_signal();
     };
 

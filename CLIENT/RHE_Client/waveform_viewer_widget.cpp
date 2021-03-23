@@ -12,6 +12,7 @@ Waveform_Viewer_Widget::Waveform_Viewer_Widget(QWidget *parent, General_Widget *
 //    ui->diagram->setOpenGl(true);         //qcustomplot.cpp - line 909
     curs_ver_line = new QCPItemLine(ui->diagram);
     curs_time = new QCPItemText(ui->diagram);
+    change_margin(5 * static_cast<int>(stndln));
     connect(ui->diagram->xAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(slot_x_axis_changed(QCPRange)));
     connect(ui->diagram->yAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(slot_y_axis_changed(QCPRange)));
     connect(ui->diagram, &QCustomPlot::mouseMove, this, &Waveform_Viewer_Widget::slot_mouse_move);
@@ -109,14 +110,15 @@ void Waveform_Viewer_Widget::on_pshBttn_slct_dsplbl_pins_clicked() {
 }
 
 void Waveform_Viewer_Widget::on_chckBx_as_wndw_stateChanged(int state) {
+    change_margin(5 * (state / 2));
+    as_window = static_cast<bool>(state);
     if(state == 2) {
         this->setWindowFlags(Qt::Window | Qt::WindowMinMaxButtonsHint | Qt::WindowTitleHint);
         this->show();
-        emit as_window_signal(true);
     } else {
-        this->setWindowFlags(flags);
-        emit as_window_signal(false);
+        this->setWindowFlags(flags);        
     }
+    emit as_window_signal();
 }
 
 void Waveform_Viewer_Widget::on_pshBttn_open_save_wvfrm_clicked() {
@@ -217,6 +219,11 @@ void Waveform_Viewer_Widget::set_ui_text() {
         ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->setItemText(2, tr("us"));
     }
     language_changed = true;
+}
+
+void Waveform_Viewer_Widget::change_margin(int val) {
+    ui->horizontalLayout->setContentsMargins(val, 5, val, val);
+    ui->horizontalLayout_2->setContentsMargins(val, val, val, 5);
 }
 
 void Waveform_Viewer_Widget::load_waveform() {

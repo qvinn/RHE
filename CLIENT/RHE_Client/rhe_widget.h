@@ -67,6 +67,8 @@
             QList<QSpacerItem*> *inpt_spcrs = nullptr;
             QList<QSlider*> *inpt_sldrs = nullptr;
             QList<QLCDNumber*> *inpt_stts = nullptr;
+            QTimer *send_file_status = nullptr;
+            QList<QString> state_strs;
             QString lname_fname;
             QPixmap pixmp_brd;
 
@@ -82,13 +84,15 @@
             bool sqnc_of_sgnls_strtd = false;
 
             int prev_board_index;
+            int crrnt_state_strs;
             int dbg_tm_tp_lmt = 0;
 
         public slots:
+            void showEvent(QShowEvent *) override;
             void slot_re_translate();
 
         private slots:
-            void showEvent(QShowEvent *) override;
+
             void paintEvent(QPaintEvent *) override;
             void resizeEvent(QResizeEvent *) override;
             void on_pushButton_2_clicked();
@@ -120,7 +124,8 @@
             void slot_sequence_of_signals_file_sended(bool flg);
             void slot_fpga_flashed();
             void slot_end_sequence_of_signals();
-            void slot_as_window(bool as_window);    
+            void slot_as_window();
+            void slot_timer_timeout();
 
         signals:
             void resize_signal();

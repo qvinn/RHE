@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>861</width>
-    <height>600</height>
+    <height>605</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -128,12 +128,12 @@
       <x>0</x>
       <y>0</y>
       <width>861</width>
-      <height>578</height>
+      <height>571</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <property name="spacing">
-      <number>0</number>
+      <number>5</number>
      </property>
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -148,6 +148,9 @@
        </property>
        <property name="topMargin">
         <number>5</number>
+       </property>
+       <property name="rightMargin">
+        <number>1</number>
        </property>
        <item>
         <widget class="QLabel" name="lbl_FName_LName">
@@ -165,7 +168,7 @@
          </property>
          <property name="maximumSize">
           <size>
-           <width>240</width>
+           <width>350</width>
            <height>21</height>
           </size>
          </property>
@@ -326,7 +329,7 @@
          </property>
          <property name="maximumSize">
           <size>
-           <width>240</width>
+           <width>350</width>
            <height>21</height>
           </size>
          </property>
@@ -435,6 +438,22 @@
         </widget>
        </item>
        <item>
+        <spacer name="verticalSpacer_14">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>1</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
         <widget class="QComboBox" name="cmbBx_chs_brd">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -450,7 +469,7 @@
          </property>
          <property name="maximumSize">
           <size>
-           <width>240</width>
+           <width>350</width>
            <height>21</height>
           </size>
          </property>
@@ -480,6 +499,9 @@
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <property name="spacing">
+          <number>0</number>
+         </property>
          <item>
           <widget class="QPushButton" name="pushButton_2">
            <property name="minimumSize">
@@ -490,7 +512,7 @@
            </property>
            <property name="maximumSize">
             <size>
-             <width>90</width>
+             <width>140</width>
              <height>25</height>
             </size>
            </property>
@@ -760,6 +782,22 @@ QPushButton:hover{
           </widget>
          </item>
          <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>6</width>
+             <height>0</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
           <widget class="QPushButton" name="pushButton_3">
            <property name="minimumSize">
             <size>
@@ -769,7 +807,7 @@ QPushButton:hover{
            </property>
            <property name="maximumSize">
             <size>
-             <width>130</width>
+             <width>210</width>
              <height>25</height>
             </size>
            </property>
@@ -1058,17 +1096,26 @@ QPushButton:hover{
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <property name="spacing">
+          <number>0</number>
+         </property>
          <item>
           <widget class="QPushButton" name="pshBttn_strt_dbg">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="minimumSize">
             <size>
-             <width>135</width>
+             <width>60</width>
              <height>25</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>90</width>
+             <width>180</width>
              <height>25</height>
             </size>
            </property>
@@ -1338,16 +1385,38 @@ QPushButton:hover{
           </widget>
          </item>
          <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>6</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
           <widget class="QPushButton" name="pshBttn_stp_dbg">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="minimumSize">
             <size>
-             <width>90</width>
+             <width>60</width>
              <height>25</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>90</width>
+             <width>190</width>
              <height>25</height>
             </size>
            </property>
@@ -1650,7 +1719,7 @@ QPushButton:hover{
          </property>
          <property name="maximumSize">
           <size>
-           <width>16777215</width>
+           <width>350</width>
            <height>21</height>
           </size>
          </property>
@@ -1699,7 +1768,7 @@ QPushButton:hover{
          </property>
          <property name="maximumSize">
           <size>
-           <width>240</width>
+           <width>350</width>
            <height>25</height>
           </size>
          </property>
@@ -2000,7 +2069,7 @@ QPushButton:hover{
          </property>
          <property name="maximumSize">
           <size>
-           <width>240</width>
+           <width>350</width>
            <height>25</height>
           </size>
          </property>
@@ -2301,7 +2370,7 @@ QPushButton:hover{
          </property>
          <property name="maximumSize">
           <size>
-           <width>240</width>
+           <width>350</width>
            <height>25</height>
           </size>
          </property>
@@ -2596,7 +2665,7 @@ QPushButton:hover{
          </property>
          <property name="maximumSize">
           <size>
-           <width>16777215</width>
+           <width>350</width>
            <height>21</height>
           </size>
          </property>
@@ -2668,6 +2737,18 @@ QPushButton:hover{
        </item>
        <item>
         <widget class="QLabel" name="lbl_dbg_tm_dscrtnss">
+         <property name="minimumSize">
+          <size>
+           <width>110</width>
+           <height>21</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>350</width>
+           <height>21</height>
+          </size>
+         </property>
          <property name="font">
           <font>
            <family>Tahoma</family>
@@ -2694,9 +2775,15 @@ QPushButton:hover{
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="minimumSize">
+            <size>
+             <width>40</width>
+             <height>21</height>
+            </size>
+           </property>
            <property name="maximumSize">
             <size>
-             <width>16777215</width>
+             <width>280</width>
              <height>21</height>
             </size>
            </property>
@@ -2724,6 +2811,12 @@ QPushButton:hover{
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>70</width>
+             <height>21</height>
+            </size>
            </property>
            <property name="maximumSize">
             <size>
@@ -2764,6 +2857,18 @@ QPushButton:hover{
          </property>
          <item>
           <widget class="QLabel" name="lbl_dbg_tm_lmt">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>23</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>23</height>
+            </size>
+           </property>
            <property name="font">
             <font>
              <family>Tahoma</family>
@@ -2779,6 +2884,18 @@ QPushButton:hover{
          </item>
          <item>
           <widget class="QLabel" name="lbl_dbg_tm_tp_lmt">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>23</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>23</height>
+            </size>
+           </property>
            <property name="font">
             <font>
              <family>Tahoma</family>
@@ -2794,10 +2911,16 @@ QPushButton:hover{
          </item>
          <item>
           <widget class="QLCDNumber" name="lcdNmbr_dbg_tm_lmt">
+           <property name="minimumSize">
+            <size>
+             <width>70</width>
+             <height>23</height>
+            </size>
+           </property>
            <property name="maximumSize">
             <size>
              <width>70</width>
-             <height>16777215</height>
+             <height>23</height>
             </size>
            </property>
            <property name="palette">
@@ -3113,9 +3236,15 @@ QPushButton:hover{
        </item>
        <item>
         <widget class="QLabel" name="lbl_fpga_inpts">
+         <property name="minimumSize">
+          <size>
+           <width>110</width>
+           <height>21</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
-           <width>240</width>
+           <width>350</width>
            <height>21</height>
           </size>
          </property>
@@ -3142,7 +3271,7 @@ QPushButton:hover{
          </property>
          <property name="maximumSize">
           <size>
-           <width>240</width>
+           <width>350</width>
            <height>100</height>
           </size>
          </property>
@@ -3186,6 +3315,104 @@ QPushButton:hover{
         </widget>
        </item>
        <item>
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>15</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QProgressBar" name="prgrssBr_fl_sts">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>110</width>
+           <height>21</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>350</width>
+           <height>21</height>
+          </size>
+         </property>
+         <property name="palette">
+          <palette>
+           <active>
+            <colorrole role="WindowText">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </active>
+           <inactive>
+            <colorrole role="WindowText">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </inactive>
+           <disabled>
+            <colorrole role="WindowText">
+             <brush brushstyle="SolidPattern">
+              <color alpha="127">
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </disabled>
+          </palette>
+         </property>
+         <property name="font">
+          <font>
+           <family>Tahoma</family>
+           <pointsize>10</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="value">
+          <number>0</number>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="textVisible">
+          <bool>true</bool>
+         </property>
+         <property name="invertedAppearance">
+          <bool>false</bool>
+         </property>
+         <property name="format">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -3201,6 +3428,31 @@ QPushButton:hover{
       </layout>
      </item>
      <item>
+      <widget class="Line" name="line">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>2</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>2</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <property name="spacing">
         <number>5</number>
@@ -3209,16 +3461,16 @@ QPushButton:hover{
         <enum>QLayout::SetDefaultConstraint</enum>
        </property>
        <property name="leftMargin">
-        <number>5</number>
+        <number>0</number>
        </property>
        <property name="topMargin">
-        <number>5</number>
+        <number>0</number>
        </property>
        <property name="rightMargin">
         <number>5</number>
        </property>
        <property name="bottomMargin">
-        <number>5</number>
+        <number>7</number>
        </property>
        <item>
         <widget class="QLabel" name="label">
@@ -3253,10 +3505,16 @@ QPushButton:hover{
      <x>0</x>
      <y>570</y>
      <width>861</width>
-     <height>31</height>
+     <height>35</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
+    <property name="leftMargin">
+     <number>5</number>
+    </property>
+    <property name="topMargin">
+     <number>5</number>
+    </property>
     <property name="rightMargin">
      <number>6</number>
     </property>
@@ -4420,6 +4678,25 @@ QPushButton:hover{
      </widget>
     </item>
    </layout>
+  </widget>
+  <widget class="Line" name="line_2">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>570</y>
+     <width>861</width>
+     <height>2</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
   </widget>
  </widget>
  <resources/>
