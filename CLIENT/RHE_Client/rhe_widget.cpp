@@ -118,7 +118,7 @@ void RHE_Widget::on_pshBttn_strt_dbg_clicked() {
     new_debug = true;
     int flag;
     send_file_status->stop();
-    if(static_cast<bool>(static_cast<int>(ui->chckBx_strt_sqnc_of_sgn_with_dbg->checkState())) && sqnc_of_sgnls_file_sended) {
+    if(static_cast<bool>(static_cast<int>(ui->chckBx_strt_sqnc_of_sgn_with_dbg->checkState())) && sqnc_of_sgnls_file_sended && static_cast<bool>(static_cast<int>(ui->chckBx_strt_dbg_aftr_flsh->checkState()))) {
         flag = CLIENT_WANT_FLASH_ALL_SYNC;
         sqnc_of_sgnls_strtd = true;
         scrll_area_sgnls_set_enabled(false);
@@ -127,12 +127,15 @@ void RHE_Widget::on_pshBttn_strt_dbg_clicked() {
         send_file_status->start();
     } else {
         flag = CLIENT_WANT_START_DEBUG;
-        if(!static_cast<bool>(static_cast<int>(ui->chckBx_strt_dbg_aftr_flsh->checkState()))) {
+        if(static_cast<bool>(static_cast<int>(ui->chckBx_strt_dbg_aftr_flsh->checkState()))) {
             crrnt_state_strs = 4;
         }
     }
     ui->prgrssBr_fl_sts->setFormat(state_strs.at(crrnt_state_strs));
     snd_rcv_module->start_debug(static_cast<uint16_t>(ui->spnBx_dbg_tm->value()), static_cast<uint8_t>(ui->cmbBx_dbg_tm_tp->currentIndex()), flag);
+    if(static_cast<bool>(static_cast<int>(ui->chckBx_strt_sqnc_of_sgn_with_dbg->checkState())) && sqnc_of_sgnls_file_sended && !static_cast<bool>(static_cast<int>(ui->chckBx_strt_dbg_aftr_flsh->checkState()))) {
+        on_pshBttn_strt_sgnls_sqnc_clicked();
+    }
     set_button_state_debug(true);
 }
 
@@ -700,6 +703,18 @@ void RHE_Widget::slot_input_val_changed(int val) {
     free(switches_states);
 }
 
+void RHE_Widget::slot_slider_pressed() {
+    for(int i = 0; i < inpt_sldrs->count(); i++) {
+        if(inpt_sldrs->at(i)->isSliderDown()) {
+            if(inpt_sldrs->at(i)->value() == inpt_sldrs->at(i)->minimum()) {
+                inpt_sldrs->at(i)->setValue(inpt_sldrs->at(i)->maximum());
+            } else {
+                inpt_sldrs->at(i)->setValue(inpt_sldrs->at(i)->minimum());
+            }
+        }
+    }
+}
+
 void RHE_Widget::slot_choose_board(QString jtag_code) {
     for(int i = 0; i < jtag_id_codes->count(); i++) {
         if(jtag_id_codes->at(i).compare(jtag_code, Qt::CaseInsensitive) == 0) {
@@ -894,6 +909,7 @@ void RHE_Widget::slot_accept_output_data_table(QByteArray output_data_table) {
         sldr->setSingleStep(1);
         sldr->setFixedSize(100, 21);
         connect(sldr, &QSlider::valueChanged, this, &RHE_Widget::slot_input_val_changed);
+        connect(sldr, &QSlider::sliderPressed, this, &RHE_Widget::slot_slider_pressed);
         inpt_sldrs->append(sldr);
         h_layout->addWidget(sldr);
         QSpacerItem *hrzntl_2 = new QSpacerItem(10, 10, QSizePolicy::Preferred, QSizePolicy::Minimum);
@@ -918,15 +934,15 @@ void RHE_Widget::slot_firmware_file_sended() {
     ui->prgrssBr_fl_sts->setFormat(state_strs.at(crrnt_state_strs));
     ui->prgrssBr_fl_sts->setValue(ui->prgrssBr_fl_sts->minimum());
     if(!static_cast<bool>(static_cast<int>(ui->chckBx_strt_sqnc_of_sgn_with_dbg->checkState())) || !sqnc_of_sgnls_file_sended) {
-        snd_rcv_module->flash_FPGA();
         send_file_status->setInterval(200);
         send_file_status->start();
         crrnt_state_strs = 2;
         ui->prgrssBr_fl_sts->setFormat(state_strs.at(crrnt_state_strs));
+        snd_rcv_module->flash_FPGA();
     }
-    if(static_cast<bool>(static_cast<int>(ui->chckBx_strt_dbg_aftr_flsh->checkState()))) {
-        on_pshBttn_strt_dbg_clicked();
-    }
+//    if(static_cast<bool>(static_cast<int>(ui->chckBx_strt_dbg_aftr_flsh->checkState()))) {
+//        on_pshBttn_strt_dbg_clicked();
+//    }
 }
 
 void RHE_Widget::slot_sequence_of_signals_file_sended(bool flg) {
@@ -946,6 +962,7 @@ void RHE_Widget::slot_fpga_flashed() {
     ui->prgrssBr_fl_sts->setValue(ui->prgrssBr_fl_sts->minimum());
     set_enable_board_power_led(true);
     if(static_cast<bool>(static_cast<int>(ui->chckBx_strt_dbg_aftr_flsh->checkState()))) {
+        on_pshBttn_strt_dbg_clicked();
         crrnt_state_strs = 4;
         ui->prgrssBr_fl_sts->setFormat(state_strs.at(crrnt_state_strs));
     }

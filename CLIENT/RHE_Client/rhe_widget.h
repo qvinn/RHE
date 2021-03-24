@@ -88,11 +88,10 @@
             int dbg_tm_tp_lmt = 0;
 
         public slots:
-            void showEvent(QShowEvent *) override;
             void slot_re_translate();
 
         private slots:
-
+            void showEvent(QShowEvent *) override;
             void paintEvent(QPaintEvent *) override;
             void resizeEvent(QResizeEvent *) override;
             void on_pushButton_2_clicked();
@@ -114,6 +113,7 @@
             void pshBttn_strt_sgnls_sqnc_set_enabled(bool flag);
             void scrll_area_sgnls_set_enabled(bool flag);
             void slot_input_val_changed(int val);
+            void slot_slider_pressed();
             void slot_choose_board(QString jtag_code);
             void slot_accept_board(bool flg);
             void slot_accept_debug_time_limit(int time, int time_type);
