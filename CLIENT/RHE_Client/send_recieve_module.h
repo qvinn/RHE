@@ -143,6 +143,7 @@
             void firmware_file_recieved_signal();
             void sequence_file_recieved_signal(bool flg);
             void fpga_flashed_signal();
+            void debug_not_started();
             void end_debugging_signal();
             void end_sequence_of_signals_signal();
             void choose_board_signal(QString jtag_code);

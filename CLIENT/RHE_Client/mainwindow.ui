@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1110</width>
-    <height>760</height>
+    <height>765</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -117,14 +117,20 @@
       <x>0</x>
       <y>730</y>
       <width>1111</width>
-      <height>31</height>
+      <height>35</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_login">
      <property name="spacing">
       <number>5</number>
      </property>
+     <property name="topMargin">
+      <number>5</number>
+     </property>
      <property name="rightMargin">
+      <number>5</number>
+     </property>
+     <property name="bottomMargin">
       <number>5</number>
      </property>
      <item>
@@ -738,7 +744,7 @@ QPushButton:hover{
      <item>
       <widget class="QStackedWidget" name="stackedWidget">
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="registartion_page"/>
        <widget class="QWidget" name="rhe_widget_page"/>
@@ -746,6 +752,18 @@ QPushButton:hover{
      </item>
      <item>
       <widget class="Line" name="line_2">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>2</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>2</height>
+        </size>
+       </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>

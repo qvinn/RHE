@@ -24,6 +24,7 @@ RHE_Widget::RHE_Widget(QWidget *parent, General_Widget *widg, Send_Recieve_Modul
     connect(wvfrm_vwr, &Waveform_Viewer_Widget::as_window_signal, this, &RHE_Widget::slot_as_window);
     connect(gen_widg, &General_Widget::re_translate_signal, wvfrm_vwr, &Waveform_Viewer_Widget::slot_re_translate);
     connect(snd_rcv_module, &Send_Recieve_Module::fpga_flashed_signal, this, &RHE_Widget::slot_fpga_flashed);
+    connect(snd_rcv_module, &Send_Recieve_Module::debug_not_started, this, &RHE_Widget::slot_end_sequence_of_signals);
     connect(snd_rcv_module, &Send_Recieve_Module::end_sequence_of_signals_signal, this, &RHE_Widget::slot_end_sequence_of_signals);
     connect(snd_rcv_module, &Send_Recieve_Module::firmware_file_recieved_signal, this, &RHE_Widget::slot_firmware_file_sended);
     connect(snd_rcv_module, &Send_Recieve_Module::sequence_file_recieved_signal, this, &RHE_Widget::slot_sequence_of_signals_file_sended);
@@ -93,7 +94,7 @@ void RHE_Widget::paintEvent(QPaintEvent *) {
 
 void RHE_Widget::resizeEvent(QResizeEvent *) {
     ui->horizontalLayoutWidget->setGeometry(0, (this->height() - ui->horizontalLayoutWidget->height()), this->width(), ui->horizontalLayoutWidget->height());
-    ui->line_2->setGeometry(0, (ui->horizontalLayoutWidget->y() - 1), this->width(), ui->line_2->geometry().height());
+    ui->line_horizontal->setGeometry(0, (ui->horizontalLayoutWidget->y() - 1), this->width(), ui->line_horizontal->geometry().height());
     ui->widget->resize(this->width(), (this->height() - ui->horizontalLayoutWidget->height()));
     ui->horizontalLayoutWidget_2->setGeometry(0, 0, ui->widget->width(), ui->widget->height());
     ui->verticalLayout_3->setGeometry(QRect(ui->cmbBx_chs_brd->width(), 0, (ui->widget->width() - ui->cmbBx_chs_brd->width()), ui->widget->height()));

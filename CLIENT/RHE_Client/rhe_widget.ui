@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>861</width>
-    <height>605</height>
+    <height>607</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -2765,7 +2765,7 @@ QPushButton:hover{
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_7">
          <property name="spacing">
-          <number>2</number>
+          <number>5</number>
          </property>
          <item>
           <widget class="QSpinBox" name="spnBx_dbg_tm">
@@ -3428,7 +3428,7 @@ QPushButton:hover{
       </layout>
      </item>
      <item>
-      <widget class="Line" name="line">
+      <widget class="Line" name="line_vertical">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -3464,7 +3464,7 @@ QPushButton:hover{
         <number>0</number>
        </property>
        <property name="topMargin">
-        <number>0</number>
+        <number>5</number>
        </property>
        <property name="rightMargin">
         <number>5</number>
@@ -3505,10 +3505,13 @@ QPushButton:hover{
      <x>0</x>
      <y>570</y>
      <width>861</width>
-     <height>35</height>
+     <height>37</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
+    <property name="spacing">
+     <number>5</number>
+    </property>
     <property name="leftMargin">
      <number>5</number>
     </property>
@@ -3516,7 +3519,7 @@ QPushButton:hover{
      <number>5</number>
     </property>
     <property name="rightMargin">
-     <number>6</number>
+     <number>5</number>
     </property>
     <property name="bottomMargin">
      <number>5</number>
@@ -4679,7 +4682,7 @@ QPushButton:hover{
     </item>
    </layout>
   </widget>
-  <widget class="Line" name="line_2">
+  <widget class="Line" name="line_horizontal">
    <property name="geometry">
     <rect>
      <x>0</x>

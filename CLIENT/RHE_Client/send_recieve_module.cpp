@@ -191,6 +191,7 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 break;
             }            
             case RUN_DEBUG_FIRSTLY: {
+                emit debug_not_started();
                 qDebug() << "_________________________________RUN DEBUG FIRSTLY!";
                 break;
             }
