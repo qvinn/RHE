@@ -9,6 +9,14 @@
 
 #define PIN_MAX 8
 
+	// s	- 0
+	// ms	- 1
+	// us	- 2
+	
+#define SEC 0
+#define MS_SEC 1
+#define US_SEC 2
+
 #define D_DATA_BUFFER 76
 
 /*
@@ -32,6 +40,8 @@
 #ifdef DURATION_DEBUG_DEBUG_CLASS
     #include <chrono>
 #endif
+
+#include <chrono>
 
 class Debug {
 	
@@ -136,9 +146,11 @@ class Debug {
 	
 	set_state_Packet buf2set_state_Packet(char *buf);
 	
+	void prepare_pin_state(set_state_Packet _pin_state);
+	
 	// Метод для задани портам ввода-вывода необхохимых состояний
 	// Метод принимает в себя буффер и разбирает его, как структуру "set_state_Packet"
-	void set_pinStates(set_state_Packet state_Packet);
+	void set_pinStates(set_state_Packet state_Packet, int start_time);
 	
 	// Метод для формирования пакета в котором будет описана максимальная длительности отладки
 	void form_time_out_info(char *buf);
@@ -149,6 +161,16 @@ class Debug {
 	
 	static int same_int_checker(std::vector<int> vec);
 	
+
+	//std::chrono::microseconds start_time;
+	std::chrono::high_resolution_clock::time_point start_time;
+	void set_start_time();
+	int get_hop_time();
+		
+	int global_time;
+	std::mutex global_time_mutex;
+	void set_global_time(int val);
+	int get_global_time();
 	
 	private:
 	
@@ -261,19 +283,12 @@ class Debug {
 	
 	int fill_debug_seq();
 	
-	void run_dfile();
+	void run_dfile(int start_time);
 	
 	int stop_dsqrun_flag = 1;
 	std::mutex stop_dsqrun_flag_mutex;
 	
-	int global_time;
-	std::mutex global_time_mutex;
-	
-	int get_global_time();
-	void set_global_time(int val);
-	
 	set_state_Packet set_state_Packet_buff;
 	int stop_pinstate_flag = 1;
-	std::mutex stop_pinstate_flag_mutex;
-		
+	std::mutex stop_pinstate_flag_mutex;	
 };

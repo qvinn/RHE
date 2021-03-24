@@ -178,7 +178,7 @@ void client_conn_v_1::wait_analize_recv_data()
 			case PING_CLIENT_TO_S_SERVER:
 			{
 				answer_to_client();
-				printf("_________________________________Slave server answer to slave server\n");
+				printf("_________________________________Slave server answer to client\n");
 				break;	
 			}
 			
@@ -224,11 +224,13 @@ void client_conn_v_1::wait_analize_recv_data()
 #ifdef HW_EN
 			case CLIENT_WANT_START_DEBUG:
 			{
+				
 				if(gdb->debug_is_run() == 1)
 				{
 					printf("_________________________________DEBUG ALREADY RUN!\n");
 					break;
 				}
+				gdb->set_start_time();
 				std::thread gdb_thread(&Debug::start_debug_process,gdb);
 				gdb_thread.detach();
 				printf("_________________________________START DEBUG\n");
@@ -370,12 +372,13 @@ void client_conn_v_1::wait_analize_recv_data()
 
 #ifdef HW_EN
 			case CLIENT_WANT_START_SYNC_DEBUG_DSQ:
-			{
+			{				
 				if(gdb->debug_is_run() == 1)
 				{
 					printf("_________________________________DEBUG ALREADY RUN!\n");
 					break;
 				}
+				gdb->set_start_time();
 				std::thread gdb_thread(&Debug::start_debug_process,gdb);
 				gdb_thread.detach();
 				printf("_________________________________START DEBUG\n");
@@ -394,7 +397,7 @@ void client_conn_v_1::wait_analize_recv_data()
 			
 #ifdef HW_EN
 			case CLIENT_WANT_SET_PINSTATE:
-			{
+			{				
 				if(gdb->debug_is_run() != 1)
 				{
 					printf("_________________________________START DEBUG FIRSTLY!\n");
@@ -405,9 +408,15 @@ void client_conn_v_1::wait_analize_recv_data()
 					printf("_________________________________STOP DSQ FIRSTLY!\n");
 					break;
 				}
-				std::thread pin_state_thread(&Debug::set_pinStates,gdb,gdb->buf2set_state_Packet(tmp_packet->data));
+				
+				gdb->prepare_pin_state(gdb->buf2set_state_Packet(tmp_packet->data));
+				// Сначала остановим предыдущий поток, если он был запущен
+				gdb->stop_pinstate_process();
+				//usleep(101); // "Заглушка" n секудн для паузы, чтобы успел остановиться уже запущенный поток
+				while(gdb->pin_state_proc_is_run() == 1){}
+				std::thread pin_state_thread(&Debug::set_pinStates,gdb,gdb->buf2set_state_Packet(tmp_packet->data),gdb->get_hop_time());
 				pin_state_thread.detach();
-				printf("_________________________________\n");
+				printf("_________________________________SET_PINSTATE\n");
 				break;	
 			}
 #endif
@@ -420,12 +429,14 @@ void client_conn_v_1::wait_analize_recv_data()
 				system("openocd -f OpenOCD_run.cfg");
 				send_U_Packet(Socket, S_SERVER_SUCCESS_FLASH_FPGA, NULL);
 				
-				// Сразу запускаем сканирование пинов
+				// Сразу запускаем сканирование пинов		
 				if(gdb->debug_is_run() == 1)
 				{
 					printf("_________________________________DEBUG ALREADY RUN!\n");
 					break;
 				}
+				
+				gdb->set_start_time();
 				std::thread gdb_thread(&Debug::start_debug_process,gdb);
 				gdb_thread.detach();
 				printf("_________________________________START DEBUG\n");
