@@ -189,6 +189,10 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 emit fpga_flashed_signal();
                 qDebug() << "_________________________________S_SERVER SUCCESS FLASH FPGA";
                 break;
+            }            
+            case RUN_DEBUG_FIRSTLY: {
+                qDebug() << "_________________________________RUN DEBUG FIRSTLY!";
+                break;
             }
             default: {
                 qDebug() << "_________________________________UNKNOWN PACKET";

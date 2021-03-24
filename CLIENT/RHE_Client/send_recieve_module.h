@@ -55,6 +55,7 @@
     #define CLIENT_WANT_FLASH_ALL_SYNC 51
     #define S_SERVER_END_DSQ 52
     #define S_SERVER_SUCCESS_FLASH_FPGA 53
+    #define RUN_DEBUG_FIRSTLY 54
 
     class Send_Recieve_Module : public QObject {
         Q_OBJECT

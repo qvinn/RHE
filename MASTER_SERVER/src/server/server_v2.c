@@ -75,6 +75,7 @@
 #define CLIENT_WANT_FLASH_ALL_SYNC 51
 #define S_SERVER_END_DSQ 52
 #define S_SERVER_SUCCESS_FLASH_FPGA 53
+#define RUN_DEBUG_FIRSTLY 54
 
 
 // Карта code_op - КОНЕЦ
@@ -866,6 +867,18 @@ void recive_new_data(char *buf, int sock)
 			{				
 				send_U_Packet(finded_client, S_SERVER_SUCCESS_FLASH_FPGA, NULL);
 				printf("\t|___Slave_server with id %i SUCCESS FLASH FPGA on client with id %i\n", sock, finded_client);
+			}			
+			break;	
+		}
+				
+		case RUN_DEBUG_FIRSTLY:
+		{
+			// Перенаправляем запрос от slave-серверу к клиенту
+			int finded_client = find_pair_for(sock);
+			if(finded_client != ERROR)
+			{				
+				send_U_Packet(finded_client, RUN_DEBUG_FIRSTLY, NULL);
+				printf("\t|___Slave_server with id %i NEED RUN DEBUG for client with id %i\n", sock, finded_client);
 			}			
 			break;	
 		}

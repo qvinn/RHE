@@ -44,6 +44,7 @@
 #define CLIENT_WANT_FLASH_ALL_SYNC 51
 #define S_SERVER_END_DSQ 52
 #define S_SERVER_SUCCESS_FLASH_FPGA 53
+#define RUN_DEBUG_FIRSTLY 54
 
 #define DATA_EXIST 1
 #define DATA_NOT_EXIST 0
@@ -347,6 +348,7 @@ void client_conn_v_1::wait_analize_recv_data()
 				if(gdb->debug_is_run() != 1)
 				{
 					printf("_________________________________START DEBUG FIRSTLY!\n");
+					send_U_Packet(Socket, RUN_DEBUG_FIRSTLY, NULL);					
 					break;
 				}
 				if(gdb->dsq_is_run() == 1)
@@ -401,6 +403,7 @@ void client_conn_v_1::wait_analize_recv_data()
 				if(gdb->debug_is_run() != 1)
 				{
 					printf("_________________________________START DEBUG FIRSTLY!\n");
+					send_U_Packet(Socket, RUN_DEBUG_FIRSTLY, NULL);		
 					break;
 				}
 				if(gdb->dsq_is_run() == 1)
