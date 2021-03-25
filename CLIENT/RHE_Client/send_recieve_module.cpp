@@ -124,8 +124,7 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 break;
             }
             case S_SERVER_SENDING_DEBUG_INFO: {
-//                QByteArray debug_data(tmp_packet->data, sizeof(debug_log_Packet));
-                emit accept_debug_data_signal(QByteArray(tmp_packet->data, sizeof(debug_log_Packet)), true);
+                emit accept_debug_data_signal(QByteArray(tmp_packet->data, sizeof(debug_log_Packet)));
 //                recive_dbg_info(tmp_packet->data);
 //                qDebug() << "_________________________________Slave server sending DEBUG INFO";
                 break;
@@ -151,7 +150,6 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 qDebug() << "_________________________________Recive ODT";
 //                O_debug_table_parser(tmp_packet->data);
                 emit accept_output_data_table_signal(QByteArray(tmp_packet->data, sizeof(tmp_packet->data)));
-
                 break;
             }
             case S_SERVER_SEND_TIMEOUT_INFO: {
@@ -170,8 +168,8 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 break;
             }
             case S_SERVER_SENDING_DSQ_INFO: {
-                emit accept_debug_data_signal(QByteArray(tmp_packet->data, sizeof(debug_log_Packet)), false);
-                qDebug() << "_________________________________Slave server sending DSQ INFO";
+                emit accept_debug_data_signal(QByteArray(tmp_packet->data, sizeof(debug_log_Packet)));
+//                qDebug() << "_________________________________Slave server sending DSQ INFO";
                 recive_dbg_info(tmp_packet->data);
                 break;
             }

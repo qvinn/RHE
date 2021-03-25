@@ -117,7 +117,7 @@
             void slot_choose_board(QString jtag_code);
             void slot_accept_board(bool flg);
             void slot_accept_debug_time_limit(int time, int time_type);
-            void slot_accept_debug_data(QByteArray debug_data, bool is_inpt_dat);
+            void slot_accept_debug_data(QByteArray debug_data);
             void slot_accept_input_data_table(QByteArray input_data_table);
             void slot_accept_output_data_table(QByteArray output_data_table);
             void slot_firmware_file_sended();

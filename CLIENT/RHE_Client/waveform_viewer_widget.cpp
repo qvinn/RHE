@@ -278,6 +278,14 @@ void Waveform_Viewer_Widget::load_waveform() {
                         if(i == 0) {
                             debug_time = lst_dat.at(i).toDouble();
                         } else {
+                            if(str.compare(str_dat, Qt::CaseInsensitive) == 0) {
+                                QString tmp = "pin ";
+                                if(i < 10) {
+                                    tmp.append(QString::number(0));
+                                }
+                                tmp.append(QString::number(i));
+                                add_pin_names(tmp);
+                            }
                             vals.append(0);
                             vals.append(lst_dat.at(i).toInt());
                         }
@@ -374,15 +382,18 @@ void Waveform_Viewer_Widget::re_scale_graph() {
     ui->diagram->setProperty("ymax", ui->diagram->yAxis->range().upper);
 }
 
-void Waveform_Viewer_Widget::add_data_to_graph(QList<int> val, QList<int> *prev_vals, double time, bool val_changed, QList<bool> *drw_lst) {
+void Waveform_Viewer_Widget::add_data_to_graph(QList<int> val, QList<int> *prev_vals, double time, bool val_changed) {
     for(int i = 0; i < pin_names_board->count() * 2; i++) {
         if((i < graph_list->count()) && debug_show) {
-            draw_data_on_graph(val, prev_vals, time, val_changed, i);
-//            if(drw_lst == nullptr) {
-//                draw_data_on_graph(val, prev_vals, time, val_changed, i);
-//            } else if(drw_lst->at(i)) {
-//                draw_data_on_graph(val, prev_vals, time, val_changed, i);
-//            }
+            int shft_val = abs((i % 2) - 1);
+            if(val_changed) {
+                graph_list->at(i)->addData(time, (shft_val + i + prev_vals->at(i)));
+            }
+            if((val.at(i) == 1) && (i != 0)) {
+                graph_list->at(i)->setBrush(QBrush(QColor(0, 255, 0, 60)));
+                graph_list->at(i)->setChannelFillGraph(graph_list->at(i - 1));
+            }
+            graph_list->at(i)->addData(time, (shft_val + i + val.at(i)));
         }
         if(i < prev_vals->count()) {
             (*prev_vals).replace(i, val.at(i));
@@ -390,21 +401,9 @@ void Waveform_Viewer_Widget::add_data_to_graph(QList<int> val, QList<int> *prev_
     }
 }
 
-void Waveform_Viewer_Widget::add_data_to_graph_rltm(QList<int> val, QList<int> *prev_vals, double time, bool val_changed, QList<bool> *drw_lst) {
-    add_data_to_graph(val, prev_vals, time, val_changed, drw_lst);
+void Waveform_Viewer_Widget::add_data_to_graph_rltm(QList<int> val, QList<int> *prev_vals, double time, bool val_changed) {
+    add_data_to_graph(val, prev_vals, time, val_changed);
     ui->diagram->replot();
-}
-
-void Waveform_Viewer_Widget::draw_data_on_graph(QList<int> val, QList<int> *prev_vals, double time, bool val_changed, int i) {
-    int shft_val = abs((i % 2) - 1);
-    if(val_changed) {
-        graph_list->at(i)->addData(time, (shft_val + i + prev_vals->at(i)));
-    }
-    if((val.at(i) == 1) && (i != 0)) {
-        graph_list->at(i)->setBrush(QBrush(QColor(0, 255, 0, 60)));
-        graph_list->at(i)->setChannelFillGraph(graph_list->at(i - 1));
-    }
-    graph_list->at(i)->addData(time, (shft_val + i + val.at(i)));
 }
 
 void Waveform_Viewer_Widget::remove_data_from_graph() {

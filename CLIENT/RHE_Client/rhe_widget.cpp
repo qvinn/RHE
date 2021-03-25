@@ -738,7 +738,7 @@ void RHE_Widget::slot_accept_debug_time_limit(int time, int time_type) {
     ui->lbl_dbg_tm_tp_lmt->setText(ui->cmbBx_dbg_tm_tp->itemText(time_type));
 }
 
-void RHE_Widget::slot_accept_debug_data(QByteArray debug_data, bool is_inpt_dat) {
+void RHE_Widget::slot_accept_debug_data(QByteArray debug_data) {
     Send_Recieve_Module::debug_log_Packet *tmp_packet = reinterpret_cast<Send_Recieve_Module::debug_log_Packet *>(debug_data.data());
     if(new_debug) {
         new_debug = false;
@@ -765,46 +765,19 @@ void RHE_Widget::slot_accept_debug_data(QByteArray debug_data, bool is_inpt_dat)
     }
     bool val_changed = false;
     double dbg_time = (static_cast<double>(tmp_packet->time) / pow(1000.0, tmp_packet->time_mode));
-    QList<bool> *draw_lst = new QList<bool>();
-    draw_lst->clear();
     for(int i = 0; i < wvfrm_vwr->get_all_pins_count(); i++) {
         val.append(0);
-        draw_lst->append(false);
         if(nmd_pin_pos.count() == 0) {
             if(i >= tmp_packet->pin_count) {
                 val.append(prev_vals->at((2 * i) + 1));           //0
-//                draw_lst->append(false);
-                draw_lst->replace((draw_lst->count() - 1), (!sqnc_of_sgnls_strtd && is_inpt_dat));
-                draw_lst->append(!sqnc_of_sgnls_strtd && is_inpt_dat);
-//                if(wvfrm_vwr->get_graphs_list()->at((i * 2) + 1)->data()->size() != 0) {
-//                    int last = (wvfrm_vwr->get_graphs_list()->at((i * 2) + 1)->data()->size() - 1);
-//                    double key_val = (wvfrm_vwr->get_graphs_list()->at((i * 2) + 1)->data()->at(last)->key);
-//                    if(dbg_time < key_val) {
-//                        for(int l = last; l > -1; l--) {
-//                            double key = (wvfrm_vwr->get_graphs_list()->at((i * 2) + 1)->data()->at(l)->key);
-//                            if(dbg_time >= key) {
-//                                val.append((wvfrm_vwr->get_graphs_list()->at((i * 2) + 1)->data()->at(l)->value) - ((i * 2) + 1));
-//                                break;
-//                            }
-//                        }
-//                    } else {
-//                        val.append(prev_vals->at((2 * i) + 1));         //0
-//                    }
-//                } else {
-//                    val.append(prev_vals->at((2 * i) + 1));         //0
-//                }
             } else {
                 val.append(tmp_packet->pins[i].state);
-                draw_lst->replace(draw_lst->count() - 1, true);
-                draw_lst->append(true);
             }
         } else {
             int tmp = 0;
             for(int k = 0; k < nmd_pin_pos.count(); k++) {
                 if(i == nmd_pin_pos.at(k).x()) {
                     val.append(tmp_packet->pins[nmd_pin_pos.at(k).y()].state);
-                    draw_lst->replace(draw_lst->count() - 1, true);
-                    draw_lst->append(true);
                     break;
                 } else {
                     tmp++;
@@ -812,26 +785,6 @@ void RHE_Widget::slot_accept_debug_data(QByteArray debug_data, bool is_inpt_dat)
             }
             if(tmp == nmd_pin_pos.count()) {
                 val.append(prev_vals->at((2 * i) + 1));         //0
-//                draw_lst->append(false);
-                draw_lst->replace((draw_lst->count() - 1), (!sqnc_of_sgnls_strtd && is_inpt_dat));
-                draw_lst->append(!sqnc_of_sgnls_strtd && is_inpt_dat);
-//                if(wvfrm_vwr->get_graphs_list()->at((i * 2) + 1)->data()->size() != 0) {
-//                    int last = (wvfrm_vwr->get_graphs_list()->at((i * 2) + 1)->data()->size() - 1);
-//                    double key_val = static_cast<double>(wvfrm_vwr->get_graphs_list()->at((i * 2) + 1)->data()->at(last)->key);
-//                    if(dbg_time < key_val) {
-//                        for(int l = last; l > -1; l--) {
-//                            double key = (wvfrm_vwr->get_graphs_list()->at((i * 2) + 1)->data()->at(l)->key);
-//                            if(dbg_time >= key) {
-//                                val.append((wvfrm_vwr->get_graphs_list()->at((i * 2) + 1)->data()->at(l)->value) - ((i * 2) + 1));
-//                                break;
-//                            }
-//                        }
-//                    } else {
-//                        val.append(prev_vals->at((2 * i) + 1));         //0
-//                    }
-//                } else {
-//                    val.append(prev_vals->at((2 * i) + 1));         //0
-//                }
             }
         }
         if(prev_vals->at(val.count() - 1) != val.at(val.count() - 1)) {
@@ -839,9 +792,7 @@ void RHE_Widget::slot_accept_debug_data(QByteArray debug_data, bool is_inpt_dat)
         }
     }
     wvfrm_vwr->add_data_to_saved_vals_list(val, prev_vals, dbg_time, val_changed);
-    wvfrm_vwr->add_data_to_graph_rltm(val, prev_vals, dbg_time, val_changed, draw_lst);
-    draw_lst->clear();
-    delete draw_lst;
+    wvfrm_vwr->add_data_to_graph_rltm(val, prev_vals, dbg_time, val_changed);
 }
 
 void RHE_Widget::slot_accept_input_data_table(QByteArray input_data_table) {

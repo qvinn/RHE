@@ -23,8 +23,8 @@
             QList<QCPGraph *>* get_graphs_list();
             void remove_graphs_from_plot();
             void re_scale_graph();
-            void add_data_to_graph(QList<int> val, QList<int> *prev_vals, double time, bool val_changed, QList<bool> *drw_lst = nullptr);
-            void add_data_to_graph_rltm(QList<int> val, QList<int> *prev_vals, double time, bool val_changed, QList<bool> *drw_lst = nullptr);
+            void add_data_to_graph(QList<int> val, QList<int> *prev_vals, double time, bool val_changed);
+            void add_data_to_graph_rltm(QList<int> val, QList<int> *prev_vals, double time, bool val_changed);
             void remove_data_from_graph();
             void add_pin_names(QString pin_name);
             QList<QString>* get_pin_names();
@@ -50,7 +50,6 @@
             void change_margin(int val);
             void load_waveform();
             void save_waveform();
-            void draw_data_on_graph(QList<int> val, QList<int> *prev_vals, double time, bool val_changed, int i);
             void select_displayable_pins();
             void limit_axis_range(QCPAxis *axis, const QCPRange &new_range, const QCPRange &limit_range);
             bool mouse_inside_object(double x_coord, double y_coord, bool graph_drawing_rect);
