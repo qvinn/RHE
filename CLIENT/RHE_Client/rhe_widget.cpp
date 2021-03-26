@@ -137,6 +137,9 @@ void RHE_Widget::on_pshBttn_strt_dbg_clicked() {
     if(static_cast<bool>(static_cast<int>(ui->chckBx_strt_sqnc_of_sgn_with_dbg->checkState())) && sqnc_of_sgnls_file_sended && !static_cast<bool>(static_cast<int>(ui->chckBx_strt_dbg_aftr_flsh->checkState()))) {
         on_pshBttn_strt_sgnls_sqnc_clicked();
     }
+    if(inpt_sldrs->count() != 0) {
+        slot_input_val_changed(inpt_sldrs->at(0)->value());
+    }
     set_button_state_debug(true);
 }
 

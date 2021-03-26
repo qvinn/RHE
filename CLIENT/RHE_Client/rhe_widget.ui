@@ -3264,7 +3264,7 @@ QPushButton:hover{
        <item>
         <widget class="QScrollArea" name="scrollArea">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -3272,7 +3272,7 @@ QPushButton:hover{
          <property name="maximumSize">
           <size>
            <width>350</width>
-           <height>100</height>
+           <height>16777215</height>
           </size>
          </property>
          <property name="widgetResizable">
@@ -3284,7 +3284,7 @@ QPushButton:hover{
             <x>0</x>
             <y>0</y>
             <width>238</width>
-            <height>68</height>
+            <height>84</height>
            </rect>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_9">
@@ -3417,10 +3417,13 @@ QPushButton:hover{
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>40</height>
+           <height>5</height>
           </size>
          </property>
         </spacer>

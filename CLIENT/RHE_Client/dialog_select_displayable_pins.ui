@@ -163,7 +163,7 @@
     </widget>
    </item>
    <item row="0" column="1" rowspan="2">
-    <spacer name="verticalSpacer">
+    <spacer name="verticalSpacer_1">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
@@ -198,7 +198,7 @@
     </widget>
    </item>
    <item row="1" column="0" rowspan="5">
-    <widget class="QListView" name="listView_All">
+    <widget class="QListView" name="lstVw_avlbl_pins">
      <property name="minimumSize">
       <size>
        <width>250</width>
@@ -214,7 +214,7 @@
     </widget>
    </item>
    <item row="1" column="2" rowspan="5">
-    <widget class="QListView" name="listView_Sel">
+    <widget class="QListView" name="lstVw_dspbl_pins">
      <property name="minimumSize">
       <size>
        <width>250</width>
@@ -230,7 +230,7 @@
     </widget>
    </item>
    <item row="2" column="1">
-    <widget class="QPushButton" name="pushButton_Add">
+    <widget class="QPushButton" name="pshBttn_add">
      <property name="enabled">
       <bool>true</bool>
      </property>
@@ -326,7 +326,7 @@ QPushButton:hover{
     </spacer>
    </item>
    <item row="4" column="1">
-    <widget class="QPushButton" name="pushButton_Del">
+    <widget class="QPushButton" name="pshBttn_dlt">
      <property name="minimumSize">
       <size>
        <width>30</width>
@@ -418,7 +418,7 @@ QPushButton:hover{
    <item row="6" column="0" colspan="3">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QPushButton" name="pushButton_Ok">
+      <widget class="QPushButton" name="pshBttn_ok">
        <property name="minimumSize">
         <size>
          <width>120</width>
@@ -490,12 +490,12 @@ QPushButton:hover{
 }</string>
        </property>
        <property name="text">
-        <string>OK</string>
+        <string>Ok</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_Cancell">
+      <widget class="QPushButton" name="pshBttn_cncl">
        <property name="minimumSize">
         <size>
          <width>120</width>
@@ -567,7 +567,7 @@ QPushButton:hover{
 }</string>
        </property>
        <property name="text">
-        <string>Cancell</string>
+        <string>Cancel</string>
        </property>
       </widget>
      </item>

@@ -47,10 +47,13 @@
         private:
             void post_initialize_ui();
             void set_ui_text();
+            void change_colors();
             void change_margin(int val);
             void load_waveform();
             void save_waveform();
+            void select_diagram_settings();
             void select_displayable_pins();
+            void draw_from_saved_vals(int val);
             void limit_axis_range(QCPAxis *axis, const QCPRange &new_range, const QCPRange &limit_range);
             bool mouse_inside_object(double x_coord, double y_coord, bool graph_drawing_rect);
 
@@ -64,6 +67,8 @@
             QCPItemLine *curs_ver_line = nullptr;
             QCPItemText *curs_time = nullptr;
             Qt::WindowFlags flags;
+            QColor grph_clr;
+            QColor grph_brsh_clr;
             QList<QList<int> *> *svd_vals = nullptr;
             QList<double> *svd_dbg_time = nullptr;
 
@@ -88,12 +93,14 @@
             void leaveEvent(QEvent *) override;
             void resizeEvent(QResizeEvent *) override;
             void closeEvent(QCloseEvent *) override;
+            void on_chckBx_as_wndw_stateChanged(int state);
             void on_chckBx_attch_crsr_stateChanged(int state);
             void on_spnBx_wvfrm_vwr_dscrtnss_tm_valueChanged(int value);
             void on_cmbBx_wvfrm_vwr_dscrtnss_tm_tp_currentIndexChanged(int index);
+            void on_pshBttn_chng_sttngs_clicked();
             void on_pshBttn_fl_scl_clicked();
             void on_pshBttn_clr_clicked();
-            void on_chckBx_as_wndw_stateChanged(int state);
+            void on_pshBttn_slct_dsplbl_pins_clicked();
             void on_pshBttn_open_save_wvfrm_clicked();
             void slot_mouse_move(QMouseEvent *event);
             void slot_mouse_pressed(QMouseEvent *event);
@@ -101,9 +108,7 @@
             void slot_x_axis_changed(const QCPRange &new_range);
             void slot_y_axis_changed(const QCPRange &new_range);
 
-            void on_pshBttn_slct_dsplbl_pins_clicked();
-
-    signals:
+        signals:
             void as_window_signal();
             void waveform_viewer_closed_signal();
     };
@@ -132,12 +137,48 @@
             QStringListModel *displayable_pins_model;
 
         private slots:
-            void on_pushButton_Ok_clicked();
-            void on_pushButton_Cancell_clicked();
-            void on_pushButton_Add_clicked();
-            void on_pushButton_Del_clicked();
+            void on_pshBttn_ok_clicked();
+            void on_pshBttn_cncl_clicked();
+            void on_pshBttn_add_clicked();
+            void on_pshBttn_dlt_clicked();
             void displayable_pins_selection_changed(const QItemSelection &sel);
             void available_pins_selection_changed(const QItemSelection &sel);
+    };
+
+    //////////////////////////////////////////////////DIALOG SELECT DIAGRAM SETTING///////////////////////////////////////////////////
+    QT_BEGIN_NAMESPACE
+    namespace Ui {
+        class Dialog_Select_Diagram_Settings;
+    }
+    QT_END_NAMESPACE
+
+    class Dialog_Select_Diagram_Settings : public QDialog {
+        Q_OBJECT
+        public:
+            Dialog_Select_Diagram_Settings(QList<QString> _sttngs_lst, QWidget *parent = nullptr);
+            ~Dialog_Select_Diagram_Settings() override;
+
+            QList<QString> get_diagram_settings();
+
+        private:
+            void change_color(int value);
+
+            Ui::Dialog_Select_Diagram_Settings *ui;
+            QList<QPushButton*> *bttns_lst = nullptr;
+            QList<QString> sttngs_lst;
+
+        private slots:
+            void on_pshBttn_axs_lbls_clr_clicked();
+            void on_pshBttn_dgrm_grd_clr_clicked();
+            void on_pshBttn_dgrm_bckgrnd_clr_clicked();
+            void on_pshBttn_slctn_clr_clicked();
+            void on_pshBttn_crsr_ln_clr_clicked();
+            void on_pshBttn_crsr_tm_lbl_brdr_clr_clicked();
+            void on_pshBttn_crsr_tm_lbl_fll_clr_clicked();
+            void on_pshBttn_grph_clr_clicked();
+            void on_spnBx_axs_lbls_fnr_sz_valueChanged(int value);
+            void on_pshBttn_ok_clicked();
+            void on_pshBttn_cncl_clicked();
     };
 
 #endif // WAVEFORM_VIEWER_WIDGET_H

@@ -1,6 +1,7 @@
 #include "waveform_viewer_widget.h"
 #include "ui_waveform_viewer.h"
 #include "ui_dialog_select_displayable_pins.h"
+#include "ui_dialog_select_diagram_color.h"
 
 Waveform_Viewer_Widget::Waveform_Viewer_Widget(QWidget *parent, General_Widget *widg, bool stndln) : QWidget(parent), ui(new Ui::Waveform_Viewer) {
     ui->setupUi(this);
@@ -60,6 +61,18 @@ void Waveform_Viewer_Widget::closeEvent(QCloseEvent *) {
     }
 }
 
+void Waveform_Viewer_Widget::on_chckBx_as_wndw_stateChanged(int state) {
+    change_margin(5 * (state / 2));
+    as_window = static_cast<bool>(state);
+    if(state == 2) {
+        this->setWindowFlags(Qt::Window | Qt::WindowMinMaxButtonsHint | Qt::WindowTitleHint);
+        this->show();
+    } else {
+        this->setWindowFlags(flags);
+    }
+    emit as_window_signal();
+}
+
 void Waveform_Viewer_Widget::on_chckBx_attch_crsr_stateChanged(int state) {
     if(ui_initialized) {
         if(standalone) {
@@ -97,6 +110,10 @@ void Waveform_Viewer_Widget::on_cmbBx_wvfrm_vwr_dscrtnss_tm_tp_currentIndexChang
     }
 }
 
+void Waveform_Viewer_Widget::on_pshBttn_chng_sttngs_clicked() {
+    select_diagram_settings();
+}
+
 void Waveform_Viewer_Widget::on_pshBttn_fl_scl_clicked() {
     re_scale_graph();
 }
@@ -107,18 +124,6 @@ void Waveform_Viewer_Widget::on_pshBttn_clr_clicked() {
 
 void Waveform_Viewer_Widget::on_pshBttn_slct_dsplbl_pins_clicked() {
     select_displayable_pins();
-}
-
-void Waveform_Viewer_Widget::on_chckBx_as_wndw_stateChanged(int state) {
-    change_margin(5 * (state / 2));
-    as_window = static_cast<bool>(state);
-    if(state == 2) {
-        this->setWindowFlags(Qt::Window | Qt::WindowMinMaxButtonsHint | Qt::WindowTitleHint);
-        this->show();
-    } else {
-        this->setWindowFlags(flags);        
-    }
-    emit as_window_signal();
 }
 
 void Waveform_Viewer_Widget::on_pshBttn_open_save_wvfrm_clicked() {
@@ -139,40 +144,11 @@ void Waveform_Viewer_Widget::pshBttn_open_save_wvfrm_set_enabled(bool flg) {
 
 void Waveform_Viewer_Widget::initialize_ui() {
     ui->diagram->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom/* | QCP::iSelectPlottables*//* | QCP::iSelectAxes*/);     //iSelectAxes
-    ui->diagram->xAxis->setBasePen(QPen(QColor(100, 100, 100), 1));
-    ui->diagram->yAxis->setBasePen(QPen(QColor(100, 100, 100), 1));
-    ui->diagram->xAxis->setTickPen(QPen(QColor(100, 100, 100), 1));
-    ui->diagram->yAxis->setTickPen(QPen(QColor(100, 100, 100), 1));
-    ui->diagram->xAxis->grid()->setPen(QPen(QColor(100, 100, 100), 1, Qt::SolidLine));
-    ui->diagram->yAxis->grid()->setPen(QPen(QColor(100, 100, 100), 1, Qt::SolidLine));
-    ui->diagram->xAxis->setTickLabelColor(Qt::white);
-    ui->diagram->yAxis->setTickLabelColor(Qt::white);
-    QLinearGradient plot_gradient;
-    plot_gradient.setStart(0, 0);
-    plot_gradient.setFinalStop(0, 350);
-    plot_gradient.setColorAt(0, QColor(0, 0, 0));
-    plot_gradient.setColorAt(1, QColor(0, 0, 0));
-    ui->diagram->setBackground(plot_gradient);
-    QLinearGradient axis_rect_gradient;
-    axis_rect_gradient.setStart(0, 0);
-    axis_rect_gradient.setFinalStop(0, 350);
-    axis_rect_gradient.setColorAt(0, QColor(0, 0, 0));
-    axis_rect_gradient.setColorAt(1, QColor(0, 0, 0));
-    ui->diagram->axisRect()->setBackground(axis_rect_gradient);
-    ui->diagram->xAxis->setSubTicks(false);
-    ui->diagram->yAxis->setSubTicks(false);
-    //////////////////////////////////////////////////////////////////////////////////
-//    ui->diagram->xAxis->setSelectableParts(QCPAxis::spNone);
-//    ui->diagram->yAxis->setSelectableParts(QCPAxis::spTickLabels);
-//    ui->diagram->yAxis->setSelectedTickLabelColor(QColor("#FF00FF50"));
-    //////////////////////////////////////////////////////////////////////////////////
-    ui->diagram->selectionRect()->setPen(QPen(QColor("#FFFF0000"), 1, Qt::SolidLine));
-    ui->diagram->selectionRect()->setBrush(QBrush(QColor("#50FF0000")));
     ui->diagram->addLayer("layerCursor", 0, QCustomPlot::limAbove);
     ui->diagram->layer("layerCursor")->setMode(QCPLayer::lmBuffered);
-    curs_ver_line->setPen(QPen(QColor("#FFFFFF00"), 1, Qt::SolidLine));
-    curs_time->setPen(QPen(QColor("#FFFFFFFF"), 1, Qt::SolidLine));
-    curs_time->setBrush(QBrush(QColor("#FFFFFF00")));
+    ui->diagram->xAxis->setSubTicks(false);
+    ui->diagram->yAxis->setSubTicks(false);
+    change_colors();
     curs_time->setPadding(QMargins(2, 2, 2, 2));
     curs_ver_line->setLayer("layerCursor");
     curs_time->setLayer("layerCursor");
@@ -219,6 +195,51 @@ void Waveform_Viewer_Widget::set_ui_text() {
         ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->setItemText(2, tr("us"));
     }
     language_changed = true;
+}
+
+void Waveform_Viewer_Widget::change_colors() {
+    QFont fnt = QFont("Tahoma", gen_widg->get_setting("settings/WVFRM_VWR_AXIS_LABELS_FONT_SIZE").toInt());
+    ui->diagram->xAxis->setTickLabelFont(fnt);
+    ui->diagram->yAxis->setTickLabelFont(fnt);
+    QColor dgrm_grd_clr = QColor(gen_widg->get_setting("settings/WVFRM_VWR_DIAGRAM_GRID_COLOR").toString());
+    QColor axs_lbls_clr = QColor(gen_widg->get_setting("settings/WVFRM_VWR_AXIS_LABELS_COLOR").toString());
+    QColor dgrm_bckgrnd_clr = QColor(gen_widg->get_setting("settings/WVFRM_VWR_DIAGRAM_BACKGROUND_COLOR").toString());
+    QColor slctn_clr = QColor(gen_widg->get_setting("settings/WVFRM_VWR_SELECTION_COLOR").toString());
+    QColor slctn_brsh_clr = slctn_clr;
+    slctn_brsh_clr.setAlpha(80);
+    grph_clr = QColor(gen_widg->get_setting("settings/WVFRM_VWR_GRAPH_COLOR").toString());
+    for(int i = 0; i < graph_list->count(); i++) {
+        if((i % 2) == 1) {
+            graph_list->at(i)->setPen(QPen(grph_clr, 1));
+        }
+    }
+    grph_brsh_clr = grph_clr;
+    grph_brsh_clr.setAlpha(60);
+    ui->diagram->xAxis->setBasePen(QPen(dgrm_grd_clr, 1));
+    ui->diagram->yAxis->setBasePen(QPen(dgrm_grd_clr, 1));
+    ui->diagram->xAxis->setTickPen(QPen(dgrm_grd_clr, 1));
+    ui->diagram->yAxis->setTickPen(QPen(dgrm_grd_clr, 1));
+    ui->diagram->xAxis->grid()->setPen(QPen(dgrm_grd_clr, 1, Qt::SolidLine));
+    ui->diagram->yAxis->grid()->setPen(QPen(dgrm_grd_clr, 1, Qt::SolidLine));
+    ui->diagram->xAxis->setTickLabelColor(axs_lbls_clr);
+    ui->diagram->yAxis->setTickLabelColor(axs_lbls_clr);
+    QLinearGradient plot_gradient;
+    plot_gradient.setStart(0, 0);
+    plot_gradient.setFinalStop(0, 350);
+    plot_gradient.setColorAt(0, dgrm_bckgrnd_clr);
+    plot_gradient.setColorAt(1, dgrm_bckgrnd_clr);
+    ui->diagram->setBackground(plot_gradient);
+    QLinearGradient axis_rect_gradient;
+    axis_rect_gradient.setStart(0, 0);
+    axis_rect_gradient.setFinalStop(0, 350);
+    axis_rect_gradient.setColorAt(0, dgrm_bckgrnd_clr);
+    axis_rect_gradient.setColorAt(1, dgrm_bckgrnd_clr);
+    ui->diagram->axisRect()->setBackground(axis_rect_gradient);
+    ui->diagram->selectionRect()->setPen(QPen(slctn_clr, 1, Qt::SolidLine));
+    ui->diagram->selectionRect()->setBrush(QBrush(slctn_brsh_clr));
+    curs_ver_line->setPen(QPen(QColor(gen_widg->get_setting("settings/WVFRM_VWR_CURSOR_LINE_COLOR").toString()), 1, Qt::SolidLine));
+    curs_time->setPen(QPen(QColor(gen_widg->get_setting("settings/WVFRM_VWR_CURSOR_TIME_LABEL_BORDER_COLOR").toString()), 1, Qt::SolidLine));
+    curs_time->setBrush(QBrush(QColor(gen_widg->get_setting("settings/WVFRM_VWR_CURSOR_TIME_LABEL_FILL_COLOR").toString())));
 }
 
 void Waveform_Viewer_Widget::change_margin(int val) {
@@ -349,10 +370,10 @@ void Waveform_Viewer_Widget::save_waveform() {
 void Waveform_Viewer_Widget::add_graphs_to_plot() {
     for(int i = 0; i < graph_count; i++) {
         graph_list->append(ui->diagram->addGraph());
-        graph_list->at(i * 2 + 0)->setPen(QPen(QColor(0, 255, 0, 0), 1));
-        graph_list->at(i * 2 + 0)->setBrush(QBrush(QColor(0, 0, 255, 0)));
+        graph_list->at(i * 2 + 0)->setPen(QPen(QColor("#00000000"), 1));
+        graph_list->at(i * 2 + 0)->setBrush(QBrush(QColor("#00000000")));
         graph_list->append(ui->diagram->addGraph());
-        graph_list->at(i * 2 + 1)->setPen(QPen(QColor(0, 255, 0, 255), 1));
+        graph_list->at(i * 2 + 1)->setPen(QPen(grph_clr, 1));
     }
     change_pin_names();
 }
@@ -390,7 +411,7 @@ void Waveform_Viewer_Widget::add_data_to_graph(QList<int> val, QList<int> *prev_
                 graph_list->at(i)->addData(time, (shft_val + i + prev_vals->at(i)));
             }
             if((val.at(i) == 1) && (i != 0)) {
-                graph_list->at(i)->setBrush(QBrush(QColor(0, 255, 0, 60)));
+                graph_list->at(i)->setBrush(QBrush(grph_brsh_clr));
                 graph_list->at(i)->setChannelFillGraph(graph_list->at(i - 1));
             }
             graph_list->at(i)->addData(time, (shft_val + i + val.at(i)));
@@ -510,6 +531,37 @@ void Waveform_Viewer_Widget::remove_all_data() {
     re_scale_graph();
 }
 
+void Waveform_Viewer_Widget::select_diagram_settings() {
+    QList<QString> sttngs_lst;
+    sttngs_lst.clear();
+    sttngs_lst.append(gen_widg->get_setting("settings/WVFRM_VWR_AXIS_LABELS_COLOR").toString());
+    sttngs_lst.append(gen_widg->get_setting("settings/WVFRM_VWR_DIAGRAM_GRID_COLOR").toString());
+    sttngs_lst.append(gen_widg->get_setting("settings/WVFRM_VWR_DIAGRAM_BACKGROUND_COLOR").toString());
+    sttngs_lst.append(gen_widg->get_setting("settings/WVFRM_VWR_SELECTION_COLOR").toString());
+    sttngs_lst.append(gen_widg->get_setting("settings/WVFRM_VWR_CURSOR_LINE_COLOR").toString());
+    sttngs_lst.append(gen_widg->get_setting("settings/WVFRM_VWR_CURSOR_TIME_LABEL_BORDER_COLOR").toString());
+    sttngs_lst.append(gen_widg->get_setting("settings/WVFRM_VWR_CURSOR_TIME_LABEL_FILL_COLOR").toString());
+    sttngs_lst.append(gen_widg->get_setting("settings/WVFRM_VWR_GRAPH_COLOR").toString());
+    sttngs_lst.append(QString::number(gen_widg->get_setting("settings/WVFRM_VWR_AXIS_LABELS_FONT_SIZE").toInt()));
+    Dialog_Select_Diagram_Settings settings_select_dialog(sttngs_lst, this);
+    int dlgCase = settings_select_dialog.exec();
+    if(dlgCase == 1) {
+        QList<QString> sttngs_lst_new = settings_select_dialog.get_diagram_settings();
+        gen_widg->save_setting("settings/WVFRM_VWR_AXIS_LABELS_COLOR", sttngs_lst_new.at(0));
+        gen_widg->save_setting("settings/WVFRM_VWR_DIAGRAM_GRID_COLOR", sttngs_lst_new.at(1));
+        gen_widg->save_setting("settings/WVFRM_VWR_DIAGRAM_BACKGROUND_COLOR", sttngs_lst_new.at(2));
+        gen_widg->save_setting("settings/WVFRM_VWR_SELECTION_COLOR", sttngs_lst_new.at(3));
+        gen_widg->save_setting("settings/WVFRM_VWR_CURSOR_LINE_COLOR", sttngs_lst_new.at(4));
+        gen_widg->save_setting("settings/WVFRM_VWR_CURSOR_TIME_LABEL_BORDER_COLOR", sttngs_lst_new.at(5));
+        gen_widg->save_setting("settings/WVFRM_VWR_CURSOR_TIME_LABEL_FILL_COLOR", sttngs_lst_new.at(6));
+        gen_widg->save_setting("settings/WVFRM_VWR_GRAPH_COLOR", sttngs_lst_new.at(7));
+        gen_widg->save_setting("settings/WVFRM_VWR_AXIS_LABELS_FONT_SIZE", sttngs_lst_new.at(8).toInt());
+        change_colors();
+        remove_data_from_graph();
+        draw_from_saved_vals(pin_names->count());
+    }
+}
+
 void Waveform_Viewer_Widget::select_displayable_pins() {
     QStringList avlbl_pins, dsplbl_pins;
     avlbl_pins.append(*pin_names_board);
@@ -593,41 +645,45 @@ void Waveform_Viewer_Widget::select_displayable_pins() {
         add_names = static_cast<bool>(pin_names->count());
         add_graphs_to_plot();
         plot_re_scale = false;
-        QList<int> prev_vals;
-        prev_vals.clear();
-        for(int i = 0; i < graph_list->count(); i++) {
-            prev_vals.append(0);
-        }
-        QList<QList<int>> tmp_vals_frm_svd;
-        if(svd_vals->count() != 0) {
-            for(int i = 0; i < svd_vals->at(0)->count(); i++) {
-                QList<int> new_lst;
-                new_lst.clear();
-                for(int k = 0; k < svd_vals->count(); k++) {
-                    if(k < dsplbl_pins_lst.count()) {
-                        new_lst.append(0);
-                        new_lst.append(svd_vals->at(k)->at(i));
-                    }
-                }
-                if(new_lst.count() != 0) {
-                    tmp_vals_frm_svd.append(new_lst);
-                }
-            }
-        }
-        if(tmp_vals_frm_svd.count() != 0) {
-            for(int i = 0; i < svd_dbg_time->count(); i++) {
-                bool val_changed = false;
-                for(int k = 0; k < tmp_vals_frm_svd.at(i).count(); k++) {
-                    if(tmp_vals_frm_svd.at(i).at(k) != prev_vals.at(k)) {
-                        val_changed = true;
-                        break;
-                    }
-                }
-                add_data_to_graph(tmp_vals_frm_svd.at(i), &prev_vals, svd_dbg_time->at(i), val_changed);
-            }
-        }
-        ui->diagram->replot();
+        draw_from_saved_vals(dsplbl_pins_lst.count());
     }
+}
+
+void Waveform_Viewer_Widget::draw_from_saved_vals(int val) {
+    QList<int> prev_vals;
+    prev_vals.clear();
+    for(int i = 0; i < graph_list->count(); i++) {
+        prev_vals.append(0);
+    }
+    QList<QList<int>> tmp_vals_frm_svd;
+    if(svd_vals->count() != 0) {
+        for(int i = 0; i < svd_vals->at(0)->count(); i++) {
+            QList<int> new_lst;
+            new_lst.clear();
+            for(int k = 0; k < svd_vals->count(); k++) {
+                if(k < val) {
+                    new_lst.append(0);
+                    new_lst.append(svd_vals->at(k)->at(i));
+                }
+            }
+            if(new_lst.count() != 0) {
+                tmp_vals_frm_svd.append(new_lst);
+            }
+        }
+    }
+    if(tmp_vals_frm_svd.count() != 0) {
+        for(int i = 0; i < svd_dbg_time->count(); i++) {
+            bool val_changed = false;
+            for(int k = 0; k < tmp_vals_frm_svd.at(i).count(); k++) {
+                if(tmp_vals_frm_svd.at(i).at(k) != prev_vals.at(k)) {
+                    val_changed = true;
+                    break;
+                }
+            }
+            add_data_to_graph(tmp_vals_frm_svd.at(i), &prev_vals, svd_dbg_time->at(i), val_changed);
+        }
+    }
+    ui->diagram->replot();
 }
 
 void Waveform_Viewer_Widget::limit_axis_range(QCPAxis *axis, const QCPRange &new_range, const QCPRange &limit_range) {
@@ -835,23 +891,22 @@ Dialog_Select_Displayable_Pins::Dialog_Select_Displayable_Pins(QStringList avlbl
     ui->setupUi(this);
     available_pins_model = new QStringListModel(this);
     available_pins_model->setStringList(avlbl_pins);
-    ui->listView_All->setModel(available_pins_model);
-    ui->listView_All->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->lstVw_avlbl_pins->setModel(available_pins_model);
+    ui->lstVw_avlbl_pins->setEditTriggers(QAbstractItemView::NoEditTriggers);
     displayable_pins_model = new QStringListModel(this);
     displayable_pins_model->setStringList(dsplbl_pins);
-    ui->listView_Sel->setModel(displayable_pins_model);
-    ui->listView_Sel->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    connect(ui->listView_All->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(available_pins_selection_changed(const QItemSelection &)));
+    ui->lstVw_dspbl_pins->setModel(displayable_pins_model);
+    ui->lstVw_dspbl_pins->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    connect(ui->lstVw_avlbl_pins->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(available_pins_selection_changed(const QItemSelection &)));
     this->setWindowTitle(tr("Select pins for display"));
     this->setFixedSize(600, 300);
     this->updateGeometry();
-    ui->pushButton_Ok->setText(tr("OK"));
-    connect(ui->listView_Sel->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(displayable_pins_selection_changed(const QItemSelection &)));
-    ui->listView_All->setSelectionMode(QAbstractItemView::SingleSelection);
-    ui->listView_All->selectionModel()->clearSelection();
-    ui->listView_Sel->selectionModel()->clearSelection();
-    ui->pushButton_Del->setEnabled(false);
-    ui->pushButton_Add->setEnabled(false);
+    connect(ui->lstVw_dspbl_pins->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(displayable_pins_selection_changed(const QItemSelection &)));
+    ui->lstVw_avlbl_pins->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->lstVw_avlbl_pins->selectionModel()->clearSelection();
+    ui->lstVw_dspbl_pins->selectionModel()->clearSelection();
+    ui->pshBttn_dlt->setEnabled(false);
+    ui->pshBttn_add->setEnabled(false);
 }
 
 Dialog_Select_Displayable_Pins::~Dialog_Select_Displayable_Pins() {
@@ -860,20 +915,20 @@ Dialog_Select_Displayable_Pins::~Dialog_Select_Displayable_Pins() {
     delete ui;
 }
 
-void Dialog_Select_Displayable_Pins::on_pushButton_Ok_clicked() {
+void Dialog_Select_Displayable_Pins::on_pshBttn_ok_clicked() {
     QDialog::done(1);
 }
 
-void Dialog_Select_Displayable_Pins::on_pushButton_Cancell_clicked() {
+void Dialog_Select_Displayable_Pins::on_pshBttn_cncl_clicked() {
     QDialog::done(0);
 }
 
-void Dialog_Select_Displayable_Pins::on_pushButton_Add_clicked() {
-    replace_selected_pin(displayable_pins_model, available_pins_model, ui->listView_Sel, ui->listView_All, ui->pushButton_Add);
+void Dialog_Select_Displayable_Pins::on_pshBttn_add_clicked() {
+    replace_selected_pin(displayable_pins_model, available_pins_model, ui->lstVw_dspbl_pins, ui->lstVw_avlbl_pins, ui->pshBttn_add);
 }
 
-void Dialog_Select_Displayable_Pins::on_pushButton_Del_clicked() {
-    replace_selected_pin(available_pins_model, displayable_pins_model, ui->listView_All, ui->listView_Sel, ui->pushButton_Del);
+void Dialog_Select_Displayable_Pins::on_pshBttn_dlt_clicked() {
+    replace_selected_pin(available_pins_model, displayable_pins_model, ui->lstVw_avlbl_pins, ui->lstVw_dspbl_pins, ui->pshBttn_dlt);
 }
 
 void Dialog_Select_Displayable_Pins::replace_selected_pin(QStringListModel *recv_model, QStringListModel *sndr_model, QListView *recv_view, QListView *sndr_view, QPushButton *sndr_button) {
@@ -890,23 +945,23 @@ void Dialog_Select_Displayable_Pins::replace_selected_pin(QStringListModel *recv
 
 void Dialog_Select_Displayable_Pins::displayable_pins_selection_changed(const QItemSelection &sel) {
     Q_UNUSED(sel);
-    ui->pushButton_Del->setEnabled(true);
-    ui->listView_All->selectionModel()->clearSelection();
+    ui->pshBttn_dlt->setEnabled(true);
+    ui->lstVw_avlbl_pins->selectionModel()->clearSelection();
 }
 
 void Dialog_Select_Displayable_Pins::available_pins_selection_changed(const QItemSelection &sel) {
     if(sel.indexes().count() > 0) {
         QModelIndex index = sel.indexes().first();
         QString pin_name = available_pins_model->data(index).toString();
-        ui->listView_Sel->selectionModel()->clearSelection();
-        ui->pushButton_Del->setEnabled(false);
+        ui->lstVw_dspbl_pins->selectionModel()->clearSelection();
+        ui->pshBttn_dlt->setEnabled(false);
         if(displayable_pins_model->stringList().contains(pin_name)) {
-            ui->pushButton_Add->setEnabled(false);
+            ui->pshBttn_add->setEnabled(false);
         } else {
-            ui->pushButton_Add->setEnabled(true);
+            ui->pshBttn_add->setEnabled(true);
         }
     } else {
-        ui->pushButton_Add->setEnabled(false);
+        ui->pshBttn_add->setEnabled(false);
     }
 }
 
@@ -916,4 +971,88 @@ QStringList Dialog_Select_Displayable_Pins::get_displayable_pins() {
 
 QStringList Dialog_Select_Displayable_Pins::get_available_pins() {
     return available_pins_model->stringList();
+}
+
+////////////////////////////////////////////////////DIALOG SELECT DIAGRAM COLOR///////////////////////////////////////////////////
+Dialog_Select_Diagram_Settings::Dialog_Select_Diagram_Settings(QList<QString> _sttngs_lst, QWidget *parent) : QDialog(parent), ui(new Ui::Dialog_Select_Diagram_Settings) {
+    ui->setupUi(this);
+    this->setWindowTitle(tr("Select diagram settings"));
+    this->setFixedSize(600, 300);
+    this->updateGeometry();
+    sttngs_lst = _sttngs_lst;
+    bttns_lst = new QList<QPushButton*>();
+    bttns_lst->append(ui->pshBttn_axs_lbls_clr);
+    bttns_lst->append(ui->pshBttn_dgrm_grd_clr);
+    bttns_lst->append(ui->pshBttn_dgrm_bckgrnd_clr);
+    bttns_lst->append(ui->pshBttn_slctn_clr);
+    bttns_lst->append(ui->pshBttn_crsr_ln_clr);
+    bttns_lst->append(ui->pshBttn_crsr_tm_lbl_brdr_clr);
+    bttns_lst->append(ui->pshBttn_crsr_tm_lbl_fll_clr);
+    bttns_lst->append(ui->pshBttn_grph_clr);
+    for(int i = 0; i < bttns_lst->count(); i++) {
+        bttns_lst->at(i)->setStyleSheet("background-color: " + sttngs_lst.at(i));
+    }
+    ui->spnBx_axs_lbls_fnr_sz->setValue(sttngs_lst.last().toInt());
+}
+
+Dialog_Select_Diagram_Settings::~Dialog_Select_Diagram_Settings() {
+    delete bttns_lst;
+    delete ui;
+}
+
+void Dialog_Select_Diagram_Settings::on_pshBttn_axs_lbls_clr_clicked() {
+    change_color(0);
+}
+
+void Dialog_Select_Diagram_Settings::on_pshBttn_dgrm_grd_clr_clicked() {
+    change_color(1);
+}
+
+void Dialog_Select_Diagram_Settings::on_pshBttn_dgrm_bckgrnd_clr_clicked() {
+    change_color(2);
+}
+
+void Dialog_Select_Diagram_Settings::on_pshBttn_slctn_clr_clicked() {
+    change_color(3);
+}
+
+void Dialog_Select_Diagram_Settings::on_pshBttn_crsr_ln_clr_clicked() {
+    change_color(4);
+}
+
+void Dialog_Select_Diagram_Settings::on_pshBttn_crsr_tm_lbl_brdr_clr_clicked() {
+    change_color(5);
+}
+
+void Dialog_Select_Diagram_Settings::on_pshBttn_crsr_tm_lbl_fll_clr_clicked() {
+    change_color(6);
+}
+
+void Dialog_Select_Diagram_Settings::on_pshBttn_grph_clr_clicked() {
+    change_color(7);
+}
+
+void Dialog_Select_Diagram_Settings::on_spnBx_axs_lbls_fnr_sz_valueChanged(int value) {
+    sttngs_lst.replace(8, QString::number(value));
+}
+
+void Dialog_Select_Diagram_Settings::on_pshBttn_ok_clicked() {
+    QDialog::done(1);
+}
+
+void Dialog_Select_Diagram_Settings::on_pshBttn_cncl_clicked() {
+    QDialog::done(0);
+}
+
+QList<QString> Dialog_Select_Diagram_Settings::get_diagram_settings() {
+    return sttngs_lst;
+}
+
+void Dialog_Select_Diagram_Settings::change_color(int value) {
+    QColorDialog dlg(this);
+    QColor color = dlg.getColor(QColor(sttngs_lst.at(value)));
+    if(color.isValid()) {
+        sttngs_lst.replace(value, color.name());
+        bttns_lst->at(value)->setStyleSheet("background-color: " + color.name());
+    }
 }

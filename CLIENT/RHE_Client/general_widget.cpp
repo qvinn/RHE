@@ -66,6 +66,15 @@ void General_Widget::create_base_settings() {
     check_setting_exist("settings/WVFRM_VWR_ATTCH_CRSR_STANDALONE", 0);
     check_setting_exist("settings/WVFRM_VWR_DISCRETENESS_TIME_STANDALONE", 1);
     check_setting_exist("settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE_STANDALONE", 0);
+    check_setting_exist("settings/WVFRM_VWR_AXIS_LABELS_COLOR", "#FFFFFFFF");
+    check_setting_exist("settings/WVFRM_VWR_DIAGRAM_GRID_COLOR", "#FF646464");
+    check_setting_exist("settings/WVFRM_VWR_DIAGRAM_BACKGROUND_COLOR", "#FF000000");
+    check_setting_exist("settings/WVFRM_VWR_SELECTION_COLOR", "#FFFF0000");
+    check_setting_exist("settings/WVFRM_VWR_CURSOR_LINE_COLOR", "#FFFFFF00");
+    check_setting_exist("settings/WVFRM_VWR_CURSOR_TIME_LABEL_BORDER_COLOR", "#FFFFFFFF");
+    check_setting_exist("settings/WVFRM_VWR_CURSOR_TIME_LABEL_FILL_COLOR", "#FFFFFF00");
+    check_setting_exist("settings/WVFRM_VWR_GRAPH_COLOR", "#FF00FF00");
+    check_setting_exist("settings/WVFRM_VWR_AXIS_LABELS_FONT_SIZE", 10);
 }
 
 void General_Widget::check_setting_exist(QString type, QVariant val) {
