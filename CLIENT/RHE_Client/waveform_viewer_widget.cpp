@@ -1,4 +1,4 @@
-#include "waveform_viewer_widget.h"
+﻿#include "waveform_viewer_widget.h"
 #include "ui_waveform_viewer.h"
 #include "ui_dialog_select_displayable_pins.h"
 #include "ui_dialog_select_diagram_color.h"
@@ -12,7 +12,11 @@ Waveform_Viewer_Widget::Waveform_Viewer_Widget(QWidget *parent, General_Widget *
     dyn_tckr = new QSharedPointer<QCPAxisTickerFixed>(new QCPAxisTickerFixed());
 //    ui->diagram->setOpenGl(true);         //qcustomplot.cpp - line 909
     curs_ver_line = new QCPItemLine(ui->diagram);
+    frst_msr_line = new QCPItemLine(ui->diagram);
+    scnd_msr_line = new QCPItemLine(ui->diagram);
+    thrd_msr_line = new QCPItemLine(ui->diagram);
     curs_time = new QCPItemText(ui->diagram);
+    msr_time = new QCPItemText(ui->diagram);
     change_margin(5 * static_cast<int>(stndln));
     connect(ui->diagram->xAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(slot_x_axis_changed(QCPRange)));
     connect(ui->diagram->yAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(slot_y_axis_changed(QCPRange)));
@@ -95,6 +99,7 @@ void Waveform_Viewer_Widget::on_spnBx_wvfrm_vwr_dscrtnss_tm_valueChanged(int val
         (*dyn_tckr)->setTickStep(x_tckr_step);
         (*dyn_tckr)->setScaleStrategy(QCPAxisTickerFixed::ssMultiples);
         ui->diagram->xAxis->setTicker(*dyn_tckr);
+        set_measurement_label_text();
         ui->diagram->replot();
     }
 }
@@ -126,6 +131,14 @@ void Waveform_Viewer_Widget::on_pshBttn_slct_dsplbl_pins_clicked() {
     select_displayable_pins();
 }
 
+void Waveform_Viewer_Widget::on_pshBttn_msr_toggled(bool checked) {
+    measure = checked;
+    ui->pshBttn_clr->setEnabled(!measure);
+    ui->pshBttn_chng_sttngs->setEnabled(!measure);
+    ui->pshBttn_open_save_wvfrm->setEnabled(!measure);
+    ui->pshBttn_slct_dsplbl_pins->setEnabled(!measure);
+}
+
 void Waveform_Viewer_Widget::on_pshBttn_open_save_wvfrm_clicked() {
     if(standalone) {
         load_waveform();
@@ -146,13 +159,26 @@ void Waveform_Viewer_Widget::initialize_ui() {
     ui->diagram->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom/* | QCP::iSelectPlottables*//* | QCP::iSelectAxes*/);     //iSelectAxes
     ui->diagram->addLayer("layerCursor", 0, QCustomPlot::limAbove);
     ui->diagram->layer("layerCursor")->setMode(QCPLayer::lmBuffered);
+    ui->diagram->addLayer("layerMeasure", 0, QCustomPlot::limAbove);
+    ui->diagram->layer("layerMeasure")->setMode(QCPLayer::lmBuffered);
     ui->diagram->xAxis->setSubTicks(false);
     ui->diagram->yAxis->setSubTicks(false);
-    change_colors();
+    change_settings();
     curs_time->setPadding(QMargins(2, 2, 2, 2));
-    curs_ver_line->setLayer("layerCursor");
     curs_time->setLayer("layerCursor");
+    msr_time->setPadding(QMargins(2, 2, 2, 2));
+    msr_time->setLayer("layerMeasure");
+    msr_time->setPositionAlignment(Qt::AlignHCenter | Qt::AlignBottom);
+    curs_ver_line->setLayer("layerCursor");
+    frst_msr_line->setLayer("layerMeasure");
+    scnd_msr_line->setLayer("layerMeasure");
+    thrd_msr_line->setLayer("layerMeasure");
     ui->diagram->layer("layerCursor")->setVisible(false);
+    ui->diagram->layer("layerMeasure")->setVisible(false);
+    frst_msr_line->setVisible(false);
+    scnd_msr_line->setVisible(false);
+    thrd_msr_line->setVisible(false);
+    msr_time->setVisible(false);
     post_initialize_ui();
 }
 
@@ -194,10 +220,17 @@ void Waveform_Viewer_Widget::set_ui_text() {
         ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->setItemText(1, tr("ms"));
         ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->setItemText(2, tr("us"));
     }
+    set_measurement_label_text();
     language_changed = true;
 }
 
-void Waveform_Viewer_Widget::change_colors() {
+void Waveform_Viewer_Widget::set_measurement_label_text() {
+    if(msr_time->visible()) {
+        msr_time->setText(QString::number(fabs(scnd_msr_line->start->key() - frst_msr_line->start->key()) * time_coef) + " " + ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->currentText());
+    }
+}
+
+void Waveform_Viewer_Widget::change_settings() {
     QFont fnt = QFont("Tahoma", gen_widg->get_setting("settings/WVFRM_VWR_AXIS_LABELS_FONT_SIZE").toInt());
     ui->diagram->xAxis->setTickLabelFont(fnt);
     ui->diagram->yAxis->setTickLabelFont(fnt);
@@ -207,6 +240,9 @@ void Waveform_Viewer_Widget::change_colors() {
     QColor slctn_clr = QColor(gen_widg->get_setting("settings/WVFRM_VWR_SELECTION_COLOR").toString());
     QColor slctn_brsh_clr = slctn_clr;
     slctn_brsh_clr.setAlpha(80);
+    QColor line_clr = QColor(gen_widg->get_setting("settings/WVFRM_VWR_CURSOR_LINE_COLOR").toString());
+    QColor lbl_clr = QColor(gen_widg->get_setting("settings/WVFRM_VWR_CURSOR_TIME_LABEL_BORDER_COLOR").toString());
+    QColor lbl_brsh_clr = QColor(gen_widg->get_setting("settings/WVFRM_VWR_CURSOR_TIME_LABEL_FILL_COLOR").toString());
     grph_clr = QColor(gen_widg->get_setting("settings/WVFRM_VWR_GRAPH_COLOR").toString());
     for(int i = 0; i < graph_list->count(); i++) {
         if((i % 2) == 1) {
@@ -237,9 +273,16 @@ void Waveform_Viewer_Widget::change_colors() {
     ui->diagram->axisRect()->setBackground(axis_rect_gradient);
     ui->diagram->selectionRect()->setPen(QPen(slctn_clr, 1, Qt::SolidLine));
     ui->diagram->selectionRect()->setBrush(QBrush(slctn_brsh_clr));
-    curs_ver_line->setPen(QPen(QColor(gen_widg->get_setting("settings/WVFRM_VWR_CURSOR_LINE_COLOR").toString()), 1, Qt::SolidLine));
-    curs_time->setPen(QPen(QColor(gen_widg->get_setting("settings/WVFRM_VWR_CURSOR_TIME_LABEL_BORDER_COLOR").toString()), 1, Qt::SolidLine));
-    curs_time->setBrush(QBrush(QColor(gen_widg->get_setting("settings/WVFRM_VWR_CURSOR_TIME_LABEL_FILL_COLOR").toString())));
+    curs_ver_line->setPen(QPen(line_clr, 1, Qt::SolidLine));
+    frst_msr_line->setPen(QPen(line_clr, 1, Qt::SolidLine));
+    scnd_msr_line->setPen(QPen(line_clr, 1, Qt::SolidLine));
+    thrd_msr_line->setPen(QPen(line_clr, 1, Qt::SolidLine));
+    curs_time->setPen(QPen(lbl_clr, 1, Qt::SolidLine));
+    curs_time->setBrush(QBrush(lbl_brsh_clr));
+    curs_time->setFont(fnt);
+    msr_time->setPen(QPen(lbl_clr, 1, Qt::SolidLine));
+    msr_time->setBrush(QBrush(lbl_brsh_clr));
+    msr_time->setFont(fnt);
 }
 
 void Waveform_Viewer_Widget::change_margin(int val) {
@@ -255,6 +298,7 @@ void Waveform_Viewer_Widget::load_waveform() {
     }
     QFile *file = new QFile(QFileInfo(lst->at(0)).absoluteFilePath());
     if(file->open(QFile::ReadOnly)) {
+        reset_measurement_data();
         QString str = file->readLine();
         file->close();
         str.replace("\n", "");
@@ -432,6 +476,7 @@ void Waveform_Viewer_Widget::remove_data_from_graph() {
         graph_list->at(i)->data().data()->clear();
         graph_list->at(i)->data().clear();
     }
+    reset_measurement_data();
     re_scale_graph();
 }
 
@@ -556,7 +601,7 @@ void Waveform_Viewer_Widget::select_diagram_settings() {
         gen_widg->save_setting("settings/WVFRM_VWR_CURSOR_TIME_LABEL_FILL_COLOR", sttngs_lst_new.at(6));
         gen_widg->save_setting("settings/WVFRM_VWR_GRAPH_COLOR", sttngs_lst_new.at(7));
         gen_widg->save_setting("settings/WVFRM_VWR_AXIS_LABELS_FONT_SIZE", sttngs_lst_new.at(8).toInt());
-        change_colors();
+        change_settings();
         remove_data_from_graph();
         draw_from_saved_vals(pin_names->count());
     }
@@ -684,6 +729,14 @@ void Waveform_Viewer_Widget::draw_from_saved_vals(int val) {
         }
     }
     ui->diagram->replot();
+}
+
+void Waveform_Viewer_Widget::reset_measurement_data() {
+    count_of_press = 0;
+    frst_msr_line->setVisible(false);
+    scnd_msr_line->setVisible(false);
+    thrd_msr_line->setVisible(false);
+    msr_time->setVisible(false);
 }
 
 void Waveform_Viewer_Widget::limit_axis_range(QCPAxis *axis, const QCPRange &new_range, const QCPRange &limit_range) {
@@ -834,23 +887,60 @@ void Waveform_Viewer_Widget::slot_mouse_move(QMouseEvent *event) {
                 curs_ver_line->end->setCoords(x_coord, QCPRange::maxRange);
             }
             ui->diagram->layer("layerCursor")->replot();
+            ui->diagram->layer("layerMeasure")->replot();
         }
     }
 }
 
 void Waveform_Viewer_Widget::slot_mouse_pressed(QMouseEvent *event) {
     if(event->button() == Qt::RightButton) {
-        double x_coord = ui->diagram->xAxis->pixelToCoord(event->pos().x());
-        double y_coord = ui->diagram->yAxis->pixelToCoord(event->pos().y());
-        if(mouse_inside_object(x_coord, y_coord, true)) {
-            zoom_pressed = true;
-            ui->diagram->layer("layerCursor")->setVisible(false);
-            ui->diagram->replot();
-            ui->diagram->setSelectionRectMode(QCP::srmZoom);
+        if(measure) {
+            reset_measurement_data();
+        } else {
+            double x_coord = ui->diagram->xAxis->pixelToCoord(event->pos().x());
+            double y_coord = ui->diagram->yAxis->pixelToCoord(event->pos().y());
+            if(mouse_inside_object(x_coord, y_coord, true)) {
+                zoom_pressed = true;
+                ui->diagram->layer("layerCursor")->setVisible(false);
+                ui->diagram->replot();
+                ui->diagram->setSelectionRectMode(QCP::srmZoom);
+            }
         }
     } else if(event->button() == Qt::LeftButton) {
-        emit ui->diagram->plottableClick(ui->diagram->plottable(1), 3, event);
-        drag_pressed = true;
+        if(measure) {
+            double x_coord = ui->diagram->xAxis->pixelToCoord(event->pos().x());
+            if(static_cast<int>(ui->chckBx_attch_crsr->checkState()) == 2) {
+                x_coord = round(x_coord / x_tckr_step) * x_tckr_step;
+            }
+            double y_coord = ui->diagram->yAxis->pixelToCoord(event->pos().y());
+            count_of_press++;
+            if(count_of_press == 3) {
+                reset_measurement_data();
+                count_of_press++;
+            }
+            if(count_of_press == 1) {
+                if(!ui->diagram->layer("layerMeasure")->visible()) {
+                    ui->diagram->layer("layerMeasure")->setVisible(true);
+                    ui->diagram->replot();
+                }
+                frst_msr_line->start->setCoords(x_coord, -QCPRange::maxRange);
+                frst_msr_line->end->setCoords(x_coord, QCPRange::maxRange);
+                frst_msr_line->setVisible(true);
+            } else if(count_of_press == 2) {
+                scnd_msr_line->start->setCoords(x_coord, -QCPRange::maxRange);
+                scnd_msr_line->end->setCoords(x_coord, QCPRange::maxRange);
+                scnd_msr_line->setVisible(true);
+                thrd_msr_line->start->setCoords(frst_msr_line->start->key(), y_coord);
+                thrd_msr_line->end->setCoords(x_coord, y_coord);
+                thrd_msr_line->setVisible(true);
+                msr_time->position->setCoords(((x_coord + frst_msr_line->start->key()) / 2), y_coord);
+                msr_time->setVisible(true);
+                set_measurement_label_text();
+            }
+        } else {
+            emit ui->diagram->plottableClick(ui->diagram->plottable(1), 3, event);
+            drag_pressed = true;
+        }
     }
 }
 

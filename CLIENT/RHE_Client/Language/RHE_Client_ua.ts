@@ -87,7 +87,7 @@
         <translation>Розмір шрифту відміток на вісях</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="979"/>
+        <location filename="../waveform_viewer_widget.cpp" line="1069"/>
         <source>Select diagram settings</source>
         <translation>Вибір налаштувань діаграми</translation>
     </message>
@@ -128,7 +128,7 @@
         <translation type="vanished">Відміна</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="901"/>
+        <location filename="../waveform_viewer_widget.cpp" line="991"/>
         <source>Select pins for display</source>
         <translation>Виберіть піни для відображування</translation>
     </message>
@@ -690,6 +690,11 @@
         <translation>  Повний масштаб  </translation>
     </message>
     <message>
+        <location filename="../waveform_viewer.ui" line="1723"/>
+        <source>Measurement</source>
+        <translation>  Вимірювання  </translation>
+    </message>
+    <message>
         <location filename="../waveform_viewer.ui" line="178"/>
         <source>As window</source>
         <translation>Як вікно</translation>
@@ -705,7 +710,7 @@
         <translation>  Вибрати Відображувані піни  </translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="1736"/>
+        <location filename="../waveform_viewer.ui" line="2024"/>
         <source>Waveform</source>
         <translation>Часова діаграма</translation>
     </message>
@@ -713,68 +718,68 @@
 <context>
     <name>Waveform_Viewer_Widget</name>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="184"/>
+        <location filename="../waveform_viewer_widget.cpp" line="210"/>
         <source>Open waveform</source>
         <translation>  Відкрити часову діаграму  </translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="186"/>
+        <location filename="../waveform_viewer_widget.cpp" line="212"/>
         <source>Save waveform</source>
         <translation>  Зберегти часову діаграму  </translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="182"/>
+        <location filename="../waveform_viewer_widget.cpp" line="208"/>
         <source>Waveform Viewer</source>
         <translation>Переглядач часових діаграм</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="189"/>
-        <location filename="../waveform_viewer_widget.cpp" line="193"/>
+        <location filename="../waveform_viewer_widget.cpp" line="215"/>
+        <location filename="../waveform_viewer_widget.cpp" line="219"/>
         <source>s</source>
         <translation>c</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="190"/>
-        <location filename="../waveform_viewer_widget.cpp" line="194"/>
+        <location filename="../waveform_viewer_widget.cpp" line="216"/>
+        <location filename="../waveform_viewer_widget.cpp" line="220"/>
         <source>ms</source>
         <translation>мс</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="191"/>
-        <location filename="../waveform_viewer_widget.cpp" line="195"/>
+        <location filename="../waveform_viewer_widget.cpp" line="217"/>
+        <location filename="../waveform_viewer_widget.cpp" line="221"/>
         <source>us</source>
         <translation>мкс</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="251"/>
+        <location filename="../waveform_viewer_widget.cpp" line="294"/>
         <source>Choose waveform file</source>
         <translation>Вибрати файл з часовими діаграмами</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="251"/>
-        <location filename="../waveform_viewer_widget.cpp" line="348"/>
-        <location filename="../waveform_viewer_widget.cpp" line="363"/>
+        <location filename="../waveform_viewer_widget.cpp" line="294"/>
+        <location filename="../waveform_viewer_widget.cpp" line="392"/>
+        <location filename="../waveform_viewer_widget.cpp" line="407"/>
         <source>Waveform (*.wvfrm)</source>
         <translation>Waveform (*.wvfrm)</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="253"/>
+        <location filename="../waveform_viewer_widget.cpp" line="296"/>
         <source>Error</source>
         <translation>Помилка</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="253"/>
+        <location filename="../waveform_viewer_widget.cpp" line="296"/>
         <source>Waveform file not choosed</source>
         <translation>Файл з часовими діаграмами не обрано</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="348"/>
-        <location filename="../waveform_viewer_widget.cpp" line="363"/>
+        <location filename="../waveform_viewer_widget.cpp" line="392"/>
+        <location filename="../waveform_viewer_widget.cpp" line="407"/>
         <source>Saving waveform</source>
         <translation>Збереження часової діаграми</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="366"/>
+        <location filename="../waveform_viewer_widget.cpp" line="410"/>
         <source>No data for saving</source>
         <translation>Немає даних для збереження</translation>
     </message>

@@ -87,7 +87,7 @@
         <translation>Axis labels font size</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="979"/>
+        <location filename="../waveform_viewer_widget.cpp" line="1069"/>
         <source>Select diagram settings</source>
         <translation>Select diagram settings</translation>
     </message>
@@ -128,7 +128,7 @@
         <translation type="vanished">Cancell</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="901"/>
+        <location filename="../waveform_viewer_widget.cpp" line="991"/>
         <source>Select pins for display</source>
         <translation>Select pins for display</translation>
     </message>
@@ -690,6 +690,11 @@
         <translation>  Full scale  </translation>
     </message>
     <message>
+        <location filename="../waveform_viewer.ui" line="1723"/>
+        <source>Measurement</source>
+        <translation>  Measurement  </translation>
+    </message>
+    <message>
         <location filename="../waveform_viewer.ui" line="178"/>
         <source>As window</source>
         <translation>As window</translation>
@@ -705,7 +710,7 @@
         <translation>  Select Displayable Pins  </translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="1736"/>
+        <location filename="../waveform_viewer.ui" line="2024"/>
         <source>Waveform</source>
         <translation>Waveform</translation>
     </message>
@@ -713,68 +718,68 @@
 <context>
     <name>Waveform_Viewer_Widget</name>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="184"/>
+        <location filename="../waveform_viewer_widget.cpp" line="210"/>
         <source>Open waveform</source>
         <translation>  Open waveform  </translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="186"/>
+        <location filename="../waveform_viewer_widget.cpp" line="212"/>
         <source>Save waveform</source>
         <translation>  Save waveform  </translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="182"/>
+        <location filename="../waveform_viewer_widget.cpp" line="208"/>
         <source>Waveform Viewer</source>
         <translation>Waveform Viewer</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="189"/>
-        <location filename="../waveform_viewer_widget.cpp" line="193"/>
+        <location filename="../waveform_viewer_widget.cpp" line="215"/>
+        <location filename="../waveform_viewer_widget.cpp" line="219"/>
         <source>s</source>
         <translation>s</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="190"/>
-        <location filename="../waveform_viewer_widget.cpp" line="194"/>
+        <location filename="../waveform_viewer_widget.cpp" line="216"/>
+        <location filename="../waveform_viewer_widget.cpp" line="220"/>
         <source>ms</source>
         <translation>ms</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="191"/>
-        <location filename="../waveform_viewer_widget.cpp" line="195"/>
+        <location filename="../waveform_viewer_widget.cpp" line="217"/>
+        <location filename="../waveform_viewer_widget.cpp" line="221"/>
         <source>us</source>
         <translation>us</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="251"/>
+        <location filename="../waveform_viewer_widget.cpp" line="294"/>
         <source>Choose waveform file</source>
         <translation>Choose waveform file</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="251"/>
-        <location filename="../waveform_viewer_widget.cpp" line="348"/>
-        <location filename="../waveform_viewer_widget.cpp" line="363"/>
+        <location filename="../waveform_viewer_widget.cpp" line="294"/>
+        <location filename="../waveform_viewer_widget.cpp" line="392"/>
+        <location filename="../waveform_viewer_widget.cpp" line="407"/>
         <source>Waveform (*.wvfrm)</source>
         <translation>Waveform (*.wvfrm)</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="253"/>
+        <location filename="../waveform_viewer_widget.cpp" line="296"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="253"/>
+        <location filename="../waveform_viewer_widget.cpp" line="296"/>
         <source>Waveform file not choosed</source>
         <translation>Waveform file not choosed</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="348"/>
-        <location filename="../waveform_viewer_widget.cpp" line="363"/>
+        <location filename="../waveform_viewer_widget.cpp" line="392"/>
+        <location filename="../waveform_viewer_widget.cpp" line="407"/>
         <source>Saving waveform</source>
         <translation>Saving waveform</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="366"/>
+        <location filename="../waveform_viewer_widget.cpp" line="410"/>
         <source>No data for saving</source>
         <translation>No data for saving</translation>
     </message>

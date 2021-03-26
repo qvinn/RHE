@@ -47,13 +47,15 @@
         private:
             void post_initialize_ui();
             void set_ui_text();
-            void change_colors();
+            void set_measurement_label_text();
+            void change_settings();
             void change_margin(int val);
             void load_waveform();
             void save_waveform();
             void select_diagram_settings();
             void select_displayable_pins();
             void draw_from_saved_vals(int val);
+            void reset_measurement_data();
             void limit_axis_range(QCPAxis *axis, const QCPRange &new_range, const QCPRange &limit_range);
             bool mouse_inside_object(double x_coord, double y_coord, bool graph_drawing_rect);
 
@@ -65,7 +67,11 @@
             QSharedPointer<QCPAxisTickerText> *textTicker = nullptr;
             QSharedPointer<QCPAxisTickerFixed> *dyn_tckr = nullptr;
             QCPItemLine *curs_ver_line = nullptr;
+            QCPItemLine *frst_msr_line = nullptr;
+            QCPItemLine *scnd_msr_line = nullptr;
+            QCPItemLine *thrd_msr_line = nullptr;
             QCPItemText *curs_time = nullptr;
+            QCPItemText *msr_time = nullptr;
             Qt::WindowFlags flags;
             QColor grph_clr;
             QColor grph_brsh_clr;
@@ -81,8 +87,10 @@
             bool language_changed = false;
             bool ui_initialized = false;
             bool add_names = true;
+            bool measure = false;
             bool standalone;
 
+            int count_of_press = 0;
             int coef;
 
         public slots:
@@ -101,6 +109,7 @@
             void on_pshBttn_fl_scl_clicked();
             void on_pshBttn_clr_clicked();
             void on_pshBttn_slct_dsplbl_pins_clicked();
+            void on_pshBttn_msr_toggled(bool checked);
             void on_pshBttn_open_save_wvfrm_clicked();
             void slot_mouse_move(QMouseEvent *event);
             void slot_mouse_pressed(QMouseEvent *event);
