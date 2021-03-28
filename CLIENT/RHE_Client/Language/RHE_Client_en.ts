@@ -87,7 +87,7 @@
         <translation>Axis labels font size</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="1069"/>
+        <location filename="../waveform_viewer_widget.cpp" line="1063"/>
         <source>Select diagram settings</source>
         <translation>Select diagram settings</translation>
     </message>
@@ -128,7 +128,7 @@
         <translation type="vanished">Cancell</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="991"/>
+        <location filename="../waveform_viewer_widget.cpp" line="976"/>
         <source>Select pins for display</source>
         <translation>Select pins for display</translation>
     </message>
@@ -254,79 +254,69 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="436"/>
+        <location filename="../rhe_widget.ui" line="442"/>
         <source>Choose board:</source>
         <translation>Choose board:</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="777"/>
-        <source>Ping Server</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../rhe_widget.ui" line="1072"/>
-        <source>Ping Slave-Server</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../rhe_widget.ui" line="1380"/>
-        <location filename="../rhe_widget.cpp" line="345"/>
+        <location filename="../rhe_widget.ui" line="789"/>
+        <location filename="../rhe_widget.cpp" line="343"/>
         <source>Start Debug</source>
         <translation>  Start Debug  </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="1681"/>
-        <location filename="../rhe_widget.cpp" line="346"/>
+        <location filename="../rhe_widget.ui" line="1090"/>
+        <location filename="../rhe_widget.cpp" line="344"/>
         <source>Stop Debug</source>
         <translation>  Stop Debug  </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="1735"/>
+        <location filename="../rhe_widget.ui" line="1144"/>
         <source>Start debug after FPGA flashing</source>
         <translation>Start debug after FPGA flashing</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="2033"/>
+        <location filename="../rhe_widget.ui" line="1442"/>
         <source>Choose Sequence Of Signals File</source>
         <translation>Choose Sequence Of Signals File</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="2334"/>
+        <location filename="../rhe_widget.ui" line="1743"/>
         <source>Send Sequence Of Signals File</source>
         <translation>Send Sequence Of Signals File</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="2635"/>
+        <location filename="../rhe_widget.ui" line="2044"/>
         <source>Start Sequence Of Signals</source>
         <translation>Start Sequence Of Signals</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="2718"/>
+        <location filename="../rhe_widget.ui" line="2133"/>
         <source>Start sequence with debug</source>
         <translation>Start sequence with debug</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="2761"/>
+        <location filename="../rhe_widget.ui" line="2182"/>
         <source>Debug time discreteness:</source>
         <translation>Debug time discreteness:</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="2881"/>
+        <location filename="../rhe_widget.ui" line="2308"/>
         <source>Debug time limit, </source>
         <translation>Debug time limit, </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="3260"/>
+        <location filename="../rhe_widget.ui" line="2705"/>
         <source>FPGA Inputs:</source>
         <translation>FPGA Inputs:</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="3824"/>
+        <location filename="../rhe_widget.ui" line="3293"/>
         <source>Send Firmware</source>
         <translation>  Send Firmware  </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="4109"/>
+        <location filename="../rhe_widget.ui" line="3578"/>
         <source>Choose Firmware</source>
         <translation>  Choose Firmware  </translation>
     </message>
@@ -335,173 +325,173 @@
         <translation type="vanished">  Load Firmware  </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="4394"/>
+        <location filename="../rhe_widget.ui" line="3863"/>
         <source>Check Project State</source>
         <translation>  Check Project State  </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="4679"/>
+        <location filename="../rhe_widget.ui" line="4148"/>
         <source>Choose project directory</source>
         <translation>  Choose project directory  </translation>
     </message>
     <message>
         <location filename="../rhe_widget.cpp" line="41"/>
-        <location filename="../rhe_widget.cpp" line="357"/>
+        <location filename="../rhe_widget.cpp" line="355"/>
         <source>Debugging</source>
         <translation>Debugging</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="161"/>
+        <location filename="../rhe_widget.cpp" line="159"/>
         <source>Choose csv-file with sequence of signals</source>
         <translation>Choose csv-file with sequence of signals</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="161"/>
+        <location filename="../rhe_widget.cpp" line="159"/>
         <source>Comma-Separated Values files (*.csv)</source>
         <translation>Comma-Separated Values files (*.csv)</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="167"/>
+        <location filename="../rhe_widget.cpp" line="165"/>
         <source>File with sequence of signals not choosed</source>
         <translation>File with sequence of signals not choosed</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="233"/>
+        <location filename="../rhe_widget.cpp" line="231"/>
         <source>Choose svf-file with firmware</source>
         <translation>Choose svf-file with firmware</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="233"/>
+        <location filename="../rhe_widget.cpp" line="231"/>
         <source>Serial Vector Format files (*.svf)</source>
         <translation>Serial Vector Format files (*.svf)</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="251"/>
-        <location filename="../rhe_widget.cpp" line="503"/>
+        <location filename="../rhe_widget.cpp" line="249"/>
+        <location filename="../rhe_widget.cpp" line="502"/>
         <source>svf-file not generated</source>
         <translation>svf-file not generated</translation>
     </message>
     <message>
         <location filename="../rhe_widget.cpp" line="41"/>
-        <location filename="../rhe_widget.cpp" line="357"/>
+        <location filename="../rhe_widget.cpp" line="355"/>
         <source>Firmware sending</source>
         <translation>Firmware sending</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="347"/>
+        <location filename="../rhe_widget.cpp" line="345"/>
         <source>Hello, </source>
         <translation>Hello, </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="349"/>
-        <location filename="../rhe_widget.cpp" line="353"/>
+        <location filename="../rhe_widget.cpp" line="347"/>
+        <location filename="../rhe_widget.cpp" line="351"/>
         <source>s</source>
         <translation>s</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="350"/>
-        <location filename="../rhe_widget.cpp" line="354"/>
+        <location filename="../rhe_widget.cpp" line="348"/>
+        <location filename="../rhe_widget.cpp" line="352"/>
         <source>ms</source>
         <translation>ms</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="351"/>
-        <location filename="../rhe_widget.cpp" line="355"/>
+        <location filename="../rhe_widget.cpp" line="349"/>
+        <location filename="../rhe_widget.cpp" line="353"/>
         <source>us</source>
         <translation>us</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="441"/>
+        <location filename="../rhe_widget.cpp" line="440"/>
         <source>Root-folder cannot be as project-folder</source>
         <translation>Root-folder cannot be as project-folder</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="481"/>
+        <location filename="../rhe_widget.cpp" line="480"/>
         <source>Folder with project not chosen</source>
         <translation>Folder with project not chosen</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="486"/>
+        <location filename="../rhe_widget.cpp" line="485"/>
         <source>Project not fittered</source>
         <translation>Project not fittered</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="496"/>
+        <location filename="../rhe_widget.cpp" line="495"/>
         <source>sof-file not generated</source>
         <translation>sof-file not generated</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="556"/>
+        <location filename="../rhe_widget.cpp" line="555"/>
         <source>Count of pins in board list are greater than in project(for current FPGA: </source>
         <translation>Count of pins in board list are greater than in project(for current FPGA: </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="564"/>
-        <location filename="../rhe_widget.cpp" line="567"/>
+        <location filename="../rhe_widget.cpp" line="563"/>
+        <location filename="../rhe_widget.cpp" line="566"/>
         <source>&apos; for pin </source>
         <translation>&apos; for pin </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="564"/>
+        <location filename="../rhe_widget.cpp" line="563"/>
         <source>In project, direction &apos;</source>
         <translation>In project, direction &apos;</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="564"/>
-        <location filename="../rhe_widget.cpp" line="567"/>
+        <location filename="../rhe_widget.cpp" line="563"/>
+        <location filename="../rhe_widget.cpp" line="566"/>
         <source> isn&apos;t correct, set &apos;</source>
         <translation> isn&apos;t correct, set &apos;</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="567"/>
+        <location filename="../rhe_widget.cpp" line="566"/>
         <source>In project, I/O Standart &apos;</source>
         <translation>In project, I/O Standart &apos;</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="576"/>
+        <location filename="../rhe_widget.cpp" line="575"/>
         <source> for board </source>
         <translation> for board </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="576"/>
+        <location filename="../rhe_widget.cpp" line="575"/>
         <source>FPGA in project isn&apos;t </source>
         <translation>FPGA in project isn&apos;t </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="579"/>
+        <location filename="../rhe_widget.cpp" line="578"/>
         <source>Pins in board list doesn&apos;t exist in project(for current FPGA: </source>
         <translation>Pins in board list doesn&apos;t exist in project(for current FPGA: </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="586"/>
+        <location filename="../rhe_widget.cpp" line="585"/>
         <source>file-list of boards and their parameters</source>
         <translation>file-list of boards and their parameters</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="589"/>
+        <location filename="../rhe_widget.cpp" line="588"/>
         <source>Cannot open </source>
         <translation>Cannot open </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="627"/>
+        <location filename="../rhe_widget.cpp" line="626"/>
         <source>&apos;jtag_id_code&apos; in board list doesn&apos;t exist for board: </source>
         <translation>&apos;jtag_id_code&apos; in board list doesn&apos;t exist for board: </translation>
     </message>
     <message>
         <location filename="../rhe_widget.cpp" line="41"/>
-        <location filename="../rhe_widget.cpp" line="357"/>
+        <location filename="../rhe_widget.cpp" line="355"/>
         <source>Firmware Sended</source>
         <translation>Firmware Sended</translation>
     </message>
     <message>
         <location filename="../rhe_widget.cpp" line="41"/>
-        <location filename="../rhe_widget.cpp" line="357"/>
+        <location filename="../rhe_widget.cpp" line="355"/>
         <source>FPGA Flashing</source>
         <translation>FPGA Flashing</translation>
     </message>
     <message>
         <location filename="../rhe_widget.cpp" line="41"/>
-        <location filename="../rhe_widget.cpp" line="357"/>
+        <location filename="../rhe_widget.cpp" line="355"/>
         <source>FPGA Flashed</source>
         <translation>FPGA Flashed</translation>
     </message>

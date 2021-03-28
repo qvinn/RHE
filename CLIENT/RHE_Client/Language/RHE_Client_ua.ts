@@ -87,7 +87,7 @@
         <translation>Розмір шрифту відміток на вісях</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="1069"/>
+        <location filename="../waveform_viewer_widget.cpp" line="1063"/>
         <source>Select diagram settings</source>
         <translation>Вибір налаштувань діаграми</translation>
     </message>
@@ -128,7 +128,7 @@
         <translation type="vanished">Відміна</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="991"/>
+        <location filename="../waveform_viewer_widget.cpp" line="976"/>
         <source>Select pins for display</source>
         <translation>Виберіть піни для відображування</translation>
     </message>
@@ -254,79 +254,69 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="436"/>
+        <location filename="../rhe_widget.ui" line="442"/>
         <source>Choose board:</source>
         <translation>Виберіть плату:</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="777"/>
-        <source>Ping Server</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../rhe_widget.ui" line="1072"/>
-        <source>Ping Slave-Server</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../rhe_widget.ui" line="1380"/>
-        <location filename="../rhe_widget.cpp" line="345"/>
+        <location filename="../rhe_widget.ui" line="789"/>
+        <location filename="../rhe_widget.cpp" line="343"/>
         <source>Start Debug</source>
         <translation>  Почати Відлагодження  </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="1681"/>
-        <location filename="../rhe_widget.cpp" line="346"/>
+        <location filename="../rhe_widget.ui" line="1090"/>
+        <location filename="../rhe_widget.cpp" line="344"/>
         <source>Stop Debug</source>
         <translation>  Зупинити Відлагодження  </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="1735"/>
+        <location filename="../rhe_widget.ui" line="1144"/>
         <source>Start debug after FPGA flashing</source>
         <translation>Почати відлагодження після прошивання ПЛІС</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="2033"/>
+        <location filename="../rhe_widget.ui" line="1442"/>
         <source>Choose Sequence Of Signals File</source>
         <translation>Виберіть Файл Послідовності Сигналів</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="2334"/>
+        <location filename="../rhe_widget.ui" line="1743"/>
         <source>Send Sequence Of Signals File</source>
         <translation>Надіслати Файл Послідовності Сигналів</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="2635"/>
+        <location filename="../rhe_widget.ui" line="2044"/>
         <source>Start Sequence Of Signals</source>
         <translation>Почати Послідовность Сигналів</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="2718"/>
+        <location filename="../rhe_widget.ui" line="2133"/>
         <source>Start sequence with debug</source>
         <translation>Почати послідовність разом з відлагодженням</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="2761"/>
+        <location filename="../rhe_widget.ui" line="2182"/>
         <source>Debug time discreteness:</source>
         <translation>Дискретність часу відлагодження:</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="2881"/>
+        <location filename="../rhe_widget.ui" line="2308"/>
         <source>Debug time limit, </source>
         <translation>Обмеження часу відлагодження, </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="3260"/>
+        <location filename="../rhe_widget.ui" line="2705"/>
         <source>FPGA Inputs:</source>
         <translation>Входи ПЛІС:</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="3824"/>
+        <location filename="../rhe_widget.ui" line="3293"/>
         <source>Send Firmware</source>
         <translation>  Надіслати Прошивку  </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="4109"/>
+        <location filename="../rhe_widget.ui" line="3578"/>
         <source>Choose Firmware</source>
         <translation>  Вибрати Прошивку  </translation>
     </message>
@@ -335,173 +325,173 @@
         <translation type="vanished">  Завантажити Прошивку  </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="4394"/>
+        <location filename="../rhe_widget.ui" line="3863"/>
         <source>Check Project State</source>
         <translation>  Перевірити Стан Проекту  </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="4679"/>
+        <location filename="../rhe_widget.ui" line="4148"/>
         <source>Choose project directory</source>
         <translation>  Вибрати папку проекту  </translation>
     </message>
     <message>
         <location filename="../rhe_widget.cpp" line="41"/>
-        <location filename="../rhe_widget.cpp" line="357"/>
+        <location filename="../rhe_widget.cpp" line="355"/>
         <source>Debugging</source>
         <translation>Відлагодження</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="161"/>
+        <location filename="../rhe_widget.cpp" line="159"/>
         <source>Choose csv-file with sequence of signals</source>
         <translation>Виберіть csv-файл з послідовністю сигналів</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="161"/>
+        <location filename="../rhe_widget.cpp" line="159"/>
         <source>Comma-Separated Values files (*.csv)</source>
         <translation>Comma-Separated Values файли (*.csv)</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="167"/>
+        <location filename="../rhe_widget.cpp" line="165"/>
         <source>File with sequence of signals not choosed</source>
         <translation>Файл з послідовнітю сигналів не обрано</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="233"/>
+        <location filename="../rhe_widget.cpp" line="231"/>
         <source>Choose svf-file with firmware</source>
         <translation>Вибрати svf-файл з прошивкою</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="233"/>
+        <location filename="../rhe_widget.cpp" line="231"/>
         <source>Serial Vector Format files (*.svf)</source>
         <translation>Файли Послідовного Векторного Формату (*.svf)</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="251"/>
-        <location filename="../rhe_widget.cpp" line="503"/>
+        <location filename="../rhe_widget.cpp" line="249"/>
+        <location filename="../rhe_widget.cpp" line="502"/>
         <source>svf-file not generated</source>
         <translation>svf-file не сгенеровано</translation>
     </message>
     <message>
         <location filename="../rhe_widget.cpp" line="41"/>
-        <location filename="../rhe_widget.cpp" line="357"/>
+        <location filename="../rhe_widget.cpp" line="355"/>
         <source>Firmware sending</source>
         <translation>Надсилання прошивки</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="347"/>
+        <location filename="../rhe_widget.cpp" line="345"/>
         <source>Hello, </source>
         <translation>Привіт, </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="349"/>
-        <location filename="../rhe_widget.cpp" line="353"/>
+        <location filename="../rhe_widget.cpp" line="347"/>
+        <location filename="../rhe_widget.cpp" line="351"/>
         <source>s</source>
         <translation>с</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="350"/>
-        <location filename="../rhe_widget.cpp" line="354"/>
+        <location filename="../rhe_widget.cpp" line="348"/>
+        <location filename="../rhe_widget.cpp" line="352"/>
         <source>ms</source>
         <translation>мс</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="351"/>
-        <location filename="../rhe_widget.cpp" line="355"/>
+        <location filename="../rhe_widget.cpp" line="349"/>
+        <location filename="../rhe_widget.cpp" line="353"/>
         <source>us</source>
         <translation>мкс</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="441"/>
+        <location filename="../rhe_widget.cpp" line="440"/>
         <source>Root-folder cannot be as project-folder</source>
         <translation>Коренева папка не може бути папкою проекту</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="481"/>
+        <location filename="../rhe_widget.cpp" line="480"/>
         <source>Folder with project not chosen</source>
         <translation>Папка з проектом не вибрана</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="486"/>
+        <location filename="../rhe_widget.cpp" line="485"/>
         <source>Project not fittered</source>
         <translation>У проекті не пройдений етап fitter&apos;a</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="496"/>
+        <location filename="../rhe_widget.cpp" line="495"/>
         <source>sof-file not generated</source>
         <translation>sof-file не сгенеровано</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="556"/>
+        <location filename="../rhe_widget.cpp" line="555"/>
         <source>Count of pins in board list are greater than in project(for current FPGA: </source>
         <translation>Кількість контактів у списку плат більша, ніж у проекті (для поточної ПЛІС: </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="564"/>
-        <location filename="../rhe_widget.cpp" line="567"/>
+        <location filename="../rhe_widget.cpp" line="563"/>
+        <location filename="../rhe_widget.cpp" line="566"/>
         <source>&apos; for pin </source>
         <translation>&apos; для піна </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="564"/>
+        <location filename="../rhe_widget.cpp" line="563"/>
         <source>In project, direction &apos;</source>
         <translation>У проекті, напрямок &apos;</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="564"/>
-        <location filename="../rhe_widget.cpp" line="567"/>
+        <location filename="../rhe_widget.cpp" line="563"/>
+        <location filename="../rhe_widget.cpp" line="566"/>
         <source> isn&apos;t correct, set &apos;</source>
         <translation> неправильне, встановіть &apos;</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="567"/>
+        <location filename="../rhe_widget.cpp" line="566"/>
         <source>In project, I/O Standart &apos;</source>
         <translation>В проекті, I/O Стандарт</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="576"/>
+        <location filename="../rhe_widget.cpp" line="575"/>
         <source> for board </source>
         <translation> для плати </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="576"/>
+        <location filename="../rhe_widget.cpp" line="575"/>
         <source>FPGA in project isn&apos;t </source>
         <translation>ПЛІС в проекті не </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="579"/>
+        <location filename="../rhe_widget.cpp" line="578"/>
         <source>Pins in board list doesn&apos;t exist in project(for current FPGA: </source>
         <translation>Піни в списку дошки не існують у проекті (для поточної ПЛІС: </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="586"/>
+        <location filename="../rhe_widget.cpp" line="585"/>
         <source>file-list of boards and their parameters</source>
         <translation>файл-список плат та їх параметри</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="589"/>
+        <location filename="../rhe_widget.cpp" line="588"/>
         <source>Cannot open </source>
         <translation>Неможливо відкрити </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="627"/>
+        <location filename="../rhe_widget.cpp" line="626"/>
         <source>&apos;jtag_id_code&apos; in board list doesn&apos;t exist for board: </source>
         <translation>&apos;jtag_id_code&apos; у списку плат не існує для плати: </translation>
     </message>
     <message>
         <location filename="../rhe_widget.cpp" line="41"/>
-        <location filename="../rhe_widget.cpp" line="357"/>
+        <location filename="../rhe_widget.cpp" line="355"/>
         <source>Firmware Sended</source>
         <translation>Прошивка Надіслана</translation>
     </message>
     <message>
         <location filename="../rhe_widget.cpp" line="41"/>
-        <location filename="../rhe_widget.cpp" line="357"/>
+        <location filename="../rhe_widget.cpp" line="355"/>
         <source>FPGA Flashing</source>
         <translation>Прошивка ПЛІС</translation>
     </message>
     <message>
         <location filename="../rhe_widget.cpp" line="41"/>
-        <location filename="../rhe_widget.cpp" line="357"/>
+        <location filename="../rhe_widget.cpp" line="355"/>
         <source>FPGA Flashed</source>
         <translation>ПЛІС Прошита</translation>
     </message>

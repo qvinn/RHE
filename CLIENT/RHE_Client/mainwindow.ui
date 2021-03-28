@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1110</width>
-    <height>765</height>
+    <width>1220</width>
+    <height>745</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>1110</width>
-    <height>760</height>
+    <width>1220</width>
+    <height>745</height>
    </size>
   </property>
   <property name="palette">
@@ -115,8 +115,8 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>730</y>
-      <width>1111</width>
+      <y>710</y>
+      <width>1221</width>
       <height>35</height>
      </rect>
     </property>
@@ -726,8 +726,8 @@ QPushButton:hover{
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>1111</width>
-      <height>731</height>
+      <width>1221</width>
+      <height>711</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">

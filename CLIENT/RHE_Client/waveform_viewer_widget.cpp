@@ -1,7 +1,7 @@
 ﻿#include "waveform_viewer_widget.h"
 #include "ui_waveform_viewer.h"
 #include "ui_dialog_select_displayable_pins.h"
-#include "ui_dialog_select_diagram_color.h"
+#include "ui_dialog_select_diagram_settings.h"
 
 Waveform_Viewer_Widget::Waveform_Viewer_Widget(QWidget *parent, General_Widget *widg, bool stndln) : QWidget(parent), ui(new Ui::Waveform_Viewer) {
     ui->setupUi(this);
@@ -731,6 +731,12 @@ void Waveform_Viewer_Widget::draw_from_saved_vals(int val) {
     ui->diagram->replot();
 }
 
+void Waveform_Viewer_Widget::draw_line(QCPItemLine *line, double x_start, double x_end, double y_start, double y_end) {
+    line->start->setCoords(x_start, y_start);
+    line->end->setCoords(x_end, y_end);
+    line->setVisible(true);
+}
+
 void Waveform_Viewer_Widget::reset_measurement_data() {
     count_of_press = 0;
     frst_msr_line->setVisible(false);
@@ -875,17 +881,11 @@ void Waveform_Viewer_Widget::slot_mouse_move(QMouseEvent *event) {
             }
             qApp->setOverrideCursor(QCursor(Qt::BlankCursor));
             if(static_cast<int>(ui->chckBx_attch_crsr->checkState()) == 2) {
-                double rnd_x = round(x_coord / x_tckr_step) * x_tckr_step;
-                curs_time->position->setCoords(rnd_x, y_coord);
-                curs_time->setText(QString::number(rnd_x * time_coef) + " " + ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->currentText());
-                curs_ver_line->start->setCoords(rnd_x, -QCPRange::maxRange);
-                curs_ver_line->end->setCoords(rnd_x, QCPRange::maxRange);
-            } else {
-                curs_time->position->setCoords(x_coord, y_coord);
-                curs_time->setText(QString::number(x_coord * time_coef) + " " + ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->currentText());
-                curs_ver_line->start->setCoords(x_coord, -QCPRange::maxRange);
-                curs_ver_line->end->setCoords(x_coord, QCPRange::maxRange);
+                x_coord = round(x_coord / x_tckr_step) * x_tckr_step;
             }
+            curs_time->position->setCoords(x_coord, y_coord);
+            curs_time->setText(QString::number(x_coord * time_coef) + " " + ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->currentText());
+            draw_line(curs_ver_line, x_coord, x_coord, -QCPRange::maxRange, QCPRange::maxRange);
             ui->diagram->layer("layerCursor")->replot();
             ui->diagram->layer("layerMeasure")->replot();
         }
@@ -923,16 +923,10 @@ void Waveform_Viewer_Widget::slot_mouse_pressed(QMouseEvent *event) {
                     ui->diagram->layer("layerMeasure")->setVisible(true);
                     ui->diagram->replot();
                 }
-                frst_msr_line->start->setCoords(x_coord, -QCPRange::maxRange);
-                frst_msr_line->end->setCoords(x_coord, QCPRange::maxRange);
-                frst_msr_line->setVisible(true);
+                draw_line(frst_msr_line, x_coord, x_coord, -QCPRange::maxRange, QCPRange::maxRange);
             } else if(count_of_press == 2) {
-                scnd_msr_line->start->setCoords(x_coord, -QCPRange::maxRange);
-                scnd_msr_line->end->setCoords(x_coord, QCPRange::maxRange);
-                scnd_msr_line->setVisible(true);
-                thrd_msr_line->start->setCoords(frst_msr_line->start->key(), y_coord);
-                thrd_msr_line->end->setCoords(x_coord, y_coord);
-                thrd_msr_line->setVisible(true);
+                draw_line(scnd_msr_line, x_coord, x_coord, -QCPRange::maxRange, QCPRange::maxRange);
+                draw_line(thrd_msr_line, frst_msr_line->start->key(), x_coord, y_coord, y_coord);
                 msr_time->position->setCoords(((x_coord + frst_msr_line->start->key()) / 2), y_coord);
                 msr_time->setVisible(true);
                 set_measurement_label_text();
@@ -979,6 +973,9 @@ void Waveform_Viewer_Widget::slot_re_translate() {
 ////////////////////////////////////////////////////DIALOG SELECT DISPLAYABLE PINS///////////////////////////////////////////////////
 Dialog_Select_Displayable_Pins::Dialog_Select_Displayable_Pins(QStringList avlbl_pins, QStringList dsplbl_pins, QWidget *parent) : QDialog(parent), ui(new Ui::Dialog_Select_Displayable_Pins) {
     ui->setupUi(this);
+    this->setWindowTitle(tr("Select pins for display"));
+    this->setFixedSize(600, 300);
+    this->updateGeometry();
     available_pins_model = new QStringListModel(this);
     available_pins_model->setStringList(avlbl_pins);
     ui->lstVw_avlbl_pins->setModel(available_pins_model);
@@ -988,9 +985,6 @@ Dialog_Select_Displayable_Pins::Dialog_Select_Displayable_Pins(QStringList avlbl
     ui->lstVw_dspbl_pins->setModel(displayable_pins_model);
     ui->lstVw_dspbl_pins->setEditTriggers(QAbstractItemView::NoEditTriggers);
     connect(ui->lstVw_avlbl_pins->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(available_pins_selection_changed(const QItemSelection &)));
-    this->setWindowTitle(tr("Select pins for display"));
-    this->setFixedSize(600, 300);
-    this->updateGeometry();
     connect(ui->lstVw_dspbl_pins->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(displayable_pins_selection_changed(const QItemSelection &)));
     ui->lstVw_avlbl_pins->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->lstVw_avlbl_pins->selectionModel()->clearSelection();
@@ -1063,7 +1057,7 @@ QStringList Dialog_Select_Displayable_Pins::get_available_pins() {
     return available_pins_model->stringList();
 }
 
-////////////////////////////////////////////////////DIALOG SELECT DIAGRAM COLOR///////////////////////////////////////////////////
+////////////////////////////////////////////////////DIALOG SELECT DIAGRAM SETTINGS///////////////////////////////////////////////////
 Dialog_Select_Diagram_Settings::Dialog_Select_Diagram_Settings(QList<QString> _sttngs_lst, QWidget *parent) : QDialog(parent), ui(new Ui::Dialog_Select_Diagram_Settings) {
     ui->setupUi(this);
     this->setWindowTitle(tr("Select diagram settings"));

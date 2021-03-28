@@ -55,6 +55,7 @@
             void select_diagram_settings();
             void select_displayable_pins();
             void draw_from_saved_vals(int val);
+            void draw_line(QCPItemLine *line, double x_start, double x_end, double y_start, double y_end);
             void reset_measurement_data();
             void limit_axis_range(QCPAxis *axis, const QCPRange &new_range, const QCPRange &limit_range);
             bool mouse_inside_object(double x_coord, double y_coord, bool graph_drawing_rect);
@@ -154,7 +155,7 @@
             void available_pins_selection_changed(const QItemSelection &sel);
     };
 
-    //////////////////////////////////////////////////DIALOG SELECT DIAGRAM SETTING///////////////////////////////////////////////////
+    //////////////////////////////////////////////////DIALOG SELECT DIAGRAM SETTINGS///////////////////////////////////////////////////
     QT_BEGIN_NAMESPACE
     namespace Ui {
         class Dialog_Select_Diagram_Settings;

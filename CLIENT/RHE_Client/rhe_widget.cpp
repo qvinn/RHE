@@ -97,21 +97,19 @@ void RHE_Widget::resizeEvent(QResizeEvent *) {
     ui->line_horizontal->setGeometry(0, (ui->horizontalLayoutWidget->y() - 1), this->width(), ui->line_horizontal->geometry().height());
     ui->widget->resize(this->width(), (this->height() - ui->horizontalLayoutWidget->height()));
     ui->horizontalLayoutWidget_2->setGeometry(0, 0, ui->widget->width(), ui->widget->height());
-    ui->verticalLayout_3->setGeometry(QRect(ui->cmbBx_chs_brd->width(), 0, (ui->widget->width() - ui->cmbBx_chs_brd->width()), ui->widget->height()));
+    ui->verticalLayout_3->setGeometry(QRect((ui->widget->width() - ui->verticalLayout_3->geometry().width()), 0, ui->verticalLayout_3->geometry().width(), ui->widget->height()));
+    if(!language_changed) {
+        ui->prgrssBr_fl_sts->resize(ui->prgrssBr_fl_sts->minimumWidth(), ui->prgrssBr_fl_sts->height());
+    }
+    ui->scrollArea->setMinimumSize(ui->prgrssBr_fl_sts->width(), 0);
+    ui->scrollArea->adjustSize();
+    ui->scrollArea->setMinimumSize(ui->scrollArea->width(), (ui->scrollAreaWidgetContents->height() + 2));
     if(!wvfrm_vwr->as_window) {
         ui->label->resize(ui->verticalLayout_3->geometry().width(), (ui->verticalLayout_3->geometry().height() - wvfrm_vwr->height() - ui->verticalLayout_3->contentsMargins().bottom() * 2));
     }
     if(!pixmp_brd.isNull()) {
         ui->label->setPixmap(pixmp_brd.scaled(ui->label->size(), Qt::KeepAspectRatio));
     }
-}
-
-void RHE_Widget::on_pushButton_2_clicked() {
-    snd_rcv_module->ping_to_server();
-}
-
-void RHE_Widget::on_pushButton_3_clicked() {
-    snd_rcv_module->ping_to_S_server();
 }
 
 void RHE_Widget::on_pshBttn_strt_dbg_clicked() {
@@ -134,11 +132,11 @@ void RHE_Widget::on_pshBttn_strt_dbg_clicked() {
     }
     ui->prgrssBr_fl_sts->setFormat(state_strs.at(crrnt_state_strs));
     snd_rcv_module->start_debug(static_cast<uint16_t>(ui->spnBx_dbg_tm->value()), static_cast<uint8_t>(ui->cmbBx_dbg_tm_tp->currentIndex()), flag);
-    if(static_cast<bool>(static_cast<int>(ui->chckBx_strt_sqnc_of_sgn_with_dbg->checkState())) && sqnc_of_sgnls_file_sended && !static_cast<bool>(static_cast<int>(ui->chckBx_strt_dbg_aftr_flsh->checkState()))) {
-        on_pshBttn_strt_sgnls_sqnc_clicked();
-    }
     if(inpt_sldrs->count() != 0) {
         slot_input_val_changed(inpt_sldrs->at(0)->value());
+    }
+    if(static_cast<bool>(static_cast<int>(ui->chckBx_strt_sqnc_of_sgn_with_dbg->checkState())) && sqnc_of_sgnls_file_sended && !static_cast<bool>(static_cast<int>(ui->chckBx_strt_dbg_aftr_flsh->checkState()))) {
+        on_pshBttn_strt_sgnls_sqnc_clicked();
     }
     set_button_state_debug(true);
 }
@@ -357,6 +355,7 @@ void RHE_Widget::set_ui_text() {
     state_strs = {tr("Firmware sending"), tr("Firmware Sended"), tr("FPGA Flashing"), tr("FPGA Flashed"), tr("Debugging"), ""};
     ui->prgrssBr_fl_sts->setFormat(state_strs.at(crrnt_state_strs));
     ui->lbl_dbg_tm_tp_lmt->setText(ui->cmbBx_dbg_tm_tp->itemText(dbg_tm_tp_lmt));
+    resizeEvent(nullptr);
     language_changed = true;
 }
 
@@ -862,7 +861,8 @@ void RHE_Widget::slot_accept_output_data_table(QByteArray output_data_table) {
         sldr->setMinimum(i * 2);
         sldr->setMaximum(i * 2 + 1);
         sldr->setSingleStep(1);
-        sldr->setFixedSize(100, 21);
+        sldr->setBaseSize(100, 21);    //setFixedSize
+        sldr->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
         connect(sldr, &QSlider::valueChanged, this, &RHE_Widget::slot_input_val_changed);
         connect(sldr, &QSlider::sliderPressed, this, &RHE_Widget::slot_slider_pressed);
         inpt_sldrs->append(sldr);
@@ -881,6 +881,7 @@ void RHE_Widget::slot_accept_output_data_table(QByteArray output_data_table) {
         h_layout->addWidget(lcd_val);
     }
     change_cnt_of_dbg_pins(wvfrm_vwr->graph_count + pin_count);
+    emit resize_signal();
 }
 
 void RHE_Widget::slot_firmware_file_sended() {
@@ -894,10 +895,9 @@ void RHE_Widget::slot_firmware_file_sended() {
         crrnt_state_strs = 2;
         ui->prgrssBr_fl_sts->setFormat(state_strs.at(crrnt_state_strs));
         snd_rcv_module->flash_FPGA();
+    } else if(static_cast<bool>(static_cast<int>(ui->chckBx_strt_sqnc_of_sgn_with_dbg->checkState())) && sqnc_of_sgnls_file_sended) {
+        on_pshBttn_strt_dbg_clicked();
     }
-//    if(static_cast<bool>(static_cast<int>(ui->chckBx_strt_dbg_aftr_flsh->checkState()))) {
-//        on_pshBttn_strt_dbg_clicked();
-//    }
 }
 
 void RHE_Widget::slot_sequence_of_signals_file_sended(bool flg) {
@@ -917,7 +917,9 @@ void RHE_Widget::slot_fpga_flashed() {
     ui->prgrssBr_fl_sts->setValue(ui->prgrssBr_fl_sts->minimum());
     set_enable_board_power_led(true);
     if(static_cast<bool>(static_cast<int>(ui->chckBx_strt_dbg_aftr_flsh->checkState()))) {
-        on_pshBttn_strt_dbg_clicked();
+        if(!static_cast<bool>(static_cast<int>(ui->chckBx_strt_sqnc_of_sgn_with_dbg->checkState()))) {
+            on_pshBttn_strt_dbg_clicked();
+        }
         crrnt_state_strs = 4;
         ui->prgrssBr_fl_sts->setFormat(state_strs.at(crrnt_state_strs));
     }

@@ -94,8 +94,6 @@
             void showEvent(QShowEvent *) override;
             void paintEvent(QPaintEvent *) override;
             void resizeEvent(QResizeEvent *) override;
-            void on_pushButton_2_clicked();
-            void on_pushButton_3_clicked();
             void on_pshBttn_strt_dbg_clicked();
             void on_pshBttn_stp_dbg_clicked();
             void on_chckBx_strt_dbg_aftr_flsh_stateChanged(int state);
