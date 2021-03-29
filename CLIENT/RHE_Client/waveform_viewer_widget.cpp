@@ -45,6 +45,10 @@ Waveform_Viewer_Widget::~Waveform_Viewer_Widget() {
 }
 
 void Waveform_Viewer_Widget::showEvent(QShowEvent *) {
+    if(shw_at_cntr) {
+        shw_at_cntr = false;
+        this->move(((QGuiApplication::primaryScreen()->geometry().width() - this->geometry().width()) / 2), ((QGuiApplication::primaryScreen()->geometry().height() - this->geometry().height()) / 2));
+    }
     resizeEvent(nullptr);
 }
 
@@ -70,6 +74,7 @@ void Waveform_Viewer_Widget::on_chckBx_as_wndw_stateChanged(int state) {
     as_window = static_cast<bool>(state);
     if(state == 2) {
         this->setWindowFlags(Qt::Window | Qt::WindowMinMaxButtonsHint | Qt::WindowTitleHint);
+        shw_at_cntr = true;
         this->show();
     } else {
         this->setWindowFlags(flags);

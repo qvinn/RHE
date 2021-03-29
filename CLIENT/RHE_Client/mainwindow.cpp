@@ -46,6 +46,14 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
+void MainWindow::showEvent(QShowEvent *) {
+    if(shw_at_cntr) {
+        shw_at_cntr = false;
+        this->move(((QGuiApplication::primaryScreen()->geometry().width() - this->geometry().width()) / 2), ((QGuiApplication::primaryScreen()->geometry().height() - this->geometry().height()) / 2));
+        resizeEvent(nullptr);
+    }
+}
+
 void MainWindow::resizeEvent(QResizeEvent *) {
     ui->horizontalLayoutWidget->setGeometry(0, (this->height() - ui->horizontalLayoutWidget->height()), this->width(), ui->horizontalLayoutWidget->height());
     ui->verticalLayoutWidget->resize(this->width(), (this->height() - ui->horizontalLayoutWidget->height()));

@@ -41,6 +41,7 @@
             bool debugging = false;
             bool debug_show = true;
             bool as_window = false;
+            bool shw_at_cntr = true;
 
             int graph_count;
 

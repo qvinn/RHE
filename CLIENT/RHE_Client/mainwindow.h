@@ -47,11 +47,13 @@
 
             bool ui_initialized = false;
             bool language_changed = false;
+            bool shw_at_cntr = true;
 
         public slots:
             void slot_re_translate();
 
         private slots:
+            void showEvent(QShowEvent *) override;
             void resizeEvent(QResizeEvent *) override;
             void closeEvent(QCloseEvent *) override;
             void on_button_login_logout_clicked();
