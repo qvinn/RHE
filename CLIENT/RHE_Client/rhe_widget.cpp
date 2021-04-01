@@ -209,6 +209,7 @@ void RHE_Widget::on_spnBx_dbg_tm_valueChanged(int value) {
 void RHE_Widget::on_cmbBx_dbg_tm_tp_currentIndexChanged(int index) {
     if(ui_initialized && language_changed) {
         gen_widg->save_setting("settings/DEBUG_DISCRETENESS_TIME_TYPE", index);
+        ui->spnBx_dbg_tm->setMinimum(pow(10, index));
     }
 }
 
@@ -346,11 +347,11 @@ void RHE_Widget::set_ui_text() {
     if(ui->cmbBx_dbg_tm_tp->count() == 0) {
         ui->cmbBx_dbg_tm_tp->addItem(tr("s"));
         ui->cmbBx_dbg_tm_tp->addItem(tr("ms"));
-        ui->cmbBx_dbg_tm_tp->addItem(tr("us"));
+//        ui->cmbBx_dbg_tm_tp->addItem(tr("us"));
     } else {
         ui->cmbBx_dbg_tm_tp->setItemText(0, tr("s"));
         ui->cmbBx_dbg_tm_tp->setItemText(1, tr("ms"));
-        ui->cmbBx_dbg_tm_tp->setItemText(2, tr("us"));
+//        ui->cmbBx_dbg_tm_tp->setItemText(2, tr("us"));
     }
     state_strs = {tr("Firmware sending"), tr("Firmware Sended"), tr("FPGA Flashing"), tr("FPGA Flashed"), tr("Debugging"), ""};
     ui->prgrssBr_fl_sts->setFormat(state_strs.at(crrnt_state_strs));
@@ -590,7 +591,6 @@ bool RHE_Widget::read_xml_file(bool read_board_params, QString *cur_fpga, QList<
     }
     QXmlStreamReader xmlReader(&xml_file);
     bool read_board_data = false;
-    int cnt = 0;
     while(!xmlReader.atEnd() && !xmlReader.hasError()) {
         xmlReader.readNext();
         if(read_board_data) {
@@ -616,7 +616,6 @@ bool RHE_Widget::read_xml_file(bool read_board_params, QString *cur_fpga, QList<
                 }
             } else {
                 ui->cmbBx_chs_brd->addItem(xmlReader.attributes().value("name").toString());
-                cnt++;
             }
         } else if(!read_board_params && (xmlReader.name().toString().compare("fpga", Qt::CaseInsensitive) == 0) && (xmlReader.attributes().hasAttribute("jtag_id_code"))) {
             QString tmp_str(xmlReader.attributes().value("jtag_id_code").toString().replace(" ", ""));
