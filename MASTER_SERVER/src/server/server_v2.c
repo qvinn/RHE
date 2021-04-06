@@ -76,6 +76,8 @@
 #define S_SERVER_END_DSQ 52
 #define S_SERVER_SUCCESS_FLASH_FPGA 53
 #define RUN_DEBUG_FIRSTLY 54
+#define CLIENT_WANT_GET_FPGA_ID	55
+#define S_SERVER_SEND_FPGA_ID 56
 
 
 // Карта code_op - КОНЕЦ
@@ -90,13 +92,13 @@ int total_slave_servers = 0;
 
 // Packet Description
 struct U_packet {
-            int code_op;    // 4 байта
-            char data[DATA_BUFFER];
+	int code_op;    // 4 байта
+	char data[DATA_BUFFER];
 };
 
 typedef struct info_about_new_device {
-		int id;
-		char FPGA_id[20];
+	int id;
+	char FPGA_id[20];
 } info_about_new_device;
 
 //----------------------------------------------
@@ -111,9 +113,9 @@ typedef struct Chain_Pair {
 
 // Метод для отправки данных в сокет
 /*
-* int sock - FD(номер сокета)
-* int code_op - КОД ОПЕРАЦИИ (см. Коды операций для сервера)
-* const char *data - данные, которые передадутся в сокет
+	* int sock - FD(номер сокета)
+	* int code_op - КОД ОПЕРАЦИИ (см. Коды операций для сервера)
+	* const char *data - данные, которые передадутся в сокет
 */
 void send_U_Packet(int sock, int code_op, const char *data);
 
@@ -131,11 +133,11 @@ void reset_Pair(int id);
 
 // Метод, который находит пару для заданного id - и возвращает найденный id
 /*
-* По скольку все id универсальны, то не важно, какое id мы зададим, как входной парметр
-* Например, если мы, как входной пармер зададим id клиента, то метод попытается найти пару -
-* клиента, а, если наоборот, по то метод попытается найти пару - slave-сервера
-* Такая универсальность достигается путем того, что все id являются файлвыми дескрипторами(сокетами)
-* что в свою очередь обуславливает их уникальность.
+	* По скольку все id универсальны, то не важно, какое id мы зададим, как входной парметр
+	* Например, если мы, как входной пармер зададим id клиента, то метод попытается найти пару -
+	* клиента, а, если наоборот, по то метод попытается найти пару - slave-сервера
+	* Такая универсальность достигается путем того, что все id являются файлвыми дескрипторами(сокетами)
+	* что в свою очередь обуславливает их уникальность.
 */
 int find_pair_for(int id);
 
@@ -144,10 +146,14 @@ std::string find_FPGA_ID_for(int id);
 
 // Метод нахтдит для клиента плату с конкретным FPGA_id
 /*
-* int curr_client_id	- ID клиента, которому необходимо сменить плату
-* std::string FPGA_id	- FPGA_id платы, которую хочет выбрать клиент
+	* int curr_client_id	- ID клиента, которому необходимо сменить плату
+	* std::string FPGA_id	- FPGA_id платы, которую хочет выбрать клиент
 */
 int change_FPGA(int curr_client_id, std::string FPGA_id);
+
+int find_available_s_server(int ignore_index);
+
+void reqest_IDT_ODT_from_s_server(int for_client_id);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -226,7 +232,7 @@ int main()
 	{
 		perror("setsockopt");
 	}
-
+	
     if(bind(listener, (struct sockaddr *)&addr, sizeof(addr)) < 0)
     {
         perror("bind");
@@ -335,7 +341,7 @@ void send_U_Packet(int sock, int code_op, const char *data)
 {
     struct U_packet *send_packet = (struct U_packet*)malloc(sizeof(struct U_packet));	
     send_packet->code_op = code_op;
-
+	
 	memset(send_packet->data,0,DATA_BUFFER); // Для надежности заполним DATA_BUFFER байт send_packet->data значениями NULL
 	if(data != NULL)
 	{
@@ -344,7 +350,7 @@ void send_U_Packet(int sock, int code_op, const char *data)
 	
     char *send_buf = (char*)malloc(sizeof(struct U_packet));
     memcpy(send_buf,send_packet,sizeof(struct U_packet));
-
+	
     send(sock, send_buf, sizeof(struct U_packet), 0);
 	
     free(send_packet);
@@ -536,6 +542,7 @@ void recive_new_data(char *buf, int sock)
 			{				
 				send_U_Packet(sock, SUCCESS_CHANGE_FPGA, NULL);
 				printf("\t|___Client SUCCESSFULLY change FPGA_ID\n");
+				reqest_IDT_ODT_from_s_server(sock);
 			} else 
 			{				
 				send_U_Packet(sock, NOT_SUCCESS_CHANGE_FPGA, NULL);
@@ -774,7 +781,7 @@ void recive_new_data(char *buf, int sock)
 			}			
 			break;	
 		}
-				
+		
 		case STOP_DSQ_FILE:
 		{
 			// Перенаправляем запрос от клиента к slave-серверу
@@ -810,7 +817,7 @@ void recive_new_data(char *buf, int sock)
 			}			
 			break;	
 		}
-			
+		
 		case S_SERVER_CANT_READ_DSQ_FILE:
 		{
 			// Перенаправляем запрос от slave-серверу к клиенту
@@ -822,7 +829,7 @@ void recive_new_data(char *buf, int sock)
 			}			
 			break;	
 		}
-				
+		
 		case CLIENT_WANT_SET_PINSTATE:
 		{
 			// Перенаправляем запрос от клиента к slave-серверу
@@ -846,7 +853,7 @@ void recive_new_data(char *buf, int sock)
 			}			
 			break;	
 		}
-				
+		
 		case S_SERVER_END_DSQ:
 		{
 			// Перенаправляем запрос от slave-серверу к клиенту
@@ -870,7 +877,7 @@ void recive_new_data(char *buf, int sock)
 			}			
 			break;	
 		}
-				
+		
 		case RUN_DEBUG_FIRSTLY:
 		{
 			// Перенаправляем запрос от slave-серверу к клиенту
@@ -879,6 +886,30 @@ void recive_new_data(char *buf, int sock)
 			{				
 				send_U_Packet(finded_client, RUN_DEBUG_FIRSTLY, NULL);
 				printf("\t|___Slave_server with id %i NEED RUN DEBUG for client with id %i\n", sock, finded_client);
+			}			
+			break;	
+		}
+		
+		case CLIENT_WANT_GET_FPGA_ID:
+		{
+			// Перенаправляем запрос от клиента к slave-серверу
+			int finded_s_server = find_pair_for(sock);
+			if(finded_s_server != ERROR)
+			{				
+				send_U_Packet(finded_s_server, CLIENT_WANT_GET_FPGA_ID, NULL);
+				printf("\t|___Client with id %i need FPGA-id on slave-server with id %i\n", sock, finded_s_server);
+			}			
+			break;
+		}
+		
+		case S_SERVER_SEND_FPGA_ID:
+		{
+			// Перенаправляем запрос от slave-серверу к клиенту
+			int finded_client = find_pair_for(sock);
+			if(finded_client != ERROR)
+			{				
+				send_U_Packet(finded_client, S_SERVER_SEND_FPGA_ID, tmp_packet->data);
+				printf("\t|___Slave_server with id %i send FPGA-ID to client with id %i\n", sock, finded_client);
 			}			
 			break;	
 		}
@@ -923,10 +954,32 @@ void reset_Pair( int id)
 			Pairs[i].id_Cl = INIT_ID;
 		} else if(Pairs.at(i).id_SS == id) // Если отключаем slave-сервера
 		{
-			// Отсылаем пакет клиенту и говорим ему, что отключаем его
-			send_U_Packet(Pairs.at(i).id_Cl, DROP_CONNECTION, NULL);
-			close(Pairs.at(i).id_Cl);
-			printf("--->   Reset client with ID: %i\n",Pairs.at(i).id_Cl);
+			// Проверим, привязан ли к этому slave-серверу какой-то клиент
+			if(Pairs.at(i).id_Cl != INIT_ID)
+			{
+				// Попытаемся найти свободный slave-сервер
+				int redirect_index = find_available_s_server(i);
+				if(redirect_index != ERROR)
+				{
+					// Если смогли найти замену для клиента, то переводим его на другой slave-сервер
+					Pairs[redirect_index].id_Cl = Pairs.at(i).id_Cl;
+					Pairs[i].id_Cl = INIT_ID; // Обнулим id для клиента
+					Chain_Pair_mutex.unlock();
+					reqest_IDT_ODT_from_s_server(Pairs.at(redirect_index).id_Cl);
+					Chain_Pair_mutex.lock(); 
+					printf("--->   Redirect client with ID: %i to slave-server with id %i\n",Pairs.at(redirect_index).id_Cl,Pairs.at(redirect_index).id_SS);
+				} else 
+				{
+					// Отсылаем пакет клиенту и говорим ему, что отключаем его
+					send_U_Packet(Pairs.at(i).id_Cl, DROP_CONNECTION, NULL);
+					close(Pairs.at(i).id_Cl);
+					printf("--->   Reset client with ID: %i\n",Pairs.at(i).id_Cl);
+				}
+			} else 
+			{
+				printf("--->   Slave_server with ID: %i has no attached client\n",id);
+			}
+			
 			// Отсылаем пакет slave-серверу и говорим ему, что отключаем его
 			send_U_Packet(id, DROP_CONNECTION, NULL);
 			close(id);
@@ -1024,4 +1077,32 @@ int change_FPGA(int curr_client_id,std::string FPGA_id)
 	}
 	Chain_Pair_mutex.unlock();
 	return ERROR;
+}
+
+
+int find_available_s_server(int ignore_index)
+{
+	for(int i = 0; i < Pairs.size(); i++)
+	{
+		if(i == ignore_index){continue;}
+		if (Pairs.at(i).id_SS != INIT_ID && Pairs.at(i).id_Cl == INIT_ID)
+		{			
+			return i;
+		}
+	}		
+	return ERROR;
+}
+
+void reqest_IDT_ODT_from_s_server(int for_client_id)
+{
+	int finded_s_server = find_pair_for(for_client_id);
+	if(finded_s_server != ERROR)
+	{				
+		send_U_Packet(finded_s_server, CLIENT_WANT_GET_FPGA_ID, NULL);
+		send_U_Packet(finded_s_server, CLIENT_WANT_IDT, NULL);
+		send_U_Packet(finded_s_server, CLIENT_WANT_ODT, NULL);
+		send_U_Packet(finded_s_server, CLIENT_WANT_GET_TIMEOUT_INFO, NULL);
+		
+		printf("\t|___MASTER-SERVER request IDT__ODT__TIME_OUT_INFO for Client with id %i from slave-server with id %i\n", for_client_id, finded_s_server);
+	}	
 }

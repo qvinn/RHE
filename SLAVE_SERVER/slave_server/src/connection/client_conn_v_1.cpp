@@ -45,6 +45,8 @@
 #define S_SERVER_END_DSQ 52
 #define S_SERVER_SUCCESS_FLASH_FPGA 53
 #define RUN_DEBUG_FIRSTLY 54
+#define CLIENT_WANT_GET_FPGA_ID	55
+#define S_SERVER_SEND_FPGA_ID 56
 
 #define DATA_EXIST 1
 #define DATA_NOT_EXIST 0
@@ -212,7 +214,7 @@ void client_conn_v_1::wait_analize_recv_data()
 				break;	
 			}
 
-#ifdef HW_EN
+//#ifdef HW_EN
 			case FLASH_FPGA:
 			{
 				printf("_________________________________FLASH FPGA\n");
@@ -220,7 +222,7 @@ void client_conn_v_1::wait_analize_recv_data()
 				send_U_Packet(Socket, S_SERVER_SUCCESS_FLASH_FPGA, NULL);
 				break;	
 			}
-#endif
+//#endif
 
 #ifdef HW_EN
 			case CLIENT_WANT_START_DEBUG:
@@ -326,14 +328,11 @@ void client_conn_v_1::wait_analize_recv_data()
 			}
 #endif
 
+#ifdef HW_EN
 			case CLIENT_FINISH_SEND_DSQ_FILE:
 			{
 				end_recive_file(dsq_fp);
 				printf("_________________________________Client FINISH sending dsq_file\n");
-				/* char *buff = (char*)malloc(DATA_BUFFER);
-				sprintf(buff, "%i", file_rcv_bytes_count);				
-				send_U_Packet(Socket, S_SERVER_END_RCV_FILE, buff);
-				free(buff); */
 				if(gdb->public_read_dfile() != -1)
 				{
 					send_U_Packet(Socket, S_SERVER_END_RCV_DSQ_FILE, NULL);
@@ -341,6 +340,7 @@ void client_conn_v_1::wait_analize_recv_data()
 				}
 				break;	
 			}
+#endif			
 
 #ifdef HW_EN
 			case RUN_DSQ_FILE:
@@ -414,8 +414,7 @@ void client_conn_v_1::wait_analize_recv_data()
 				
 				gdb->prepare_pin_state(gdb->buf2set_state_Packet(tmp_packet->data));
 				// Сначала остановим предыдущий поток, если он был запущен
-				gdb->stop_pinstate_process();
-				//usleep(101); // "Заглушка" n секудн для паузы, чтобы успел остановиться уже запущенный поток
+				gdb->stop_pinstate_process();				
 				while(gdb->pin_state_proc_is_run() == 1){}
 				std::thread pin_state_thread(&Debug::set_pinStates,gdb,gdb->buf2set_state_Packet(tmp_packet->data),gdb->get_hop_time());
 				pin_state_thread.detach();
@@ -455,7 +454,37 @@ void client_conn_v_1::wait_analize_recv_data()
 				break;	
 			}
 #endif
-
+	
+			case CLIENT_WANT_GET_FPGA_ID:
+			{
+				/* char *buff = (char*)malloc(DATA_BUFFER);
+				memset(buff,0,DATA_BUFFER);
+				char tmp_mas[20];
+				memset(tmp_mas,0,sizeof(tmp_mas));
+				memcpy(tmp_mas, this->FPGA_id.c_str(), this->FPGA_id.length());
+				memcpy(buff, tmp_mas, sizeof(tmp_mas));
+				send_U_Packet(Socket, S_SERVER_SEND_FPGA_ID, buff);
+				free(buff); */
+				
+				// char *buff = (char*)malloc(DATA_BUFFER);
+				// memset(buff,0,DATA_BUFFER);
+				// char *tmp_mas = (char *)malloc(20);
+				// memset(tmp_mas,0,20);
+				// memcpy(tmp_mas, this->FPGA_id.c_str(), this->FPGA_id.length());
+				// memcpy(buff, tmp_mas, this->FPGA_id.length());
+				// send_U_Packet(Socket, S_SERVER_SEND_FPGA_ID, buff);
+				// free(buff);
+				// delete[] tmp_mas;
+				
+				char *buff = (char*)malloc(DATA_BUFFER);
+				memset(buff,0,DATA_BUFFER);
+				memcpy(buff, this->FPGA_id.c_str(), this->FPGA_id.length());
+				send_U_Packet(Socket, S_SERVER_SEND_FPGA_ID, buff);
+				free(buff);
+				printf("_________________________________SEND FPGA-id\n");
+				break;	
+			}
+			
 			default:
 			{
 				printf("\t|___UNKNOWN PACKET\n");

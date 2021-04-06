@@ -127,7 +127,7 @@ void Debug::start_debug_process()
 	std::vector<pinState> log;
 	// Установим начальное "текущее" время для первого прохода 0 условных единиц
 	int curr_time = 0;
-	printf("Debug proc -> start time: %i us\n",curr_time);
+	//printf("Debug proc -> start time: %i us\n",curr_time);
 	// Выполним заданное количество итераций
 	while(1)
 	{
@@ -171,7 +171,7 @@ void Debug::start_debug_process()
 		#endif
 		
 		free(buff);
-		printf("--------->End of debug iteration on %i us\n", curr_time);
+		//printf("--------->End of debug iteration on %i us\n", curr_time);
 		
 		usleep(discrete_delay*curr_time_mux);
 		curr_time = curr_time+(discrete_delay*curr_time_mux);
@@ -281,8 +281,10 @@ void Debug::calculate_us_max_duration_time()
 		}
 		case 2: // us
 		{
-			us_max_duration_time = max_duration_time * 1;
+			//us_max_duration_time = max_duration_time * 1;
 			//printf(" us\n");
+			printf(" us NOT ENABLED on this version -> set as ms\n");
+			us_max_duration_time = max_duration_time * 1000;
 			break;
 		}
 		default:
@@ -398,7 +400,7 @@ void Debug::set_pinStates(set_state_Packet _pin_state, int start_time)
 	int send_every_us = discrete_delay * curr_time_mux; //250000
 	
 	int curr_time = start_time;
-	printf("Pinstate proc -> start time: %i us\n",curr_time);
+	//printf("Pinstate proc -> start time: %i us\n",curr_time);
 	
 	while(1)
 	{
@@ -417,22 +419,7 @@ void Debug::set_pinStates(set_state_Packet _pin_state, int start_time)
 		}	
 		
 		if(delay_counter > send_every_us)
-		{
-			/* 			if(curr_time > get_global_time())
-				{
-				char *buff = (char*)malloc(sizeof(debug_log_Packet));
-				form_Packet(debug_output_pinName,log,curr_time, US_SEC, buff);
-				send_U_Packet(sock, S_SERVER_SENDING_DSQ_INFO , buff); // Проверить правильность работы пакета
-				free(buff);
-				delay_counter = 0;
-				printf("--------->End of set pintate iteration on %i us\n", curr_time);
-				} else
-				{
-				printf("--------->Ppintate iteration on %i us(need hop)\n", curr_time);
-				curr_time += 500000;
-				delay_counter = 0;
-			} */
-			
+		{			
 			// Синхронизация потоков
 			while(curr_time < get_global_time())
 			{
@@ -444,7 +431,7 @@ void Debug::set_pinStates(set_state_Packet _pin_state, int start_time)
 			send_U_Packet(sock, S_SERVER_SENDING_DSQ_INFO , buff); // Проверить правильность работы пакета
 			free(buff);
 			delay_counter = 0;
-			printf("--------->End of set pintate iteration on %i us\n", curr_time);
+			//printf("--------->End of set pintate iteration on %i us\n", curr_time);
 			
 		}
 		usleep(curr_udelay);
@@ -658,7 +645,8 @@ void Debug::run_dfile(int start_time)
 	{
 		// Остановим процесс генерации пакетов для портов, которые мы установили в ручном режиме
 		stop_pinstate_process();
-		// Состояния были сохранны при запусге того потока
+		// Состояния были сохранны при запуске того потока
+		while(pin_state_proc_is_run() == 1){}
 		printf("Pinstate process STOPPED -> states SAVED\n");
 	}
 	
@@ -731,7 +719,6 @@ void Debug::run_dfile(int start_time)
 			curr_pinNum = d_seq_table.debug_seq_vec.at(i).pin_states.at(k).pinNum;
 			curr_state = d_seq_table.debug_seq_vec.at(i).pin_states.at(k).state;
 			digitalWrite(curr_pinNum,curr_state);
-			//log.push_back(pinState{curr_pinNum,(global_time_state/from_debug_time_mux),curr_state});
 			log.push_back(pinState{curr_pinNum,global_time_state,curr_state});
 			//printf("Pin with num: %i, at %i unit have state: %i\n", curr_pinNum, (global_time_state/from_debug_time_mux),curr_state);
 		}
@@ -744,7 +731,6 @@ void Debug::run_dfile(int start_time)
 		
 		// Выполним отравку пакета с состояниями портов
 		char *buff = (char*)malloc(sizeof(debug_log_Packet));
-		//form_Packet(debug_output_pinName,log,(global_time_state/from_debug_time_mux),buff);
 		form_Packet(debug_output_pinName,log,global_time_state,US_SEC,buff);
 		send_U_Packet(sock, S_SERVER_SENDING_DSQ_INFO , buff);
 		free(buff);

@@ -113,6 +113,7 @@ int main(int argc, char *argv[])
 	}
 	printf("\n");
 	
+#ifdef HW_EN	
 	// Выполним проверку на то, нет ли повтотряющихся номеров портов среди INPUT и OUTPUT	
 	if(Debug::same_int_checker(debug_input_Wpi_pinNum) == -1)
 	{
@@ -124,7 +125,8 @@ int main(int argc, char *argv[])
 		printf("ERR:DETECTED SAME PINUM AT OUTPUT PINS LIST!\n");
 		return 0;
 	}
-	
+#endif
+
 	// Выполним проверку на то, нет ли коллизий между портами, которые будут INPUT и OUTPUT
 	for(int i = 0; i < debug_input_Wpi_pinNum.size(); i++)
 	{
@@ -171,7 +173,7 @@ int main(int argc, char *argv[])
             client->ping_to_server();
 		} else if(cmd == "sendfile")
         {
-			client->send_file_to_client("debug_result.txt");
+			//client->send_file_to_client("debug_result.txt");
 		} else if(cmd == "read_dfile")
         {
 #ifdef HW_EN
@@ -182,7 +184,14 @@ int main(int argc, char *argv[])
 #ifdef HW_EN
 		client->gdb->public_run_dfile();
 #endif
-		} else if(cmd == "")
+		} else if(cmd == "reconnect")
+        {
+			if(!client->init_connection()){return 0;}
+			std::thread waiting_thread(&client_conn_v_1::wait_analize_recv_data,client);
+			waiting_thread.detach();
+			if(client->get_id_for_client() != CS_OK){return 0;}
+		}
+		 else if(cmd == "")
         {
 			
 		}
