@@ -193,6 +193,12 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 qDebug() << "_________________________________RUN DEBUG FIRSTLY!";
                 break;
             }
+            case S_SERVER_SEND_FPGA_ID:
+            {
+                qDebug() << "_________________________________RECIVE FPGA ID!";
+                qDebug() << "FPGA-ID: " << QString(tmp_packet->data);
+                break;
+            }
             default: {
                 qDebug() << "_________________________________UNKNOWN PACKET";
                 break;

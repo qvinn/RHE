@@ -56,6 +56,8 @@
     #define S_SERVER_END_DSQ 52
     #define S_SERVER_SUCCESS_FLASH_FPGA 53
     #define RUN_DEBUG_FIRSTLY 54
+    #define CLIENT_WANT_GET_FPGA_ID	55
+    #define S_SERVER_SEND_FPGA_ID 56
 
     class Send_Recieve_Module : public QObject {
         Q_OBJECT
