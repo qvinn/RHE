@@ -81,6 +81,7 @@
             bool new_debug = false;
             bool clr_trnsprnt = true;
             bool sqnc_of_sgnls_file_sended = false;
+            bool dgb_strtd = false;
             bool sqnc_of_sgnls_strtd = false;
 
             int prev_board_index;

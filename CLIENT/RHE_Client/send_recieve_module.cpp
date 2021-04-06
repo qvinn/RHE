@@ -196,7 +196,8 @@ void Send_Recieve_Module::wait_analize_recv_data() {
             case S_SERVER_SEND_FPGA_ID:
             {
                 qDebug() << "_________________________________RECIVE FPGA ID!";
-                qDebug() << "FPGA-ID: " << QString(tmp_packet->data);
+                emit choose_board_signal(tmp_packet->data);
+//                qDebug() << "FPGA-ID: " << QString(tmp_packet->data);
                 break;
             }
             default: {

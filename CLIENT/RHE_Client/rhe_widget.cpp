@@ -40,7 +40,6 @@ RHE_Widget::RHE_Widget(QWidget *parent, General_Widget *widg, Send_Recieve_Modul
     send_file_status = new QTimer(nullptr);
     state_strs = {tr("Firmware sending"), tr("Firmware Sended"), tr("FPGA Flashing"), tr("FPGA Flashed"), tr("Debugging"), ""};
     connect(send_file_status, &QTimer::timeout, this, &RHE_Widget::slot_timer_timeout);
-    send_file_status->stop();
     pre_initialize_ui();
 }
 
@@ -174,9 +173,13 @@ void RHE_Widget::on_pshBttn_snd_sgnls_sqnc_clicked() {
 }
 
 void RHE_Widget::on_pshBttn_strt_sgnls_sqnc_clicked() {
-    sqnc_of_sgnls_strtd = true;
-    snd_rcv_module->start_sequence_of_signals();
-    scrll_area_sgnls_set_enabled(false);
+    if(dgb_strtd) {
+        sqnc_of_sgnls_strtd = true;
+        snd_rcv_module->start_sequence_of_signals();
+        scrll_area_sgnls_set_enabled(false);
+    } else {
+        gen_widg->show_message_box("", tr("Debug not started"), 0);
+    }
 }
 
 void RHE_Widget::on_chckBx_strt_sqnc_of_sgn_with_dbg_stateChanged(int state) {
@@ -300,6 +303,8 @@ void RHE_Widget::pre_initialize_ui() {
 
 void RHE_Widget::initialize_ui() {
     ui_initialized = false;
+    send_file_status->stop();
+    ui->prgrssBr_fl_sts->setValue(ui->prgrssBr_fl_sts->minimum());
     on_pshBttn_stp_dbg_clicked();
     path_to_proj->clear();
     QDir::setCurrent(qApp->applicationDirPath());
@@ -408,6 +413,7 @@ void RHE_Widget::set_enable_board_power_led(bool flg) {
 }
 
 void RHE_Widget::set_button_state_debug(bool flg) {
+    dgb_strtd = flg;
     wvfrm_vwr->debugging = flg;
     wvfrm_vwr->pshBttn_slct_dsplbl_pins_set_enabled(!flg);
     wvfrm_vwr->pshBttn_open_save_wvfrm_set_enabled(!flg);
