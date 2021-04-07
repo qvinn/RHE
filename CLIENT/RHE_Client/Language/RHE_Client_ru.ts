@@ -87,7 +87,7 @@
         <translation>Размер шрифта отметок на осях</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="1068"/>
+        <location filename="../waveform_viewer_widget.cpp" line="1070"/>
         <source>Select diagram settings</source>
         <translation>Выбор настроек диаграммы</translation>
     </message>
@@ -128,7 +128,7 @@
         <translation type="vanished">Отмена</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="981"/>
+        <location filename="../waveform_viewer_widget.cpp" line="983"/>
         <source>Select pins for display</source>
         <translation>Выберите пины для отображаения</translation>
     </message>

@@ -87,7 +87,7 @@
         <translation>Axis labels font size</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="1068"/>
+        <location filename="../waveform_viewer_widget.cpp" line="1070"/>
         <source>Select diagram settings</source>
         <translation>Select diagram settings</translation>
     </message>
@@ -128,7 +128,7 @@
         <translation type="vanished">Cancell</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="981"/>
+        <location filename="../waveform_viewer_widget.cpp" line="983"/>
         <source>Select pins for display</source>
         <translation>Select pins for display</translation>
     </message>

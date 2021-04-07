@@ -772,6 +772,7 @@ void RHE_Widget::slot_accept_debug_data(QByteArray debug_data) {
     }
     bool val_changed = false;
     double dbg_time = (static_cast<double>(tmp_packet->time) / pow(1000.0, tmp_packet->time_mode));
+    int tmp;
     for(int i = 0; i < wvfrm_vwr->get_all_pins_count(); i++) {
         val.append(0);
         if(nmd_pin_pos.count() == 0) {
@@ -781,7 +782,7 @@ void RHE_Widget::slot_accept_debug_data(QByteArray debug_data) {
                 val.append(tmp_packet->pins[i].state);
             }
         } else {
-            int tmp = 0;
+            tmp = 0;
             for(int k = 0; k < nmd_pin_pos.count(); k++) {
                 if(i == nmd_pin_pos.at(k).x()) {
                     val.append(tmp_packet->pins[nmd_pin_pos.at(k).y()].state);
@@ -843,8 +844,9 @@ void RHE_Widget::slot_accept_output_data_table(QByteArray output_data_table) {
     }
     ui->verticalLayout_4->update();
     wvfrm_vwr->add_saved_vals_list(pin_count);
+    int val;
     for(int i = 0; i < pin_count; i++) {
-        int val;
+        val = 0;
         memcpy(&val, (output_data_table.data() + ((hop * i) + 6 + i)), 1);
         pi_pins_nums->append(val);
         QString pin_name_str = QByteArray((output_data_table.data() + ((hop * i) + 1 + i)), 5);

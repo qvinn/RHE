@@ -69,7 +69,7 @@
     <message>
         <location filename="../dialog_select_diagram_settings.ui" line="583"/>
         <source>Cursor time label border color</source>
-        <translation>Колір рамки тимчасової мітки курсору</translation>
+        <translation>Колір рамки часової мітки курсору</translation>
     </message>
     <message>
         <location filename="../dialog_select_diagram_settings.ui" line="618"/>
@@ -87,7 +87,7 @@
         <translation>Розмір шрифту відміток на вісях</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="1068"/>
+        <location filename="../waveform_viewer_widget.cpp" line="1070"/>
         <source>Select diagram settings</source>
         <translation>Вибір налаштувань діаграми</translation>
     </message>
@@ -128,7 +128,7 @@
         <translation type="vanished">Відміна</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="981"/>
+        <location filename="../waveform_viewer_widget.cpp" line="983"/>
         <source>Select pins for display</source>
         <translation>Виберіть піни для відображування</translation>
     </message>

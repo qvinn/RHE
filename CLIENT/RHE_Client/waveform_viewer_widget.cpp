@@ -901,6 +901,7 @@ void Waveform_Viewer_Widget::slot_mouse_pressed(QMouseEvent *event) {
     if(event->button() == Qt::RightButton) {
         if(measure) {
             reset_measurement_data();
+            ui->diagram->layer("layerMeasure")->replot();
         } else {
             double x_coord = ui->diagram->xAxis->pixelToCoord(event->pos().x());
             double y_coord = ui->diagram->yAxis->pixelToCoord(event->pos().y());
@@ -936,6 +937,7 @@ void Waveform_Viewer_Widget::slot_mouse_pressed(QMouseEvent *event) {
                 msr_time->setVisible(true);
                 set_measurement_label_text();
             }
+            ui->diagram->layer("layerMeasure")->replot();
         } else {
             emit ui->diagram->plottableClick(ui->diagram->plottable(1), 3, event);
             drag_pressed = true;
