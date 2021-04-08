@@ -138,6 +138,7 @@ void MainWindow::on_button_register_clicked() {
 void MainWindow::initialize_ui() {
     menu_bar = new QMenuBar(this);
     menu_bar->setStyleSheet("QMenuBar { background-color: #F5F5F5 } QMenuBar::item:selected { background: #9D9D90; } QMenuBar::item:pressed { background: #5D5D50; }" );
+    menu_bar->setNativeMenuBar(false);
     ui->verticalLayout->insertWidget(0, menu_bar);
     menu_file = new QMenu(menu_bar);
     menu_file->setStyleSheet("QMenu { background-color: #F5F5F5 } QMenu::item:selected { background: #9D9D90; }" );
