@@ -32,9 +32,17 @@
         <translation>Select displayable pins</translation>
     </message>
     <message>
-        <location filename="../dialog_select_diagram_settings.ui" line="182"/>
         <source>Cursor line color</source>
-        <translation>Cursor line color</translation>
+        <translation type="vanished">Cursor line color</translation>
+    </message>
+    <message>
+        <source>Cursor and measurement line color</source>
+        <translation type="vanished">Cursor and measurement lines color</translation>
+    </message>
+    <message>
+        <location filename="../dialog_select_diagram_settings.ui" line="182"/>
+        <source>Cursor and measurement lines color</source>
+        <translation>Cursor and measurement lines color</translation>
     </message>
     <message>
         <location filename="../dialog_select_diagram_settings.ui" line="242"/>
@@ -68,8 +76,30 @@
     </message>
     <message>
         <location filename="../dialog_select_diagram_settings.ui" line="583"/>
+        <source>Cursor and measurement time labels border color</source>
+        <translation>Cursor and measurement time labels border color</translation>
+    </message>
+    <message>
+        <location filename="../dialog_select_diagram_settings.ui" line="640"/>
+        <source>Cursor and measurement time labels fill color</source>
+        <translation>Cursor and measurement time labels fill color</translation>
+    </message>
+    <message>
+        <location filename="../dialog_select_diagram_settings.ui" line="684"/>
+        <source>Axis, cursor and measurement time labels font size   </source>
+        <translation>Axis, cursor and measurement time labels font size   </translation>
+    </message>
+    <message>
+        <source>Cursor and measurement time label border color</source>
+        <translation type="vanished">Cursor and measurement time labels border color</translation>
+    </message>
+    <message>
+        <source>Cursor and measurement time label fill color</source>
+        <translation type="vanished">Cursor and measurement time labels fill color</translation>
+    </message>
+    <message>
         <source>Cursor time label border color</source>
-        <translation>Cursor time label border color</translation>
+        <translation type="vanished">Cursor time label border color</translation>
     </message>
     <message>
         <location filename="../dialog_select_diagram_settings.ui" line="618"/>
@@ -77,14 +107,16 @@
         <translation>Selection color</translation>
     </message>
     <message>
-        <location filename="../dialog_select_diagram_settings.ui" line="640"/>
         <source>Cursor time label fill color</source>
-        <translation>Cursor time label fill color</translation>
+        <translation type="vanished">Cursor time label fill color</translation>
     </message>
     <message>
-        <location filename="../dialog_select_diagram_settings.ui" line="684"/>
+        <source>Axis and cursor time labels font size</source>
+        <translation type="vanished">Axis, cursor and measurement time labels font size</translation>
+    </message>
+    <message>
         <source>Axis labels font size</source>
-        <translation>Axis labels font size</translation>
+        <translation type="vanished">Axis and cursor time labels font size</translation>
     </message>
     <message>
         <location filename="../waveform_viewer_widget.cpp" line="1070"/>
@@ -136,27 +168,27 @@
 <context>
     <name>General_Widget</name>
     <message>
-        <location filename="../general_widget.cpp" line="177"/>
+        <location filename="../general_widget.cpp" line="192"/>
         <source>Warning</source>
         <translation>Warning</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="182"/>
+        <location filename="../general_widget.cpp" line="197"/>
         <source>Question</source>
         <translation>Question</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="187"/>
+        <location filename="../general_widget.cpp" line="202"/>
         <source>Yes</source>
         <translation>Yes</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="188"/>
+        <location filename="../general_widget.cpp" line="203"/>
         <source>No</source>
         <translation>No</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="191"/>
+        <location filename="../general_widget.cpp" line="206"/>
         <source>Information</source>
         <translation>Information</translation>
     </message>
@@ -170,78 +202,78 @@
     </message>
     <message>
         <location filename="../mainwindow.ui" line="430"/>
-        <location filename="../mainwindow.cpp" line="200"/>
+        <location filename="../mainwindow.cpp" line="201"/>
         <source>Register</source>
         <translation>  Register  </translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="715"/>
-        <location filename="../mainwindow.cpp" line="195"/>
-        <location filename="../mainwindow.cpp" line="239"/>
+        <location filename="../mainwindow.cpp" line="196"/>
+        <location filename="../mainwindow.cpp" line="240"/>
         <source>Login</source>
         <translation>Login</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="197"/>
-        <location filename="../mainwindow.cpp" line="232"/>
+        <location filename="../mainwindow.cpp" line="198"/>
+        <location filename="../mainwindow.cpp" line="233"/>
         <source>Logout</source>
         <translation>Logout</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="178"/>
+        <location filename="../mainwindow.cpp" line="179"/>
         <source>File</source>
         <translation>File</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="177"/>
+        <location filename="../mainwindow.cpp" line="178"/>
         <source>Remote Hardware Education</source>
         <translation>Remote Hardware Education</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="179"/>
+        <location filename="../mainwindow.cpp" line="180"/>
         <source>Settings</source>
         <translation>Settings</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="180"/>
+        <location filename="../mainwindow.cpp" line="181"/>
         <source>Open waveform viewer</source>
         <translation>Open waveform viewer</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="181"/>
+        <location filename="../mainwindow.cpp" line="182"/>
         <source>Exit</source>
         <translation>Exit</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="182"/>
+        <location filename="../mainwindow.cpp" line="183"/>
         <source>Files checking</source>
         <translation>Files checking</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="183"/>
+        <location filename="../mainwindow.cpp" line="184"/>
         <source>Pins checking</source>
         <translation>Pins checking</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="184"/>
+        <location filename="../mainwindow.cpp" line="185"/>
         <source>Manualy load firmware</source>
         <translation>Manualy load firmware</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="186"/>
-        <location filename="../mainwindow.cpp" line="190"/>
+        <location filename="../mainwindow.cpp" line="187"/>
+        <location filename="../mainwindow.cpp" line="191"/>
         <source>English</source>
         <translation>English</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="187"/>
-        <location filename="../mainwindow.cpp" line="191"/>
+        <location filename="../mainwindow.cpp" line="188"/>
+        <location filename="../mainwindow.cpp" line="192"/>
         <source>Ukrainian</source>
         <translation>Ukrainian</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="188"/>
-        <location filename="../mainwindow.cpp" line="192"/>
+        <location filename="../mainwindow.cpp" line="189"/>
+        <location filename="../mainwindow.cpp" line="193"/>
         <source>Russian</source>
         <translation>Russian</translation>
     </message>

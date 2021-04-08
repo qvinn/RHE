@@ -179,7 +179,7 @@
       <enum>QFrame::Box</enum>
      </property>
      <property name="text">
-      <string>Cursor line color</string>
+      <string>Cursor and measurement lines color</string>
      </property>
     </widget>
    </item>
@@ -580,7 +580,7 @@ QPushButton:hover{
       <enum>QFrame::Box</enum>
      </property>
      <property name="text">
-      <string>Cursor time label border color</string>
+      <string>Cursor and measurement time labels border color</string>
      </property>
     </widget>
    </item>
@@ -637,7 +637,7 @@ QPushButton:hover{
       <enum>QFrame::Box</enum>
      </property>
      <property name="text">
-      <string>Cursor time label fill color</string>
+      <string>Cursor and measurement time labels fill color</string>
      </property>
     </widget>
    </item>
@@ -681,7 +681,7 @@ QPushButton:hover{
       <number>0</number>
      </property>
      <property name="text">
-      <string>Axis labels font size</string>
+      <string>Axis, cursor and measurement time labels font size   </string>
      </property>
     </widget>
    </item>

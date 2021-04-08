@@ -32,9 +32,17 @@
         <translation>Вибір відображуваних пінів</translation>
     </message>
     <message>
-        <location filename="../dialog_select_diagram_settings.ui" line="182"/>
         <source>Cursor line color</source>
-        <translation>Колір лінії курсору</translation>
+        <translation type="vanished">Колір лінії курсору</translation>
+    </message>
+    <message>
+        <source>Cursor and measurement line color</source>
+        <translation type="vanished">Колір ліній курсору та вимірювань</translation>
+    </message>
+    <message>
+        <location filename="../dialog_select_diagram_settings.ui" line="182"/>
+        <source>Cursor and measurement lines color</source>
+        <translation>Колір ліній курсору та вимірювань</translation>
     </message>
     <message>
         <location filename="../dialog_select_diagram_settings.ui" line="242"/>
@@ -68,8 +76,30 @@
     </message>
     <message>
         <location filename="../dialog_select_diagram_settings.ui" line="583"/>
+        <source>Cursor and measurement time labels border color</source>
+        <translation>Колір рамки часових міток курсору та вимірювань</translation>
+    </message>
+    <message>
+        <location filename="../dialog_select_diagram_settings.ui" line="640"/>
+        <source>Cursor and measurement time labels fill color</source>
+        <translation>Колір заливки часових міток курсору та вимірювань</translation>
+    </message>
+    <message>
+        <location filename="../dialog_select_diagram_settings.ui" line="684"/>
+        <source>Axis, cursor and measurement time labels font size   </source>
+        <translation>Розмір шрифту відміток на вісях, часових мітках курсору та вимірювань   </translation>
+    </message>
+    <message>
+        <source>Cursor and measurement time label border color</source>
+        <translation type="vanished">Колір рамки часових міток курсору та вимірювань</translation>
+    </message>
+    <message>
+        <source>Cursor and measurement time label fill color</source>
+        <translation type="vanished">Колір заливки часових міток курсору та вимірювань</translation>
+    </message>
+    <message>
         <source>Cursor time label border color</source>
-        <translation>Колір рамки часової мітки курсору</translation>
+        <translation type="vanished">Колір рамки часової мітки курсору</translation>
     </message>
     <message>
         <location filename="../dialog_select_diagram_settings.ui" line="618"/>
@@ -77,14 +107,16 @@
         <translation>Колір виділення</translation>
     </message>
     <message>
-        <location filename="../dialog_select_diagram_settings.ui" line="640"/>
         <source>Cursor time label fill color</source>
-        <translation>Колір заливки часової мітки курсору</translation>
+        <translation type="vanished">Колір заливки часової мітки курсору</translation>
     </message>
     <message>
-        <location filename="../dialog_select_diagram_settings.ui" line="684"/>
+        <source>Axis and cursor time labels font size</source>
+        <translation type="vanished">Розмір шрифту відміток на вісях, часових мітках курсору та вимірювань</translation>
+    </message>
+    <message>
         <source>Axis labels font size</source>
-        <translation>Розмір шрифту відміток на вісях</translation>
+        <translation type="vanished">Розмір шрифту відміток на вісях і часовій мітці курсору</translation>
     </message>
     <message>
         <location filename="../waveform_viewer_widget.cpp" line="1070"/>
@@ -136,27 +168,27 @@
 <context>
     <name>General_Widget</name>
     <message>
-        <location filename="../general_widget.cpp" line="177"/>
+        <location filename="../general_widget.cpp" line="192"/>
         <source>Warning</source>
         <translation>Увага</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="182"/>
+        <location filename="../general_widget.cpp" line="197"/>
         <source>Question</source>
         <translation>Питання</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="187"/>
+        <location filename="../general_widget.cpp" line="202"/>
         <source>Yes</source>
         <translation>Так</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="188"/>
+        <location filename="../general_widget.cpp" line="203"/>
         <source>No</source>
         <translation>Ні</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="191"/>
+        <location filename="../general_widget.cpp" line="206"/>
         <source>Information</source>
         <translation>Інформація</translation>
     </message>
@@ -170,78 +202,78 @@
     </message>
     <message>
         <location filename="../mainwindow.ui" line="430"/>
-        <location filename="../mainwindow.cpp" line="200"/>
+        <location filename="../mainwindow.cpp" line="201"/>
         <source>Register</source>
         <translation>  Реєстрація  </translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="715"/>
-        <location filename="../mainwindow.cpp" line="195"/>
-        <location filename="../mainwindow.cpp" line="239"/>
+        <location filename="../mainwindow.cpp" line="196"/>
+        <location filename="../mainwindow.cpp" line="240"/>
         <source>Login</source>
         <translation>Війти</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="197"/>
-        <location filename="../mainwindow.cpp" line="232"/>
+        <location filename="../mainwindow.cpp" line="198"/>
+        <location filename="../mainwindow.cpp" line="233"/>
         <source>Logout</source>
         <translation>Вийти</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="178"/>
+        <location filename="../mainwindow.cpp" line="179"/>
         <source>File</source>
         <translation>Файл</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="177"/>
+        <location filename="../mainwindow.cpp" line="178"/>
         <source>Remote Hardware Education</source>
         <translation>Віддалене Апаратне Навчання</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="179"/>
+        <location filename="../mainwindow.cpp" line="180"/>
         <source>Settings</source>
         <translation>Налаштування</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="180"/>
+        <location filename="../mainwindow.cpp" line="181"/>
         <source>Open waveform viewer</source>
         <translation>Відкрити переглядач часових діаграм</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="181"/>
+        <location filename="../mainwindow.cpp" line="182"/>
         <source>Exit</source>
         <translation>Вихід</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="182"/>
+        <location filename="../mainwindow.cpp" line="183"/>
         <source>Files checking</source>
         <translation>Перевірка файлів</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="183"/>
+        <location filename="../mainwindow.cpp" line="184"/>
         <source>Pins checking</source>
         <translation>Перевірка пінів</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="184"/>
+        <location filename="../mainwindow.cpp" line="185"/>
         <source>Manualy load firmware</source>
         <translation>Завантажити прошивку власноруч</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="186"/>
-        <location filename="../mainwindow.cpp" line="190"/>
+        <location filename="../mainwindow.cpp" line="187"/>
+        <location filename="../mainwindow.cpp" line="191"/>
         <source>English</source>
         <translation>Англійська</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="187"/>
-        <location filename="../mainwindow.cpp" line="191"/>
+        <location filename="../mainwindow.cpp" line="188"/>
+        <location filename="../mainwindow.cpp" line="192"/>
         <source>Ukrainian</source>
         <translation>Українська</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="188"/>
-        <location filename="../mainwindow.cpp" line="192"/>
+        <location filename="../mainwindow.cpp" line="189"/>
+        <location filename="../mainwindow.cpp" line="193"/>
         <source>Russian</source>
         <translation>Російська</translation>
     </message>
