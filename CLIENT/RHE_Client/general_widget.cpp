@@ -3,13 +3,13 @@
 General_Widget::General_Widget() {
     files_list = new QStringList();
     QString path = qApp->applicationDirPath();
-    path.append("/settings.cfg");
-#ifdef __linux__
-    settings = new QSettings(path, QSettings::NativeFormat);
-#else
-    settings = new QSettings(path, QSettings::IniFormat);
-#endif
+    settings = new QSettings(path + "/settings.cfg", QSettings::IniFormat);
     create_base_settings();
+#ifdef __linux__
+    QString icon_path = (path + "/" + get_setting("settings/PATH_TO_DATA").toString() + "icon.png");
+    check_is_icon_exist(icon_path);
+    qApp->setWindowIcon(QIcon(icon_path));
+#endif
     language_translator = new QTranslator();
 }
 
@@ -80,6 +80,21 @@ void General_Widget::create_base_settings() {
 void General_Widget::check_setting_exist(QString type, QVariant val) {
     if(!settings->contains(type)) {
         save_setting(type, val);
+    }
+}
+
+void General_Widget::check_is_icon_exist(QString path) {
+    QFile r_icon_file(path);
+    if(!r_icon_file.exists()) {
+        if(r_icon_file.open(QIODevice::WriteOnly)) {
+            QFile i_icon_file(":/icons/1.png");
+            if(i_icon_file.open(QIODevice::ReadOnly)) {
+                QByteArray arr = i_icon_file.readAll();
+                r_icon_file.write(arr, arr.size());
+                i_icon_file.close();
+            }
+        }
+        r_icon_file.close();
     }
 }
 

@@ -2,6 +2,7 @@
     #define GENERAL_WIDGET_H
 
     #include <QFile>
+    #include <QIcon>
     #include <QDebug>
     #include <QWidget>
     #include <QSettings>
@@ -28,6 +29,7 @@
         private:
             void create_base_settings();
             void check_setting_exist(QString type, QVariant val);
+            void check_is_icon_exist(QString path);
 
             QStringList *files_list = nullptr;
             QSettings *settings = nullptr;
