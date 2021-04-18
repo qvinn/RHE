@@ -78,7 +78,6 @@
             bool ui_initialized = false;
             bool language_changed = false;
             bool board_is_on = false;
-            bool new_debug = false;
             bool clr_trnsprnt = true;
             bool sqnc_of_sgnls_file_sended = false;
             bool dgb_strtd = false;

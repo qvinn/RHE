@@ -783,7 +783,7 @@ bool Waveform_Viewer_Widget::mouse_inside_object(double x_coord, double y_coord,
             return true;
         }
     } else {
-        if((x_coord < left) && (y_coord >= (bottom + 1.0)) && (y_coord < top)) {
+        if((x_coord < left) && (y_coord >= (bottom + 0.5)) && (y_coord < top)) {
             return true;
         } else {
             return false;
@@ -799,7 +799,10 @@ void Waveform_Viewer_Widget::slot_mouse_move(QMouseEvent *event) {
             ui->diagram->layer("layerCursor")->setVisible(false);
             ui->diagram->replot();
         }
-        qApp->setOverrideCursor(QCursor(Qt::ArrowCursor));
+        if(this->cursor().shape() != Qt::ClosedHandCursor) {
+            qApp->setOverrideCursor(QCursor(Qt::OpenHandCursor));
+            this->setCursor(Qt::OpenHandCursor);
+        }
         if(drag_pressed && !debugging) {
             double rnd_y = round(y_coord / 2.0) * 2.0 - 1.0;
             if(rnd_y < 1.0) {
@@ -880,11 +883,13 @@ void Waveform_Viewer_Widget::slot_mouse_move(QMouseEvent *event) {
                 ui->diagram->replot();
             }
             qApp->setOverrideCursor(QCursor(Qt::ArrowCursor));
+            this->setCursor(Qt::ArrowCursor);
         } else {
             if(!ui->diagram->layer("layerCursor")->visible()) {
                 ui->diagram->layer("layerCursor")->setVisible(true);
             }
             qApp->setOverrideCursor(QCursor(Qt::BlankCursor));
+            this->setCursor(Qt::BlankCursor);
             if(static_cast<int>(ui->chckBx_attch_crsr->checkState()) == 2) {
                 x_coord = round(x_coord / x_tckr_step) * x_tckr_step;
             }
@@ -898,6 +903,10 @@ void Waveform_Viewer_Widget::slot_mouse_move(QMouseEvent *event) {
 }
 
 void Waveform_Viewer_Widget::slot_mouse_pressed(QMouseEvent *event) {
+    if(this->cursor().shape() == Qt::OpenHandCursor) {
+        qApp->setOverrideCursor(QCursor(Qt::ClosedHandCursor));
+        this->setCursor(Qt::ClosedHandCursor);
+    }
     if(event->button() == Qt::RightButton) {
         if(measure) {
             reset_measurement_data();
@@ -946,6 +955,10 @@ void Waveform_Viewer_Widget::slot_mouse_pressed(QMouseEvent *event) {
 }
 
 void Waveform_Viewer_Widget::slot_mouse_unpressed(QMouseEvent *event) {
+    if(this->cursor().shape() == Qt::ClosedHandCursor) {
+        qApp->setOverrideCursor(QCursor(Qt::OpenHandCursor));
+        this->setCursor(Qt::OpenHandCursor);
+    }
     if(event->button() == Qt::RightButton) {
         zoom_pressed = false;
     } else if(event->button() == Qt::LeftButton) {
