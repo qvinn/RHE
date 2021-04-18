@@ -387,6 +387,11 @@ void Debug::prepare_pin_state(set_state_Packet _pin_state)
 	}
 }
 
+void Debug::reset_pin_state()
+{
+	set_state_Packet_buff = {};
+}
+
 void Debug::set_pinStates(set_state_Packet _pin_state, int start_time)
 {	
 	stop_pinstate_flag = 0;

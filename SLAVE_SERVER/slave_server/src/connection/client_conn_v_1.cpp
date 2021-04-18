@@ -246,9 +246,12 @@ void client_conn_v_1::wait_analize_recv_data()
 			{
 				gdb->stop_debug();
 				printf("_________________________________STOP DEBUG\n");
+				gdb->reset_pin_state(); // Эта операция необходима, чтобы для закрытии DSQ-потока не создать поток Pin_State
 				gdb->stop_d_seq();
+				while(gdb->dsq_is_run() == 1){}
 				printf("_________________________________STOP DSQ\n");
 				gdb->stop_pinstate_process();
+				while(gdb->pin_state_proc_is_run() == 1){}
 				printf("_________________________________STOP PINSTATE PROC\n");
 				break;	
 			}

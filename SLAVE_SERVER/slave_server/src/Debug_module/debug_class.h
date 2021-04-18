@@ -144,9 +144,14 @@ class Debug {
 	// Метод для формирования Output debug table(Таблица с названиями портов ввода-вывода)
 	void create_ODT(char *buf);
 	
+	// Метод для вычленения из пакета CLIENT_WANT_SET_PINSTATE структуры set_state_Packet
 	set_state_Packet buf2set_state_Packet(char *buf);
 	
+	// Метод для задания логических уровней на порты вывода(заданых отдельным пакетом)
 	void prepare_pin_state(set_state_Packet _pin_state);
+	
+	// Обнулить структу set_state_Packet_buff
+	void reset_pin_state();
 	
 	// Метод для задани портам ввода-вывода необхохимых состояний
 	// Метод принимает в себя буффер и разбирает его, как структуру "set_state_Packet"
@@ -155,18 +160,24 @@ class Debug {
 	// Метод для формирования пакета в котором будет описана максимальная длительности отладки
 	void form_time_out_info(char *buf);
 	
+	// public: ---> fill_debug_seq()
 	int public_read_dfile();
 	
+	// public: ---> run_dfile()
 	void public_run_dfile();
 	
+	// Метод для обнаружения повторяющихся элементов в std::vector<int>
 	static int same_int_checker(std::vector<int> vec);
 	
-
-	//std::chrono::microseconds start_time;
+	// В этой переменной будет храниться системное время начала процеса отладки
 	std::chrono::high_resolution_clock::time_point start_time;
+	// Метод для инициализации переменной "start_time"
 	void set_start_time();
+	// Метод для определения начального времени для запуска дочернего потока(DSQ/PinState)
 	int get_hop_time();
-		
+	
+	// Переменная в корой хранится текущее время для основного потока(Debug thread)
+	// Эта переменная используется для синхронизации потоков
 	int global_time;
 	std::mutex global_time_mutex;
 	void set_global_time(int val);
@@ -279,15 +290,19 @@ class Debug {
 	// Структура, которая содержит описание всей таблицы файла-отладки
 	debug_seq d_seq_table;
 	
+	// Метод, для нахождение Wpi-номера для порта из масива <debug_output_pinName>
 	int pinName2WpiNum(std::string pinName);
 	
+	// Метод, который читает файл "debug_seq.txt" и заполниет структуру d_seq_table
 	int fill_debug_seq();
 	
+	// Метод, который генерирует на портах уровни в соответствии с последовательностью в d_seq_table
 	void run_dfile(int start_time);
 	
 	int stop_dsqrun_flag = 1;
 	std::mutex stop_dsqrun_flag_mutex;
 	
+	// Стрктура, в которой хранятся состояния портов вывода, заданные пользователем в отдельном пакете
 	set_state_Packet set_state_Packet_buff;
 	int stop_pinstate_flag = 1;
 	std::mutex stop_pinstate_flag_mutex;	
