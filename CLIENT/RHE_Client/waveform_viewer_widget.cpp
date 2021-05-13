@@ -47,7 +47,7 @@ Waveform_Viewer_Widget::~Waveform_Viewer_Widget() {
 void Waveform_Viewer_Widget::showEvent(QShowEvent *) {
     if(shw_at_cntr) {
         shw_at_cntr = false;
-        this->move(((QGuiApplication::primaryScreen()->geometry().width() - this->geometry().width()) / 2), ((QGuiApplication::primaryScreen()->geometry().height() - this->geometry().height()) / 2));
+        this->move((gen_widg->get_position().x() - (this->geometry().width() / 2)), (gen_widg->get_position().y() - (this->geometry().height() / 2)));
     }
     resizeEvent(nullptr);
 }
@@ -73,7 +73,7 @@ void Waveform_Viewer_Widget::on_chckBx_as_wndw_stateChanged(int state) {
     change_margin(5 * (state / 2));
     as_window = static_cast<bool>(state);
     if(state == 2) {
-        this->setWindowFlags(Qt::Window | Qt::WindowMinMaxButtonsHint | Qt::WindowTitleHint);
+        this->setWindowFlags(Qt::Window | Qt::WindowMaximizeButtonHint | Qt::WindowTitleHint);
         shw_at_cntr = true;
         this->show();
     } else {
@@ -85,9 +85,9 @@ void Waveform_Viewer_Widget::on_chckBx_as_wndw_stateChanged(int state) {
 void Waveform_Viewer_Widget::on_chckBx_attch_crsr_stateChanged(int state) {
     if(ui_initialized) {
         if(standalone) {
-            gen_widg->save_setting("settings/WVFRM_VWR_ATTCH_CRSR_STANDALONE", state);
+            gen_widg->save_setting("waveform_viewer_standalone_settings/WVFRM_VWR_ATTCH_CRSR", state);
         } else {
-            gen_widg->save_setting("settings/WVFRM_VWR_ATTCH_CRSR", state);
+            gen_widg->save_setting("waveform_viewer_settings/WVFRM_VWR_ATTCH_CRSR", state);
         }
     }
 }
@@ -95,9 +95,9 @@ void Waveform_Viewer_Widget::on_chckBx_attch_crsr_stateChanged(int state) {
 void Waveform_Viewer_Widget::on_spnBx_wvfrm_vwr_dscrtnss_tm_valueChanged(int value) {
     if(ui_initialized) {
         if(standalone) {
-            gen_widg->save_setting("settings/WVFRM_VWR_DISCRETENESS_TIME_STANDALONE", value);
+            gen_widg->save_setting("waveform_viewer_standalone_settings/WVFRM_VWR_DISCRETENESS_TIME", value);
         } else {
-            gen_widg->save_setting("settings/WVFRM_VWR_DISCRETENESS_TIME", value);
+            gen_widg->save_setting("waveform_viewer_settings/WVFRM_VWR_DISCRETENESS_TIME", value);
         }
         time_coef = pow(1000.0, static_cast<double>(ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->currentIndex()));
         x_tckr_step = static_cast<double>(value) / time_coef;
@@ -112,9 +112,9 @@ void Waveform_Viewer_Widget::on_spnBx_wvfrm_vwr_dscrtnss_tm_valueChanged(int val
 void Waveform_Viewer_Widget::on_cmbBx_wvfrm_vwr_dscrtnss_tm_tp_currentIndexChanged(int index) {
     if(ui_initialized && language_changed) {
         if(standalone) {
-            gen_widg->save_setting("settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE_STANDALONE", index);
+            gen_widg->save_setting("waveform_viewer_standalone_settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE", index);
         } else {
-            gen_widg->save_setting("settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE", index);
+            gen_widg->save_setting("waveform_viewer_settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE", index);
         }
         on_spnBx_wvfrm_vwr_dscrtnss_tm_valueChanged(ui->spnBx_wvfrm_vwr_dscrtnss_tm->value());
     }
@@ -189,23 +189,22 @@ void Waveform_Viewer_Widget::initialize_ui() {
 
 void Waveform_Viewer_Widget::post_initialize_ui() {
     set_ui_text();
-    if(standalone) {
-        ui->chckBx_attch_crsr->setCheckState(static_cast<Qt::CheckState>(abs(gen_widg->get_setting("settings/WVFRM_VWR_ATTCH_CRSR_STANDALONE").toInt() - 2)));
-        ui->spnBx_wvfrm_vwr_dscrtnss_tm->setValue(gen_widg->get_setting("settings/WVFRM_VWR_DISCRETENESS_TIME_STANDALONE").toInt());
-        ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->setCurrentIndex(abs(gen_widg->get_setting("settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE_STANDALONE").toInt() - 1));
-    } else {
-        ui->chckBx_attch_crsr->setCheckState(static_cast<Qt::CheckState>(abs(gen_widg->get_setting("settings/WVFRM_VWR_ATTCH_CRSR").toInt() - 2)));
-        ui->spnBx_wvfrm_vwr_dscrtnss_tm->setValue(gen_widg->get_setting("settings/WVFRM_VWR_DISCRETENESS_TIME").toInt());
-        ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->setCurrentIndex(abs(gen_widg->get_setting("settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE").toInt() - 1));
+    QList<QString> params_lst = QList<QString>({"WVFRM_VWR_ATTCH_CRSR", "WVFRM_VWR_DISCRETENESS_TIME", "WVFRM_VWR_DISCRETENESS_TIME_TYPE"});
+    for(int i = 0; i < params_lst.count(); i++) {
+        QString tmp = params_lst.at(i);
+        if(standalone) {
+            tmp.prepend("waveform_viewer_standalone_settings/");
+        } else {
+            tmp.prepend("waveform_viewer_settings/");
+        }
+        params_lst.replace(i, tmp);
     }
+    ui->chckBx_attch_crsr->setCheckState(static_cast<Qt::CheckState>(abs(gen_widg->get_setting(params_lst.at(0)).toInt() - 2)));
+    ui->spnBx_wvfrm_vwr_dscrtnss_tm->setValue(gen_widg->get_setting(params_lst.at(1)).toInt());
+    ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->setCurrentIndex(abs(gen_widg->get_setting(params_lst.at(2)).toInt() - 1));
     ui_initialized = true;
-    if(standalone) {
-        ui->chckBx_attch_crsr->setCheckState(static_cast<Qt::CheckState>(gen_widg->get_setting("settings/WVFRM_VWR_ATTCH_CRSR_STANDALONE").toInt()));
-        ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->setCurrentIndex(gen_widg->get_setting("settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE_STANDALONE").toInt());
-    } else {
-        ui->chckBx_attch_crsr->setCheckState(static_cast<Qt::CheckState>(gen_widg->get_setting("settings/WVFRM_VWR_ATTCH_CRSR").toInt()));
-        ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->setCurrentIndex(gen_widg->get_setting("settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE").toInt());
-    }
+    ui->chckBx_attch_crsr->setCheckState(static_cast<Qt::CheckState>(gen_widg->get_setting(params_lst.at(0)).toInt()));
+    ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->setCurrentIndex(gen_widg->get_setting(params_lst.at(2)).toInt());
 }
 
 void Waveform_Viewer_Widget::set_ui_text() {
@@ -236,19 +235,31 @@ void Waveform_Viewer_Widget::set_measurement_label_text() {
 }
 
 void Waveform_Viewer_Widget::change_settings() {
-    QFont fnt = QFont("Tahoma", gen_widg->get_setting("settings/WVFRM_VWR_AXIS_LABELS_FONT_SIZE").toInt());
+    QList<QString> params_lst = QList<QString>({"WVFRM_VWR_AXIS_LABELS_COLOR", "WVFRM_VWR_DIAGRAM_GRID_COLOR", "WVFRM_VWR_DIAGRAM_BACKGROUND_COLOR",
+                                                "WVFRM_VWR_SELECTION_COLOR", "WVFRM_VWR_CURSOR_LINE_COLOR", "WVFRM_VWR_CURSOR_TIME_LABEL_BORDER_COLOR",
+                                                "WVFRM_VWR_CURSOR_TIME_LABEL_FILL_COLOR", "WVFRM_VWR_GRAPH_COLOR", "WVFRM_VWR_AXIS_LABELS_FONT_SIZE"});
+    for(int i = 0; i < params_lst.count(); i++) {
+        QString tmp = params_lst.at(i);
+        if(standalone) {
+            tmp.prepend("waveform_viewer_standalone_settings/");
+        } else {
+            tmp.prepend("waveform_viewer_settings/");
+        }
+        params_lst.replace(i, tmp);
+    }
+    QFont fnt = QFont("Tahoma", gen_widg->get_setting(params_lst.at(8)).toInt());
     ui->diagram->xAxis->setTickLabelFont(fnt);
     ui->diagram->yAxis->setTickLabelFont(fnt);
-    QColor dgrm_grd_clr = QColor(gen_widg->get_setting("settings/WVFRM_VWR_DIAGRAM_GRID_COLOR").toString());
-    QColor axs_lbls_clr = QColor(gen_widg->get_setting("settings/WVFRM_VWR_AXIS_LABELS_COLOR").toString());
-    QColor dgrm_bckgrnd_clr = QColor(gen_widg->get_setting("settings/WVFRM_VWR_DIAGRAM_BACKGROUND_COLOR").toString());
-    QColor slctn_clr = QColor(gen_widg->get_setting("settings/WVFRM_VWR_SELECTION_COLOR").toString());
+    QColor dgrm_grd_clr = QColor(gen_widg->get_setting(params_lst.at(1)).toString());
+    QColor axs_lbls_clr = QColor(gen_widg->get_setting(params_lst.at(0)).toString());
+    QColor dgrm_bckgrnd_clr = QColor(gen_widg->get_setting(params_lst.at(2)).toString());
+    QColor slctn_clr = QColor(gen_widg->get_setting(params_lst.at(3)).toString());
     QColor slctn_brsh_clr = slctn_clr;
     slctn_brsh_clr.setAlpha(80);
-    QColor line_clr = QColor(gen_widg->get_setting("settings/WVFRM_VWR_CURSOR_LINE_COLOR").toString());
-    QColor lbl_clr = QColor(gen_widg->get_setting("settings/WVFRM_VWR_CURSOR_TIME_LABEL_BORDER_COLOR").toString());
-    QColor lbl_brsh_clr = QColor(gen_widg->get_setting("settings/WVFRM_VWR_CURSOR_TIME_LABEL_FILL_COLOR").toString());
-    grph_clr = QColor(gen_widg->get_setting("settings/WVFRM_VWR_GRAPH_COLOR").toString());
+    QColor line_clr = QColor(gen_widg->get_setting(params_lst.at(4)).toString());
+    QColor lbl_clr = QColor(gen_widg->get_setting(params_lst.at(5)).toString());
+    QColor lbl_brsh_clr = QColor(gen_widg->get_setting(params_lst.at(6)).toString());
+    grph_clr = QColor(gen_widg->get_setting(params_lst.at(7)).toString());
     for(int i = 0; i < graph_list->count(); i++) {
         if((i % 2) == 1) {
             graph_list->at(i)->setPen(QPen(grph_clr, 1));
@@ -296,9 +307,20 @@ void Waveform_Viewer_Widget::change_margin(int val) {
 }
 
 void Waveform_Viewer_Widget::load_waveform() {
-    QStringList *lst = gen_widg->load_files(false, false, tr("Choose waveform file"), tr("Waveform (*.wvfrm)"));
+    QWidget *prnt = this;
+    if((this->parentWidget() != nullptr) && !as_window) {
+        prnt = this->parentWidget();
+    }
+    QStringList *lst = gen_widg->load_files(false, false, tr("Choose waveform file"), tr("Waveform (*.wvfrm)"), prnt);
     if((lst == nullptr) || (lst->count() == 0)) {
-        gen_widg->show_message_box(tr("Error"), tr("Waveform file not choosed"), 0);
+        QPoint pos;
+        if(standalone || as_window) {
+            pos.setX(this->x() + (this->width() / 2));
+            pos.setY(this->y() + (this->height() / 2));
+        } else {
+            pos = gen_widg->get_position();
+        }
+        gen_widg->show_message_box(tr("Error"), tr("Waveform file not choosed"), 0, pos);
         return;
     }
     QFile *file = new QFile(QFileInfo(lst->at(0)).absoluteFilePath());
@@ -394,7 +416,11 @@ void Waveform_Viewer_Widget::save_waveform() {
                 str.append("\n");
             }
         }
-        gen_widg->save_file(this, tr("Saving waveform"), tr("Waveform (*.wvfrm)"), &str, &fn_nm, false, false);
+        QWidget *prnt = this;
+        if((this->parentWidget() != nullptr) && !as_window) {
+            prnt = this->parentWidget();
+        }
+        gen_widg->save_file(prnt, tr("Saving waveform"), tr("Waveform (*.wvfrm)"), &str, &fn_nm, false, false);
         str.clear();
         for(int i = 0; i < cnt; i++) {
             str.clear();
@@ -409,10 +435,17 @@ void Waveform_Viewer_Widget::save_waveform() {
                     str.append("\n");
                 }
             }
-            gen_widg->save_file(this, tr("Saving waveform"), tr("Waveform (*.wvfrm)"), &str, &fn_nm, false, true);
+            gen_widg->save_file(prnt, tr("Saving waveform"), tr("Waveform (*.wvfrm)"), &str, &fn_nm, false, true);
         }
     } else {
-        gen_widg->show_message_box("", tr("No data for saving"), 0);
+        QPoint pos;
+        if(standalone || as_window) {
+            pos.setX(this->x() + (this->width() / 2));
+            pos.setY(this->y() + (this->height() / 2));
+        } else {
+            pos = gen_widg->get_position();
+        }
+        gen_widg->show_message_box("", tr("No data for saving"), 0, pos);
     }
 }
 
@@ -584,28 +617,39 @@ void Waveform_Viewer_Widget::remove_all_data() {
 void Waveform_Viewer_Widget::select_diagram_settings() {
     QList<QString> sttngs_lst;
     sttngs_lst.clear();
-    sttngs_lst.append(gen_widg->get_setting("settings/WVFRM_VWR_AXIS_LABELS_COLOR").toString());
-    sttngs_lst.append(gen_widg->get_setting("settings/WVFRM_VWR_DIAGRAM_GRID_COLOR").toString());
-    sttngs_lst.append(gen_widg->get_setting("settings/WVFRM_VWR_DIAGRAM_BACKGROUND_COLOR").toString());
-    sttngs_lst.append(gen_widg->get_setting("settings/WVFRM_VWR_SELECTION_COLOR").toString());
-    sttngs_lst.append(gen_widg->get_setting("settings/WVFRM_VWR_CURSOR_LINE_COLOR").toString());
-    sttngs_lst.append(gen_widg->get_setting("settings/WVFRM_VWR_CURSOR_TIME_LABEL_BORDER_COLOR").toString());
-    sttngs_lst.append(gen_widg->get_setting("settings/WVFRM_VWR_CURSOR_TIME_LABEL_FILL_COLOR").toString());
-    sttngs_lst.append(gen_widg->get_setting("settings/WVFRM_VWR_GRAPH_COLOR").toString());
-    sttngs_lst.append(QString::number(gen_widg->get_setting("settings/WVFRM_VWR_AXIS_LABELS_FONT_SIZE").toInt()));
-    Dialog_Select_Diagram_Settings settings_select_dialog(sttngs_lst, this);
+    QList<QString> params_lst = QList<QString>({"WVFRM_VWR_AXIS_LABELS_COLOR", "WVFRM_VWR_DIAGRAM_GRID_COLOR", "WVFRM_VWR_DIAGRAM_BACKGROUND_COLOR",
+                                                "WVFRM_VWR_SELECTION_COLOR", "WVFRM_VWR_CURSOR_LINE_COLOR", "WVFRM_VWR_CURSOR_TIME_LABEL_BORDER_COLOR",
+                                                "WVFRM_VWR_CURSOR_TIME_LABEL_FILL_COLOR", "WVFRM_VWR_GRAPH_COLOR", "WVFRM_VWR_AXIS_LABELS_FONT_SIZE"});
+    for(int i = 0; i < params_lst.count(); i++) {
+        QString tmp = params_lst.at(i);
+        if(standalone) {
+            tmp.prepend("waveform_viewer_standalone_settings/");
+        } else {
+            tmp.prepend("waveform_viewer_settings/");
+        }
+        params_lst.replace(i, tmp);
+        if(i == (params_lst.count() - 1)) {
+            sttngs_lst.append(QString::number(gen_widg->get_setting(tmp).toInt()));
+        } else {
+            sttngs_lst.append(gen_widg->get_setting(tmp).toString());
+        }
+    }
+    Dialog_Select_Diagram_Settings settings_select_dialog(sttngs_lst, gen_widg, this);
+    if(standalone || as_window) {
+        settings_select_dialog.move((this->pos().x() + (abs(this->width() - settings_select_dialog.width()) / 2)), (this->pos().y() + (abs(this->height() - settings_select_dialog.height()) / 2)));
+    } else {
+        settings_select_dialog.move((gen_widg->get_position().x() - (settings_select_dialog.width() / 2)), (gen_widg->get_position().y() - (settings_select_dialog.height() / 2)));
+    }
     int dlgCase = settings_select_dialog.exec();
     if(dlgCase == 1) {
         QList<QString> sttngs_lst_new = settings_select_dialog.get_diagram_settings();
-        gen_widg->save_setting("settings/WVFRM_VWR_AXIS_LABELS_COLOR", sttngs_lst_new.at(0));
-        gen_widg->save_setting("settings/WVFRM_VWR_DIAGRAM_GRID_COLOR", sttngs_lst_new.at(1));
-        gen_widg->save_setting("settings/WVFRM_VWR_DIAGRAM_BACKGROUND_COLOR", sttngs_lst_new.at(2));
-        gen_widg->save_setting("settings/WVFRM_VWR_SELECTION_COLOR", sttngs_lst_new.at(3));
-        gen_widg->save_setting("settings/WVFRM_VWR_CURSOR_LINE_COLOR", sttngs_lst_new.at(4));
-        gen_widg->save_setting("settings/WVFRM_VWR_CURSOR_TIME_LABEL_BORDER_COLOR", sttngs_lst_new.at(5));
-        gen_widg->save_setting("settings/WVFRM_VWR_CURSOR_TIME_LABEL_FILL_COLOR", sttngs_lst_new.at(6));
-        gen_widg->save_setting("settings/WVFRM_VWR_GRAPH_COLOR", sttngs_lst_new.at(7));
-        gen_widg->save_setting("settings/WVFRM_VWR_AXIS_LABELS_FONT_SIZE", sttngs_lst_new.at(8).toInt());
+        for(int i = 0; i < sttngs_lst_new.count(); i++) {
+            if(i == (params_lst.count() - 1)) {
+                gen_widg->save_setting(params_lst.at(i), sttngs_lst_new.at(i).toInt());
+            } else {
+                gen_widg->save_setting(params_lst.at(i), sttngs_lst_new.at(i));
+            }
+        }
         change_settings();
         remove_data_from_graph();
         draw_from_saved_vals(pin_names->count());
@@ -640,8 +684,12 @@ void Waveform_Viewer_Widget::select_displayable_pins() {
         }
         dsplbl_pins.append(*pin_names);
     }
-    Dialog_Select_Displayable_Pins pins_select_dialog(avlbl_pins, dsplbl_pins, nullptr);
-    pins_select_dialog.setWindowFlag(Qt::WindowStaysOnTopHint);
+    Dialog_Select_Displayable_Pins pins_select_dialog(avlbl_pins, dsplbl_pins, this);
+    if(standalone || as_window) {
+        pins_select_dialog.move((this->pos().x() + (abs(this->width() - pins_select_dialog.width()) / 2)), (this->pos().y() + (abs(this->height() - pins_select_dialog.height()) / 2)));
+    } else {
+        pins_select_dialog.move((gen_widg->get_position().x() - (pins_select_dialog.width() / 2)), (gen_widg->get_position().y() - (pins_select_dialog.height() / 2)));
+    }
     int dlgCase = pins_select_dialog.exec();
     if(dlgCase == 1) {
         QStringList dsplbl_pins_lst = pins_select_dialog.get_displayable_pins();
@@ -1078,8 +1126,9 @@ QStringList Dialog_Select_Displayable_Pins::get_available_pins() {
 }
 
 ////////////////////////////////////////////////////DIALOG SELECT DIAGRAM SETTINGS///////////////////////////////////////////////////
-Dialog_Select_Diagram_Settings::Dialog_Select_Diagram_Settings(QList<QString> _sttngs_lst, QWidget *parent) : QDialog(parent), ui(new Ui::Dialog_Select_Diagram_Settings) {
+Dialog_Select_Diagram_Settings::Dialog_Select_Diagram_Settings(QList<QString> _sttngs_lst, General_Widget *widg, QWidget *parent) : QDialog(parent), ui(new Ui::Dialog_Select_Diagram_Settings) {
     ui->setupUi(this);
+    gen_widg = widg;
     this->setWindowTitle(tr("Select diagram settings"));
     this->setFixedSize(600, 300);
     this->updateGeometry();
@@ -1154,9 +1203,14 @@ QList<QString> Dialog_Select_Diagram_Settings::get_diagram_settings() {
 
 void Dialog_Select_Diagram_Settings::change_color(int value) {
     QColorDialog dlg(this);
-    QColor color = dlg.getColor(QColor(sttngs_lst.at(value)));
-    if(color.isValid()) {
-        sttngs_lst.replace(value, color.name());
-        bttns_lst->at(value)->setStyleSheet("background-color: " + color.name());
+    dlg.setOption(QColorDialog::DontUseNativeDialog, true);
+    dlg.setStyleSheet(gen_widg->get_style_sheet("QColorDialog"));
+    dlg.setCurrentColor(QColor(sttngs_lst.at(value)));
+    if(dlg.exec() == QDialog::Accepted) {
+        QColor color = dlg.selectedColor();
+        if(color.isValid()) {
+            sttngs_lst.replace(value, color.name());
+            bttns_lst->at(value)->setStyleSheet("background-color: " + color.name());
+        }
     }
 }

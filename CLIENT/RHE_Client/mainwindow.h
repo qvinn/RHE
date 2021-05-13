@@ -55,6 +55,7 @@
         private slots:
             void showEvent(QShowEvent *) override;
             void resizeEvent(QResizeEvent *) override;
+            void moveEvent(QMoveEvent *) override;
             void closeEvent(QCloseEvent *) override;
             void on_button_login_logout_clicked();
             void on_button_register_clicked();

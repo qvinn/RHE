@@ -20,6 +20,7 @@ RHE_Widget::RHE_Widget(QWidget *parent, General_Widget *widg, Send_Recieve_Modul
     led_colors = new QList<QString>();
     led_x_y = new QList<QPoint>();
     led_width_height = new QList<QPoint>();
+    hrzntl_spcr = new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
     wvfrm_vwr = new Waveform_Viewer_Widget(this, gen_widg, false);
     connect(wvfrm_vwr, &Waveform_Viewer_Widget::as_window_signal, this, &RHE_Widget::slot_as_window);
     connect(gen_widg, &General_Widget::re_translate_signal, wvfrm_vwr, &Waveform_Viewer_Widget::slot_re_translate);
@@ -44,6 +45,7 @@ RHE_Widget::RHE_Widget(QWidget *parent, General_Widget *widg, Send_Recieve_Modul
 }
 
 RHE_Widget::~RHE_Widget() {
+    delete hrzntl_spcr;
     delete send_file_status;
     delete pi_pins_nums;
     delete inpt_hbxs;
@@ -104,8 +106,13 @@ void RHE_Widget::resizeEvent(QResizeEvent *) {
     ui->scrollArea->adjustSize();
     ui->scrollArea->setMinimumSize(ui->scrollArea->width(), (ui->scrollAreaWidgetContents->height() + 2));
     if(!wvfrm_vwr->as_window) {
-        ui->label->resize(ui->verticalLayout_3->geometry().width(), (ui->verticalLayout_3->geometry().height() - wvfrm_vwr->height() - ui->verticalLayout_3->contentsMargins().bottom() * 2));
+        int val = static_cast<int>(!((pixmp_names->count() == 0) || (pixmp_names->at(ui->cmbBx_chs_brd->currentIndex()).count() == 0) || pixmp_brd.isNull()));
+        ui->verticalLayout_3->contentsMargins().setTop(5 * val);
+        ui->verticalLayout_3->contentsMargins().setBottom(7 * val);
+        ui->label->setSizePolicy(QSizePolicy::Expanding, static_cast<QSizePolicy::Policy>(7 * val));
+        ui->label->resize((ui->verticalLayout_3->geometry().width() * val), ((ui->verticalLayout_3->geometry().height() - wvfrm_vwr->height() - (ui->verticalLayout_3->contentsMargins().bottom() + ui->verticalLayout_3->contentsMargins().top() + ui->verticalLayout_3->spacing())) * val));
     }
+    ui->label->setVisible(!pixmp_brd.isNull());
     if(!pixmp_brd.isNull()) {
         ui->label->setPixmap(pixmp_brd.scaled(ui->label->size(), Qt::KeepAspectRatio));
     }
@@ -161,13 +168,13 @@ void RHE_Widget::on_chckBx_strt_dbg_aftr_flsh_stateChanged(int state) {
 }
 
 void RHE_Widget::on_pshBttn_chs_sgnls_sqnc_clicked() {
-    QString str = gen_widg->load_file_path(tr("Choose csv-file with sequence of signals"), tr("Comma-Separated Values files (*.csv)"));
+    QString str = gen_widg->load_file_path(tr("Choose csv-file with sequence of signals"), tr("Comma-Separated Values files (*.csv)"), this);
     if(str.length() != 0) {
         csv_file->setFileName(str);
         ui->pshBttn_snd_sgnls_sqnc->setEnabled(true);
         pshBttn_strt_sgnls_sqnc_set_enabled(false);
     } else {
-        gen_widg->show_message_box("", tr("File with sequence of signals not choosed"), 0);
+        gen_widg->show_message_box("", tr("File with sequence of signals not choosed"), 0, gen_widg->get_position());
     }
 }
 
@@ -184,7 +191,7 @@ void RHE_Widget::on_pshBttn_strt_sgnls_sqnc_clicked() {
         snd_rcv_module->start_sequence_of_signals();
         scrll_area_sgnls_set_enabled(false);
     } else {
-        gen_widg->show_message_box("", tr("Debug not started"), 0);
+        gen_widg->show_message_box("", tr("Debug not started"), 0, gen_widg->get_position());
     }
 }
 
@@ -216,7 +223,7 @@ void RHE_Widget::on_cmbBx_dbg_tm_tp_currentIndexChanged(int index) {
 }
 
 void RHE_Widget::on_pshBttn_set_path_to_proj_clicked() {
-    QStringList *lst = gen_widg->load_files(false, true, "", "");
+    QStringList *lst = gen_widg->load_files(false, true, "", "", this);
     if(lst == nullptr) {
         return;
     }
@@ -231,7 +238,7 @@ void RHE_Widget::on_pshBttn_chk_prj_stat_clicked() {
 }
 
 void RHE_Widget::on_pshBttn_ld_frmwr_clicked() {
-    QString str = gen_widg->load_file_path(tr("Choose svf-file with firmware"), tr("Serial Vector Format files (*.svf)"));
+    QString str = gen_widg->load_file_path(tr("Choose svf-file with firmware"), tr("Serial Vector Format files (*.svf)"), this);
     if(str.length() != 0) {
         if(!gen_widg->get_setting("settings/ENABLE_FILE_CHEKING").toBool()) {
             QRegExp tag_exp_path("/");
@@ -244,12 +251,14 @@ void RHE_Widget::on_pshBttn_ld_frmwr_clicked() {
         svf_exist = true;
         pshBttn_snd_frmwr_set_enabled(svf_exist);
         svf_file->setFileName(str);
+    } else {
+        gen_widg->show_message_box(tr("Error"), tr("svf-file with firmware not choosed"), 0, gen_widg->get_position());
     }
 }
 
 void RHE_Widget::on_pshBttn_snd_frmwr_clicked() {
     if(!svf_exist) {
-        gen_widg->show_message_box("", tr("svf-file not generated"), 0);
+        gen_widg->show_message_box("", tr("svf-file not generated"), 0, gen_widg->get_position());
         return;
     }
     if(svf_file->open(QIODevice::ReadOnly)) {
@@ -314,6 +323,7 @@ void RHE_Widget::initialize_ui() {
     ui->prgrssBr_fl_sts->setValue(0);
     ui->chckBx_strt_dbg_aftr_flsh->setCheckState(static_cast<Qt::CheckState>(abs(gen_widg->get_setting("settings/START_DEBUG_AFTER_FPGA_FLASHING").toInt() - 2)));
     ui->chckBx_strt_sqnc_of_sgn_with_dbg->setCheckState(static_cast<Qt::CheckState>(abs(gen_widg->get_setting("settings/START_SEQUENCE_OF_SIGNALS_WITH_DEBUG").toInt() - 2)));
+    ui->cmbBx_chs_brd->setCurrentIndex(abs(gen_widg->get_setting("settings/CURRENT_BOARD").toInt() - 1));
     if(gen_widg->get_setting("settings/MANUALY_LOAD_FIRMWARE").toBool() && gen_widg->get_setting("settings/ENABLE_FILE_CHEKING").toBool()) {
         pshBttn_ld_frmwr_set_enabled(false);
     }
@@ -392,11 +402,22 @@ void RHE_Widget::change_board_pixmap() {
             QPixmap tmp;
             pixmp_brd.swap(tmp);
         } else {
-            if(pixmp_brd.load(qApp->applicationDirPath() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString() + pixmp_names->at(ui->cmbBx_chs_brd->currentIndex()))) {
+            QString path(qApp->applicationDirPath() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString() + pixmp_names->at(ui->cmbBx_chs_brd->currentIndex()));
+            if(pixmp_brd.load(path)) {
+                remove_horizontal_spacer();
                 showEvent(nullptr);
                 ui->label->setPixmap(pixmp_brd.scaled(ui->label->size(), Qt::KeepAspectRatio));
+            } else {
+                ui->label->clear();
+                if(wvfrm_vwr->as_window) {
+                    add_horizontal_spacer();
+                }
+                gen_widg->show_message_box("", (tr("Board picture at: ") + path + tr(" not found")), 0, gen_widg->get_position());
+                QPixmap tmp;
+                pixmp_brd.swap(tmp);
             }
         }
+        emit resize_signal();
     }
 }
 
@@ -425,6 +446,27 @@ void RHE_Widget::set_button_state_debug(bool flg) {
     pshBttn_snd_frmwr_set_enabled(!flg && svf_exist);
 }
 
+void RHE_Widget::add_horizontal_spacer() {
+    int cnt = 0;
+    for(int i = 0; i < ui->verticalLayout_3->count(); i++) {
+        if(ui->verticalLayout_3->itemAt(i) != hrzntl_spcr) {
+            cnt++;
+        }
+    }
+    if(cnt == ui->verticalLayout_3->count()) {
+        ui->verticalLayout_3->addItem(hrzntl_spcr);
+    }
+}
+
+void RHE_Widget::remove_horizontal_spacer() {
+    for(int i = 0; i < ui->verticalLayout_3->count(); i++) {
+        if(ui->verticalLayout_3->itemAt(i) == hrzntl_spcr) {
+            ui->verticalLayout_3->removeItem(hrzntl_spcr);
+            ui->label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        }
+    }
+}
+
 void RHE_Widget::check_is_proj_folder(bool folder_exist) {
     qpf_exist = false;
     fit_exist = false;
@@ -444,7 +486,7 @@ void RHE_Widget::check_is_proj_folder(bool folder_exist) {
     if(path_lst.at(1).count() == 0) {
         prev_path_to_proj->clear();
         prev_path_to_proj->append(*path_to_proj);
-        gen_widg->show_message_box("", tr("Root-folder cannot be as project-folder"), 0);
+        gen_widg->show_message_box("", tr("Root-folder cannot be as project-folder"), 0, gen_widg->get_position());
         return;
     }
     while(proj_files.hasNext()) {
@@ -484,12 +526,12 @@ void RHE_Widget::check_is_proj_folder(bool folder_exist) {
         if(!qpf_exist) {
             path_to_proj->clear();
             path_to_proj->append(*prev_path_to_proj);
-            gen_widg->show_message_box("", tr("Folder with project not chosen"), 0);
+            gen_widg->show_message_box("", tr("Folder with project not chosen"), 0, gen_widg->get_position());
             return;
         }
     }
     if(!fit_exist) {
-        gen_widg->show_message_box("", tr("Project not fittered"), 0);
+        gen_widg->show_message_box("", tr("Project not fittered"), 0, gen_widg->get_position());
         return;
     }
     if(pins_chk) {
@@ -499,14 +541,14 @@ void RHE_Widget::check_is_proj_folder(bool folder_exist) {
         }
     }
     if(!sof_exist) {
-        gen_widg->show_message_box("", tr("sof-file not generated"), 0);
+        gen_widg->show_message_box("", tr("sof-file not generated"), 0, gen_widg->get_position());
         return;
     }
     pshBttn_ld_frmwr_set_enabled(gen_widg->get_setting("settings/MANUALY_LOAD_FIRMWARE").toBool());
     pshBttn_snd_frmwr_set_enabled(svf_exist && !gen_widg->get_setting("settings/MANUALY_LOAD_FIRMWARE").toBool());
     if(!svf_exist) {
         svf_file->setFileName("");
-        gen_widg->show_message_box("", tr("svf-file not generated"), 0);
+        gen_widg->show_message_box("", tr("svf-file not generated"), 0, gen_widg->get_position());
         return;
     }
 }
@@ -546,7 +588,9 @@ bool RHE_Widget::check_fpga_connections(QString path_to_fit_rprtr) {
                 }
             } else if(mode == 2) {
                 if(!rght_board) {
-                    break;
+                    fit_file.close();
+                    gen_widg->show_message_box("", (tr("FPGA in project isn't ") + cur_fpga + tr(" for board ") + (ui->cmbBx_chs_brd->itemText(ui->cmbBx_chs_brd->currentIndex()))), 0, gen_widg->get_position());
+                    return false;
                 }
                 QStringList lst = str.split(tagExp);
                 cur_pins_numb.append(static_cast<QString>(lst.at(1)).replace(" ", ""));
@@ -559,7 +603,7 @@ bool RHE_Widget::check_fpga_connections(QString path_to_fit_rprtr) {
         fit_file.close();
     }
     if(cur_pins_numb.count() < rght_pins_numb.count()) {
-        gen_widg->show_message_box("", (tr("Count of pins in board list are greater than in project(for current FPGA: ") + cur_fpga + ")\nPlease, contact with teacher or administrator"), 0);
+        gen_widg->show_message_box("", (tr("Count of pins in board list are greater than in project(for current FPGA: ") + cur_fpga + ")\nPlease, contact with teacher or administrator"), 0, gen_widg->get_position());
         return false;
     }
     int pins_cnt = 0;
@@ -567,10 +611,10 @@ bool RHE_Widget::check_fpga_connections(QString path_to_fit_rprtr) {
         for(int k = 0; k < cur_pins_numb.count(); k++) {
             if(cur_pins_numb.at(k).compare(rght_pins_numb.at(i), Qt::CaseInsensitive) == 0) {
                 if(cur_pins_dir.at(k).compare(rght_pins_dir.at(i), Qt::CaseInsensitive) != 0) {
-                    gen_widg->show_message_box("", (tr("In project, direction '") + cur_pins_dir.at(k) + tr("' for pin ") + cur_pins_numb.at(k) + tr(" isn't correct, set '") + rght_pins_dir.at(i) + ("' direction")), 0);
+                    gen_widg->show_message_box("", (tr("In project, direction '") + cur_pins_dir.at(k) + tr("' for pin ") + cur_pins_numb.at(k) + tr(" isn't correct, set '") + rght_pins_dir.at(i) + ("' direction")), 0, gen_widg->get_position());
                     return false;
                 } else if(cur_pins_io_stndrd.at(k).compare(rght_pins_io_stndrd.at(i), Qt::CaseInsensitive) != 0) {
-                    gen_widg->show_message_box("", (tr("In project, I/O Standart '") + cur_pins_io_stndrd.at(k) + tr("' for pin ") + cur_pins_numb.at(k) + tr(" isn't correct, set '") + rght_pins_io_stndrd.at(i) + ("' I/O Standart")), 0);
+                    gen_widg->show_message_box("", (tr("In project, I/O Standart '") + cur_pins_io_stndrd.at(k) + tr("' for pin ") + cur_pins_numb.at(k) + tr(" isn't correct, set '") + rght_pins_io_stndrd.at(i) + ("' I/O Standart")), 0, gen_widg->get_position());
                     return false;
                 } else {
                     pins_cnt++;
@@ -578,21 +622,25 @@ bool RHE_Widget::check_fpga_connections(QString path_to_fit_rprtr) {
             }
         }
     }
-    if(!rght_board) {
-        gen_widg->show_message_box("", (tr("FPGA in project isn't ") + cur_fpga + tr(" for board ") + (ui->cmbBx_chs_brd->itemText(ui->cmbBx_chs_brd->currentIndex()))), 0);
-        return false;
-    } else if((pins_cnt != rght_pins_numb.count()) && (cur_pins_numb.count() != 0)) {
-        gen_widg->show_message_box("", (tr("Pins in board list doesn't exist in project(for current FPGA: ") + cur_fpga + ")\nPlease, contact with teacher or administrator"), 0);
+    if((pins_cnt != rght_pins_numb.count()) && (cur_pins_numb.count() != 0)) {
+        gen_widg->show_message_box("", (tr("Pins in board list doesn't exist in project(for current FPGA: ") + cur_fpga + ")\nPlease, contact with teacher or administrator"), 0, gen_widg->get_position());
         return false;
     }
     return true;
 }
 
 bool RHE_Widget::read_xml_file(bool read_board_params, QString *cur_fpga, QList<QString> *pins_numb, QList<QString> *pins_typ, QList<QString> *pins_io_stndrd) {
-    QString fl_lst_str = tr("file-list of boards and their parameters");
-    QFile xml_file(qApp->applicationDirPath() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString() + gen_widg->get_setting("settings/BOARDS_LIST_FILENAME").toString());
+    QString fl_lst_str = tr("File-list of boards and their parameters at: ");
+    QPoint pos;
+    if(ui_initialized) {
+        pos = gen_widg->get_position();
+    } else {
+        pos = QPoint((QGuiApplication::primaryScreen()->geometry().width() / 2), (QGuiApplication::primaryScreen()->geometry().height() / 2));
+    }
+    QString path(qApp->applicationDirPath() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString() + gen_widg->get_setting("settings/BOARDS_LIST_FILENAME").toString());
+    QFile xml_file(path);
     if(!xml_file.open(QFile::ReadOnly | QFile::Text)) {
-        gen_widg->show_message_box("", (tr("Cannot open ") + fl_lst_str), 0);
+        gen_widg->show_message_box("", (fl_lst_str + path + tr(" not found. Please, contact with teacher or administrator")), 0, pos);
         return false;
     }
     QXmlStreamReader xmlReader(&xml_file);
@@ -623,14 +671,14 @@ bool RHE_Widget::read_xml_file(bool read_board_params, QString *cur_fpga, QList<
             } else {
                 ui->cmbBx_chs_brd->addItem(xmlReader.attributes().value("name").toString());
             }
-        } else if(!read_board_params && (xmlReader.name().toString().compare("fpga", Qt::CaseInsensitive) == 0) && (xmlReader.attributes().hasAttribute("jtag_id_code"))) {
+        } else if(!read_board_params && (xmlReader.name().toString().compare("fpga", Qt::CaseInsensitive) == 0) && (xmlReader.tokenType() == QXmlStreamReader::StartElement)) {
             QString tmp_str(xmlReader.attributes().value("jtag_id_code").toString().replace(" ", ""));
-            if(tmp_str.count() != 0) {
-                jtag_id_codes->append(tmp_str);
-            } else {
-                gen_widg->show_message_box("", (tr("'jtag_id_code' in board list doesn't exist for board: ") + ui->cmbBx_chs_brd->itemText(ui->cmbBx_chs_brd->count() - 1) + "\nPlease, contact with teacher or administrator"), 0);
+            if((!xmlReader.attributes().hasAttribute("jtag_id_code")) || (tmp_str.count() == 0)) {
+                gen_widg->show_message_box("", (tr("'jtag_id_code' in board list doesn't exist for board: ") + ui->cmbBx_chs_brd->itemText(ui->cmbBx_chs_brd->count() - 1) + "\nPlease, contact with teacher or administrator"), 0, pos);
                 xml_file.close();
                 return false;
+            } else {
+                jtag_id_codes->append(tmp_str);
             }
         } else if(!ui_initialized) {
             if((xmlReader.name().toString().compare("pic", Qt::CaseInsensitive) == 0) && (xmlReader.attributes().hasAttribute("name"))) {
@@ -652,18 +700,19 @@ bool RHE_Widget::read_xml_file(bool read_board_params, QString *cur_fpga, QList<
                     led_colors->append(xmlReader.attributes().value("color").toString());
                 }
             }
-        } else if((xmlReader.name().toString().compare("board", Qt::CaseInsensitive) == 0) && (!xmlReader.attributes().hasAttribute("name"))) {
-            while(pixmp_names->count() < ui->cmbBx_chs_brd->count()) {
-                pixmp_names->append("");
-            }
-            while(led_x_y->count() < ui->cmbBx_chs_brd->count()) {
-                add_data_to_qpoint(led_x_y, -1, true);
-            }
-            while(led_width_height->count() < ui->cmbBx_chs_brd->count()) {
-                add_data_to_qpoint(led_width_height, -1, true);
-            }
-            while(led_colors->count() < ui->cmbBx_chs_brd->count()) {
-                led_colors->append("");
+            if((xmlReader.name().toString().compare("board", Qt::CaseInsensitive) == 0) && (!xmlReader.attributes().hasAttribute("name"))) {
+                while(pixmp_names->count() < ui->cmbBx_chs_brd->count()) {
+                    pixmp_names->append("");
+                }
+                while(led_x_y->count() < ui->cmbBx_chs_brd->count()) {
+                    add_data_to_qpoint(led_x_y, -1, true);
+                }
+                while(led_width_height->count() < ui->cmbBx_chs_brd->count()) {
+                    add_data_to_qpoint(led_width_height, -1, true);
+                }
+                while(led_colors->count() < ui->cmbBx_chs_brd->count()) {
+                    led_colors->append("");
+                }
             }
         }
     }
@@ -934,9 +983,16 @@ void RHE_Widget::slot_end_sequence_of_signals() {
 
 void RHE_Widget::slot_as_window() {
     if(!wvfrm_vwr->as_window) {
+        wvfrm_vwr->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         ui->verticalLayout_3->addWidget(wvfrm_vwr);
+        if((pixmp_names->count() == 0) || (pixmp_names->at(ui->cmbBx_chs_brd->currentIndex()).count() == 0) || pixmp_brd.isNull()) {
+            remove_horizontal_spacer();
+        }
     } else {
         ui->verticalLayout_3->removeWidget(wvfrm_vwr);
+        if((pixmp_names->count() == 0) || (pixmp_names->at(ui->cmbBx_chs_brd->currentIndex()).count() == 0) || pixmp_brd.isNull()) {
+            add_horizontal_spacer();
+        }
     }
     emit resize_signal();
 }

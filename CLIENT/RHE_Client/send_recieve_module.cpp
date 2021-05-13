@@ -53,7 +53,11 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 qDebug() << "Server want give me ID: " << info->id;
                 qDebug() << "Attach to FPGA with ID: " << info->FPGA_id;
                 set_client_id(info->id);
-                emit choose_board_signal(info->FPGA_id);
+                if(FPGA_id_code.count() == 0) {
+                    emit choose_board_signal(info->FPGA_id);
+                } else {
+                    set_FPGA_id(FPGA_id_code);
+                }
                 // Запросим информацию о максимальном допустимом врмени отладки
                 send_U_Packet(CLIENT_WANT_GET_TIMEOUT_INFO, ""); // обработка в S_SERVER_SEND_TIMEOUT_INFO
                 // Как только мы получили ID и убедились в том, что соединение установено успешно, запросим таблицы с инофрмацией
@@ -64,24 +68,24 @@ void Send_Recieve_Module::wait_analize_recv_data() {
             }
             case PING_TO_SERVER: {
                 qDebug() << "_________________________________Server answer PING";
-                emit show_message_box_signal("", tr("Server answer PING"), 2);
+                emit show_message_box_signal("", tr("Server answer PING"), 2, gen_widg->get_position());
                 break;
             }
             case S_SERVER_ANSWER_TO_CLIENT: {
                 qDebug() << "_________________________________Slave server answer PING";
-                emit show_message_box_signal("", tr("Slave server answer PING"), 2);
+                emit show_message_box_signal("", tr("Slave server answer PING"), 2, gen_widg->get_position());
                 break;
             }
             case DROP_CONNECTION: {
                 set_disconnected();
                 qDebug() << "_________________________________YOU ARE DROPPED";
-                emit show_message_box_signal(tr("Error"), tr("You are dropped"), 0);
+                emit show_message_box_signal(tr("Error"), tr("You are dropped"), 0, gen_widg->get_position());
                 break;
             }
             case NO_MORE_PLACES: {
                 set_disconnected();
                 qDebug() << "_________________________________Can't get ID from Server - no more places";
-                emit show_message_box_signal(tr("Error"), tr("Can't get ID from Server - no more places"), 0);
+                emit show_message_box_signal(tr("Error"), tr("Can't get ID from Server - no more places"), 0, gen_widg->get_position());
                 break;
             }
             case S_SERVER_END_RCV_FILE: {
@@ -118,7 +122,7 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 break;
             }
             case NOT_SUCCESS_CHANGE_FPGA: {
-                emit show_message_box_signal(tr("Error"), tr("Selected board not available"), 0);
+                emit show_message_box_signal(tr("Error"), tr("Selected board not available"), 0, gen_widg->get_position());
                 emit accept_board_signal(false);
                 qDebug() << "_________________________________Client change FPGA NOT Successfuly";
                 break;
@@ -286,6 +290,7 @@ void Send_Recieve_Module::set_disconnected() {
 }
 
 void Send_Recieve_Module::set_FPGA_id(QString FPGA_id) {
+    FPGA_id_code = FPGA_id;
     send_U_Packet(SET_FPGA_ID, FPGA_id.toLatin1());
 }
 
@@ -300,8 +305,8 @@ void Send_Recieve_Module::send_swtches_states(QByteArray data) {
 //-------------------PRIVATE----------------------------------------------------------------
 void Send_Recieve_Module::server_disconnected() {
     if(!manual_disconnect) {
-        emit show_message_box_signal(tr("Error"), tr("Server disconnected"), 0);
         close_connection();
+        emit show_message_box_signal(tr("Error"), tr("Server disconnected"), 0, gen_widg->get_position());
     }
 }
 
@@ -309,6 +314,7 @@ void Send_Recieve_Module::close_connection() {
     if(socket->isOpen()) {
         reset_ID();
         connected = false;
+        FPGA_id_code.clear();
         socket->close();
         emit logout_signal();
     }

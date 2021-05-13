@@ -60,6 +60,10 @@ void MainWindow::resizeEvent(QResizeEvent *) {
     ui->stackedWidget->setGeometry(0, (menu_bar->height() + ui->line_1->height()), this->width(), (ui->verticalLayoutWidget->height() - menu_bar->height() - (2 * ui->line_1->height())));
 }
 
+void MainWindow::moveEvent(QMoveEvent *) {
+    gen_widg->set_position(QPoint((this->pos().x() + (this->width() / 2)), (this->pos().y() + (this->height() / 2))));
+}
+
 void MainWindow::closeEvent(QCloseEvent *) {
     onPshBttnExt();
 }

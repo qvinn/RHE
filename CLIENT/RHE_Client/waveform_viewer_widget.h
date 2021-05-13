@@ -166,7 +166,7 @@
     class Dialog_Select_Diagram_Settings : public QDialog {
         Q_OBJECT
         public:
-            Dialog_Select_Diagram_Settings(QList<QString> _sttngs_lst, QWidget *parent = nullptr);
+            Dialog_Select_Diagram_Settings(QList<QString> _sttngs_lst, General_Widget *widg, QWidget *parent = nullptr);
             ~Dialog_Select_Diagram_Settings() override;
 
             QList<QString> get_diagram_settings();
@@ -175,6 +175,7 @@
             void change_color(int value);
 
             Ui::Dialog_Select_Diagram_Settings *ui;
+            General_Widget *gen_widg = nullptr;
             QList<QPushButton*> *bttns_lst = nullptr;
             QList<QString> sttngs_lst;
 

@@ -33,7 +33,7 @@ bool RegistrationWidget::register_user() {
             QRegExp tagExp("_");
             QStringList log_pwd = lst.at(i).split(tagExp);
             if((log_pwd.at(0).compare(ui->lineEdit_login->text(), Qt::CaseSensitive)) == 0) {
-                gen_widg->show_message_box(tr("Error"), tr("The same login does already exist"), 0);
+                gen_widg->show_message_box(tr("Error"), tr("The same login does already exist"), 0, gen_widg->get_position());
                 return false;
             }
         }
@@ -41,7 +41,7 @@ bool RegistrationWidget::register_user() {
         account_info->sync();
         return true;
     } else {
-        gen_widg->show_message_box(tr("Error"), tr("Enter login, password, first and last names"), 0);
+        gen_widg->show_message_box(tr("Error"), tr("Enter login, password, first and last names"), 0, gen_widg->get_position());
         return false;
     }
 }
@@ -59,20 +59,20 @@ bool RegistrationWidget::login() {
             ui->lineEdit_FName->setText("");
             ui->lineEdit_LName->setText("");
             if(!snd_rcv_module->init_connection()) {        // Иницализируем поключение
-                gen_widg->show_message_box(tr("Error"), tr("Can't init connection"), 0);
+                gen_widg->show_message_box(tr("Error"), tr("Can't init connection"), 0, gen_widg->get_position());
                 return false;
             }
             if(snd_rcv_module->get_id_for_client() != CS_OK) {          // Запросим у сервера ID
-                gen_widg->show_message_box(tr("Error"), tr("Can't get ID"), 0);
+                gen_widg->show_message_box(tr("Error"), tr("Can't get ID"), 0, gen_widg->get_position());
                 return false;
             }
             return true;
         } else {
-            gen_widg->show_message_box(tr("Error"), tr("You enter wrong login or password"), 0);
+            gen_widg->show_message_box(tr("Error"), tr("You enter wrong login or password"), 0, gen_widg->get_position());
             return false;
         }
     } else {
-        gen_widg->show_message_box(tr("Error"), tr("Enter login and password"), 0);
+        gen_widg->show_message_box(tr("Error"), tr("Enter login and password"), 0, gen_widg->get_position());
         return false;
     }
 }

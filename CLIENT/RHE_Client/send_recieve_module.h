@@ -132,6 +132,7 @@
             QTcpSocket *socket = nullptr;
             QFile *file = nullptr;
             QString server_ip;
+            QString FPGA_id_code = "";
 
             int file_rcv_bytes_count = 0;
             int last_send_file_bytes = 0;
@@ -154,7 +155,7 @@
             void accept_debug_data_signal(QByteArray debug_data);
             void accept_input_data_table_signal(QByteArray input_data_table);
             void accept_output_data_table_signal(QByteArray output_data_table);
-            void show_message_box_signal(QString str1, QString str2, int type);
+            void show_message_box_signal(QString str1, QString str2, int type, QPoint position);
     };
 
 #endif // SEND_RECIEVE_MODULE_H

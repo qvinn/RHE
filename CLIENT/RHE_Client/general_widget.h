@@ -10,6 +10,7 @@
     #include <QMessageBox>
     #include <QFileDialog>
     #include <QApplication>
+    #include <QScreen>
 
     class General_Widget : public QWidget {
         Q_OBJECT
@@ -17,13 +18,15 @@
             General_Widget();
             ~General_Widget() override;
 
+            QPoint get_position();
+            void set_position(QPoint widg_pos);
             QVariant get_setting(QString type);
             void save_setting(QString type, QVariant val);
-            QStringList* load_files(bool files, bool path, QString title, QString filter);
-//            QFile* load_file(QString title, QString filter);
-            void save_file(QWidget *widg = nullptr, QString title = "", QString filter = "",  QString *data = nullptr, QString *file_name = nullptr, bool re_write = false, bool fl_nm_exist = false);
-            QString load_file_path(QString title, QString filter);
-            int show_message_box(QString str1, QString str2, int type);
+            QString get_style_sheet(QString pattern);
+            QStringList* load_files(bool files, bool path, QString title, QString filter, QWidget *prnt);
+            void save_file(QWidget *prnt = nullptr, QString title = "", QString filter = "",  QString *data = nullptr, QString *file_name = nullptr, bool re_write = false, bool fl_nm_exist = false);
+            QString load_file_path(QString title, QString filter, QWidget *prnt);
+            int show_message_box(QString str1, QString str2, int type, QPoint position);
             void change_current_locale();
 
         private:
@@ -34,7 +37,9 @@
             QStringList *files_list = nullptr;
             QSettings *settings = nullptr;
             QTranslator *language_translator = nullptr;
-            QLocale cur_locale;
+            QPoint *current_pos = nullptr;
+            QString style_sheet = "";
+            QLocale cur_locale;  
 
         signals:
             void re_translate_signal();

@@ -42,6 +42,8 @@
             void change_board_pixmap();
             void set_enable_board_power_led(bool flg);
             void set_button_state_debug(bool flg);
+            void add_horizontal_spacer();
+            void remove_horizontal_spacer();
             void check_is_proj_folder(bool folder_exist);
             bool check_fpga_connections(QString path_to_fit_rprtr);
             bool read_xml_file(bool type, QString *cur_fpga = nullptr, QList<QString> *pins_numb = nullptr, QList<QString> *pins_typ = nullptr, QList<QString> *pins_io_stndrt = nullptr);
@@ -68,6 +70,7 @@
             QList<QSlider*> *inpt_sldrs = nullptr;
             QList<QLCDNumber*> *inpt_stts = nullptr;
             QTimer *send_file_status = nullptr;
+            QSpacerItem *hrzntl_spcr = nullptr;
             QList<QString> state_strs;
             QString lname_fname;
             QPixmap pixmp_brd;

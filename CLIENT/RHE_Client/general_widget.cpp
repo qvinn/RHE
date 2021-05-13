@@ -11,12 +11,32 @@ General_Widget::General_Widget() {
     qApp->setWindowIcon(QIcon(icon_path));
 #endif
     language_translator = new QTranslator();
+    current_pos = new QPoint(-1, -1);
+    QString sub_style_sheet = "background-color: lightblue; border-style: outset; color: black; font: bold 10p; border-style: outset; border-width: 1px; border-radius: 0px; border-color: blue; padding: 0px 0px;";
+    style_sheet.append("pattern { background-color: rgb(245, 245, 245); }"
+                       "QPushButton:checked { " + sub_style_sheet + " }"
+                       "QPushButton:pressed { " + sub_style_sheet + " }"
+                       "QPushButton:disabled { " + sub_style_sheet + " }"
+                       "QPushButton { background-color: lightGray; color: black; border-style: outset; border-width: 1px; border-radius: 0px; border-color: gray; padding: 0px 0px; }"
+                       "QPushButton:hover { border-style: outset; border-width: 1px; border-radius: 0px; border-color: royalblue; }"
+                       "QPushButton { min-width:73; min-height:21; }"
+                      );
 }
 
 General_Widget::~General_Widget() {
     delete files_list;
     delete settings;
+    delete current_pos;
     delete language_translator;
+}
+
+QPoint General_Widget::get_position() {
+    return *current_pos;
+}
+
+void General_Widget::set_position(QPoint widg_pos) {
+    current_pos->setX(widg_pos.x());
+    current_pos->setY(widg_pos.y());
 }
 
 QVariant General_Widget::get_setting(QString type) {
@@ -60,21 +80,30 @@ void General_Widget::create_base_settings() {
     check_setting_exist("settings/DEBUG_DISCRETENESS_TIME_TYPE", 0);
     check_setting_exist("settings/START_DEBUG_AFTER_FPGA_FLASHING", 0);
     check_setting_exist("settings/START_SEQUENCE_OF_SIGNALS_WITH_DEBUG", 0);
-    check_setting_exist("settings/WVFRM_VWR_ATTCH_CRSR", 0);
-    check_setting_exist("settings/WVFRM_VWR_DISCRETENESS_TIME", 1);
-    check_setting_exist("settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE", 0);
-    check_setting_exist("settings/WVFRM_VWR_ATTCH_CRSR_STANDALONE", 0);
-    check_setting_exist("settings/WVFRM_VWR_DISCRETENESS_TIME_STANDALONE", 1);
-    check_setting_exist("settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE_STANDALONE", 0);
-    check_setting_exist("settings/WVFRM_VWR_AXIS_LABELS_COLOR", "#FFFFFFFF");
-    check_setting_exist("settings/WVFRM_VWR_DIAGRAM_GRID_COLOR", "#FF646464");
-    check_setting_exist("settings/WVFRM_VWR_DIAGRAM_BACKGROUND_COLOR", "#FF000000");
-    check_setting_exist("settings/WVFRM_VWR_SELECTION_COLOR", "#FFFF0000");
-    check_setting_exist("settings/WVFRM_VWR_CURSOR_LINE_COLOR", "#FFFFFF00");
-    check_setting_exist("settings/WVFRM_VWR_CURSOR_TIME_LABEL_BORDER_COLOR", "#FFFFFFFF");
-    check_setting_exist("settings/WVFRM_VWR_CURSOR_TIME_LABEL_FILL_COLOR", "#FFFFFF00");
-    check_setting_exist("settings/WVFRM_VWR_GRAPH_COLOR", "#FF00FF00");
-    check_setting_exist("settings/WVFRM_VWR_AXIS_LABELS_FONT_SIZE", 10);
+    check_setting_exist("waveform_viewer_settings/WVFRM_VWR_ATTCH_CRSR", 0);
+    check_setting_exist("waveform_viewer_settings/WVFRM_VWR_DISCRETENESS_TIME", 1);
+    check_setting_exist("waveform_viewer_settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE", 0);
+    check_setting_exist("waveform_viewer_settings/WVFRM_VWR_AXIS_LABELS_COLOR", "#FFFFFFFF");
+    check_setting_exist("waveform_viewer_settings/WVFRM_VWR_DIAGRAM_GRID_COLOR", "#FF646464");
+    check_setting_exist("waveform_viewer_settings/WVFRM_VWR_DIAGRAM_BACKGROUND_COLOR", "#FF000000");
+    check_setting_exist("waveform_viewer_settings/WVFRM_VWR_SELECTION_COLOR", "#FFFF0000");
+    check_setting_exist("waveform_viewer_settings/WVFRM_VWR_CURSOR_LINE_COLOR", "#FFFFFF00");
+    check_setting_exist("waveform_viewer_settings/WVFRM_VWR_CURSOR_TIME_LABEL_BORDER_COLOR", "#FFFFFFFF");
+    check_setting_exist("waveform_viewer_settings/WVFRM_VWR_CURSOR_TIME_LABEL_FILL_COLOR", "#FFFFFF00");
+    check_setting_exist("waveform_viewer_settings/WVFRM_VWR_GRAPH_COLOR", "#FF00FF00");
+    check_setting_exist("waveform_viewer_settings/WVFRM_VWR_AXIS_LABELS_FONT_SIZE", 10);
+    check_setting_exist("waveform_viewer_standalone_settings/WVFRM_VWR_ATTCH_CRSR", 0);
+    check_setting_exist("waveform_viewer_standalone_settings/WVFRM_VWR_DISCRETENESS_TIME", 1);
+    check_setting_exist("waveform_viewer_standalone_settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE", 0);
+    check_setting_exist("waveform_viewer_standalone_settings/WVFRM_VWR_AXIS_LABELS_COLOR", "#FFFFFFFF");
+    check_setting_exist("waveform_viewer_standalone_settings/WVFRM_VWR_DIAGRAM_GRID_COLOR", "#FF646464");
+    check_setting_exist("waveform_viewer_standalone_settings/WVFRM_VWR_DIAGRAM_BACKGROUND_COLOR", "#FF000000");
+    check_setting_exist("waveform_viewer_standalone_settings/WVFRM_VWR_SELECTION_COLOR", "#FFFF0000");
+    check_setting_exist("waveform_viewer_standalone_settings/WVFRM_VWR_CURSOR_LINE_COLOR", "#FFFFFF00");
+    check_setting_exist("waveform_viewer_standalone_settings/WVFRM_VWR_CURSOR_TIME_LABEL_BORDER_COLOR", "#FFFFFFFF");
+    check_setting_exist("waveform_viewer_standalone_settings/WVFRM_VWR_CURSOR_TIME_LABEL_FILL_COLOR", "#FFFFFF00");
+    check_setting_exist("waveform_viewer_standalone_settings/WVFRM_VWR_GRAPH_COLOR", "#FF00FF00");
+    check_setting_exist("waveform_viewer_standalone_settings/WVFRM_VWR_AXIS_LABELS_FONT_SIZE", 10);
 }
 
 void General_Widget::check_setting_exist(QString type, QVariant val) {
@@ -98,61 +127,56 @@ void General_Widget::check_is_icon_exist(QString path) {
     }
 }
 
-QStringList* General_Widget::load_files(bool files, bool path, QString title, QString filter) {
-    QFileDialog *dialog = nullptr;
-    dialog = new QFileDialog(nullptr, title, QDir::current().path(), filter);
-    dialog->setOption(QFileDialog::HideNameFilterDetails);
+QString General_Widget::get_style_sheet(QString pattern) {
+    QString str = style_sheet;
+    return str.replace("pattern", pattern);
+}
+
+QStringList* General_Widget::load_files(bool files, bool path, QString title, QString filter, QWidget *prnt) {
+    QFileDialog dialog(prnt, title, QDir::current().path(), filter);
+    dialog.setOption(QFileDialog::DontUseNativeDialog, true);
+    dialog.resize(800, 600);
+    dialog.setOption(QFileDialog::HideNameFilterDetails);
     if(files) {
-        dialog->setFileMode(QFileDialog::ExistingFiles);
+        dialog.setFileMode(QFileDialog::ExistingFiles);
     } else if(path) {
-        dialog->setFileMode(QFileDialog::Directory);
+        dialog.setFileMode(QFileDialog::Directory);
     } else {
-        dialog->setFileMode(QFileDialog::ExistingFile);
+        dialog.setFileMode(QFileDialog::ExistingFile);
     }
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->setModal(true);
-    dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
-    if(dialog->exec() == QDialog::Accepted) {
+    dialog.setStyleSheet(get_style_sheet("QFileDialog"));
+    if(dialog.exec() == QDialog::Accepted) {
         files_list->clear();
-        files_list->append(dialog->selectedFiles());
+        files_list->append(dialog.selectedFiles());
     } else {
-        delete dialog;
         return nullptr;
     }
     if(files_list->count() == 0) {
-        delete dialog;
         return nullptr;
     }
-    delete dialog;
     return files_list;
 }
 
-//QFile* General_Widget::load_file(QString title, QString filter) {
-//    fileList = load_files(false, false, title, filter);
-//    if(fileList == nullptr) {
-//        return nullptr;
-//    }
-//    QFile *file = nullptr;
-//    for(int i = 0; i < fileList->count(); i++) {
-//        QFileInfo fileInf(fileList->at(i));
-//        file = new QFile(fileInf.absoluteFilePath());
-//    }
-//    return file;
-//}
-
-void General_Widget::save_file(QWidget *widg, QString title, QString filter, QString *data, QString *file_name, bool re_write, bool fl_nm_exist) {
+void General_Widget::save_file(QWidget *prnt, QString title, QString filter, QString *data, QString *file_name, bool re_write, bool fl_nm_exist) {
     QString fileName;
     if(fl_nm_exist) {
         fileName.append(*file_name);
     } else {
-        fileName = QFileDialog::getSaveFileName(widg, title, qApp->applicationDirPath(), filter);
-#ifdef __linux__
-        QStringList lst_1 = filter.split("*");
-        QStringList lst_2 = lst_1.at(lst_1.count() - 1).split(")");
-        if(!fileName.contains(lst_2.at(0))) {
-            fileName.append(lst_2.at(0));
+        QFileDialog dialog(prnt, title, QDir::current().path(), filter);
+        dialog.setOption(QFileDialog::DontUseNativeDialog, true);
+        dialog.setOption(QFileDialog::HideNameFilterDetails);
+        dialog.resize(800, 600);
+        dialog.setFileMode(QFileDialog::AnyFile);
+        dialog.setAcceptMode(QFileDialog::AcceptSave);
+        dialog.setStyleSheet(get_style_sheet("QFileDialog"));
+        if(dialog.exec() == QDialog::Accepted) {
+            fileName = dialog.selectedFiles().at(0);
+            QStringList lst_1 = filter.split("*");
+            QStringList lst_2 = lst_1.at(lst_1.count() - 1).split(")");
+            if(!fileName.contains(lst_2.at(0))) {
+                fileName.append(lst_2.at(0));
+            }
         }
-#endif
     }
     if(!fileName.isEmpty()) {
         QFile *file = new QFile(fileName);
@@ -173,8 +197,8 @@ void General_Widget::save_file(QWidget *widg, QString title, QString filter, QSt
     }
 }
 
-QString General_Widget::load_file_path(QString title, QString filter) {
-    QStringList *lst = load_files(false, false, title, filter);
+QString General_Widget::load_file_path(QString title, QString filter, QWidget *prnt) {
+    QStringList *lst = load_files(false, false, title, filter, prnt);
     QString file_path = "";
     if(lst == nullptr) {
         return file_path;
@@ -186,8 +210,8 @@ QString General_Widget::load_file_path(QString title, QString filter) {
     return file_path;
 }
 
-int General_Widget::show_message_box(QString str1, QString str2, int type) {
-    QMessageBox msgBox(QMessageBox::Warning, str1, str2);
+int General_Widget::show_message_box(QString str1, QString str2, int type, QPoint position) {
+    QMessageBox msgBox(QMessageBox::Warning, str1, QString("\n").append(str2).toLatin1().data());
     if(str1.count() == 0) {
         msgBox.setWindowTitle(tr("Warning"));
     }
@@ -210,6 +234,10 @@ int General_Widget::show_message_box(QString str1, QString str2, int type) {
     msgBox.setWindowModality(Qt::ApplicationModal);
     msgBox.setModal(true);
     msgBox.setWindowFlags(msgBox.windowFlags() | Qt::WindowStaysOnTopHint);
+    msgBox.setStyleSheet(get_style_sheet("QMessageBox"));
+    msgBox.show();
+    msgBox.hide();
+    msgBox.move((position.x() - (msgBox.width() / 2)), (position.y() - (msgBox.height() / 2)));
     return msgBox.exec();
 }
 
