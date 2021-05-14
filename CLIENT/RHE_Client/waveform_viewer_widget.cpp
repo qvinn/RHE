@@ -8,6 +8,7 @@ Waveform_Viewer_Widget::Waveform_Viewer_Widget(QWidget *parent, General_Widget *
     gen_widg = widg;
     standalone = stndln;
     ui->chckBx_as_wndw->setVisible(!stndln);
+    ui->chckBx_ft_sz->setVisible(!stndln);
     textTicker = new QSharedPointer<QCPAxisTickerText>(new QCPAxisTickerText());
     dyn_tckr = new QSharedPointer<QCPAxisTickerFixed>(new QCPAxisTickerFixed());
 //    ui->diagram->setOpenGl(true);         //qcustomplot.cpp - line 909
@@ -89,6 +90,13 @@ void Waveform_Viewer_Widget::on_chckBx_attch_crsr_stateChanged(int state) {
         } else {
             gen_widg->save_setting("waveform_viewer_settings/WVFRM_VWR_ATTCH_CRSR", state);
         }
+    }
+}
+
+void Waveform_Viewer_Widget::on_chckBx_ft_sz_stateChanged(int state) {
+    if(ui_initialized) {
+        fit_size = static_cast<bool>(state);
+        gen_widg->save_setting("waveform_viewer_settings/WVFRM_VWR_FIT_SIZE", state);
     }
 }
 
@@ -200,10 +208,12 @@ void Waveform_Viewer_Widget::post_initialize_ui() {
         params_lst.replace(i, tmp);
     }
     ui->chckBx_attch_crsr->setCheckState(static_cast<Qt::CheckState>(abs(gen_widg->get_setting(params_lst.at(0)).toInt() - 2)));
+    ui->chckBx_ft_sz->setCheckState(static_cast<Qt::CheckState>(abs(gen_widg->get_setting("waveform_viewer_settings/WVFRM_VWR_FIT_SIZE").toInt() - 2)));
     ui->spnBx_wvfrm_vwr_dscrtnss_tm->setValue(gen_widg->get_setting(params_lst.at(1)).toInt());
     ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->setCurrentIndex(abs(gen_widg->get_setting(params_lst.at(2)).toInt() - 1));
     ui_initialized = true;
     ui->chckBx_attch_crsr->setCheckState(static_cast<Qt::CheckState>(gen_widg->get_setting(params_lst.at(0)).toInt()));
+    ui->chckBx_ft_sz->setCheckState(static_cast<Qt::CheckState>(gen_widg->get_setting("waveform_viewer_settings/WVFRM_VWR_FIT_SIZE").toInt()));
     ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->setCurrentIndex(gen_widg->get_setting(params_lst.at(2)).toInt());
 }
 

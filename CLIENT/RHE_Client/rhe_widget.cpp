@@ -843,6 +843,9 @@ void RHE_Widget::slot_accept_debug_data(QByteArray debug_data) {
     }
     wvfrm_vwr->add_data_to_saved_vals_list(val, prev_vals, dbg_time, val_changed);
     wvfrm_vwr->add_data_to_graph_rltm(val, prev_vals, dbg_time, val_changed);
+    if(wvfrm_vwr->fit_size) {
+        wvfrm_vwr->re_scale_graph();
+    }
 }
 
 void RHE_Widget::slot_accept_input_data_table(QByteArray input_data_table) {

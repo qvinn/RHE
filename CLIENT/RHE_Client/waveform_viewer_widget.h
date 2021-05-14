@@ -42,6 +42,7 @@
             bool debug_show = true;
             bool as_window = false;
             bool shw_at_cntr = true;
+            bool fit_size = false;
 
             int graph_count;
 
@@ -105,6 +106,7 @@
             void closeEvent(QCloseEvent *) override;
             void on_chckBx_as_wndw_stateChanged(int state);
             void on_chckBx_attch_crsr_stateChanged(int state);
+            void on_chckBx_ft_sz_stateChanged(int state);
             void on_spnBx_wvfrm_vwr_dscrtnss_tm_valueChanged(int value);
             void on_cmbBx_wvfrm_vwr_dscrtnss_tm_tp_currentIndexChanged(int index);
             void on_pshBttn_chng_sttngs_clicked();

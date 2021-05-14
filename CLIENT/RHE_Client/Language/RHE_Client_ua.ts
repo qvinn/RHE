@@ -119,7 +119,7 @@
         <translation type="vanished">Розмір шрифту відміток на вісях і часовій мітці курсору</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="1132"/>
+        <location filename="../waveform_viewer_widget.cpp" line="1142"/>
         <source>Select diagram settings</source>
         <translation>Вибір налаштувань діаграми</translation>
     </message>
@@ -160,7 +160,7 @@
         <translation type="vanished">Відміна</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="1044"/>
+        <location filename="../waveform_viewer_widget.cpp" line="1054"/>
         <source>Select pins for display</source>
         <translation>Виберіть піни для відображування</translation>
     </message>
@@ -168,27 +168,27 @@
 <context>
     <name>General_Widget</name>
     <message>
-        <location filename="../general_widget.cpp" line="216"/>
+        <location filename="../general_widget.cpp" line="217"/>
         <source>Warning</source>
         <translation>Увага</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="221"/>
+        <location filename="../general_widget.cpp" line="222"/>
         <source>Question</source>
         <translation>Питання</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="226"/>
+        <location filename="../general_widget.cpp" line="227"/>
         <source>Yes</source>
         <translation>Так</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="227"/>
+        <location filename="../general_widget.cpp" line="228"/>
         <source>No</source>
         <translation>Ні</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="230"/>
+        <location filename="../general_widget.cpp" line="231"/>
         <source>Information</source>
         <translation>Інформація</translation>
     </message>
@@ -737,17 +737,17 @@
         <translation>Прикріплювати курсор до осі</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="548"/>
+        <location filename="../waveform_viewer.ui" line="567"/>
         <source>Change Settings</source>
         <translation>  Змінити Налаштування  </translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="868"/>
+        <location filename="../waveform_viewer.ui" line="887"/>
         <source>Full scale</source>
         <translation>  Повний масштаб  </translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="1723"/>
+        <location filename="../waveform_viewer.ui" line="1742"/>
         <source>Measurement</source>
         <translation>  Вимірювання  </translation>
     </message>
@@ -757,17 +757,22 @@
         <translation>Як вікно</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="1153"/>
+        <location filename="../waveform_viewer.ui" line="216"/>
+        <source>Fit size</source>
+        <translation>Підганяти розмір</translation>
+    </message>
+    <message>
+        <location filename="../waveform_viewer.ui" line="1172"/>
         <source>Clear</source>
         <translation>  Очистити  </translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="1438"/>
+        <location filename="../waveform_viewer.ui" line="1457"/>
         <source>Select Displayable Pins</source>
         <translation>  Вибрати Відображувані піни  </translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="2024"/>
+        <location filename="../waveform_viewer.ui" line="2043"/>
         <source>Waveform</source>
         <translation>Часова діаграма</translation>
     </message>
@@ -775,68 +780,68 @@
 <context>
     <name>Waveform_Viewer_Widget</name>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="214"/>
+        <location filename="../waveform_viewer_widget.cpp" line="224"/>
         <source>Open waveform</source>
         <translation>  Відкрити часову діаграму  </translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="216"/>
+        <location filename="../waveform_viewer_widget.cpp" line="226"/>
         <source>Save waveform</source>
         <translation>  Зберегти часову діаграму  </translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="212"/>
+        <location filename="../waveform_viewer_widget.cpp" line="222"/>
         <source>Waveform Viewer</source>
         <translation>Переглядач часових діаграм</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="219"/>
-        <location filename="../waveform_viewer_widget.cpp" line="223"/>
+        <location filename="../waveform_viewer_widget.cpp" line="229"/>
+        <location filename="../waveform_viewer_widget.cpp" line="233"/>
         <source>s</source>
         <translation>c</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="220"/>
-        <location filename="../waveform_viewer_widget.cpp" line="224"/>
+        <location filename="../waveform_viewer_widget.cpp" line="230"/>
+        <location filename="../waveform_viewer_widget.cpp" line="234"/>
         <source>ms</source>
         <translation>мс</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="221"/>
-        <location filename="../waveform_viewer_widget.cpp" line="225"/>
+        <location filename="../waveform_viewer_widget.cpp" line="231"/>
+        <location filename="../waveform_viewer_widget.cpp" line="235"/>
         <source>us</source>
         <translation>мкс</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="314"/>
+        <location filename="../waveform_viewer_widget.cpp" line="324"/>
         <source>Choose waveform file</source>
         <translation>Вибрати файл з часовими діаграмами</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="314"/>
-        <location filename="../waveform_viewer_widget.cpp" line="423"/>
-        <location filename="../waveform_viewer_widget.cpp" line="438"/>
+        <location filename="../waveform_viewer_widget.cpp" line="324"/>
+        <location filename="../waveform_viewer_widget.cpp" line="433"/>
+        <location filename="../waveform_viewer_widget.cpp" line="448"/>
         <source>Waveform (*.wvfrm)</source>
         <translation>Waveform (*.wvfrm)</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="323"/>
+        <location filename="../waveform_viewer_widget.cpp" line="333"/>
         <source>Error</source>
         <translation>Помилка</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="323"/>
+        <location filename="../waveform_viewer_widget.cpp" line="333"/>
         <source>Waveform file not choosed</source>
         <translation>Файл з часовими діаграмами не обрано</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="423"/>
-        <location filename="../waveform_viewer_widget.cpp" line="438"/>
+        <location filename="../waveform_viewer_widget.cpp" line="433"/>
+        <location filename="../waveform_viewer_widget.cpp" line="448"/>
         <source>Saving waveform</source>
         <translation>Збереження часової діаграми</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="448"/>
+        <location filename="../waveform_viewer_widget.cpp" line="458"/>
         <source>No data for saving</source>
         <translation>Немає даних для збереження</translation>
     </message>

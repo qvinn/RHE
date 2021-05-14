@@ -81,6 +81,7 @@ void General_Widget::create_base_settings() {
     check_setting_exist("settings/START_DEBUG_AFTER_FPGA_FLASHING", 0);
     check_setting_exist("settings/START_SEQUENCE_OF_SIGNALS_WITH_DEBUG", 0);
     check_setting_exist("waveform_viewer_settings/WVFRM_VWR_ATTCH_CRSR", 0);
+    check_setting_exist("waveform_viewer_settings/WVFRM_VWR_FIT_SIZE", 0);
     check_setting_exist("waveform_viewer_settings/WVFRM_VWR_DISCRETENESS_TIME", 1);
     check_setting_exist("waveform_viewer_settings/WVFRM_VWR_DISCRETENESS_TIME_TYPE", 0);
     check_setting_exist("waveform_viewer_settings/WVFRM_VWR_AXIS_LABELS_COLOR", "#FFFFFFFF");
@@ -211,7 +212,7 @@ QString General_Widget::load_file_path(QString title, QString filter, QWidget *p
 }
 
 int General_Widget::show_message_box(QString str1, QString str2, int type, QPoint position) {
-    QMessageBox msgBox(QMessageBox::Warning, str1, QString("\n").append(str2).toLatin1().data());
+    QMessageBox msgBox(QMessageBox::Warning, str1, QString("\n").append(str2));
     if(str1.count() == 0) {
         msgBox.setWindowTitle(tr("Warning"));
     }
