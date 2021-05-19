@@ -305,6 +305,7 @@ void MainWindow::logout() {
 void MainWindow::slot_re_size() {
     QSize cur_size = this->size();
     this->resize(QSize((this->width() + 1), (this->height() + 1)));
+    this->updateGeometry();
     this->resize(cur_size);
 }
 
