@@ -46,6 +46,9 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
+//-------------------------------------------------------------------------
+// HACK TO DISPLAY WINDOW AT CENTRE OF SCREEN ON THE FIRST RUN
+//-------------------------------------------------------------------------
 void MainWindow::showEvent(QShowEvent *) {
     if(shw_at_cntr) {
         shw_at_cntr = false;
@@ -54,20 +57,32 @@ void MainWindow::showEvent(QShowEvent *) {
     }
 }
 
+//-------------------------------------------------------------------------
+// RESIZING OF BASIC WINDOW
+//-------------------------------------------------------------------------
 void MainWindow::resizeEvent(QResizeEvent *) {
     ui->horizontalLayoutWidget->setGeometry(0, (this->height() - ui->horizontalLayoutWidget->height()), this->width(), ui->horizontalLayoutWidget->height());
     ui->verticalLayoutWidget->resize(this->width(), (this->height() - ui->horizontalLayoutWidget->height()));
     ui->stackedWidget->setGeometry(0, (menu_bar->height() + ui->line_1->height()), this->width(), (ui->verticalLayoutWidget->height() - menu_bar->height() - (2 * ui->line_1->height())));
 }
 
+//-------------------------------------------------------------------------
+// SAVING POSITION OF CURRENT ACTIVE WINDOW
+//-------------------------------------------------------------------------
 void MainWindow::moveEvent(QMoveEvent *) {
     gen_widg->set_position(QPoint((this->pos().x() + (this->width() / 2)), (this->pos().y() + (this->height() / 2))));
 }
 
+//-------------------------------------------------------------------------
+// CLOSING OF APPLICATION
+//-------------------------------------------------------------------------
 void MainWindow::closeEvent(QCloseEvent *) {
     onPshBttnExt();
 }
 
+//-------------------------------------------------------------------------
+// PUSH BUTTON 'WAVEFORM VIEWER' CLICKED
+//-------------------------------------------------------------------------
 void MainWindow::onPshBttnWvfrmVwr() {
     wvfrm_vwr = new Waveform_Viewer_Widget(nullptr, gen_widg, true);
     connect(gen_widg, &General_Widget::re_translate_signal, wvfrm_vwr, &Waveform_Viewer_Widget::slot_re_translate);
@@ -77,10 +92,16 @@ void MainWindow::onPshBttnWvfrmVwr() {
     wvfrm_vwr->show();
 }
 
+//-------------------------------------------------------------------------
+// PUSH BUTTON 'EXIT' CLICKED
+//-------------------------------------------------------------------------
 void MainWindow::onPshBttnExt() {
     QApplication::quit();
 }
 
+//-------------------------------------------------------------------------
+// CHECK BOX 'FILES CHECKING' CHECKED
+//-------------------------------------------------------------------------
 void MainWindow::onChkBxFlsChckngStateChanged() {
     if(ui_initialized) {
         ptr_RHE_widg->pshBttn_chk_prj_stat_set_visible(chkBx_fls_chckng_actn->isChecked());
@@ -97,10 +118,13 @@ void MainWindow::onChkBxFlsChckngStateChanged() {
         }
         gen_widg->save_setting("settings/ENABLE_FILE_CHEKING", (static_cast<int>(chkBx_fls_chckng_actn->isChecked())));
         ptr_RHE_widg->pshBttn_snd_frmwr_set_enabled(/*(ptr_RHE_widg->svf_exist) && (static_cast<bool>(main_settings->value("settings/MANUALY_LOAD_FIRMWARE").toInt()))*/false);
-        ptr_RHE_widg->pshBttn_ld_frmwr_set_enabled(gen_widg->get_setting("settings/MANUALY_LOAD_FIRMWARE").toBool() && (!chkBx_fls_chckng_actn->isChecked() || ptr_RHE_widg->sof_exist));
+        ptr_RHE_widg->pshBttn_chs_frmwr_set_enabled(gen_widg->get_setting("settings/MANUALY_LOAD_FIRMWARE").toBool() && (!chkBx_fls_chckng_actn->isChecked() || ptr_RHE_widg->sof_exist));
     }
 }
 
+//-------------------------------------------------------------------------
+// CHECK BOX 'PINS CHECKING' CHECKED
+//-------------------------------------------------------------------------
 void MainWindow::onChkBxPinsChckngStateChanged() {
     if(ui_initialized) {
         if(gen_widg->get_setting("settings/ENABLE_PINS_CHEKING").toInt() != -1) {
@@ -110,14 +134,20 @@ void MainWindow::onChkBxPinsChckngStateChanged() {
     }
 }
 
+//-------------------------------------------------------------------------
+// CHECK BOX 'MANUALY LOAD FIRMWARE' CHECKED
+//-------------------------------------------------------------------------
 void MainWindow::onChkBxLdMnlFrmwrStateChanged() {
     if(ui_initialized) {
-        ptr_RHE_widg->pshBttn_ld_frmwr_set_visible(chkBx_ld_mnl_frmwr_actn->isChecked());
+        ptr_RHE_widg->pshBttn_chs_frmwr_set_visible(chkBx_ld_mnl_frmwr_actn->isChecked());
         gen_widg->save_setting("settings/MANUALY_LOAD_FIRMWARE", (static_cast<int>(chkBx_ld_mnl_frmwr_actn->isChecked())));
-        ptr_RHE_widg->pshBttn_ld_frmwr_set_enabled(gen_widg->get_setting("settings/MANUALY_LOAD_FIRMWARE").toBool() && (!gen_widg->get_setting("settings/ENABLE_FILE_CHEKING").toBool() || ptr_RHE_widg->sof_exist));
+        ptr_RHE_widg->pshBttn_chs_frmwr_set_enabled(gen_widg->get_setting("settings/MANUALY_LOAD_FIRMWARE").toBool() && (!gen_widg->get_setting("settings/ENABLE_FILE_CHEKING").toBool() || ptr_RHE_widg->sof_exist));
     }
 }
 
+//-------------------------------------------------------------------------
+// CHOOSING LANGUAUGE OF APPLICATION
+//-------------------------------------------------------------------------
 void MainWindow::onCmbBxLngChsCurrentIndexChanged(int index) {
     if(ui_initialized && language_changed) {
         gen_widg->save_setting("settings/LANGUAGE", index);
@@ -125,6 +155,9 @@ void MainWindow::onCmbBxLngChsCurrentIndexChanged(int index) {
     }
 }
 
+//-------------------------------------------------------------------------
+// PUSH BUTTON 'LOGIN/LOGOUT' CLICKED
+//-------------------------------------------------------------------------
 void MainWindow::on_button_login_logout_clicked() {
     if(ui->stackedWidget->currentWidget() == ptr_registration_widg) {
         login();
@@ -133,12 +166,18 @@ void MainWindow::on_button_login_logout_clicked() {
     }
 }
 
+//-------------------------------------------------------------------------
+// PUSH BUTTON 'REGISTER' CLICKED
+//-------------------------------------------------------------------------
 void MainWindow::on_button_register_clicked() {
     if(ptr_registration_widg->register_user()) {
         on_button_login_logout_clicked();
     }
 }
 
+//-------------------------------------------------------------------------
+// INITIALIZING OF UI COMPONENTS
+//-------------------------------------------------------------------------
 void MainWindow::initialize_ui() {
     menu_bar = new QMenuBar(this);
     menu_bar->setStyleSheet("QMenuBar { background-color: #F5F5F5 } QMenuBar::item:selected { background: #9D9D90; } QMenuBar::item:pressed { background: #5D5D50; }" );
@@ -177,6 +216,9 @@ void MainWindow::initialize_ui() {
     connect(cmbBx_lng_chs, SIGNAL(currentIndexChanged(int)), this, SLOT(onCmbBxLngChsCurrentIndexChanged(int)));
 }
 
+//-------------------------------------------------------------------------
+// UPDATE UI TEXT AFTER CHANGING LANGUAGE OF APPLICATION
+//-------------------------------------------------------------------------
 void MainWindow::set_ui_text() {
     language_changed = false;
     this->setWindowTitle(tr("Remote Hardware Education"));
@@ -207,6 +249,9 @@ void MainWindow::set_ui_text() {
     language_changed = true;
 }
 
+//-------------------------------------------------------------------------
+// LOAD SETTINGS OF MAIN PART UI
+//-------------------------------------------------------------------------
 void MainWindow::load_settings() {
     bool fls_chk = gen_widg->get_setting("settings/ENABLE_FILE_CHEKING").toBool();
     int pins_chk;
@@ -228,6 +273,9 @@ void MainWindow::load_settings() {
     chkBx_pins_chckng_actn->setVisible(true);
 }
 
+//-------------------------------------------------------------------------
+// START OF USER SESSION ON SERVER
+//-------------------------------------------------------------------------
 void MainWindow::login() {
     if(ui->stackedWidget->currentWidget() == ptr_registration_widg) {
         if(ptr_registration_widg->login()) {
@@ -239,6 +287,9 @@ void MainWindow::login() {
     }
 }
 
+//-------------------------------------------------------------------------
+// END OF USER SESSION ON SERVER
+//-------------------------------------------------------------------------
 void MainWindow::logout() {
     if(ui->stackedWidget->currentWidget() != ptr_registration_widg) {
         ui->button_login_logout->setText(tr("Login"));
@@ -248,17 +299,26 @@ void MainWindow::logout() {
     }
 }
 
+//-------------------------------------------------------------------------
+// HACK TO UPDATING SIZE OF ALL COMPONENTS OF UI
+//-------------------------------------------------------------------------
 void MainWindow::slot_re_size() {
     QSize cur_size = this->size();
     this->resize(QSize((this->width() + 1), (this->height() + 1)));
     this->resize(cur_size);
 }
 
+//-------------------------------------------------------------------------
+// START OF TIMER WHICH INDICATES CLOSING OF STANDALONE WAVEFORM VIEWER
+//-------------------------------------------------------------------------
 void MainWindow::slot_waveform_viewer_closed() {
     tmr->setInterval(100);
     tmr->start();
 }
 
+//-------------------------------------------------------------------------
+// TIMEOUT OF TIMER WHICH INDICATES CLOSING OF STANDALONE WAVEFORM VIEWER
+//-------------------------------------------------------------------------
 void MainWindow::slot_timer_timeout() {
     tmr->stop();
     if(wvfrm_vwr != nullptr) {
@@ -270,6 +330,9 @@ void MainWindow::slot_timer_timeout() {
     }
 }
 
+//-------------------------------------------------------------------------
+// RETRANSLATING UI ON BASIC WINDOW
+//-------------------------------------------------------------------------
 void MainWindow::slot_re_translate() {
     ui->retranslateUi(this);
     set_ui_text();

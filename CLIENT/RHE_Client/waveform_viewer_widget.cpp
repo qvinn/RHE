@@ -45,6 +45,9 @@ Waveform_Viewer_Widget::~Waveform_Viewer_Widget() {
     delete ui;
 }
 
+//-------------------------------------------------------------------------
+// DISPLAYING OF WAVEFORM VIEWER WIDGET
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::showEvent(QShowEvent *) {
     if(shw_at_cntr) {
         shw_at_cntr = false;
@@ -53,23 +56,35 @@ void Waveform_Viewer_Widget::showEvent(QShowEvent *) {
     resizeEvent(nullptr);
 }
 
+//-------------------------------------------------------------------------
+// HIDING CURSOR-LINE ON DIAGRAM
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::leaveEvent(QEvent *) {
     ui->diagram->layer("layerCursor")->setVisible(false);
     ui->diagram->replot();
     qApp->setOverrideCursor(QCursor(Qt::ArrowCursor));
 }
 
+//-------------------------------------------------------------------------
+// RESIZING OF WAVEFORM VIEWER WIDGET
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::resizeEvent(QResizeEvent *) {
     ui->verticalLayoutWidget->resize(this->width(), this->height());
     ui->diagram->resize(ui->verticalLayoutWidget->width(), (ui->verticalLayoutWidget->height() - ui->horizontalLayout->geometry().height() - ui->horizontalLayout_2->geometry().height()));
 }
 
+//-------------------------------------------------------------------------
+// CLOSING STANDALONE WAVEFORM VIEWER WIDGET
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::closeEvent(QCloseEvent *) {
     if(standalone) {
         emit waveform_viewer_closed_signal();
     }
 }
 
+//-------------------------------------------------------------------------
+// CHECK BOX 'AS WINDOW' CHECKED
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::on_chckBx_as_wndw_stateChanged(int state) {
     change_margin(5 * (state / 2));
     as_window = static_cast<bool>(state);
@@ -83,6 +98,9 @@ void Waveform_Viewer_Widget::on_chckBx_as_wndw_stateChanged(int state) {
     emit as_window_signal();
 }
 
+//-------------------------------------------------------------------------
+// CHECK BOX 'ATTACH CURSOR' CHECKED
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::on_chckBx_attch_crsr_stateChanged(int state) {
     if(ui_initialized) {
         if(standalone) {
@@ -93,6 +111,9 @@ void Waveform_Viewer_Widget::on_chckBx_attch_crsr_stateChanged(int state) {
     }
 }
 
+//-------------------------------------------------------------------------
+// CHECK BOX 'FIT SIZE' CHECKED
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::on_chckBx_ft_sz_stateChanged(int state) {
     if(ui_initialized) {
         fit_size = static_cast<bool>(state);
@@ -100,6 +121,9 @@ void Waveform_Viewer_Widget::on_chckBx_ft_sz_stateChanged(int state) {
     }
 }
 
+//-------------------------------------------------------------------------
+// CHOOSE VALUE OF DISCRETENNES DISPLAYING TIME
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::on_spnBx_wvfrm_vwr_dscrtnss_tm_valueChanged(int value) {
     if(ui_initialized) {
         if(standalone) {
@@ -117,6 +141,9 @@ void Waveform_Viewer_Widget::on_spnBx_wvfrm_vwr_dscrtnss_tm_valueChanged(int val
     }
 }
 
+//-------------------------------------------------------------------------
+// CHOOSE TYPE OF DISCRETENNES DISPLAYING DEBUG (s/ms/us)
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::on_cmbBx_wvfrm_vwr_dscrtnss_tm_tp_currentIndexChanged(int index) {
     if(ui_initialized && language_changed) {
         if(standalone) {
@@ -128,22 +155,37 @@ void Waveform_Viewer_Widget::on_cmbBx_wvfrm_vwr_dscrtnss_tm_tp_currentIndexChang
     }
 }
 
+//-------------------------------------------------------------------------
+// PUSH BUTTON 'CHANGE SETTINGS' CLICKED
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::on_pshBttn_chng_sttngs_clicked() {
     select_diagram_settings();
 }
 
+//-------------------------------------------------------------------------
+// PUSH BUTTON 'FULL SCALE' CLICKED
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::on_pshBttn_fl_scl_clicked() {
     re_scale_graph();
 }
 
+//-------------------------------------------------------------------------
+// PUSH BUTTON 'CLEAR' CLICKED
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::on_pshBttn_clr_clicked() {
     remove_all_data();
 }
 
+//-------------------------------------------------------------------------
+// PUSH BUTTON 'SELECT DISPLAYABLE PINS' CLICKED
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::on_pshBttn_slct_dsplbl_pins_clicked() {
     select_displayable_pins();
 }
 
+//-------------------------------------------------------------------------
+// PUSH BUTTON 'MEASUREMENT' TOGGLED
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::on_pshBttn_msr_toggled(bool checked) {
     measure = checked;
     ui->pshBttn_clr->setEnabled(!measure);
@@ -152,6 +194,9 @@ void Waveform_Viewer_Widget::on_pshBttn_msr_toggled(bool checked) {
     ui->pshBttn_slct_dsplbl_pins->setEnabled(!measure);
 }
 
+//-------------------------------------------------------------------------
+// PUSH BUTTON 'OPEN/SAVE WAVEFORM' CLICKED
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::on_pshBttn_open_save_wvfrm_clicked() {
     if(standalone) {
         load_waveform();
@@ -160,14 +205,23 @@ void Waveform_Viewer_Widget::on_pshBttn_open_save_wvfrm_clicked() {
     }
 }
 
+//-------------------------------------------------------------------------
+// SET ENABLE/DISABLE PUSH BUTTON 'SELECT DISPLAYABLE PINS'
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::pshBttn_slct_dsplbl_pins_set_enabled(bool flg) {
     ui->pshBttn_slct_dsplbl_pins->setEnabled(flg);
 }
 
+//-------------------------------------------------------------------------
+// SET ENABLE/DISABLE PUSH BUTTON 'OPEN/SAVE WAVEFORM'
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::pshBttn_open_save_wvfrm_set_enabled(bool flg) {
     ui->pshBttn_open_save_wvfrm->setEnabled(flg);
 }
 
+//-------------------------------------------------------------------------
+// INITIALIZING OF UI COMPONENTS
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::initialize_ui() {
     ui->diagram->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom/* | QCP::iSelectPlottables*//* | QCP::iSelectAxes*/);     //iSelectAxes
     ui->diagram->addLayer("layerCursor", 0, QCustomPlot::limAbove);
@@ -195,6 +249,9 @@ void Waveform_Viewer_Widget::initialize_ui() {
     post_initialize_ui();
 }
 
+//-------------------------------------------------------------------------
+// POST-INITIALIZING OF UI COMPONENTS
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::post_initialize_ui() {
     set_ui_text();
     QList<QString> params_lst = QList<QString>({"WVFRM_VWR_ATTCH_CRSR", "WVFRM_VWR_DISCRETENESS_TIME", "WVFRM_VWR_DISCRETENESS_TIME_TYPE"});
@@ -217,6 +274,9 @@ void Waveform_Viewer_Widget::post_initialize_ui() {
     ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->setCurrentIndex(gen_widg->get_setting(params_lst.at(2)).toInt());
 }
 
+//-------------------------------------------------------------------------
+// UPDATE UI TEXT AFTER CHANGING LANGUAGE OF APPLICATION
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::set_ui_text() {
     language_changed = false;
     this->setWindowTitle(tr("Waveform Viewer"));
@@ -244,6 +304,9 @@ void Waveform_Viewer_Widget::set_measurement_label_text() {
     }
 }
 
+//-------------------------------------------------------------------------
+// CHANGE SETTINGS (COLOR, FONT SIZE) OF DIAGRAM
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::change_settings() {
     QList<QString> params_lst = QList<QString>({"WVFRM_VWR_AXIS_LABELS_COLOR", "WVFRM_VWR_DIAGRAM_GRID_COLOR", "WVFRM_VWR_DIAGRAM_BACKGROUND_COLOR",
                                                 "WVFRM_VWR_SELECTION_COLOR", "WVFRM_VWR_CURSOR_LINE_COLOR", "WVFRM_VWR_CURSOR_TIME_LABEL_BORDER_COLOR",
@@ -311,17 +374,23 @@ void Waveform_Viewer_Widget::change_settings() {
     msr_time->setFont(fnt);
 }
 
+//-------------------------------------------------------------------------
+// CHANGE MARGINS OF WAVEFORM VIEWER COMPONENTS
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::change_margin(int val) {
     ui->horizontalLayout->setContentsMargins(val, 5, val, val);
     ui->horizontalLayout_2->setContentsMargins(val, val, val, 5);
 }
 
+//-------------------------------------------------------------------------
+// LOAD WAVEFORM
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::load_waveform() {
     QWidget *prnt = this;
     if((this->parentWidget() != nullptr) && !as_window) {
         prnt = this->parentWidget();
     }
-    QStringList *lst = gen_widg->load_files(false, false, tr("Choose waveform file"), tr("Waveform (*.wvfrm)"), prnt);
+    QStringList *lst = gen_widg->load_files(prnt, tr("Choose waveform file"), tr("Waveform (*.wvfrm)"), false, false);
     if((lst == nullptr) || (lst->count() == 0)) {
         QPoint pos;
         if(standalone || as_window) {
@@ -410,6 +479,9 @@ void Waveform_Viewer_Widget::load_waveform() {
     re_scale_graph();
 }
 
+//-------------------------------------------------------------------------
+// SAVE WAVEFORM
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::save_waveform() {
     if(svd_dbg_time->count() != 0) {
         int cnt = svd_dbg_time->count();
@@ -459,6 +531,9 @@ void Waveform_Viewer_Widget::save_waveform() {
     }
 }
 
+//-------------------------------------------------------------------------
+// ADDING GRAPHS ON PLOT
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::add_graphs_to_plot() {
     for(int i = 0; i < graph_count; i++) {
         graph_list->append(ui->diagram->addGraph());
@@ -470,10 +545,16 @@ void Waveform_Viewer_Widget::add_graphs_to_plot() {
     change_pin_names();
 }
 
+//-------------------------------------------------------------------------
+// GETTING LIST OF GRAPHS
+//-------------------------------------------------------------------------
 QList<QCPGraph *>* Waveform_Viewer_Widget::get_graphs_list() {
     return graph_list;
 }
 
+//-------------------------------------------------------------------------
+// REMOVING GRAPHS FROM PLOT
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::remove_graphs_from_plot() {
     graph_list->clear();
     graph_count = 0;
@@ -483,6 +564,9 @@ void Waveform_Viewer_Widget::remove_graphs_from_plot() {
     }
 }
 
+//-------------------------------------------------------------------------
+// RESCALING GRAPHS
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::re_scale_graph() {
     ui->diagram->xAxis->rescale();
     ui->diagram->yAxis->rescale();
@@ -495,6 +579,9 @@ void Waveform_Viewer_Widget::re_scale_graph() {
     ui->diagram->setProperty("ymax", ui->diagram->yAxis->range().upper);
 }
 
+//-------------------------------------------------------------------------
+// ADDING DATA ON GRAPHS
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::add_data_to_graph(QList<int> val, QList<int> *prev_vals, double time, bool val_changed) {
     for(int i = 0; i < pin_names_board->count() * 2; i++) {
         if((i < graph_list->count()) && debug_show) {
@@ -514,11 +601,17 @@ void Waveform_Viewer_Widget::add_data_to_graph(QList<int> val, QList<int> *prev_
     }
 }
 
+//-------------------------------------------------------------------------
+// ADDING DATA AND UPDATING GRAPHS
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::add_data_to_graph_rltm(QList<int> val, QList<int> *prev_vals, double time, bool val_changed) {
     add_data_to_graph(val, prev_vals, time, val_changed);
     ui->diagram->replot();
 }
 
+//-------------------------------------------------------------------------
+// REMOVING DATA FROM GRAPHS
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::remove_data_from_graph() {
     for(int i = 0; i < graph_list->count(); i++) {
         graph_list->at(i)->data().data()->clear();
@@ -528,24 +621,39 @@ void Waveform_Viewer_Widget::remove_data_from_graph() {
     re_scale_graph();
 }
 
+//-------------------------------------------------------------------------
+// ADDING PINS NAMES ON GRAPHS
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::add_pin_names(QString pin_name) {
     pin_names->append(pin_name);
     pin_names_board->append(pin_name);
 }
 
+//-------------------------------------------------------------------------
+// GETTING PINS NAMES
+//-------------------------------------------------------------------------
 QList<QString>* Waveform_Viewer_Widget::get_pin_names() {
     return pin_names_board;
 }
 
+//-------------------------------------------------------------------------
+// GETTING COUNT OF ALL PINS (DISPLAYABLE AND NOT DISPLAYABLE)
+//-------------------------------------------------------------------------
 int Waveform_Viewer_Widget::get_all_pins_count() {
     return pin_names_board->count();
 }
 
+//-------------------------------------------------------------------------
+// REMOVING PINS NAMES FROM GRAPHS
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::remove_pin_names() {
     pin_names->clear();
     pin_names_board->clear();
 }
 
+//-------------------------------------------------------------------------
+// CHANGING PINS NAMES ON GRAPHS
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::change_pin_names() {
     (*textTicker)->clear();
     ui->diagram->yAxis->ticker().clear();
@@ -570,6 +678,9 @@ void Waveform_Viewer_Widget::change_pin_names() {
     ui->diagram->yAxis->setTicker(*textTicker);
 }
 
+//-------------------------------------------------------------------------
+// ADDING LISTS FOR SAVED VALS
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::add_saved_vals_list(int cnt) {
     for(int i = 0; i < cnt; i++) {
         QList<int> *val = new QList<int>();
@@ -578,6 +689,9 @@ void Waveform_Viewer_Widget::add_saved_vals_list(int cnt) {
     }
 }
 
+//-------------------------------------------------------------------------
+// REMOVING LISTS FOR SAVED VALUES
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::remove_saved_vals_list() {
     while(svd_vals->count() != 0) {
         delete svd_vals->at(0);
@@ -585,6 +699,9 @@ void Waveform_Viewer_Widget::remove_saved_vals_list() {
     }
 }
 
+//-------------------------------------------------------------------------
+// ADDING SAVED VALUES IN LISTS
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::add_data_to_saved_vals_list(QList<int> val, QList<int> *prev_vals, double time, bool val_changed) {
     svd_dbg_time->append(time);
     if(val_changed) {
@@ -598,6 +715,9 @@ void Waveform_Viewer_Widget::add_data_to_saved_vals_list(QList<int> val, QList<i
     }
 }
 
+//-------------------------------------------------------------------------
+// REMOVING SAVED VALUES FROM LISTS
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::remove_data_from_saved_vals_list() {
     for(int i = 0; i < svd_vals->count(); i++) {
         svd_vals->at(i)->clear();
@@ -624,6 +744,9 @@ void Waveform_Viewer_Widget::remove_all_data() {
     re_scale_graph();
 }
 
+//-------------------------------------------------------------------------
+// 'CHANGE SETTINGS' DIALOG CALLING
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::select_diagram_settings() {
     QList<QString> sttngs_lst;
     sttngs_lst.clear();
@@ -666,6 +789,9 @@ void Waveform_Viewer_Widget::select_diagram_settings() {
     }
 }
 
+//-------------------------------------------------------------------------
+// 'SELECT DISPLAYABLE PINS' DIALOG CALLING
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::select_displayable_pins() {
     QStringList avlbl_pins, dsplbl_pins;
     avlbl_pins.append(*pin_names_board);
@@ -757,6 +883,9 @@ void Waveform_Viewer_Widget::select_displayable_pins() {
     }
 }
 
+//-------------------------------------------------------------------------
+// RESTORE SAVED VALUES ON DIAGRAM
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::draw_from_saved_vals(int val) {
     QList<int> prev_vals;
     prev_vals.clear();
@@ -794,12 +923,18 @@ void Waveform_Viewer_Widget::draw_from_saved_vals(int val) {
     ui->diagram->replot();
 }
 
+//-------------------------------------------------------------------------
+// DRAW LINE ON DIAGRAM
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::draw_line(QCPItemLine *line, double x_start, double x_end, double y_start, double y_end) {
     line->start->setCoords(x_start, y_start);
     line->end->setCoords(x_end, y_end);
     line->setVisible(true);
 }
 
+//-------------------------------------------------------------------------
+// RESET MEASUREMENT DATA
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::reset_measurement_data() {
     count_of_press = 0;
     frst_msr_line->setVisible(false);
@@ -808,6 +943,9 @@ void Waveform_Viewer_Widget::reset_measurement_data() {
     msr_time->setVisible(false);
 }
 
+//-------------------------------------------------------------------------
+// LIMIT RANGE OF 'X' AND 'Y' AXISES
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::limit_axis_range(QCPAxis *axis, const QCPRange &new_range, const QCPRange &limit_range) {
     auto lower_bound = limit_range.lower;
     auto upper_bound = limit_range.upper;
@@ -829,6 +967,9 @@ void Waveform_Viewer_Widget::limit_axis_range(QCPAxis *axis, const QCPRange &new
     }
 }
 
+//-------------------------------------------------------------------------
+// CHECK MOUSE POSITION
+//-------------------------------------------------------------------------
 bool Waveform_Viewer_Widget::mouse_inside_object(double x_coord, double y_coord, bool graph_drawing_rect) {
     double top = ui->diagram->yAxis->pixelToCoord(ui->diagram->yAxis->axisRect()->top());
     double bottom = ui->diagram->yAxis->pixelToCoord(ui->diagram->yAxis->axisRect()->bottom());
@@ -849,6 +990,9 @@ bool Waveform_Viewer_Widget::mouse_inside_object(double x_coord, double y_coord,
     }
 }
 
+//-------------------------------------------------------------------------
+// HANDLER OF MOUSE MOVING INSIDE DIAGRAM
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::slot_mouse_move(QMouseEvent *event) {
     double x_coord = ui->diagram->xAxis->pixelToCoord(event->pos().x());
     double y_coord = ui->diagram->yAxis->pixelToCoord(event->pos().y());
@@ -960,6 +1104,9 @@ void Waveform_Viewer_Widget::slot_mouse_move(QMouseEvent *event) {
     }
 }
 
+//-------------------------------------------------------------------------
+// HANDLER OF MOUSE PRESSED INSIDE DIAGRAM
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::slot_mouse_pressed(QMouseEvent *event) {
     if(this->cursor().shape() == Qt::OpenHandCursor) {
         qApp->setOverrideCursor(QCursor(Qt::ClosedHandCursor));
@@ -1012,6 +1159,9 @@ void Waveform_Viewer_Widget::slot_mouse_pressed(QMouseEvent *event) {
     }
 }
 
+//-------------------------------------------------------------------------
+// HANDLER OF MOUSE RELEASED INSIDE DIAGRAM
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::slot_mouse_unpressed(QMouseEvent *event) {
     if(this->cursor().shape() == Qt::ClosedHandCursor) {
         qApp->setOverrideCursor(QCursor(Qt::OpenHandCursor));
@@ -1025,6 +1175,9 @@ void Waveform_Viewer_Widget::slot_mouse_unpressed(QMouseEvent *event) {
     }
 }
 
+//-------------------------------------------------------------------------
+// CHANGING RANGES OF 'X' AXIS
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::slot_x_axis_changed(const QCPRange &new_range) {
     if(!plot_re_scale) {
         QCPAxis *axis = qobject_cast<QCPAxis *>(QObject::sender());
@@ -1034,6 +1187,9 @@ void Waveform_Viewer_Widget::slot_x_axis_changed(const QCPRange &new_range) {
     }
 }
 
+//-------------------------------------------------------------------------
+// CHANGING RANGES OF 'Y' AXIS
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::slot_y_axis_changed(const QCPRange &new_range) {
     if(!plot_re_scale) {
         QCPAxis *axis = qobject_cast<QCPAxis *>(QObject::sender());
@@ -1043,6 +1199,9 @@ void Waveform_Viewer_Widget::slot_y_axis_changed(const QCPRange &new_range) {
     }
 }
 
+//-------------------------------------------------------------------------
+// RETRANSLATING UI ON WAVEFORM VIEWER WIDGET
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::slot_re_translate() {
     ui->retranslateUi(this);
     set_ui_text();
@@ -1077,22 +1236,37 @@ Dialog_Select_Displayable_Pins::~Dialog_Select_Displayable_Pins() {
     delete ui;
 }
 
+//-------------------------------------------------------------------------
+// PUSH BUTTON 'OK' CLICKED
+//-------------------------------------------------------------------------
 void Dialog_Select_Displayable_Pins::on_pshBttn_ok_clicked() {
     QDialog::done(1);
 }
 
+//-------------------------------------------------------------------------
+// PUSH BUTTON 'CANCEL' CLICKED
+//-------------------------------------------------------------------------
 void Dialog_Select_Displayable_Pins::on_pshBttn_cncl_clicked() {
     QDialog::done(0);
 }
 
+//-------------------------------------------------------------------------
+// PUSH BUTTON 'SET PIN DISPLAYABLE' CLICKED
+//-------------------------------------------------------------------------
 void Dialog_Select_Displayable_Pins::on_pshBttn_add_clicked() {
     replace_selected_pin(displayable_pins_model, available_pins_model, ui->lstVw_dspbl_pins, ui->lstVw_avlbl_pins, ui->pshBttn_add);
 }
 
+//-------------------------------------------------------------------------
+// PUSH BUTTON 'SET PIN NON-DISPLAYABLE' CLICKED
+//-------------------------------------------------------------------------
 void Dialog_Select_Displayable_Pins::on_pshBttn_dlt_clicked() {
     replace_selected_pin(available_pins_model, displayable_pins_model, ui->lstVw_avlbl_pins, ui->lstVw_dspbl_pins, ui->pshBttn_dlt);
 }
 
+//-------------------------------------------------------------------------
+// CHANGE STATE OF SELECTED PIN
+//-------------------------------------------------------------------------
 void Dialog_Select_Displayable_Pins::replace_selected_pin(QStringListModel *recv_model, QStringListModel *sndr_model, QListView *recv_view, QListView *sndr_view, QPushButton *sndr_button) {
     QStringList lst = recv_model->stringList();
     lst.append(sndr_model->stringList().at(sndr_view->currentIndex().row()));
@@ -1105,12 +1279,18 @@ void Dialog_Select_Displayable_Pins::replace_selected_pin(QStringListModel *recv
     }
 }
 
+//-------------------------------------------------------------------------
+// SELECTION CHANGED IN LIST WITH DISPLAYABLE PINS
+//-------------------------------------------------------------------------
 void Dialog_Select_Displayable_Pins::displayable_pins_selection_changed(const QItemSelection &sel) {
     Q_UNUSED(sel);
     ui->pshBttn_dlt->setEnabled(true);
     ui->lstVw_avlbl_pins->selectionModel()->clearSelection();
 }
 
+//-------------------------------------------------------------------------
+// SELECTION CHANGED IN LIST WITH NON-DISPLAYABLE PINS
+//-------------------------------------------------------------------------
 void Dialog_Select_Displayable_Pins::available_pins_selection_changed(const QItemSelection &sel) {
     if(sel.indexes().count() > 0) {
         QModelIndex index = sel.indexes().first();
@@ -1127,10 +1307,16 @@ void Dialog_Select_Displayable_Pins::available_pins_selection_changed(const QIte
     }
 }
 
+//-------------------------------------------------------------------------
+// GETTING LIST WITH DISPLAYABLE PINS
+//-------------------------------------------------------------------------
 QStringList Dialog_Select_Displayable_Pins::get_displayable_pins() {
     return displayable_pins_model->stringList();
 }
 
+//-------------------------------------------------------------------------
+// GETTING LIST WITH NON-DISPLAYABLE PINS
+//-------------------------------------------------------------------------
 QStringList Dialog_Select_Displayable_Pins::get_available_pins() {
     return available_pins_model->stringList();
 }
@@ -1163,54 +1349,93 @@ Dialog_Select_Diagram_Settings::~Dialog_Select_Diagram_Settings() {
     delete ui;
 }
 
+//-------------------------------------------------------------------------
+// CHANGE COLOR OF AXIS LABELS
+//-------------------------------------------------------------------------
 void Dialog_Select_Diagram_Settings::on_pshBttn_axs_lbls_clr_clicked() {
     change_color(0);
 }
 
+//-------------------------------------------------------------------------
+// CHANGE COLOR OF DIAGRAM GRID
+//-------------------------------------------------------------------------
 void Dialog_Select_Diagram_Settings::on_pshBttn_dgrm_grd_clr_clicked() {
     change_color(1);
 }
 
+//-------------------------------------------------------------------------
+// CHANGE COLOR OF DIAGRAM BACKGROUND
+//-------------------------------------------------------------------------
 void Dialog_Select_Diagram_Settings::on_pshBttn_dgrm_bckgrnd_clr_clicked() {
     change_color(2);
 }
 
+//-------------------------------------------------------------------------
+// CHANGE COLOR OF SELECTION AREA
+//-------------------------------------------------------------------------
 void Dialog_Select_Diagram_Settings::on_pshBttn_slctn_clr_clicked() {
     change_color(3);
 }
 
+//-------------------------------------------------------------------------
+// CHANGE COLOR OF CURSOR/MEASUREMENT LINE
+//-------------------------------------------------------------------------
 void Dialog_Select_Diagram_Settings::on_pshBttn_crsr_ln_clr_clicked() {
     change_color(4);
 }
 
+//-------------------------------------------------------------------------
+// CHANGE COLOR OF CURSOR/MEASUREMENT TIME'S LABEL BORDER
+//-------------------------------------------------------------------------
 void Dialog_Select_Diagram_Settings::on_pshBttn_crsr_tm_lbl_brdr_clr_clicked() {
     change_color(5);
 }
 
+//-------------------------------------------------------------------------
+// CHANGE COLOR OF CURSOR/MEASUREMENT TIME'S LABEL FILLED AREA
+//-------------------------------------------------------------------------
 void Dialog_Select_Diagram_Settings::on_pshBttn_crsr_tm_lbl_fll_clr_clicked() {
     change_color(6);
 }
 
+//-------------------------------------------------------------------------
+// CHANGE COLOR OF DIAGRAM GRAPHS
+//-------------------------------------------------------------------------
 void Dialog_Select_Diagram_Settings::on_pshBttn_grph_clr_clicked() {
     change_color(7);
 }
 
+//-------------------------------------------------------------------------
+// CHANGE FONT SIZE FOR AXIS LABELS
+//-------------------------------------------------------------------------
 void Dialog_Select_Diagram_Settings::on_spnBx_axs_lbls_fnr_sz_valueChanged(int value) {
     sttngs_lst.replace(8, QString::number(value));
 }
 
+//-------------------------------------------------------------------------
+// PUSH BUTTON 'OK' CLICKED
+//-------------------------------------------------------------------------
 void Dialog_Select_Diagram_Settings::on_pshBttn_ok_clicked() {
     QDialog::done(1);
 }
 
+//-------------------------------------------------------------------------
+// PUSH BUTTON 'CANCEL' CLICKED
+//-------------------------------------------------------------------------
 void Dialog_Select_Diagram_Settings::on_pshBttn_cncl_clicked() {
     QDialog::done(0);
 }
 
+//-------------------------------------------------------------------------
+// GETTING LIST WITH DIAGRAM SETTINGS
+//-------------------------------------------------------------------------
 QList<QString> Dialog_Select_Diagram_Settings::get_diagram_settings() {
     return sttngs_lst;
 }
 
+//-------------------------------------------------------------------------
+// CHANGING COLOR FOR CERTAIN PART OF DIAGRAM
+//-------------------------------------------------------------------------
 void Dialog_Select_Diagram_Settings::change_color(int value) {
     QColorDialog dlg(this);
     dlg.setOption(QColorDialog::DontUseNativeDialog, true);

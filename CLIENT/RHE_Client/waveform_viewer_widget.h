@@ -23,16 +23,46 @@
             QList<QCPGraph *>* get_graphs_list();
             void remove_graphs_from_plot();
             void re_scale_graph();
+
+            /*
+             * QList<int> val - list with actual debug values
+             * QList<int> *prev_vals - list with previous debug values
+             * double time - time for actual values
+             * bool val_changed - flag which indicates, that at least 1 actual value in list changed relative to previous
+             */
             void add_data_to_graph(QList<int> val, QList<int> *prev_vals, double time, bool val_changed);
+
+            /*
+             * QList<int> val - list with actual debug values
+             * QList<int> *prev_vals - list with previous debug values
+             * double time - time for actual values
+             * bool val_changed - flag which indicates, that at least 1 actual value in list changed relative to previous
+             */
             void add_data_to_graph_rltm(QList<int> val, QList<int> *prev_vals, double time, bool val_changed);
+
             void remove_data_from_graph();
+
+            /*
+             * QString pin_name - name of pin, which added on diagram
+             */
             void add_pin_names(QString pin_name);
             QList<QString>* get_pin_names();
             int get_all_pins_count();
             void remove_pin_names();
             void change_pin_names();
+
+            /*
+             * int cnt - count of list, in which values be saved
+             */
             void add_saved_vals_list(int cnt);
             void remove_saved_vals_list();
+
+            /*
+             * QList<int> val - list with actual debug values
+             * QList<int> *prev_vals - list with previous debug values
+             * double time - time for actual values
+             * bool val_changed - flag which indicates, that at least 1 actual value in list changed relative to previous
+             */
             void add_data_to_saved_vals_list(QList<int> val, QList<int> *prev_vals, double time, bool val_changed);
             void remove_data_from_saved_vals_list();
             void remove_all_data();
@@ -51,15 +81,43 @@
             void set_ui_text();
             void set_measurement_label_text();
             void change_settings();
+
+            /*
+             * int val - value of margin for certain UI components
+             */
             void change_margin(int val);
             void load_waveform();
             void save_waveform();
             void select_diagram_settings();
             void select_displayable_pins();
+
+            /*
+             * int val - count of saved list, which be restored
+             */
             void draw_from_saved_vals(int val);
+
+            /*
+             * QCPItemLine *line - pointer to object-line
+             * double x_start - x coordinate of line start
+             * double x_end - x coordinate of line end
+             * double y_start - y coordinate of line start
+             * double y_end - y coordinate of line end
+             */
             void draw_line(QCPItemLine *line, double x_start, double x_end, double y_start, double y_end);
             void reset_measurement_data();
+
+            /*
+             * QCPItemLine *axis - pointer to object-axis
+             * const QCPRange &new_range - link to new axis range
+             * const QCPRange &limit_range - link to current axis range
+             */
             void limit_axis_range(QCPAxis *axis, const QCPRange &new_range, const QCPRange &limit_range);
+
+            /*
+             * double x_coord - x coordinate of mouse pointer
+             * double y_coord - x coordinate of mouse pointer
+             * bool graph_drawing_rect - flag which indicates, that position check of mouse pointer be relative to diagram rect
+             */
             bool mouse_inside_object(double x_coord, double y_coord, bool graph_drawing_rect);
 
             Ui::Waveform_Viewer *ui;
@@ -143,6 +201,13 @@
             QStringList get_available_pins();
 
         private:
+            /*
+             * QStringListModel *recv_model - pointer to model, which receive the selected pin
+             * QStringListModel *sndr_model - pointer to model, which send the selected pin
+             * QListView *recv_view - pointer to list-view, in which receive pin be shown
+             * QListView *sndr_view - pointer to list-view, in which sended pin shown
+             * QPushButton *sndr_button - pointer to button, which answer for sending pin
+             */
             void replace_selected_pin(QStringListModel *recv_model, QStringListModel *sndr_model, QListView *recv_view, QListView *sndr_view, QPushButton *sndr_button);
 
             Ui::Dialog_Select_Displayable_Pins *ui;

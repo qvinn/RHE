@@ -3298,7 +3298,7 @@ QPushButton:hover{
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="pshBttn_ld_frmwr">
+     <widget class="QPushButton" name="pshBttn_chs_frmwr">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
         <horstretch>0</horstretch>

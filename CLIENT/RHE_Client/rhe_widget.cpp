@@ -67,18 +67,24 @@ RHE_Widget::~RHE_Widget() {
     delete ui;
 }
 
+//-------------------------------------------------------------------------
+// DISPLAYING OF RHE WIDGET
+//-------------------------------------------------------------------------
 void RHE_Widget::showEvent(QShowEvent *) {
     paintEvent(nullptr);
     resizeEvent(nullptr);
 }
 
+//-------------------------------------------------------------------------
+// PAINTING OF POWER-LED EMITATION ON BOARD PICTURE
+//-------------------------------------------------------------------------
 void RHE_Widget::paintEvent(QPaintEvent *) {
     if(!pixmp_brd.isNull() && !clr_trnsprnt) {
         QPainter painter(&pixmp_brd);
         QRect rectangle(led_x_y->at(ui->cmbBx_chs_brd->currentIndex()).x(), led_x_y->at(ui->cmbBx_chs_brd->currentIndex()).y(), led_width_height->at(ui->cmbBx_chs_brd->currentIndex()).x(), led_width_height->at(ui->cmbBx_chs_brd->currentIndex()).y());
         QColor clr;
         if(!board_is_on) {
-            clr.setNamedColor("#00DEFDEF"); //00-Alpha DE-Red FD-Green EF-Blue
+            clr.setNamedColor("#00DEFDEF");     //00-Alpha DE-Red FD-Green EF-Blue
         } else {
             clr.setNamedColor(led_colors->at(ui->cmbBx_chs_brd->currentIndex()));
         }
@@ -93,6 +99,9 @@ void RHE_Widget::paintEvent(QPaintEvent *) {
     }
 }
 
+//-------------------------------------------------------------------------
+// RESIZING OF RHE WIDGET
+//-------------------------------------------------------------------------
 void RHE_Widget::resizeEvent(QResizeEvent *) {
     ui->horizontalLayoutWidget->setGeometry(0, (this->height() - ui->horizontalLayoutWidget->height()), this->width(), ui->horizontalLayoutWidget->height());
     ui->line_horizontal->setGeometry(0, (ui->horizontalLayoutWidget->y() - 1), this->width(), ui->line_horizontal->geometry().height());
@@ -106,7 +115,7 @@ void RHE_Widget::resizeEvent(QResizeEvent *) {
     ui->scrollArea->adjustSize();
     ui->scrollArea->setMinimumSize(ui->scrollArea->width(), (ui->scrollAreaWidgetContents->height() + 2));
     if(!wvfrm_vwr->as_window) {
-        int val = static_cast<int>(!((pixmp_names->count() == 0) || (pixmp_names->at(ui->cmbBx_chs_brd->currentIndex()).count() == 0) || pixmp_brd.isNull()));
+        int val = static_cast<int>(!((pixmp_names->count() == 0) || (pixmp_names->at(ui->cmbBx_chs_brd->currentIndex()).count() == 0) || pixmp_brd.isNull()));      //USING HACK - CONVERTATION 'BOOL -> INT' TO AVOID UNNECESSARY 'IF...ELSE'
         ui->verticalLayout_3->contentsMargins().setTop(5 * val);
         ui->verticalLayout_3->contentsMargins().setBottom(7 * val);
         ui->label->setSizePolicy(QSizePolicy::Expanding, static_cast<QSizePolicy::Policy>(7 * val));
@@ -118,6 +127,9 @@ void RHE_Widget::resizeEvent(QResizeEvent *) {
     }
 }
 
+//-------------------------------------------------------------------------
+// PUSH BUTTON 'START DEBUG' CLICKED
+//-------------------------------------------------------------------------
 void RHE_Widget::on_pshBttn_strt_dbg_clicked() {
     set_enable_board_power_led(true);
     wvfrm_vwr->remove_all_data();
@@ -152,6 +164,9 @@ void RHE_Widget::on_pshBttn_strt_dbg_clicked() {
     }
 }
 
+//-------------------------------------------------------------------------
+// PUSH BUTTON 'STOP DEBUG' CLICKED
+//-------------------------------------------------------------------------
 void RHE_Widget::on_pshBttn_stp_dbg_clicked() {
     crrnt_state_strs = 5;
     ui->prgrssBr_fl_sts->setFormat(state_strs.at(crrnt_state_strs));
@@ -160,6 +175,9 @@ void RHE_Widget::on_pshBttn_stp_dbg_clicked() {
     slot_end_sequence_of_signals();
 }
 
+//-------------------------------------------------------------------------
+// CHECK BOX 'START DEBUG AFTER FPGA FLASHING' CHECKED
+//-------------------------------------------------------------------------
 void RHE_Widget::on_chckBx_strt_dbg_aftr_flsh_stateChanged(int state) {
     if(ui_initialized) {
         gen_widg->save_setting("settings/START_DEBUG_AFTER_FPGA_FLASHING", state);
@@ -167,8 +185,11 @@ void RHE_Widget::on_chckBx_strt_dbg_aftr_flsh_stateChanged(int state) {
     }
 }
 
+//-------------------------------------------------------------------------
+// PUSH BUTTON 'CHOOSE SEQUENCE OF SIGNALS FILE' CLICKED
+//-------------------------------------------------------------------------
 void RHE_Widget::on_pshBttn_chs_sgnls_sqnc_clicked() {
-    QString str = gen_widg->load_file_path(tr("Choose csv-file with sequence of signals"), tr("Comma-Separated Values files (*.csv)"), this);
+    QString str = gen_widg->load_file_path(this, tr("Choose csv-file with sequence of signals"), tr("Comma-Separated Values files (*.csv)"));
     if(str.length() != 0) {
         csv_file->setFileName(str);
         ui->pshBttn_snd_sgnls_sqnc->setEnabled(true);
@@ -178,6 +199,9 @@ void RHE_Widget::on_pshBttn_chs_sgnls_sqnc_clicked() {
     }
 }
 
+//-------------------------------------------------------------------------
+// PUSH BUTTON 'SEND SEQUENCE OF SIGNALS FILE' CLICKED
+//-------------------------------------------------------------------------
 void RHE_Widget::on_pshBttn_snd_sgnls_sqnc_clicked() {
     if(csv_file->open(QIODevice::ReadOnly)) {
         snd_rcv_module->send_file_to_ss(csv_file->readAll(), CLIENT_START_SEND_DSQ_FILE, CLIENT_SENDING_DSQ_FILE, CLIENT_FINISH_SEND_DSQ_FILE);
@@ -185,6 +209,9 @@ void RHE_Widget::on_pshBttn_snd_sgnls_sqnc_clicked() {
     }
 }
 
+//-------------------------------------------------------------------------
+// PUSH BUTTON 'START SEQUENCE OF SIGNALS' CLICKED
+//-------------------------------------------------------------------------
 void RHE_Widget::on_pshBttn_strt_sgnls_sqnc_clicked() {
     if(dgb_strtd) {
         sqnc_of_sgnls_strtd = true;
@@ -195,6 +222,9 @@ void RHE_Widget::on_pshBttn_strt_sgnls_sqnc_clicked() {
     }
 }
 
+//-------------------------------------------------------------------------
+// CHECK BOX 'START SEQUENCE WITH DEBUG' CHECKED
+//-------------------------------------------------------------------------
 void RHE_Widget::on_chckBx_strt_sqnc_of_sgn_with_dbg_stateChanged(int state) {
     if(ui_initialized) {
         gen_widg->save_setting("settings/START_SEQUENCE_OF_SIGNALS_WITH_DEBUG", state);
@@ -202,6 +232,9 @@ void RHE_Widget::on_chckBx_strt_sqnc_of_sgn_with_dbg_stateChanged(int state) {
     }
 }
 
+//-------------------------------------------------------------------------
+// CHOOSE BOARD
+//-------------------------------------------------------------------------
 void RHE_Widget::on_cmbBx_chs_brd_currentIndexChanged(int index) {
     if(ui_initialized && (index != -1)) {
         gen_widg->save_setting("settings/CURRENT_BOARD", index);
@@ -209,21 +242,30 @@ void RHE_Widget::on_cmbBx_chs_brd_currentIndexChanged(int index) {
     }
 }
 
+//-------------------------------------------------------------------------
+// CHOOSE VALUE OF DISCRETENNES DEBUG TIME
+//-------------------------------------------------------------------------
 void RHE_Widget::on_spnBx_dbg_tm_valueChanged(int value) {
     if(ui_initialized) {
         gen_widg->save_setting("settings/DEBUG_DISCRETENESS_TIME", value);
     }
 }
 
+//-------------------------------------------------------------------------
+// CHOOSE TYPE OF DISCRETENNES DEBUG TIME (s/ms (previously us))
+//-------------------------------------------------------------------------
 void RHE_Widget::on_cmbBx_dbg_tm_tp_currentIndexChanged(int index) {
     if(ui_initialized && language_changed) {
         gen_widg->save_setting("settings/DEBUG_DISCRETENESS_TIME_TYPE", index);
-        ui->spnBx_dbg_tm->setMinimum(pow(10, index));
+        ui->spnBx_dbg_tm->setMinimum(pow(50, index));                               //50 ms - minimum debug dicreteness time value
     }
 }
 
+//-------------------------------------------------------------------------
+// PUSH BUTTON 'CHOOSE PROJECT DIRECTORY' CLICKED
+//-------------------------------------------------------------------------
 void RHE_Widget::on_pshBttn_set_path_to_proj_clicked() {
-    QStringList *lst = gen_widg->load_files(false, true, "", "", this);
+    QStringList *lst = gen_widg->load_files(this, "", "", false, true);
     if(lst == nullptr) {
         return;
     }
@@ -233,12 +275,18 @@ void RHE_Widget::on_pshBttn_set_path_to_proj_clicked() {
     path_exist = qpf_exist;
 }
 
+//-------------------------------------------------------------------------
+// PUSH BUTTON 'CHECK PROJECT STATE' CLICKED
+//-------------------------------------------------------------------------
 void RHE_Widget::on_pshBttn_chk_prj_stat_clicked() {
     check_is_proj_folder(path_exist);
 }
 
-void RHE_Widget::on_pshBttn_ld_frmwr_clicked() {
-    QString str = gen_widg->load_file_path(tr("Choose svf-file with firmware"), tr("Serial Vector Format files (*.svf)"), this);
+//-------------------------------------------------------------------------
+// PUSH BUTTON 'CHOOSE FIRMWARE' CLICKED
+//-------------------------------------------------------------------------
+void RHE_Widget::on_pshBttn_chs_frmwr_clicked() {
+    QString str = gen_widg->load_file_path(this, tr("Choose svf-file with firmware"), tr("Serial Vector Format files (*.svf)"));
     if(str.length() != 0) {
         if(!gen_widg->get_setting("settings/ENABLE_FILE_CHEKING").toBool()) {
             QRegExp tag_exp_path("/");
@@ -256,6 +304,9 @@ void RHE_Widget::on_pshBttn_ld_frmwr_clicked() {
     }
 }
 
+//-------------------------------------------------------------------------
+// PUSH BUTTON 'SEND FIRMWARE' CLICKED
+//-------------------------------------------------------------------------
 void RHE_Widget::on_pshBttn_snd_frmwr_clicked() {
     if(!svf_exist) {
         gen_widg->show_message_box("", tr("svf-file not generated"), 0, gen_widg->get_position());
@@ -271,44 +322,74 @@ void RHE_Widget::on_pshBttn_snd_frmwr_clicked() {
     }
 }
 
+//-------------------------------------------------------------------------
+// CHANGE VISIBILITY OF PUSH BUTTON 'CHOOSE PROJECT DIRECTORY'
+//-------------------------------------------------------------------------
 void RHE_Widget::pshBttn_set_path_to_proj_set_visible(bool flag) {
     ui->pshBttn_set_path_to_proj->setVisible(flag);
 }
 
+//-------------------------------------------------------------------------
+// CHANGE VISIBILITY OF PUSH BUTTON 'CHECK PROJECT STATE'
+//-------------------------------------------------------------------------
 void RHE_Widget::pshBttn_chk_prj_stat_set_visible(bool flag) {
     ui->pshBttn_chk_prj_stat->setVisible(flag);
 }
 
-void RHE_Widget::pshBttn_ld_frmwr_set_visible(bool flag) {
-    ui->pshBttn_ld_frmwr->setVisible(flag);
+//-------------------------------------------------------------------------
+// CHANGE VISIBILITY OF PUSH BUTTON 'CHOOSE FIRMWARE'
+//-------------------------------------------------------------------------
+void RHE_Widget::pshBttn_chs_frmwr_set_visible(bool flag) {
+    ui->pshBttn_chs_frmwr->setVisible(flag);
 }
 
+//-------------------------------------------------------------------------
+// SET ENABLE/DISABLE PUSH BUTTON 'CHECK PROJECT STATE'
+//-------------------------------------------------------------------------
 void RHE_Widget::pshBttn_chk_prj_stat_set_enabled(bool flag) {
     ui->pshBttn_chk_prj_stat->setEnabled(flag && (static_cast<bool>(path_to_proj->count())));
 }
 
-void RHE_Widget::pshBttn_ld_frmwr_set_enabled(bool flag) {
-    ui->pshBttn_ld_frmwr->setEnabled(flag);
+//-------------------------------------------------------------------------
+// SET ENABLE/DISABLE PUSH BUTTON 'CHOOSE FIRMWARE'
+//-------------------------------------------------------------------------
+void RHE_Widget::pshBttn_chs_frmwr_set_enabled(bool flag) {
+    ui->pshBttn_chs_frmwr->setEnabled(flag);
 }
 
+//-------------------------------------------------------------------------
+// SET ENABLE/DISABLE PUSH BUTTON 'SEND FIRMWARE'
+//-------------------------------------------------------------------------
 void RHE_Widget::pshBttn_snd_frmwr_set_enabled(bool flag) {
     ui->pshBttn_snd_frmwr->setEnabled(flag);
 }
 
+//-------------------------------------------------------------------------
+// SET ENABLE/DISABLE PUSH BUTTON 'START SEQUENCE OF SIGNALS'
+//-------------------------------------------------------------------------
 void RHE_Widget::pshBttn_strt_sgnls_sqnc_set_enabled(bool flag) {
     ui->pshBttn_strt_sgnls_sqnc->setEnabled(flag);
 }
 
+//-------------------------------------------------------------------------
+// SET ENABLE/DISABLE FPGA INPUT SWITCHES
+//-------------------------------------------------------------------------
 void RHE_Widget::scrll_area_sgnls_set_enabled(bool flag) {
     ui->scrollArea->setEnabled(flag);
 }
 
+//-------------------------------------------------------------------------
+// PRE-INITIALIZING OF UI COMPONENTS
+//-------------------------------------------------------------------------
 void RHE_Widget::pre_initialize_ui() {
     wvfrm_vwr->initialize_ui();
     ui->verticalLayout_3->addWidget(wvfrm_vwr);
     initialize_ui();
 }
 
+//-------------------------------------------------------------------------
+// INITIALIZING OF UI COMPONENTS
+//-------------------------------------------------------------------------
 void RHE_Widget::initialize_ui() {
     ui_initialized = false;
     send_file_status->stop();
@@ -325,7 +406,7 @@ void RHE_Widget::initialize_ui() {
     ui->chckBx_strt_sqnc_of_sgn_with_dbg->setCheckState(static_cast<Qt::CheckState>(abs(gen_widg->get_setting("settings/START_SEQUENCE_OF_SIGNALS_WITH_DEBUG").toInt() - 2)));
     ui->cmbBx_chs_brd->setCurrentIndex(abs(gen_widg->get_setting("settings/CURRENT_BOARD").toInt() - 1));
     if(gen_widg->get_setting("settings/MANUALY_LOAD_FIRMWARE").toBool() && gen_widg->get_setting("settings/ENABLE_FILE_CHEKING").toBool()) {
-        pshBttn_ld_frmwr_set_enabled(false);
+        pshBttn_chs_frmwr_set_enabled(false);
     }
     if(ui->cmbBx_chs_brd->count() == 0) {
         if(read_xml_file(false)) {
@@ -338,6 +419,9 @@ void RHE_Widget::initialize_ui() {
     }
 }
 
+//-------------------------------------------------------------------------
+// POST-INITIALIZING OF UI COMPONENTS
+//-------------------------------------------------------------------------
 void RHE_Widget::post_initialize_ui() {
     ui_initialized = true;
     set_ui_text();
@@ -353,6 +437,9 @@ void RHE_Widget::post_initialize_ui() {
     set_enable_board_power_led(false);
 }
 
+//-------------------------------------------------------------------------
+// UPDATE UI TEXT AFTER CHANGING LANGUAGE OF APPLICATION
+//-------------------------------------------------------------------------
 void RHE_Widget::set_ui_text() {
     language_changed = false;
     ui->pshBttn_strt_dbg->setText(tr("Start Debug"));
@@ -374,12 +461,18 @@ void RHE_Widget::set_ui_text() {
     language_changed = true;
 }
 
+//-------------------------------------------------------------------------
+// SET FIRST AND LAST NAMES OF REGISTERED USER
+//-------------------------------------------------------------------------
 void RHE_Widget::set_fname_lname(QString str) {
     lname_fname.clear();
     lname_fname.append(str);
     set_ui_text();
 }
 
+//-------------------------------------------------------------------------
+// CHANGE COUNT OF PINS FOR WAVEFORM VIEWER
+//-------------------------------------------------------------------------
 void RHE_Widget::change_cnt_of_dbg_pins(int value) {
     wvfrm_vwr->plot_re_scale = true;
     prev_vals->clear();
@@ -395,6 +488,9 @@ void RHE_Widget::change_cnt_of_dbg_pins(int value) {
     wvfrm_vwr->re_scale_graph();
 }
 
+//-------------------------------------------------------------------------
+// CHANGE PICTURE OF BOARD
+//-------------------------------------------------------------------------
 void RHE_Widget::change_board_pixmap() {
     if(pixmp_names->count() != 0) {
         if(pixmp_names->at(ui->cmbBx_chs_brd->currentIndex()).count() == 0) {
@@ -421,6 +517,9 @@ void RHE_Widget::change_board_pixmap() {
     }
 }
 
+//-------------------------------------------------------------------------
+// ENABLE/DISABLE OF EMITATION BOARD'S POWER-LED
+//-------------------------------------------------------------------------
 void RHE_Widget::set_enable_board_power_led(bool flg) {
     if((led_x_y->at(ui->cmbBx_chs_brd->currentIndex()).x() != -1) || (led_x_y->at(ui->cmbBx_chs_brd->currentIndex()).y() != -1) || (led_width_height->at(ui->cmbBx_chs_brd->currentIndex()).x() != -1) || (led_width_height->at(ui->cmbBx_chs_brd->currentIndex()).y() != -1) || (led_colors->at(ui->cmbBx_chs_brd->currentIndex()).count() == 9)) {
         board_is_on = flg;
@@ -432,6 +531,9 @@ void RHE_Widget::set_enable_board_power_led(bool flg) {
     }
 }
 
+//-------------------------------------------------------------------------
+// ENABLE/DISABLE OF SOME PUSH BUTTONS ON DEBUG STARTS
+//-------------------------------------------------------------------------
 void RHE_Widget::set_button_state_debug(bool flg) {
     dgb_strtd = flg;
     wvfrm_vwr->debugging = flg;
@@ -442,10 +544,14 @@ void RHE_Widget::set_button_state_debug(bool flg) {
     ui->cmbBx_dbg_tm_tp->setEnabled(!flg);
     ui->cmbBx_chs_brd->setEnabled(!flg);
     pshBttn_chk_prj_stat_set_enabled(!flg);
-    pshBttn_ld_frmwr_set_enabled(!flg);
+    pshBttn_chs_frmwr_set_enabled(!flg);
     pshBttn_snd_frmwr_set_enabled(!flg && svf_exist);
 }
 
+//-------------------------------------------------------------------------
+// ADD HORIZONTAL SPACER IF BUILT-IN WAVEFORM VIEWER IN 'AS WINDOW' MODE
+// AND NO BOARD PICTURE
+//-------------------------------------------------------------------------
 void RHE_Widget::add_horizontal_spacer() {
     int cnt = 0;
     for(int i = 0; i < ui->verticalLayout_3->count(); i++) {
@@ -458,6 +564,10 @@ void RHE_Widget::add_horizontal_spacer() {
     }
 }
 
+//-------------------------------------------------------------------------
+// REMOVE HORIZONTAL SPACER IF BUILT-IN WAVEFORM VIEWER IN NON 'AS WINDOW'
+// MODE AND NO BOARD PICTURE
+//-------------------------------------------------------------------------
 void RHE_Widget::remove_horizontal_spacer() {
     for(int i = 0; i < ui->verticalLayout_3->count(); i++) {
         if(ui->verticalLayout_3->itemAt(i) == hrzntl_spcr) {
@@ -467,6 +577,9 @@ void RHE_Widget::remove_horizontal_spacer() {
     }
 }
 
+//-------------------------------------------------------------------------
+// CHECK USER'S CHOOSEN FOLDER IS CONTANING QUARTUS PROJECT
+//-------------------------------------------------------------------------
 void RHE_Widget::check_is_proj_folder(bool folder_exist) {
     qpf_exist = false;
     fit_exist = false;
@@ -544,7 +657,7 @@ void RHE_Widget::check_is_proj_folder(bool folder_exist) {
         gen_widg->show_message_box("", tr("sof-file not generated"), 0, gen_widg->get_position());
         return;
     }
-    pshBttn_ld_frmwr_set_enabled(gen_widg->get_setting("settings/MANUALY_LOAD_FIRMWARE").toBool());
+    pshBttn_chs_frmwr_set_enabled(gen_widg->get_setting("settings/MANUALY_LOAD_FIRMWARE").toBool());
     pshBttn_snd_frmwr_set_enabled(svf_exist && !gen_widg->get_setting("settings/MANUALY_LOAD_FIRMWARE").toBool());
     if(!svf_exist) {
         svf_file->setFileName("");
@@ -553,8 +666,11 @@ void RHE_Widget::check_is_proj_folder(bool folder_exist) {
     }
 }
 
+//-------------------------------------------------------------------------
+// CHECK USER'S QUARTUS PROJECT PROPERTIES
+//-------------------------------------------------------------------------
 bool RHE_Widget::check_fpga_connections(QString path_to_fit_rprtr) {
-    pshBttn_ld_frmwr_set_enabled(false);
+    pshBttn_chs_frmwr_set_enabled(false);
     QString cur_fpga = "";
     QList<QString> rght_pins_numb;
     QList<QString> rght_pins_dir;
@@ -629,6 +745,9 @@ bool RHE_Widget::check_fpga_connections(QString path_to_fit_rprtr) {
     return true;
 }
 
+//-------------------------------------------------------------------------
+// READ XML-FILE WITH NEEDED QUARTUS PROJECT PROPERTIES
+//-------------------------------------------------------------------------
 bool RHE_Widget::read_xml_file(bool read_board_params, QString *cur_fpga, QList<QString> *pins_numb, QList<QString> *pins_typ, QList<QString> *pins_io_stndrd) {
     QString fl_lst_str = tr("File-list of boards and their parameters at: ");
     QPoint pos;
@@ -720,6 +839,9 @@ bool RHE_Widget::read_xml_file(bool read_board_params, QString *cur_fpga, QList<
     return true;
 }
 
+//-------------------------------------------------------------------------
+// READ XML-FILE WITH NEEDED QUARTUS PROJECT PROPERTIES
+//-------------------------------------------------------------------------
 void RHE_Widget::add_data_to_qpoint(QList<QPoint> *lst, int val, bool is_x) {
     if(lst->count() != ui->cmbBx_chs_brd->count()) {
         if(is_x) {
@@ -736,6 +858,9 @@ void RHE_Widget::add_data_to_qpoint(QList<QPoint> *lst, int val, bool is_x) {
     }
 }
 
+//-------------------------------------------------------------------------
+// VALUE OF VIRTUAL FPGA-INPUT SWITCHES CHANGED (SWITCH SHIFTED)
+//-------------------------------------------------------------------------
 void RHE_Widget::slot_input_val_changed(int val) {
     int pos = (val - (val % 2)) / 2;
     inpt_stts->at(pos)->display(val % 2);
@@ -752,6 +877,9 @@ void RHE_Widget::slot_input_val_changed(int val) {
     free(switches_states);
 }
 
+//-------------------------------------------------------------------------
+// VALUE OF VIRTUAL FPGA-INPUT SWITCHES CHANGED (SWITCH CLICKED)
+//-------------------------------------------------------------------------
 void RHE_Widget::slot_slider_pressed() {
     for(int i = 0; i < inpt_sldrs->count(); i++) {
         if(inpt_sldrs->at(i)->isSliderDown()) {
@@ -764,6 +892,9 @@ void RHE_Widget::slot_slider_pressed() {
     }
 }
 
+//-------------------------------------------------------------------------
+// COMMAND 'SET BOARD' FROM SERVER
+//-------------------------------------------------------------------------
 void RHE_Widget::slot_choose_board(QString jtag_code) {
     if(dgb_strtd) {
         on_pshBttn_stp_dbg_clicked();
@@ -782,6 +913,9 @@ void RHE_Widget::slot_choose_board(QString jtag_code) {
     set_enable_board_power_led(false);
 }
 
+//-------------------------------------------------------------------------
+// SERVER ACCEPT/NOT ACCEPT SELECTED BY USER BOARD
+//-------------------------------------------------------------------------
 void RHE_Widget::slot_accept_board(bool flg) { 
     if(flg) {
         prev_board_index = ui->cmbBx_chs_brd->currentIndex();
@@ -790,12 +924,18 @@ void RHE_Widget::slot_accept_board(bool flg) {
     }
 }
 
+//-------------------------------------------------------------------------
+// COMMAND 'DEBUG TIME LIMIT' FROM SERVER
+//-------------------------------------------------------------------------
 void RHE_Widget::slot_accept_debug_time_limit(int time, int time_type) {
     ui->lcdNmbr_dbg_tm_lmt->display(time);
     dbg_tm_tp_lmt = time_type;
     ui->lbl_dbg_tm_tp_lmt->setText(ui->cmbBx_dbg_tm_tp->itemText(time_type));
 }
 
+//-------------------------------------------------------------------------
+// RECEIVE DEBUG DATA FROM SERVER
+//-------------------------------------------------------------------------
 void RHE_Widget::slot_accept_debug_data(QByteArray debug_data) {
     Send_Recieve_Module::debug_log_Packet *tmp_packet = reinterpret_cast<Send_Recieve_Module::debug_log_Packet *>(debug_data.data());
     QList<int> val;
@@ -848,6 +988,9 @@ void RHE_Widget::slot_accept_debug_data(QByteArray debug_data) {
     }
 }
 
+//-------------------------------------------------------------------------
+// RECEIVE INPUT DATA TABLE FROM SERVER
+//-------------------------------------------------------------------------
 void RHE_Widget::slot_accept_input_data_table(QByteArray input_data_table) {
     int pin_count = 0;
     memcpy(&pin_count, input_data_table.data(), sizeof(uint8_t));
@@ -862,6 +1005,9 @@ void RHE_Widget::slot_accept_input_data_table(QByteArray input_data_table) {
     wvfrm_vwr->add_saved_vals_list(pin_count);
 }
 
+//-------------------------------------------------------------------------
+// RECEIVE OUTPUT DATA TABLE FROM SERVER
+//-------------------------------------------------------------------------
 void RHE_Widget::slot_accept_output_data_table(QByteArray output_data_table) {
     int pin_count = 0;
     int hop = 5; // bytes
@@ -936,6 +1082,9 @@ void RHE_Widget::slot_accept_output_data_table(QByteArray output_data_table) {
     emit resize_signal();
 }
 
+//-------------------------------------------------------------------------
+// SERVER RECEIVED FIRMWARE FILE FROM USER
+//-------------------------------------------------------------------------
 void RHE_Widget::slot_firmware_file_sended() {
     send_file_status->stop();
     crrnt_state_strs = 1;
@@ -952,6 +1101,9 @@ void RHE_Widget::slot_firmware_file_sended() {
     }
 }
 
+//-------------------------------------------------------------------------
+// SERVER RECEIVED SEQUENCE OF SIGNALS FILE FROM USER
+//-------------------------------------------------------------------------
 void RHE_Widget::slot_sequence_of_signals_file_sended(bool flg) {
     sqnc_of_sgnls_file_sended = flg;
     ui->chckBx_strt_sqnc_of_sgn_with_dbg->setEnabled(flg);
@@ -964,6 +1116,9 @@ void RHE_Widget::slot_sequence_of_signals_file_sended(bool flg) {
     }
 }
 
+//-------------------------------------------------------------------------
+// SERVER FLASHED FPGA
+//-------------------------------------------------------------------------
 void RHE_Widget::slot_fpga_flashed() {
     send_file_status->stop();
     crrnt_state_strs = 3;
@@ -979,11 +1134,17 @@ void RHE_Widget::slot_fpga_flashed() {
     }
 }
 
+//-------------------------------------------------------------------------
+// SERVER FINISHED SEQUENCE OF SIGNALS
+//-------------------------------------------------------------------------
 void RHE_Widget::slot_end_sequence_of_signals() {
     sqnc_of_sgnls_strtd = false;
     scrll_area_sgnls_set_enabled(true);
 }
 
+//-------------------------------------------------------------------------
+// BUILT-IN WAVEFORM VIEWER CHANGED MODE
+//-------------------------------------------------------------------------
 void RHE_Widget::slot_as_window() {
     if(!wvfrm_vwr->as_window) {
         wvfrm_vwr->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -1000,6 +1161,9 @@ void RHE_Widget::slot_as_window() {
     emit resize_signal();
 }
 
+//-------------------------------------------------------------------------
+// TIMEOUT OF PROGRESS BAR TIMER
+//-------------------------------------------------------------------------
 void RHE_Widget::slot_timer_timeout() {
     send_file_status->stop();
     int val = ui->prgrssBr_fl_sts->value() + 5;
@@ -1011,6 +1175,9 @@ void RHE_Widget::slot_timer_timeout() {
     send_file_status->start();
 }
 
+//-------------------------------------------------------------------------
+// RETRANSLATING UI ON RHE WIDGET
+//-------------------------------------------------------------------------
 void RHE_Widget::slot_re_translate() {
     ui->retranslateUi(this);
     set_ui_text();

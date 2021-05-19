@@ -23,9 +23,9 @@
 
             void pshBttn_set_path_to_proj_set_visible(bool flag);
             void pshBttn_chk_prj_stat_set_visible(bool flag);
-            void pshBttn_ld_frmwr_set_visible(bool flag);
+            void pshBttn_chs_frmwr_set_visible(bool flag);
             void pshBttn_chk_prj_stat_set_enabled(bool flag);
-            void pshBttn_ld_frmwr_set_enabled(bool flag);
+            void pshBttn_chs_frmwr_set_enabled(bool flag);
             void pshBttn_snd_frmwr_set_enabled(bool flag);
             void set_fname_lname(QString str);
             void initialize_ui();
@@ -46,7 +46,15 @@
             void remove_horizontal_spacer();
             void check_is_proj_folder(bool folder_exist);
             bool check_fpga_connections(QString path_to_fit_rprtr);
-            bool read_xml_file(bool type, QString *cur_fpga = nullptr, QList<QString> *pins_numb = nullptr, QList<QString> *pins_typ = nullptr, QList<QString> *pins_io_stndrt = nullptr);
+
+            /*
+             * bool read_board_params - flag, which indicates that be reads parameters needed only to check pins
+             * QString *cur_fpga - pointer to string, in which writes fpga-name from xml-file
+             * QList<QString> *pins_numb - pointer to list, in which writes pins numbers from xml-file
+             * QList<QString> *pins_typ - pointer to list, in which writes pins types from xml-file
+             * QList<QString> *pins_io_stndrt - pointer to list, in which writes pins I/O standarts from xml-file
+             */
+            bool read_xml_file(bool read_board_params, QString *cur_fpga = nullptr, QList<QString> *pins_numb = nullptr, QList<QString> *pins_typ = nullptr, QList<QString> *pins_io_stndrt = nullptr);
             void add_data_to_qpoint(QList<QPoint> *lst, int val, bool is_x);
 
             Ui::RHE_Widget *ui;
@@ -110,7 +118,7 @@
             void on_pshBttn_set_path_to_proj_clicked();
             void on_pshBttn_snd_frmwr_clicked();
             void on_pshBttn_chk_prj_stat_clicked();
-            void on_pshBttn_ld_frmwr_clicked();
+            void on_pshBttn_chs_frmwr_clicked();
             void pshBttn_strt_sgnls_sqnc_set_enabled(bool flag);
             void scrll_area_sgnls_set_enabled(bool flag);
             void slot_input_val_changed(int val);

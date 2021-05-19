@@ -15,10 +15,16 @@ RegistrationWidget::~RegistrationWidget() {
     delete ui;
 }
 
+//-------------------------------------------------------------------------
+// DISPLAYING OF REGISTRATION WIDGET
+//-------------------------------------------------------------------------
 void RegistrationWidget::showEvent(QShowEvent *) {
     resizeEvent(nullptr);
 }
 
+//-------------------------------------------------------------------------
+// RESIZING OF REGISTRATION WIDGET
+//-------------------------------------------------------------------------
 void RegistrationWidget::resizeEvent(QResizeEvent *) {
     ui->verticalLayoutWidget_3->setGeometry(0, 0, this->width(), ui->verticalLayoutWidget_3->height());
     ui->horizontalLayoutWidget->setGeometry(ui->grpBx_rgstr->contentsRect().x(), ui->grpBx_rgstr->contentsRect().y(), ui->grpBx_rgstr->contentsRect().width(), ui->grpBx_rgstr->contentsRect().height());
@@ -26,6 +32,9 @@ void RegistrationWidget::resizeEvent(QResizeEvent *) {
     ui->verticalSpacer_2->changeSize(ui->verticalSpacer_2->geometry().width(), (ui->grpBx_rgstr->contentsMargins().top() + ui->verticalSpacer_4->sizeHint().height()));
 }
 
+//-------------------------------------------------------------------------
+// REGISTRATION OF USER
+//-------------------------------------------------------------------------
 bool RegistrationWidget::register_user() {
     if((ui->lineEdit_FName->text().length() != 0) && (ui->lineEdit_LName->text().length() != 0) && (ui->lineEdit_login->text().length() != 0) && (ui->lineEdit_password->text().length() != 0)) {
         QStringList lst = account_info->allKeys();
@@ -46,6 +55,9 @@ bool RegistrationWidget::register_user() {
     }
 }
 
+//-------------------------------------------------------------------------
+// LOGGING OF USER
+//-------------------------------------------------------------------------
 bool RegistrationWidget::login() {
     if((ui->lineEdit_login->text().length() != 0) && (ui->lineEdit_password->text().length() != 0)) {
         if(account_info->contains(ui->lineEdit_login->text() + "_" + ui->lineEdit_password->text())) {
@@ -77,14 +89,23 @@ bool RegistrationWidget::login() {
     }
 }
 
+//-------------------------------------------------------------------------
+// GET REGISTERED USER FIRST NAME
+//-------------------------------------------------------------------------
 QString RegistrationWidget::get_user_fname() {
     return user_fname;
 }
 
+//-------------------------------------------------------------------------
+// GET REGISTERED USER LAST NAME
+//-------------------------------------------------------------------------
 QString RegistrationWidget::get_user_lname() {
     return user_lname;
 }
 
+//-------------------------------------------------------------------------
+// RETRANSLATING UI ON REGISTRATION WIDGET
+//-------------------------------------------------------------------------
 void RegistrationWidget::slot_re_translate() {
     ui->retranslateUi(this);
 }

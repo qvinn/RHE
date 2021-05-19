@@ -36,21 +36,21 @@
     #define CLIENT_WANT_STOP_DEBUG 32
     #define CLIENT_WANT_CHANGE_DEBUG_SETTINGS 33
     #define DEBUG_PROCESS_TIMEOUT 34
-    #define CLIENT_WANT_IDT 35 // IDT - Input Debug Table
-    #define CLIENT_WANT_ODT 36 // ODT - Output Debug Table
-    #define S_SERVER_SEND_IDT 37 // IDT - Input Debug Table
-    #define S_SERVER_SEND_ODT 38 // ODT - Output Debug Table
+    #define CLIENT_WANT_IDT 35                      // IDT - Input Debug Table
+    #define CLIENT_WANT_ODT 36                      // ODT - Output Debug Table
+    #define S_SERVER_SEND_IDT 37                    // IDT - Input Debug Table
+    #define S_SERVER_SEND_ODT 38                    // ODT - Output Debug Table
     #define CLIENT_WANT_GET_TIMEOUT_INFO 39
     #define S_SERVER_SEND_TIMEOUT_INFO 40
-    #define CLIENT_START_SEND_DSQ_FILE 41   // DSQ_FILE -  Debug sequence file
-    #define CLIENT_SENDING_DSQ_FILE 42      // DSQ_FILE -  Debug sequence file
-    #define CLIENT_FINISH_SEND_DSQ_FILE 43  // DSQ_FILE -  Debug sequence file
-    #define S_SERVER_END_RCV_DSQ_FILE 44	// DSQ_FILE -  Debug sequence file
-    #define RUN_DSQ_FILE 45                 // DSQ_FILE -  Debug sequence file
-    #define STOP_DSQ_FILE 46                // DSQ_FILE -  Debug sequence file
-    #define S_SERVER_SENDING_DSQ_INFO 47	// DSQ_FILE -  Debug sequence file
-    #define CLIENT_WANT_START_SYNC_DEBUG_DSQ 48 // DSQ_FILE -  Debug sequence file
-    #define S_SERVER_CANT_READ_DSQ_FILE 49	// DSQ_FILE -  Debug sequence file
+    #define CLIENT_START_SEND_DSQ_FILE 41           // DSQ_FILE -  Debug sequence file
+    #define CLIENT_SENDING_DSQ_FILE 42              // DSQ_FILE -  Debug sequence file
+    #define CLIENT_FINISH_SEND_DSQ_FILE 43          // DSQ_FILE -  Debug sequence file
+    #define S_SERVER_END_RCV_DSQ_FILE 44            // DSQ_FILE -  Debug sequence file
+    #define RUN_DSQ_FILE 45                         // DSQ_FILE -  Debug sequence file
+    #define STOP_DSQ_FILE 46                        // DSQ_FILE -  Debug sequence file
+    #define S_SERVER_SENDING_DSQ_INFO 47            // DSQ_FILE -  Debug sequence file
+    #define CLIENT_WANT_START_SYNC_DEBUG_DSQ 48     // DSQ_FILE -  Debug sequence file
+    #define S_SERVER_CANT_READ_DSQ_FILE 49          // DSQ_FILE -  Debug sequence file
     #define CLIENT_WANT_SET_PINSTATE 50
     #define CLIENT_WANT_FLASH_ALL_SYNC 51
     #define S_SERVER_END_DSQ 52
@@ -86,15 +86,15 @@
             void send_swtches_states(QByteArray data);
 
             typedef struct pin_in_Packet {		// 48 байта
-                char pinName[5];	// 5 байт
-                uint8_t state;	// 1 байт
+                char pinName[5];                // 5 байт
+                uint8_t state;                  // 1 байт
             } pin_in_Packet;
 
-            typedef struct debug_log_Packet { // 24 байта
-                uint8_t pin_count;	// 1 байт
-                uint8_t time_mode;	// 1 байт
-                pin_in_Packet pins[8];	// 16 байт
-                int time;				// 4 байта
+            typedef struct debug_log_Packet {   // 24 байта
+                uint8_t pin_count;              // 1 байт
+                uint8_t time_mode;              // 1 байт
+                pin_in_Packet pins[8];          // 16 байт
+                int time;                       // 4 байта
             } debug_log_Packet;
 
             typedef struct info_about_new_device {
@@ -103,9 +103,9 @@
             } info_about_new_device;
 
             // Пара структур для задания состояния портам ввода-вывода
-            typedef struct set_state {		// 2 байта
-                uint8_t pinNum;				// 1 байт
-                uint8_t state;				// 1 байт
+            typedef struct set_state {          // 2 байта
+                uint8_t pinNum;                 // 1 байт
+                uint8_t state;                  // 1 байт
             } set_state;
 
             typedef struct set_state_Packet { 	// 17 байт
@@ -124,9 +124,6 @@
             int start_recive_file();
             int rcv_new_data_for_file(char *buf);
             int end_recive_file();
-            void recive_dbg_info(char *info);
-            void I_debug_table_parser(char *buff);
-            void O_debug_table_parser(char *buff);
 
             General_Widget *gen_widg = nullptr;
             QTcpSocket *socket = nullptr;
@@ -136,7 +133,7 @@
 
             int file_rcv_bytes_count = 0;
             int last_send_file_bytes = 0;
-            int my_client_ID = -1;          // INIT_ID
+            int my_client_ID = -1;              // INIT_ID
             int server_port;
             bool manual_disconnect = false;
             bool connected = false;

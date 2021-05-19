@@ -30,15 +30,24 @@ General_Widget::~General_Widget() {
     delete language_translator;
 }
 
+//-------------------------------------------------------------------------
+// GET POSITION FOR CURRENT ACTIVE WINDOW
+//-------------------------------------------------------------------------
 QPoint General_Widget::get_position() {
     return *current_pos;
 }
 
+//-------------------------------------------------------------------------
+// SET POSITION FOR CURRENT ACTIVE WINDOW
+//-------------------------------------------------------------------------
 void General_Widget::set_position(QPoint widg_pos) {
     current_pos->setX(widg_pos.x());
     current_pos->setY(widg_pos.y());
 }
 
+//-------------------------------------------------------------------------
+// LOAD VALUE OF SEETING
+//-------------------------------------------------------------------------
 QVariant General_Widget::get_setting(QString type) {
     QRegExp tagExp("/");
     QStringList lst = type.split(tagExp);
@@ -53,6 +62,9 @@ QVariant General_Widget::get_setting(QString type) {
     return val;
 }
 
+//-------------------------------------------------------------------------
+// SAVE SEETING WITH VALUE
+//-------------------------------------------------------------------------
 void General_Widget::save_setting(QString type, QVariant val) {
     QRegExp tagExp("/");
     QStringList lst = type.split(tagExp);
@@ -66,6 +78,9 @@ void General_Widget::save_setting(QString type, QVariant val) {
     settings->sync();
 }
 
+//-------------------------------------------------------------------------
+// CREATING OF INITIAL SETTING (IF SETTINGS-FILE OR CERTAIN SETTING DOESN'T EXIST)
+//-------------------------------------------------------------------------
 void General_Widget::create_base_settings() {
     check_setting_exist("settings/ENABLE_PINS_CHEKING", 1);
     check_setting_exist("settings/MANUALY_LOAD_FIRMWARE", 0);
@@ -107,12 +122,18 @@ void General_Widget::create_base_settings() {
     check_setting_exist("waveform_viewer_standalone_settings/WVFRM_VWR_AXIS_LABELS_FONT_SIZE", 10);
 }
 
+//-------------------------------------------------------------------------
+// CHECK EXISTANCE OF CERTAIN SETTING IN SETTIGNS-FILE
+//-------------------------------------------------------------------------
 void General_Widget::check_setting_exist(QString type, QVariant val) {
     if(!settings->contains(type)) {
         save_setting(type, val);
     }
 }
 
+//-------------------------------------------------------------------------
+// CHECK EXISTANCE OF FILE-ICON (FOR GNU/LINUX OLNY)
+//-------------------------------------------------------------------------
 void General_Widget::check_is_icon_exist(QString path) {
     QFile r_icon_file(path);
     if(!r_icon_file.exists()) {
@@ -128,12 +149,18 @@ void General_Widget::check_is_icon_exist(QString path) {
     }
 }
 
+//-------------------------------------------------------------------------
+// GET STYLE_SHEET TO CUSTOMIZE SOME WINDOWS
+//-------------------------------------------------------------------------
 QString General_Widget::get_style_sheet(QString pattern) {
     QString str = style_sheet;
     return str.replace("pattern", pattern);
 }
 
-QStringList* General_Widget::load_files(bool files, bool path, QString title, QString filter, QWidget *prnt) {
+//-------------------------------------------------------------------------
+// LOAD FILE/FILES
+//-------------------------------------------------------------------------
+QStringList* General_Widget::load_files(QWidget *prnt, QString title, QString filter, bool files, bool path) {
     QFileDialog dialog(prnt, title, QDir::current().path(), filter);
     dialog.setOption(QFileDialog::DontUseNativeDialog, true);
     dialog.resize(800, 600);
@@ -158,6 +185,9 @@ QStringList* General_Widget::load_files(bool files, bool path, QString title, QS
     return files_list;
 }
 
+//-------------------------------------------------------------------------
+// SAVE/APPEND/REWRITE FILE
+//-------------------------------------------------------------------------
 void General_Widget::save_file(QWidget *prnt, QString title, QString filter, QString *data, QString *file_name, bool re_write, bool fl_nm_exist) {
     QString fileName;
     if(fl_nm_exist) {
@@ -198,8 +228,11 @@ void General_Widget::save_file(QWidget *prnt, QString title, QString filter, QSt
     }
 }
 
-QString General_Widget::load_file_path(QString title, QString filter, QWidget *prnt) {
-    QStringList *lst = load_files(false, false, title, filter, prnt);
+//-------------------------------------------------------------------------
+// GET PATH OF FILE LOADED WITH 'LOAD_FILES' METHOD
+//-------------------------------------------------------------------------
+QString General_Widget::load_file_path(QWidget *prnt, QString title, QString filter) {
+    QStringList *lst = load_files(prnt, title, filter, false, false);
     QString file_path = "";
     if(lst == nullptr) {
         return file_path;
@@ -211,14 +244,17 @@ QString General_Widget::load_file_path(QString title, QString filter, QWidget *p
     return file_path;
 }
 
-int General_Widget::show_message_box(QString str1, QString str2, int type, QPoint position) {
-    QMessageBox msgBox(QMessageBox::Warning, str1, QString("\n").append(str2));
-    if(str1.count() == 0) {
+//-------------------------------------------------------------------------
+// DISPLAYING WARNING/QUESTION/INFO MESSAGES
+//-------------------------------------------------------------------------
+int General_Widget::show_message_box(QString title, QString message, int type, QPoint position) {
+    QMessageBox msgBox(QMessageBox::Warning, title, QString("\n").append(message));
+    if(title.count() == 0) {
         msgBox.setWindowTitle(tr("Warning"));
     }
     msgBox.setParent(this);
     if(type == 1) {
-        if(str1.count() == 0) {
+        if(title.count() == 0) {
             msgBox.setWindowTitle(tr("Question"));
         }
         msgBox.setIcon(QMessageBox::Question);
@@ -227,7 +263,7 @@ int General_Widget::show_message_box(QString str1, QString str2, int type, QPoin
         msgBox.setButtonText(QMessageBox::Yes, tr("Yes"));
         msgBox.setButtonText(QMessageBox::No, tr("No"));
     } else if(type == 2) {
-        if(str1.count() == 0) {
+        if(title.count() == 0) {
             msgBox.setWindowTitle(tr("Information"));
         }
         msgBox.setIcon(QMessageBox::Information);
@@ -236,12 +272,17 @@ int General_Widget::show_message_box(QString str1, QString str2, int type, QPoin
     msgBox.setModal(true);
     msgBox.setWindowFlags(msgBox.windowFlags() | Qt::WindowStaysOnTopHint);
     msgBox.setStyleSheet(get_style_sheet("QMessageBox"));
+    //hack to place message window at centre of window with 'position' coordinates
     msgBox.show();
     msgBox.hide();
+    //end hack
     msgBox.move((position.x() - (msgBox.width() / 2)), (position.y() - (msgBox.height() / 2)));
     return msgBox.exec();
 }
 
+//-------------------------------------------------------------------------
+// CHANGING LANGUAGE OF APPLICATION
+//-------------------------------------------------------------------------
 void General_Widget::change_current_locale() {
     if(get_setting("settings/LANGUAGE").toInt() == 0) {
         language_translator->load(":/Language/RHE_Client_en.qm");
