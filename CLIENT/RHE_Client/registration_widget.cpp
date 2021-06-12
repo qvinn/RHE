@@ -5,7 +5,10 @@ RegistrationWidget::RegistrationWidget(QWidget *parent, General_Widget *widg, Se
     ui->setupUi(this);
     this->setGeometry(parent->x(), parent->y(), parent->width(), parent->height());
     gen_widg = widg;
-    snd_rcv_module = snd_rcv_mod;
+    connect(this, &RegistrationWidget::init_connection_signal, snd_rcv_mod, &Send_Recieve_Module::init_connection);
+    connect(this, &RegistrationWidget::get_id_for_client_signal, snd_rcv_mod, &Send_Recieve_Module::get_id_for_client);
+    connect(snd_rcv_mod, &Send_Recieve_Module::link_established, this, &RegistrationWidget::link_established);
+    connect(snd_rcv_mod, &Send_Recieve_Module::id_received, this, &RegistrationWidget::id_received);
     account_info = new QSettings("TestRegistration.cfg", QSettings::IniFormat);
     ui->lineEdit_password->setEchoMode(QLineEdit::Password);
 }
@@ -58,7 +61,7 @@ bool RegistrationWidget::register_user() {
 //-------------------------------------------------------------------------
 // LOGGING OF USER
 //-------------------------------------------------------------------------
-bool RegistrationWidget::login() {
+void RegistrationWidget::login() {
     if((ui->lineEdit_login->text().length() != 0) && (ui->lineEdit_password->text().length() != 0)) {
         if(account_info->contains(ui->lineEdit_login->text() + "_" + ui->lineEdit_password->text())) {
             QString data = account_info->value(ui->lineEdit_login->text() + "_" + ui->lineEdit_password->text()).toString();
@@ -70,23 +73,39 @@ bool RegistrationWidget::login() {
             ui->lineEdit_password->setText("");
             ui->lineEdit_FName->setText("");
             ui->lineEdit_LName->setText("");
-            if(!snd_rcv_module->init_connection()) {        // Иницализируем поключение
-                gen_widg->show_message_box(tr("Error"), tr("Can't init connection"), 0, gen_widg->get_position());
-                return false;
-            }
-            if(snd_rcv_module->get_id_for_client() != CS_OK) {          // Запросим у сервера ID
-                gen_widg->show_message_box(tr("Error"), tr("Can't get ID"), 0, gen_widg->get_position());
-                return false;
-            }
-            return true;
+            emit init_connection_signal();      // Иницализируем поключение
         } else {
+            emit logined(false);
             gen_widg->show_message_box(tr("Error"), tr("You enter wrong login or password"), 0, gen_widg->get_position());
-            return false;
         }
     } else {
+        emit logined(false);
         gen_widg->show_message_box(tr("Error"), tr("Enter login and password"), 0, gen_widg->get_position());
-        return false;
     }
+}
+
+//-------------------------------------------------------------------------
+//
+//-------------------------------------------------------------------------
+void RegistrationWidget::link_established(bool flg) {
+    if(!flg) {
+        emit logined(false);
+        gen_widg->show_message_box(tr("Error"), tr("Can't init connection"), 0, gen_widg->get_position());
+        return;
+    }
+    emit get_id_for_client_signal();
+}
+
+//-------------------------------------------------------------------------
+//
+//-------------------------------------------------------------------------
+void RegistrationWidget::id_received(int state) {
+    if(state != CS_OK) {
+        emit logined(false);
+        gen_widg->show_message_box(tr("Error"), tr("Can't get ID"), 0, gen_widg->get_position());
+        return;
+    }
+    emit logined(true);
 }
 
 //-------------------------------------------------------------------------

@@ -71,12 +71,12 @@
             Send_Recieve_Module(QString _server_ip, int _server_port, General_Widget *widg = nullptr);
             ~Send_Recieve_Module() override;
 
-            bool init_connection();
-            int get_id_for_client();
+            void init_connection();
+            void get_id_for_client();
             void wait_analize_recv_data();
             void ping_to_server();
             void ping_to_S_server();
-            void start_debug(uint16_t dscrt_tm, uint8_t dscrt_tm_tp, int flag);
+            void start_debug(quint16 dscrt_tm, quint8 dscrt_tm_tp, int flag);
             void stop_debug();
             void start_sequence_of_signals();
             bool send_file_to_ss(QByteArray File_byteArray, int strt_sndng_val, int cntns_sndng_val, int end_sndng_val);
@@ -87,12 +87,12 @@
 
             typedef struct pin_in_Packet {		// 48 байта
                 char pinName[5];                // 5 байт
-                uint8_t state;                  // 1 байт
+                quint8 state;                  // 1 байт
             } pin_in_Packet;
 
             typedef struct debug_log_Packet {   // 24 байта
-                uint8_t pin_count;              // 1 байт
-                uint8_t time_mode;              // 1 байт
+                quint8 pin_count;              // 1 байт
+                quint8 time_mode;              // 1 байт
                 pin_in_Packet pins[8];          // 16 байт
                 int time;                       // 4 байта
             } debug_log_Packet;
@@ -104,12 +104,12 @@
 
             // Пара структур для задания состояния портам ввода-вывода
             typedef struct set_state {          // 2 байта
-                uint8_t pinNum;                 // 1 байт
-                uint8_t state;                  // 1 байт
+                quint8 pinNum;                 // 1 байт
+                quint8 state;                  // 1 байт
             } set_state;
 
             typedef struct set_state_Packet { 	// 17 байт
-                uint8_t pin_count;				// 1 байт
+                quint8 pin_count;				// 1 байт
                 set_state pins[8];              // 2 байт * PIN_MAX = 16 байт
             } set_state_Packet;
 
@@ -139,6 +139,8 @@
             bool connected = false;
 
         signals:
+            void link_established(bool flg);
+            void id_received(int state);
             void logout_signal();
             void firmware_file_recieved_signal();
             void sequence_file_recieved_signal(bool flg);

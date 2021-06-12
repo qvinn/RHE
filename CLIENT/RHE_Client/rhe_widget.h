@@ -60,7 +60,6 @@
 
             Ui::RHE_Widget *ui;
             General_Widget *gen_widg = nullptr;
-            Send_Recieve_Module *snd_rcv_module = nullptr;
             Waveform_Viewer_Widget *wvfrm_vwr = nullptr;
             QString *path_to_proj = nullptr;
             QString *prev_path_to_proj = nullptr;
@@ -140,6 +139,13 @@
 
         signals:
             void resize_signal();
+            void set_FPGA_id_signal(QString jtag_id_code);
+            void flash_FPGA_signal();
+            void send_file_to_ss_signal(QByteArray File_byteArray, int strt_sndng_val, int cntns_sndng_val, int end_sndng_val);
+            void start_debug_signal(quint16 dscrt_tm, quint8 dscrt_tm_tp, int flag);
+            void stop_debug_signal();
+            void start_sequence_of_signals_signal();
+            void send_swtches_states_signal(QByteArray arr);
     };
 
 #endif // RHE_WIDGET_H

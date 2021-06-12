@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
     #define MAINWINDOW_H
 
+    #include <QThread>
     #include <QMenuBar>
     #include <QComboBox>
     #include <QMainWindow>
@@ -26,6 +27,7 @@
             void load_settings();
             void login();
             void logout();
+            void logined(bool flg);
 
             Ui::MainWindow *ui;
             General_Widget *gen_widg = nullptr;
@@ -43,7 +45,9 @@
             QMenu *menu_file = nullptr;
             QMenu *menu_settngs = nullptr;
             QWidgetAction *cmbBx_lng_chs_actn = nullptr;
-            QTimer *tmr = nullptr;
+            QTimer *tmr_waveform_viewer = nullptr;
+            QTimer *tmr_progress_bar = nullptr;
+            QThread thread_1;
 
             bool ui_initialized = false;
             bool language_changed = false;
@@ -67,7 +71,11 @@
             void onCmbBxLngChsCurrentIndexChanged(int index);
             void slot_re_size();
             void slot_waveform_viewer_closed();
-            void slot_timer_timeout();
+            void slot_timer_waveform_viewer_timeout();
+            void slot_timer_progress_bar_timeout();
+
+        signals:
+            void set_disconnected_signal();
     };
 
 #endif // MAINWINDOW_H

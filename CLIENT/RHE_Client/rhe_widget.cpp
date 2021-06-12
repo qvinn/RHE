@@ -5,7 +5,6 @@ RHE_Widget::RHE_Widget(QWidget *parent, General_Widget *widg, Send_Recieve_Modul
     ui->setupUi(this);
     this->setGeometry(parent->x(), parent->y(), parent->width(), parent->height());
     gen_widg = widg;
-    snd_rcv_module = snd_rcv_mod;
     path_to_proj = new QString("");
     prev_path_to_proj = new QString("");
     svf_file = new QFile();
@@ -24,18 +23,25 @@ RHE_Widget::RHE_Widget(QWidget *parent, General_Widget *widg, Send_Recieve_Modul
     wvfrm_vwr = new Waveform_Viewer_Widget(this, gen_widg, false);
     connect(wvfrm_vwr, &Waveform_Viewer_Widget::as_window_signal, this, &RHE_Widget::slot_as_window);
     connect(gen_widg, &General_Widget::re_translate_signal, wvfrm_vwr, &Waveform_Viewer_Widget::slot_re_translate);
-    connect(snd_rcv_module, &Send_Recieve_Module::fpga_flashed_signal, this, &RHE_Widget::slot_fpga_flashed);
-//    connect(snd_rcv_module, &Send_Recieve_Module::debug_not_started, this, &RHE_Widget::slot_end_sequence_of_signals);            //////////////
-    connect(snd_rcv_module, &Send_Recieve_Module::end_sequence_of_signals_signal, this, &RHE_Widget::slot_end_sequence_of_signals);
-    connect(snd_rcv_module, &Send_Recieve_Module::firmware_file_recieved_signal, this, &RHE_Widget::slot_firmware_file_sended);
-    connect(snd_rcv_module, &Send_Recieve_Module::sequence_file_recieved_signal, this, &RHE_Widget::slot_sequence_of_signals_file_sended);
-    connect(snd_rcv_module, &Send_Recieve_Module::end_debugging_signal, this, &RHE_Widget::on_pshBttn_stp_dbg_clicked);
-    connect(snd_rcv_module, &Send_Recieve_Module::choose_board_signal, this, &RHE_Widget::slot_choose_board);
-    connect(snd_rcv_module, &Send_Recieve_Module::accept_board_signal, this, &RHE_Widget::slot_accept_board);
-    connect(snd_rcv_module, &Send_Recieve_Module::accept_debug_time_limit_signal, this, &RHE_Widget::slot_accept_debug_time_limit);
-    connect(snd_rcv_module, &Send_Recieve_Module::accept_debug_data_signal, this, &RHE_Widget::slot_accept_debug_data);
-    connect(snd_rcv_module, &Send_Recieve_Module::accept_input_data_table_signal, this, &RHE_Widget::slot_accept_input_data_table);
-    connect(snd_rcv_module, &Send_Recieve_Module::accept_output_data_table_signal, this, &RHE_Widget::slot_accept_output_data_table);
+    connect(snd_rcv_mod, &Send_Recieve_Module::fpga_flashed_signal, this, &RHE_Widget::slot_fpga_flashed);
+//    connect(snd_rcv_mod, &Send_Recieve_Module::debug_not_started, this, &RHE_Widget::slot_end_sequence_of_signals);            //////////////
+    connect(snd_rcv_mod, &Send_Recieve_Module::end_sequence_of_signals_signal, this, &RHE_Widget::slot_end_sequence_of_signals);
+    connect(snd_rcv_mod, &Send_Recieve_Module::firmware_file_recieved_signal, this, &RHE_Widget::slot_firmware_file_sended);
+    connect(snd_rcv_mod, &Send_Recieve_Module::sequence_file_recieved_signal, this, &RHE_Widget::slot_sequence_of_signals_file_sended);
+    connect(snd_rcv_mod, &Send_Recieve_Module::end_debugging_signal, this, &RHE_Widget::on_pshBttn_stp_dbg_clicked);
+    connect(snd_rcv_mod, &Send_Recieve_Module::choose_board_signal, this, &RHE_Widget::slot_choose_board);
+    connect(snd_rcv_mod, &Send_Recieve_Module::accept_board_signal, this, &RHE_Widget::slot_accept_board);
+    connect(snd_rcv_mod, &Send_Recieve_Module::accept_debug_time_limit_signal, this, &RHE_Widget::slot_accept_debug_time_limit);
+    connect(snd_rcv_mod, &Send_Recieve_Module::accept_debug_data_signal, this, &RHE_Widget::slot_accept_debug_data);
+    connect(snd_rcv_mod, &Send_Recieve_Module::accept_input_data_table_signal, this, &RHE_Widget::slot_accept_input_data_table);
+    connect(snd_rcv_mod, &Send_Recieve_Module::accept_output_data_table_signal, this, &RHE_Widget::slot_accept_output_data_table);
+    connect(this, &RHE_Widget::set_FPGA_id_signal, snd_rcv_mod, &Send_Recieve_Module::set_FPGA_id);
+    connect(this, &RHE_Widget::flash_FPGA_signal, snd_rcv_mod, &Send_Recieve_Module::flash_FPGA);
+    connect(this, &RHE_Widget::send_file_to_ss_signal, snd_rcv_mod, &Send_Recieve_Module::send_file_to_ss);
+    connect(this, &RHE_Widget::start_debug_signal, snd_rcv_mod, &Send_Recieve_Module::start_debug);
+    connect(this, &RHE_Widget::stop_debug_signal, snd_rcv_mod, &Send_Recieve_Module::stop_debug);
+    connect(this, &RHE_Widget::start_sequence_of_signals_signal, snd_rcv_mod, &Send_Recieve_Module::start_sequence_of_signals);
+    connect(this, &RHE_Widget::send_swtches_states_signal, snd_rcv_mod, &Send_Recieve_Module::send_swtches_states);
     prev_vals = new QList<int>();
     pi_pins_nums = new QList<int>();
     send_file_status = new QTimer(nullptr);
@@ -152,7 +158,7 @@ void RHE_Widget::on_pshBttn_strt_dbg_clicked() {
         crrnt_state_strs = 4;
     }
     ui->prgrssBr_fl_sts->setFormat(state_strs.at(crrnt_state_strs));
-    snd_rcv_module->start_debug(static_cast<uint16_t>(ui->spnBx_dbg_tm->value()), static_cast<uint8_t>(ui->cmbBx_dbg_tm_tp->currentIndex()), flag);
+    emit start_debug_signal(static_cast<quint16>(ui->spnBx_dbg_tm->value()), static_cast<quint8>(ui->cmbBx_dbg_tm_tp->currentIndex()), flag);
     if(inpt_sldrs->count() != 0) {
         slot_input_val_changed(inpt_sldrs->at(0)->value());
     }
@@ -171,7 +177,7 @@ void RHE_Widget::on_pshBttn_stp_dbg_clicked() {
     if(dbg_strtd) {
         crrnt_state_strs = 7;
         ui->prgrssBr_fl_sts->setFormat(state_strs.at(crrnt_state_strs));
-        snd_rcv_module->stop_debug();
+        emit stop_debug_signal();
         set_button_state_debug(false);
         slot_end_sequence_of_signals();
     }
@@ -213,7 +219,7 @@ void RHE_Widget::on_pshBttn_snd_sgnls_sqnc_clicked() {
         send_file_status->setInterval(200);
         send_file_status->start();
         set_buttons_state_enabled(false);
-        snd_rcv_module->send_file_to_ss(csv_file->readAll(), CLIENT_START_SEND_DSQ_FILE, CLIENT_SENDING_DSQ_FILE, CLIENT_FINISH_SEND_DSQ_FILE);
+        emit send_file_to_ss_signal(csv_file->readAll(), CLIENT_START_SEND_DSQ_FILE, CLIENT_SENDING_DSQ_FILE, CLIENT_FINISH_SEND_DSQ_FILE);
         csv_file->close();
     }
 }
@@ -224,7 +230,7 @@ void RHE_Widget::on_pshBttn_snd_sgnls_sqnc_clicked() {
 void RHE_Widget::on_pshBttn_strt_sgnls_sqnc_clicked() {
     if(dbg_strtd) {
         sqnc_of_sgnls_strtd = true;
-        snd_rcv_module->start_sequence_of_signals();
+        emit start_sequence_of_signals_signal();
         scrll_area_sgnls_set_enabled(false);
         pshBttn_strt_sgnls_sqnc_set_enabled(false);
         ui->pshBttn_snd_sgnls_sqnc->setEnabled(false);
@@ -250,7 +256,7 @@ void RHE_Widget::on_chckBx_strt_sqnc_of_sgn_with_dbg_stateChanged(int state) {
 void RHE_Widget::on_cmbBx_chs_brd_currentIndexChanged(int index) {
     if(ui_initialized && (index != -1)) {
         gen_widg->save_setting("settings/CURRENT_BOARD", index);
-        snd_rcv_module->set_FPGA_id(jtag_id_codes->at(index));
+        emit set_FPGA_id_signal(jtag_id_codes->at(index));
     }
 }
 
@@ -329,7 +335,7 @@ void RHE_Widget::on_pshBttn_snd_frmwr_clicked() {
         send_file_status->start();
         crrnt_state_strs = 0;
         ui->prgrssBr_fl_sts->setFormat(state_strs.at(crrnt_state_strs));
-        snd_rcv_module->send_file_to_ss(svf_file->readAll(), CLIENT_START_SEND_FILE, CLIENT_SENDING_FILE, CLIENT_FINISH_SEND_FILE);
+        emit send_file_to_ss_signal(svf_file->readAll(), CLIENT_START_SEND_FILE, CLIENT_SENDING_FILE, CLIENT_FINISH_SEND_FILE);
         svf_file->close();
         set_buttons_state_enabled(false);
     }
@@ -911,7 +917,7 @@ void RHE_Widget::slot_input_val_changed(int val) {
         switch_state.state = static_cast<uint8_t>(inpt_sldrs->at(i)->value() % 2);
         switches_states->pins[i] = switch_state;
     }
-    snd_rcv_module->send_swtches_states(QByteArray::fromRawData(reinterpret_cast<const char*>(switches_states), sizeof(Send_Recieve_Module::set_state_Packet)));
+    emit send_swtches_states_signal(QByteArray::fromRawData(reinterpret_cast<const char*>(switches_states), sizeof(Send_Recieve_Module::set_state_Packet)));
     free(switches_states);
 }
 
@@ -1134,7 +1140,7 @@ void RHE_Widget::slot_firmware_file_sended() {
         send_file_status->start();
         crrnt_state_strs = 2;
         ui->prgrssBr_fl_sts->setFormat(state_strs.at(crrnt_state_strs));
-        snd_rcv_module->flash_FPGA();
+        emit flash_FPGA_signal();
     } else if(static_cast<bool>(static_cast<int>(ui->chckBx_strt_dbg_aftr_flsh->checkState()))) {
         on_pshBttn_strt_dbg_clicked();
     }

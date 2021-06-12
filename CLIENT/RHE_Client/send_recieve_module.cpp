@@ -23,25 +23,25 @@ Send_Recieve_Module::~Send_Recieve_Module() {
 //-------------------------------------------------------------------------
 // INIT CONNECTION WITH SERVER
 //-------------------------------------------------------------------------
-bool Send_Recieve_Module::init_connection() {
+void Send_Recieve_Module::init_connection() {
     connected = establish_socket();
     if(!connected) {
         reset_ID();
         socket->close();
     }
-    return connected;
+    emit link_established(connected);
 }
 
 //-------------------------------------------------------------------------
 // GET UNIQE CLIENT-ID FOR SERVER
 //-------------------------------------------------------------------------
-int Send_Recieve_Module::get_id_for_client() {
+void Send_Recieve_Module::get_id_for_client() {
     char *send_buff = (char*)malloc(DATA_BUFFER);
     int init_id = INIT_ID;
     memcpy(send_buff, &init_id, sizeof(int));
     send_U_Packet(CLIENT_WANT_INIT_CONNECTION, send_buff);
     free(send_buff);
-    return CS_OK;
+    emit id_received(CS_OK);
 }
 
 //-------------------------------------------------------------------------
@@ -132,9 +132,9 @@ void Send_Recieve_Module::wait_analize_recv_data() {
             }
             case S_SERVER_SEND_TIMEOUT_INFO: {
                 int max_duration;
-                uint8_t tm_tp;
+                quint8 tm_tp;
                 memcpy(&max_duration, tmp_packet->data, sizeof(int));
-                memcpy(&tm_tp, tmp_packet->data+sizeof(int), sizeof(uint8_t));
+                memcpy(&tm_tp, tmp_packet->data+sizeof(int), sizeof(quint8));
                 emit accept_debug_time_limit_signal(max_duration, tm_tp);
                 break;
             }
@@ -189,13 +189,13 @@ void Send_Recieve_Module::ping_to_S_server() {
 //-------------------------------------------------------------------------
 // SEND SIGNAL TO SERVER TO START DEBUG
 //-------------------------------------------------------------------------
-void Send_Recieve_Module::start_debug(uint16_t dscrt_tm, uint8_t dscrt_tm_tp, int flag) {
+void Send_Recieve_Module::start_debug(quint16 dscrt_tm, quint8 dscrt_tm_tp, int flag) {
     //for variable dscrt_tm_tp: 0 - seconds, 1 - miliseconds, 2 - microseconds
     char buff[DATA_BUFFER];
     memset(buff,0,DATA_BUFFER);
-    memcpy(buff, &dscrt_tm, sizeof(uint16_t));
-    memcpy(buff+sizeof(uint16_t), &dscrt_tm_tp, sizeof(uint8_t));
-    send_U_Packet(CLIENT_WANT_CHANGE_DEBUG_SETTINGS, QByteArray(buff,(sizeof (uint16_t) + sizeof (uint8_t))));
+    memcpy(buff, &dscrt_tm, sizeof(quint16));
+    memcpy(buff+sizeof(quint16), &dscrt_tm_tp, sizeof(quint8));
+    send_U_Packet(CLIENT_WANT_CHANGE_DEBUG_SETTINGS, QByteArray(buff,(sizeof (quint16) + sizeof (quint8))));
     send_U_Packet(flag, "");
 }
 

@@ -6,6 +6,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     QDir::setCurrent(qApp->applicationDirPath());
     gen_widg = new General_Widget();
     snd_rcv_module = new Send_Recieve_Module(gen_widg->get_setting("settings/SERVER_IP").toString(), gen_widg->get_setting("settings/SERVER_PORT").toInt(), gen_widg);
+    snd_rcv_module->moveToThread(&thread_1);
+    thread_1.start();
     ptr_registration_widg = new RegistrationWidget(this, gen_widg, snd_rcv_module);
     ptr_RHE_widg = new RHE_Widget(this, gen_widg, snd_rcv_module);
     ui->stackedWidget->addWidget(ptr_registration_widg);
@@ -19,16 +21,22 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(gen_widg, &General_Widget::re_translate_signal, ptr_registration_widg, &RegistrationWidget::slot_re_translate);
     connect(gen_widg, &General_Widget::re_translate_signal, ptr_RHE_widg, &RHE_Widget::slot_re_translate);
     connect(snd_rcv_module, &Send_Recieve_Module::logout_signal, this, &MainWindow::logout);
+    connect(this, &MainWindow::set_disconnected_signal, snd_rcv_module, &Send_Recieve_Module::set_disconnected);
+    connect(ptr_registration_widg, &RegistrationWidget::logined, this, &MainWindow::logined);
     gen_widg->change_current_locale();
-    tmr = new QTimer(this);
-    connect(tmr, &QTimer::timeout, this, &MainWindow::slot_timer_timeout);
-    tmr->stop();
+    tmr_waveform_viewer = new QTimer(this);
+    connect(tmr_waveform_viewer, &QTimer::timeout, this, &MainWindow::slot_timer_waveform_viewer_timeout);
+    tmr_waveform_viewer->stop();
+    tmr_progress_bar = new QTimer(nullptr);
+    connect(tmr_progress_bar, &QTimer::timeout, this, &MainWindow::slot_timer_progress_bar_timeout);
 }
 
 MainWindow::~MainWindow() {
-    disconnect(tmr, &QTimer::timeout, this, &MainWindow::slot_timer_timeout);
-    slot_timer_timeout();
-    delete tmr;
+    thread_1.quit();
+    disconnect(tmr_waveform_viewer, &QTimer::timeout, this, &MainWindow::slot_timer_waveform_viewer_timeout);
+    slot_timer_waveform_viewer_timeout();
+    delete tmr_waveform_viewer;
+    delete tmr_progress_bar;
     delete ptr_registration_widg;
     delete ptr_RHE_widg;
     delete wvfrm_vwr_actn;
@@ -41,7 +49,7 @@ MainWindow::~MainWindow() {
     delete menu_file;
     delete menu_settngs;
     delete menu_bar;
-    delete snd_rcv_module;
+//    delete snd_rcv_module;
     delete gen_widg;
     delete ui;
 }
@@ -162,7 +170,7 @@ void MainWindow::on_button_login_logout_clicked() {
     if(ui->stackedWidget->currentWidget() == ptr_registration_widg) {
         login();
     } else {
-        snd_rcv_module->set_disconnected();
+        emit set_disconnected_signal();
     }
 }
 
@@ -179,6 +187,10 @@ void MainWindow::on_button_register_clicked() {
 // INITIALIZING OF UI COMPONENTS
 //-------------------------------------------------------------------------
 void MainWindow::initialize_ui() {
+    ui->prgrssBr_cnnctn_stat->setValue(ui->prgrssBr_cnnctn_stat->minimum());
+    ui->prgrssBr_cnnctn_stat->setStyleSheet("QProgressBar { border: 2px solid grey; border-radius: 5px; color: #FFFFFF; background-color: #000000; } QProgressBar::chunk { background-color: #0020FF; width: 10px; margin: 0.5px; }");
+    ui->prgrssBr_cnnctn_stat->setValue(0);
+    ui->prgrssBr_cnnctn_stat->setVisible(false);
     menu_bar = new QMenuBar(this);
     menu_bar->setStyleSheet("QMenuBar { background-color: #F5F5F5 } QMenuBar::item:selected { background: #9D9D90; } QMenuBar::item:pressed { background: #5D5D50; }" );
     menu_bar->setNativeMenuBar(false);
@@ -278,12 +290,26 @@ void MainWindow::load_settings() {
 //-------------------------------------------------------------------------
 void MainWindow::login() {
     if(ui->stackedWidget->currentWidget() == ptr_registration_widg) {
-        if(ptr_registration_widg->login()) {
-            ptr_RHE_widg->set_fname_lname(ptr_registration_widg->get_user_fname() + " " + ptr_registration_widg->get_user_lname());
-            ui->button_register->hide();
-            ui->stackedWidget->setCurrentWidget(ptr_RHE_widg);
-            ui->button_login_logout->setText(tr("Logout"));
-        }
+        ui->prgrssBr_cnnctn_stat->setVisible(true);
+        ui->prgrssBr_cnnctn_stat->setFormat(tr("Logging To Server"));
+        tmr_progress_bar->setInterval(200);
+        tmr_progress_bar->start();
+        ptr_registration_widg->login();
+    }
+}
+
+//-------------------------------------------------------------------------
+//
+//-------------------------------------------------------------------------
+void MainWindow::logined(bool flg) {
+    tmr_progress_bar->stop();
+    ui->prgrssBr_cnnctn_stat->setFormat("");
+    ui->prgrssBr_cnnctn_stat->setVisible(false);
+    if(flg) {
+        ptr_RHE_widg->set_fname_lname(ptr_registration_widg->get_user_fname() + " " + ptr_registration_widg->get_user_lname());
+        ui->button_register->hide();
+        ui->stackedWidget->setCurrentWidget(ptr_RHE_widg);
+        ui->button_login_logout->setText(tr("Logout"));
     }
 }
 
@@ -313,15 +339,15 @@ void MainWindow::slot_re_size() {
 // START OF TIMER WHICH INDICATES CLOSING OF STANDALONE WAVEFORM VIEWER
 //-------------------------------------------------------------------------
 void MainWindow::slot_waveform_viewer_closed() {
-    tmr->setInterval(100);
-    tmr->start();
+    tmr_waveform_viewer->setInterval(100);
+    tmr_waveform_viewer->start();
 }
 
 //-------------------------------------------------------------------------
 // TIMEOUT OF TIMER WHICH INDICATES CLOSING OF STANDALONE WAVEFORM VIEWER
 //-------------------------------------------------------------------------
-void MainWindow::slot_timer_timeout() {
-    tmr->stop();
+void MainWindow::slot_timer_waveform_viewer_timeout() {
+    tmr_waveform_viewer->stop();
     if(wvfrm_vwr != nullptr) {
         disconnect(gen_widg, &General_Widget::re_translate_signal, wvfrm_vwr, &Waveform_Viewer_Widget::slot_re_translate);
         disconnect(wvfrm_vwr, &Waveform_Viewer_Widget::waveform_viewer_closed_signal, this, &MainWindow::slot_waveform_viewer_closed);
@@ -329,6 +355,20 @@ void MainWindow::slot_timer_timeout() {
         delete wvfrm_vwr;
         wvfrm_vwr = nullptr;
     }
+}
+
+//-------------------------------------------------------------------------
+// TIMEOUT OF PROGRESS BAR TIMER
+//-------------------------------------------------------------------------
+void MainWindow::slot_timer_progress_bar_timeout() {
+    tmr_progress_bar->stop();
+    int val = ui->prgrssBr_cnnctn_stat->value() + 5;
+    if(val > ui->prgrssBr_cnnctn_stat->maximum()) {
+        val = ui->prgrssBr_cnnctn_stat->minimum();
+    }
+    ui->prgrssBr_cnnctn_stat->setValue(val);
+    tmr_progress_bar->setInterval(200);
+    tmr_progress_bar->start();
 }
 
 //-------------------------------------------------------------------------
