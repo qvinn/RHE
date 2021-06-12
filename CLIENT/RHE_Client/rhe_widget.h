@@ -42,6 +42,7 @@
             void change_board_pixmap();
             void set_enable_board_power_led(bool flg);
             void set_button_state_debug(bool flg);
+            void set_buttons_state_enabled(bool flg);
             void add_horizontal_spacer();
             void remove_horizontal_spacer();
             void check_is_proj_folder(bool folder_exist);
@@ -86,16 +87,17 @@
             bool qpf_exist = false;
             bool fit_exist = false;
             bool path_exist = false;
+            bool csv_exist = false;
+            bool csv_sended = false;
             bool ui_initialized = false;
             bool language_changed = false;
             bool board_is_on = false;
             bool clr_trnsprnt = true;
-            bool sqnc_of_sgnls_file_sended = false;
-            bool dgb_strtd = false;
+            bool dbg_strtd = false;
             bool sqnc_of_sgnls_strtd = false;
 
             int prev_board_index;
-            int crrnt_state_strs;
+            int crrnt_state_strs = 7;
             int dbg_tm_tp_lmt = 0;
 
         public slots:

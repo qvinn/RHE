@@ -10,7 +10,7 @@
     #include <QMessageBox>
     #include <QFileDialog>
     #include <QApplication>
-    #include <QScreen>
+    #include <QCryptographicHash>
 
     class General_Widget : public QWidget {
         Q_OBJECT
@@ -67,6 +67,8 @@
              * QString filter - needed file extension
              */
             QString load_file_path(QWidget *prnt, QString title, QString filter);
+
+            QByteArray fileChecksum(const QString &fileName, QCryptographicHash::Algorithm hashAlgorithm);
 
             /*
              * QString title - title of message dialog

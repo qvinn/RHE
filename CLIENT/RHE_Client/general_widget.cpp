@@ -228,6 +228,19 @@ void General_Widget::save_file(QWidget *prnt, QString title, QString filter, QSt
     }
 }
 
+QByteArray General_Widget::fileChecksum(const QString &fileName, QCryptographicHash::Algorithm hashAlgorithm) {
+    QFile f(fileName);
+    if(f.open(QFile::ReadOnly)) {
+        QCryptographicHash hash(hashAlgorithm);
+        if(hash.addData(&f)) {
+            return hash.result();
+        }
+    } else {
+        qDebug() << "Cant open file";
+    }
+    return QByteArray();
+}
+
 //-------------------------------------------------------------------------
 // GET PATH OF FILE LOADED WITH 'LOAD_FILES' METHOD
 //-------------------------------------------------------------------------

@@ -298,6 +298,9 @@ void Waveform_Viewer_Widget::set_ui_text() {
     language_changed = true;
 }
 
+//-------------------------------------------------------------------------
+//
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::set_measurement_label_text() {
     if(msr_time->visible()) {
         msr_time->setText(QString::number(fabs(scnd_msr_line->start->key() - frst_msr_line->start->key()) * time_coef) + " " + ui->cmbBx_wvfrm_vwr_dscrtnss_tm_tp->currentText());
@@ -725,6 +728,9 @@ void Waveform_Viewer_Widget::remove_data_from_saved_vals_list() {
     svd_dbg_time->clear();
 }
 
+//-------------------------------------------------------------------------
+//
+//-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::remove_all_data() {
     remove_data_from_graph();
     remove_data_from_saved_vals_list();
@@ -773,8 +779,7 @@ void Waveform_Viewer_Widget::select_diagram_settings() {
     } else {
         settings_select_dialog.move((gen_widg->get_position().x() - (settings_select_dialog.width() / 2)), (gen_widg->get_position().y() - (settings_select_dialog.height() / 2)));
     }
-    int dlgCase = settings_select_dialog.exec();
-    if(dlgCase == 1) {
+    if(settings_select_dialog.exec() == QDialog::Accepted) {
         QList<QString> sttngs_lst_new = settings_select_dialog.get_diagram_settings();
         for(int i = 0; i < sttngs_lst_new.count(); i++) {
             if(i == (params_lst.count() - 1)) {
@@ -826,8 +831,7 @@ void Waveform_Viewer_Widget::select_displayable_pins() {
     } else {
         pins_select_dialog.move((gen_widg->get_position().x() - (pins_select_dialog.width() / 2)), (gen_widg->get_position().y() - (pins_select_dialog.height() / 2)));
     }
-    int dlgCase = pins_select_dialog.exec();
-    if(dlgCase == 1) {
+    if(pins_select_dialog.exec() == QDialog::Accepted) {
         QStringList dsplbl_pins_lst = pins_select_dialog.get_displayable_pins();
         if((dsplbl_pins_lst.count() == 0) && (svd_vals->count() == 0)) {
             return;

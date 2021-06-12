@@ -39,7 +39,7 @@ RHE_Widget::RHE_Widget(QWidget *parent, General_Widget *widg, Send_Recieve_Modul
     prev_vals = new QList<int>();
     pi_pins_nums = new QList<int>();
     send_file_status = new QTimer(nullptr);
-    state_strs = {tr("Firmware sending"), tr("Firmware Sended"), tr("FPGA Flashing"), tr("FPGA Flashed"), tr("Debugging"), ""};
+    state_strs = {tr("Firmware Sending"), tr("Firmware Sended"), tr("FPGA Flashing"), tr("FPGA Flashed"), tr("Debugging"), tr("Sequence Of Signals File Sending"), tr("Sequence Of Signals File Sended"), ""};
     connect(send_file_status, &QTimer::timeout, this, &RHE_Widget::slot_timer_timeout);
     pre_initialize_ui();
 }
@@ -140,7 +140,7 @@ void RHE_Widget::on_pshBttn_strt_dbg_clicked() {
     }
     int flag;
     send_file_status->stop();
-    if(ui->chckBx_strt_sqnc_of_sgn_with_dbg->isEnabled() && static_cast<bool>(static_cast<int>(ui->chckBx_strt_sqnc_of_sgn_with_dbg->checkState())) && sqnc_of_sgnls_file_sended && static_cast<bool>(static_cast<int>(ui->chckBx_strt_dbg_aftr_flsh->checkState()))) {
+    if(ui->chckBx_strt_sqnc_of_sgn_with_dbg->isEnabled() && static_cast<bool>(static_cast<int>(ui->chckBx_strt_sqnc_of_sgn_with_dbg->checkState())) && csv_sended && static_cast<bool>(static_cast<int>(ui->chckBx_strt_dbg_aftr_flsh->checkState()))) {
         flag = CLIENT_WANT_FLASH_ALL_SYNC;
         sqnc_of_sgnls_strtd = true;
         scrll_area_sgnls_set_enabled(false);
@@ -157,7 +157,7 @@ void RHE_Widget::on_pshBttn_strt_dbg_clicked() {
         slot_input_val_changed(inpt_sldrs->at(0)->value());
     }
     set_button_state_debug(true);
-    if(ui->chckBx_strt_sqnc_of_sgn_with_dbg->isEnabled() && static_cast<bool>(static_cast<int>(ui->chckBx_strt_sqnc_of_sgn_with_dbg->checkState())) && sqnc_of_sgnls_file_sended && !static_cast<bool>(static_cast<int>(ui->chckBx_strt_dbg_aftr_flsh->checkState()))) {
+    if(ui->chckBx_strt_sqnc_of_sgn_with_dbg->isEnabled() && static_cast<bool>(static_cast<int>(ui->chckBx_strt_sqnc_of_sgn_with_dbg->checkState())) && csv_sended && !static_cast<bool>(static_cast<int>(ui->chckBx_strt_dbg_aftr_flsh->checkState()))) {
         sqnc_of_sgnls_strtd = true;
         scrll_area_sgnls_set_enabled(false);
         on_pshBttn_strt_sgnls_sqnc_clicked();
@@ -168,11 +168,13 @@ void RHE_Widget::on_pshBttn_strt_dbg_clicked() {
 // PUSH BUTTON 'STOP DEBUG' CLICKED
 //-------------------------------------------------------------------------
 void RHE_Widget::on_pshBttn_stp_dbg_clicked() {
-    crrnt_state_strs = 5;
-    ui->prgrssBr_fl_sts->setFormat(state_strs.at(crrnt_state_strs));
-    snd_rcv_module->stop_debug();
-    set_button_state_debug(false);
-    slot_end_sequence_of_signals();
+    if(dbg_strtd) {
+        crrnt_state_strs = 7;
+        ui->prgrssBr_fl_sts->setFormat(state_strs.at(crrnt_state_strs));
+        snd_rcv_module->stop_debug();
+        set_button_state_debug(false);
+        slot_end_sequence_of_signals();
+    }
 }
 
 //-------------------------------------------------------------------------
@@ -181,7 +183,7 @@ void RHE_Widget::on_pshBttn_stp_dbg_clicked() {
 void RHE_Widget::on_chckBx_strt_dbg_aftr_flsh_stateChanged(int state) {
     if(ui_initialized) {
         gen_widg->save_setting("settings/START_DEBUG_AFTER_FPGA_FLASHING", state);
-        ui->pshBttn_strt_dbg->setEnabled(!static_cast<bool>(state));
+        ui->pshBttn_strt_dbg->setEnabled(!static_cast<bool>(state) && !dbg_strtd);
     }
 }
 
@@ -190,7 +192,9 @@ void RHE_Widget::on_chckBx_strt_dbg_aftr_flsh_stateChanged(int state) {
 //-------------------------------------------------------------------------
 void RHE_Widget::on_pshBttn_chs_sgnls_sqnc_clicked() {
     QString str = gen_widg->load_file_path(this, tr("Choose csv-file with sequence of signals"), tr("Comma-Separated Values files (*.csv)"));
-    if(str.length() != 0) {
+    csv_exist = static_cast<bool>(str.length());
+    csv_sended = false;
+    if(csv_exist) {
         csv_file->setFileName(str);
         ui->pshBttn_snd_sgnls_sqnc->setEnabled(true);
         pshBttn_strt_sgnls_sqnc_set_enabled(false);
@@ -204,6 +208,11 @@ void RHE_Widget::on_pshBttn_chs_sgnls_sqnc_clicked() {
 //-------------------------------------------------------------------------
 void RHE_Widget::on_pshBttn_snd_sgnls_sqnc_clicked() {
     if(csv_file->open(QIODevice::ReadOnly)) {
+        crrnt_state_strs = 5;
+        ui->prgrssBr_fl_sts->setFormat(state_strs.at(crrnt_state_strs));
+        send_file_status->setInterval(200);
+        send_file_status->start();
+        set_buttons_state_enabled(false);
         snd_rcv_module->send_file_to_ss(csv_file->readAll(), CLIENT_START_SEND_DSQ_FILE, CLIENT_SENDING_DSQ_FILE, CLIENT_FINISH_SEND_DSQ_FILE);
         csv_file->close();
     }
@@ -213,10 +222,13 @@ void RHE_Widget::on_pshBttn_snd_sgnls_sqnc_clicked() {
 // PUSH BUTTON 'START SEQUENCE OF SIGNALS' CLICKED
 //-------------------------------------------------------------------------
 void RHE_Widget::on_pshBttn_strt_sgnls_sqnc_clicked() {
-    if(dgb_strtd) {
+    if(dbg_strtd) {
         sqnc_of_sgnls_strtd = true;
         snd_rcv_module->start_sequence_of_signals();
         scrll_area_sgnls_set_enabled(false);
+        pshBttn_strt_sgnls_sqnc_set_enabled(false);
+        ui->pshBttn_snd_sgnls_sqnc->setEnabled(false);
+        ui->pshBttn_chs_sgnls_sqnc->setEnabled(false);
     } else {
         gen_widg->show_message_box("", tr("Debug not started"), 0, gen_widg->get_position());
     }
@@ -228,7 +240,7 @@ void RHE_Widget::on_pshBttn_strt_sgnls_sqnc_clicked() {
 void RHE_Widget::on_chckBx_strt_sqnc_of_sgn_with_dbg_stateChanged(int state) {
     if(ui_initialized) {
         gen_widg->save_setting("settings/START_SEQUENCE_OF_SIGNALS_WITH_DEBUG", state);
-        ui->pshBttn_strt_sgnls_sqnc->setEnabled(!(static_cast<bool>(state)) && sqnc_of_sgnls_file_sended);
+        ui->pshBttn_strt_sgnls_sqnc->setEnabled(!(static_cast<bool>(state)) && csv_sended && !sqnc_of_sgnls_strtd);
     }
 }
 
@@ -319,6 +331,7 @@ void RHE_Widget::on_pshBttn_snd_frmwr_clicked() {
         ui->prgrssBr_fl_sts->setFormat(state_strs.at(crrnt_state_strs));
         snd_rcv_module->send_file_to_ss(svf_file->readAll(), CLIENT_START_SEND_FILE, CLIENT_SENDING_FILE, CLIENT_FINISH_SEND_FILE);
         svf_file->close();
+        set_buttons_state_enabled(false);
     }
 }
 
@@ -424,6 +437,8 @@ void RHE_Widget::initialize_ui() {
 //-------------------------------------------------------------------------
 void RHE_Widget::post_initialize_ui() {
     ui_initialized = true;
+    csv_exist = false;
+    csv_sended = false;
     set_ui_text();
     prev_board_index = gen_widg->get_setting("settings/CURRENT_BOARD").toInt();
     ui->cmbBx_chs_brd->setCurrentIndex(prev_board_index);
@@ -454,7 +469,7 @@ void RHE_Widget::set_ui_text() {
         ui->cmbBx_dbg_tm_tp->setItemText(1, tr("ms"));
 //        ui->cmbBx_dbg_tm_tp->setItemText(2, tr("us"));
     }
-    state_strs = {tr("Firmware sending"), tr("Firmware Sended"), tr("FPGA Flashing"), tr("FPGA Flashed"), tr("Debugging"), ""};
+    state_strs = {tr("Firmware sending"), tr("Firmware Sended"), tr("FPGA Flashing"), tr("FPGA Flashed"), tr("Debugging"), tr("Sequence Of Signals File Sending"), tr("Sequence Of Signals File Sended"), ""};
     ui->prgrssBr_fl_sts->setFormat(state_strs.at(crrnt_state_strs));
     ui->lbl_dbg_tm_tp_lmt->setText(ui->cmbBx_dbg_tm_tp->itemText(dbg_tm_tp_lmt));
     resizeEvent(nullptr);
@@ -535,7 +550,7 @@ void RHE_Widget::set_enable_board_power_led(bool flg) {
 // ENABLE/DISABLE OF SOME PUSH BUTTONS ON DEBUG STARTS
 //-------------------------------------------------------------------------
 void RHE_Widget::set_button_state_debug(bool flg) {
-    dgb_strtd = flg;
+    dbg_strtd = flg;
     wvfrm_vwr->debugging = flg;
     wvfrm_vwr->pshBttn_slct_dsplbl_pins_set_enabled(!flg);
     wvfrm_vwr->pshBttn_open_save_wvfrm_set_enabled(!flg);
@@ -546,6 +561,29 @@ void RHE_Widget::set_button_state_debug(bool flg) {
     pshBttn_chk_prj_stat_set_enabled(!flg);
     pshBttn_chs_frmwr_set_enabled(!flg);
     pshBttn_snd_frmwr_set_enabled(!flg && svf_exist);
+}
+
+//-------------------------------------------------------------------------
+// ENABLE/DISABLE OF SOME GUI ELEMENTS
+//-------------------------------------------------------------------------
+void RHE_Widget::set_buttons_state_enabled(bool flg) {
+    wvfrm_vwr->pshBttn_slct_dsplbl_pins_set_enabled(flg && !dbg_strtd);
+    wvfrm_vwr->pshBttn_open_save_wvfrm_set_enabled(flg && !dbg_strtd);
+    ui->pshBttn_strt_dbg->setEnabled(!dbg_strtd && flg && !static_cast<bool>(static_cast<int>(ui->chckBx_strt_dbg_aftr_flsh->checkState())));
+    ui->pshBttn_stp_dbg->setEnabled(flg);
+    ui->spnBx_dbg_tm->setEnabled(flg && !dbg_strtd);
+    ui->cmbBx_dbg_tm_tp->setEnabled(flg && !dbg_strtd);
+    ui->cmbBx_chs_brd->setEnabled(flg && !dbg_strtd);
+    ui->pshBttn_chs_sgnls_sqnc->setEnabled(flg);
+    ui->pshBttn_snd_sgnls_sqnc->setEnabled(flg && csv_exist);
+    ui->pshBttn_strt_sgnls_sqnc->setEnabled(flg && csv_exist & csv_sended && !static_cast<bool>(static_cast<int>(ui->chckBx_strt_sqnc_of_sgn_with_dbg->checkState())));
+    ui->chckBx_strt_dbg_aftr_flsh->setEnabled(flg);
+    ui->chckBx_strt_sqnc_of_sgn_with_dbg->setEnabled(flg && csv_exist & csv_sended);
+    ui->pshBttn_set_path_to_proj->setEnabled(flg && !dbg_strtd);
+    pshBttn_chk_prj_stat_set_enabled(flg && !dbg_strtd);
+    pshBttn_chs_frmwr_set_enabled(flg && !dbg_strtd);
+    pshBttn_snd_frmwr_set_enabled(flg && !dbg_strtd);
+    scrll_area_sgnls_set_enabled(flg);
 }
 
 //-------------------------------------------------------------------------
@@ -896,7 +934,7 @@ void RHE_Widget::slot_slider_pressed() {
 // COMMAND 'SET BOARD' FROM SERVER
 //-------------------------------------------------------------------------
 void RHE_Widget::slot_choose_board(QString jtag_code) {
-    if(dgb_strtd) {
+    if(dbg_strtd) {
         on_pshBttn_stp_dbg_clicked();
     }
     for(int i = 0; i < jtag_id_codes->count(); i++) {
@@ -959,7 +997,7 @@ void RHE_Widget::slot_accept_debug_data(QByteArray debug_data) {
         val.append(0);
         if(nmd_pin_pos.count() == 0) {
             if(i >= tmp_packet->pin_count) {
-                val.append(prev_vals->at((2 * i) + 1));           //0
+                val.append(prev_vals->at((2 * i) + 1));
             } else {
                 val.append(tmp_packet->pins[i].state);
             }
@@ -974,7 +1012,7 @@ void RHE_Widget::slot_accept_debug_data(QByteArray debug_data) {
                 }
             }
             if(tmp == nmd_pin_pos.count()) {
-                val.append(prev_vals->at((2 * i) + 1));         //0
+                val.append(prev_vals->at((2 * i) + 1));
             }
         }
         if(prev_vals->at(val.count() - 1) != val.at(val.count() - 1)) {
@@ -1049,6 +1087,7 @@ void RHE_Widget::slot_accept_output_data_table(QByteArray output_data_table) {
         wvfrm_vwr->add_pin_names(pin_name_str);
         pin_name->setFixedSize(40, 21);
         pin_name->setFont(ui->lbl_chs_brd->font());
+        pin_name->setStyleSheet("QLabel:disabled { color: #393939; }");
         inpt_lbls->append(pin_name);
         h_layout->addWidget(pin_name);
         QSpacerItem *hrzntl_1 = new QSpacerItem(20, 20, QSizePolicy::Preferred, QSizePolicy::Minimum);
@@ -1090,7 +1129,7 @@ void RHE_Widget::slot_firmware_file_sended() {
     crrnt_state_strs = 1;
     ui->prgrssBr_fl_sts->setFormat(state_strs.at(crrnt_state_strs));
     ui->prgrssBr_fl_sts->setValue(ui->prgrssBr_fl_sts->minimum());
-    if(!static_cast<bool>(static_cast<int>(ui->chckBx_strt_sqnc_of_sgn_with_dbg->checkState())) || !sqnc_of_sgnls_file_sended || !static_cast<bool>(static_cast<int>(ui->chckBx_strt_dbg_aftr_flsh->checkState()))) {
+    if(!static_cast<bool>(static_cast<int>(ui->chckBx_strt_sqnc_of_sgn_with_dbg->checkState())) || !csv_sended || !static_cast<bool>(static_cast<int>(ui->chckBx_strt_dbg_aftr_flsh->checkState()))) {
         send_file_status->setInterval(200);
         send_file_status->start();
         crrnt_state_strs = 2;
@@ -1105,12 +1144,21 @@ void RHE_Widget::slot_firmware_file_sended() {
 // SERVER RECEIVED SEQUENCE OF SIGNALS FILE FROM USER
 //-------------------------------------------------------------------------
 void RHE_Widget::slot_sequence_of_signals_file_sended(bool flg) {
-    sqnc_of_sgnls_file_sended = flg;
+    csv_sended = flg;
     ui->chckBx_strt_sqnc_of_sgn_with_dbg->setEnabled(flg);
+    send_file_status->stop();
+    if(dbg_strtd) {
+        crrnt_state_strs = 4;
+    } else {
+        crrnt_state_strs = 6;
+    }
+    ui->prgrssBr_fl_sts->setFormat(state_strs.at(crrnt_state_strs));
+    ui->prgrssBr_fl_sts->setValue(ui->prgrssBr_fl_sts->minimum());
+    set_buttons_state_enabled(true);
     if(!static_cast<bool>(static_cast<int>(ui->chckBx_strt_sqnc_of_sgn_with_dbg->checkState()))) {
         pshBttn_strt_sgnls_sqnc_set_enabled(flg);
     } else {
-        if(dgb_strtd) {
+        if(dbg_strtd) {
             on_pshBttn_strt_sgnls_sqnc_clicked();
         }
     }
@@ -1125,6 +1173,7 @@ void RHE_Widget::slot_fpga_flashed() {
     ui->prgrssBr_fl_sts->setFormat(state_strs.at(crrnt_state_strs));
     ui->prgrssBr_fl_sts->setValue(ui->prgrssBr_fl_sts->minimum());
     set_enable_board_power_led(true);
+    set_buttons_state_enabled(true);
     if(static_cast<bool>(static_cast<int>(ui->chckBx_strt_dbg_aftr_flsh->checkState()))) {
         if(!static_cast<bool>(static_cast<int>(ui->chckBx_strt_sqnc_of_sgn_with_dbg->checkState())) || !ui->chckBx_strt_sqnc_of_sgn_with_dbg->isEnabled()) {
             on_pshBttn_strt_dbg_clicked();
@@ -1140,6 +1189,9 @@ void RHE_Widget::slot_fpga_flashed() {
 void RHE_Widget::slot_end_sequence_of_signals() {
     sqnc_of_sgnls_strtd = false;
     scrll_area_sgnls_set_enabled(true);
+    ui->pshBttn_chs_sgnls_sqnc->setEnabled(true);
+    ui->pshBttn_snd_sgnls_sqnc->setEnabled(csv_exist);
+    pshBttn_strt_sgnls_sqnc_set_enabled(csv_sended && !static_cast<bool>(static_cast<int>(ui->chckBx_strt_sqnc_of_sgn_with_dbg->checkState())));
 }
 
 //-------------------------------------------------------------------------
