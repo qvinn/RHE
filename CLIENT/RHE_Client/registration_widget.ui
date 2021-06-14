@@ -368,7 +368,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QLabel" name="label_login">
+             <widget class="QLabel" name="lbl_login">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -520,7 +520,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QLabel" name="label_password">
+             <widget class="QLabel" name="lbl_password">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -727,7 +727,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QLabel" name="label_frst_name">
+           <widget class="QLabel" name="lbl_frst_name">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -879,7 +879,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QLabel" name="label_lst_name">
+           <widget class="QLabel" name="lbl_lst_name">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>

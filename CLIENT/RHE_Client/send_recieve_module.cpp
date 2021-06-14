@@ -316,7 +316,7 @@ bool Send_Recieve_Module::establish_socket() {
     if(!socket->isOpen() || !socket->isValid()) {
         return false;
     }
-    return socket->waitForConnected(-1);
+    return socket->waitForConnected(60000);     //60000 msec timeout for establishing connection
 }
 
 //-------------------------------------------------------------------------

@@ -47,11 +47,14 @@
             QWidgetAction *cmbBx_lng_chs_actn = nullptr;
             QTimer *tmr_waveform_viewer = nullptr;
             QTimer *tmr_progress_bar = nullptr;
+            QList<QString> state_strs;
             QThread thread;
 
             bool ui_initialized = false;
             bool language_changed = false;
             bool shw_at_cntr = true;
+
+            int crrnt_state_strs = 1;
 
         public slots:
             void slot_re_translate();
@@ -61,8 +64,8 @@
             void resizeEvent(QResizeEvent *) override;
             void moveEvent(QMoveEvent *) override;
             void closeEvent(QCloseEvent *) override;
-            void on_button_login_logout_clicked();
-            void on_button_register_clicked();
+            void on_pshBttn_login_logout_clicked();
+            void on_pshBttn_register_clicked();
             void onPshBttnWvfrmVwr();
             void onPshBttnExt();
             void onChkBxFlsChckngStateChanged();

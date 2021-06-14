@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(this, &MainWindow::set_disconnected_signal, snd_rcv_module, &Send_Recieve_Module::set_disconnected);
     connect(ptr_registration_widg, &RegistrationWidget::logined, this, &MainWindow::logined);
     gen_widg->change_current_locale();
+    state_strs = {tr("Connecting To Server"), ""};
     tmr_waveform_viewer = new QTimer(this);
     connect(tmr_waveform_viewer, &QTimer::timeout, this, &MainWindow::slot_timer_waveform_viewer_timeout);
     tmr_waveform_viewer->stop();
@@ -166,7 +167,7 @@ void MainWindow::onCmbBxLngChsCurrentIndexChanged(int index) {
 //-------------------------------------------------------------------------
 // PUSH BUTTON 'LOGIN/LOGOUT' CLICKED
 //-------------------------------------------------------------------------
-void MainWindow::on_button_login_logout_clicked() {
+void MainWindow::on_pshBttn_login_logout_clicked() {
     if(ui->stackedWidget->currentWidget() == ptr_registration_widg) {
         login();
     } else {
@@ -177,9 +178,9 @@ void MainWindow::on_button_login_logout_clicked() {
 //-------------------------------------------------------------------------
 // PUSH BUTTON 'REGISTER' CLICKED
 //-------------------------------------------------------------------------
-void MainWindow::on_button_register_clicked() {
+void MainWindow::on_pshBttn_register_clicked() {
     if(ptr_registration_widg->register_user()) {
-        on_button_login_logout_clicked();
+        on_pshBttn_login_logout_clicked();
     }
 }
 
@@ -250,12 +251,16 @@ void MainWindow::set_ui_text() {
         cmbBx_lng_chs->setItemText(2, tr("Russian"));
     }
     if(ui->stackedWidget->currentWidget() == ptr_registration_widg) {
-        ui->button_login_logout->setText(tr("Login"));
+        ui->pshBttn_login_logout->setText(tr("Login"));
     } else {
-        ui->button_login_logout->setText(tr("Logout"));
+        ui->pshBttn_login_logout->setText(tr("Logout"));
     }
-    if(!ui->button_register->isHidden()) {
-        ui->button_register->setText(tr("Register"));
+    if(!ui->pshBttn_register->isHidden()) {
+        ui->pshBttn_register->setText(tr("Register"));
+    }
+    state_strs = {tr("Connecting To Server"), ""};
+    if(!ui->prgrssBr_cnnctn_stat->isHidden()) {
+        ui->prgrssBr_cnnctn_stat->setFormat(state_strs.at(crrnt_state_strs));
     }
     language_changed = true;
 }
@@ -290,9 +295,12 @@ void MainWindow::load_settings() {
 void MainWindow::login() {
     if(ui->stackedWidget->currentWidget() == ptr_registration_widg) {
         ui->prgrssBr_cnnctn_stat->setVisible(true);
-        ui->prgrssBr_cnnctn_stat->setFormat(tr("Connecting To Server"));
+        crrnt_state_strs = 0;
+        ui->prgrssBr_cnnctn_stat->setFormat(state_strs.at(crrnt_state_strs));
         tmr_progress_bar->setInterval(200);
         tmr_progress_bar->start();
+        ui->pshBttn_register->setEnabled(false);
+        ui->pshBttn_login_logout->setEnabled(false);
         ptr_registration_widg->login();
     }
 }
@@ -303,13 +311,16 @@ void MainWindow::login() {
 void MainWindow::logined(bool flg) {
     tmr_progress_bar->stop();
     ui->prgrssBr_cnnctn_stat->setValue(ui->prgrssBr_cnnctn_stat->minimum());
-    ui->prgrssBr_cnnctn_stat->setFormat("");
+    crrnt_state_strs = 1;
+    ui->prgrssBr_cnnctn_stat->setFormat(state_strs.at(crrnt_state_strs));
     ui->prgrssBr_cnnctn_stat->setVisible(false);
+    ui->pshBttn_register->setEnabled(true);
+    ui->pshBttn_login_logout->setEnabled(true);
     if(flg) {
         ptr_RHE_widg->set_fname_lname(ptr_registration_widg->get_user_fname() + " " + ptr_registration_widg->get_user_lname());
-        ui->button_register->hide();
+        ui->pshBttn_register->hide();
         ui->stackedWidget->setCurrentWidget(ptr_RHE_widg);
-        ui->button_login_logout->setText(tr("Logout"));
+        ui->pshBttn_login_logout->setText(tr("Logout"));
     }
 }
 
@@ -318,8 +329,8 @@ void MainWindow::logined(bool flg) {
 //-------------------------------------------------------------------------
 void MainWindow::logout() {
     if(ui->stackedWidget->currentWidget() != ptr_registration_widg) {
-        ui->button_login_logout->setText(tr("Login"));
-        ui->button_register->show();
+        ui->pshBttn_login_logout->setText(tr("Login"));
+        ui->pshBttn_register->show();
         ui->stackedWidget->setCurrentWidget(ptr_registration_widg);
         ptr_RHE_widg->initialize_ui();
     }
