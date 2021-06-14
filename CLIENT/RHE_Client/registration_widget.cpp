@@ -85,7 +85,7 @@ void RegistrationWidget::login() {
 }
 
 //-------------------------------------------------------------------------
-//
+// CONNECTION WITH SERVER ESTABLISHED
 //-------------------------------------------------------------------------
 void RegistrationWidget::link_established(bool flg) {
     if(!flg) {
@@ -97,7 +97,7 @@ void RegistrationWidget::link_established(bool flg) {
 }
 
 //-------------------------------------------------------------------------
-//
+// SERVER RECIEVED USER ID
 //-------------------------------------------------------------------------
 void RegistrationWidget::id_received(int state) {
     if(state != CS_OK) {

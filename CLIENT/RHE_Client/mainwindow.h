@@ -47,7 +47,7 @@
             QWidgetAction *cmbBx_lng_chs_actn = nullptr;
             QTimer *tmr_waveform_viewer = nullptr;
             QTimer *tmr_progress_bar = nullptr;
-            QThread thread_1;
+            QThread thread;
 
             bool ui_initialized = false;
             bool language_changed = false;

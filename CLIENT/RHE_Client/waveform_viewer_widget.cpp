@@ -11,7 +11,6 @@ Waveform_Viewer_Widget::Waveform_Viewer_Widget(QWidget *parent, General_Widget *
     ui->chckBx_ft_sz->setVisible(!stndln);
     textTicker = new QSharedPointer<QCPAxisTickerText>(new QCPAxisTickerText());
     dyn_tckr = new QSharedPointer<QCPAxisTickerFixed>(new QCPAxisTickerFixed());
-//    ui->diagram->setOpenGl(true);         //qcustomplot.cpp - line 909
     curs_ver_line = new QCPItemLine(ui->diagram);
     frst_msr_line = new QCPItemLine(ui->diagram);
     scnd_msr_line = new QCPItemLine(ui->diagram);

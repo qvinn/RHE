@@ -68,7 +68,11 @@
              */
             QString load_file_path(QWidget *prnt, QString title, QString filter);
 
-            QByteArray fileChecksum(const QString &fileName, QCryptographicHash::Algorithm hashAlgorithm);
+            /*
+             * QString file_path - path to file, which checksum will be calculated
+             * QCryptographicHash::Algorithm hash_algorithm - type of algorithm for checksum
+             */
+            QByteArray get_file_checksum(QString file_path, QCryptographicHash::Algorithm hash_algorithm);
 
             /*
              * QString title - title of message dialog

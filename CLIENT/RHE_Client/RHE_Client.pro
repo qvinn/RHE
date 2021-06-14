@@ -7,7 +7,6 @@ CONFIG += app c++11
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
-#DEFINES += QCUSTOMPLOT_USE_OPENGL
 
 SOURCES += \
     general_widget.cpp \
@@ -36,9 +35,10 @@ HEADERS += \
     send_recieve_module.h \
     waveform_viewer_widget.h
 
-TRANSLATIONS += Language/RHE_Client_en.ts \
-                Language/RHE_Client_ua.ts \
-                Language/RHE_Client_ru.ts
+TRANSLATIONS += \
+    Language/RHE_Client_en.ts \
+    Language/RHE_Client_ua.ts \
+    Language/RHE_Client_ru.ts
 
 CODECFORSRC = UTF-8
 

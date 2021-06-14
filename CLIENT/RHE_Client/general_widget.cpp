@@ -228,11 +228,14 @@ void General_Widget::save_file(QWidget *prnt, QString title, QString filter, QSt
     }
 }
 
-QByteArray General_Widget::fileChecksum(const QString &fileName, QCryptographicHash::Algorithm hashAlgorithm) {
-    QFile f(fileName);
-    if(f.open(QFile::ReadOnly)) {
-        QCryptographicHash hash(hashAlgorithm);
-        if(hash.addData(&f)) {
+//-------------------------------------------------------------------------
+// GET CHECKSUM OF FILE
+//-------------------------------------------------------------------------
+QByteArray General_Widget::get_file_checksum(QString file_path, QCryptographicHash::Algorithm hash_algorithm) {
+    QFile file(file_path);
+    if(file.open(QFile::ReadOnly)) {
+        QCryptographicHash hash(hash_algorithm);
+        if(hash.addData(&file)) {
             return hash.result();
         }
     } else {

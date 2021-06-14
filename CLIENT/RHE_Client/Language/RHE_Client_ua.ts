@@ -119,7 +119,7 @@
         <translation type="vanished">Розмір шрифту відміток на вісях і часовій мітці курсору</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="1332"/>
+        <location filename="../waveform_viewer_widget.cpp" line="1331"/>
         <source>Select diagram settings</source>
         <translation>Вибір налаштувань діаграми</translation>
     </message>
@@ -160,7 +160,7 @@
         <translation type="vanished">Відміна</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="1217"/>
+        <location filename="../waveform_viewer_widget.cpp" line="1216"/>
         <source>Select pins for display</source>
         <translation>Виберіть піни для відображування</translation>
     </message>
@@ -168,27 +168,27 @@
 <context>
     <name>General_Widget</name>
     <message>
-        <location filename="../general_widget.cpp" line="266"/>
+        <location filename="../general_widget.cpp" line="269"/>
         <source>Warning</source>
         <translation>Увага</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="271"/>
+        <location filename="../general_widget.cpp" line="274"/>
         <source>Question</source>
         <translation>Питання</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="276"/>
+        <location filename="../general_widget.cpp" line="279"/>
         <source>Yes</source>
         <translation>Так</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="277"/>
+        <location filename="../general_widget.cpp" line="280"/>
         <source>No</source>
         <translation>Ні</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="280"/>
+        <location filename="../general_widget.cpp" line="283"/>
         <source>Information</source>
         <translation>Інформація</translation>
     </message>
@@ -202,85 +202,85 @@
     </message>
     <message>
         <location filename="../mainwindow.ui" line="515"/>
-        <location filename="../mainwindow.cpp" line="259"/>
+        <location filename="../mainwindow.cpp" line="258"/>
         <source>Register</source>
         <translation>  Реєстрація  </translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="800"/>
-        <location filename="../mainwindow.cpp" line="254"/>
+        <location filename="../mainwindow.cpp" line="253"/>
         <location filename="../mainwindow.cpp" line="321"/>
         <source>Login</source>
         <translation>Війти</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="256"/>
+        <location filename="../mainwindow.cpp" line="255"/>
         <location filename="../mainwindow.cpp" line="312"/>
         <source>Logout</source>
         <translation>Вийти</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="237"/>
+        <location filename="../mainwindow.cpp" line="236"/>
         <source>File</source>
         <translation>Файл</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="236"/>
+        <location filename="../mainwindow.cpp" line="235"/>
         <source>Remote Hardware Education</source>
         <translation>Віддалене Апаратне Навчання</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="238"/>
+        <location filename="../mainwindow.cpp" line="237"/>
         <source>Settings</source>
         <translation>Налаштування</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="239"/>
+        <location filename="../mainwindow.cpp" line="238"/>
         <source>Open waveform viewer</source>
         <translation>Відкрити переглядач часових діаграм</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="240"/>
+        <location filename="../mainwindow.cpp" line="239"/>
         <source>Exit</source>
         <translation>Вихід</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="241"/>
+        <location filename="../mainwindow.cpp" line="240"/>
         <source>Files checking</source>
         <translation>Перевірка файлів</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="242"/>
+        <location filename="../mainwindow.cpp" line="241"/>
         <source>Pins checking</source>
         <translation>Перевірка пінів</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="243"/>
+        <location filename="../mainwindow.cpp" line="242"/>
         <source>Manualy load firmware</source>
         <translation>Завантажити прошивку власноруч</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="245"/>
-        <location filename="../mainwindow.cpp" line="249"/>
+        <location filename="../mainwindow.cpp" line="244"/>
+        <location filename="../mainwindow.cpp" line="248"/>
         <source>English</source>
         <translation>Англійська</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="246"/>
-        <location filename="../mainwindow.cpp" line="250"/>
+        <location filename="../mainwindow.cpp" line="245"/>
+        <location filename="../mainwindow.cpp" line="249"/>
         <source>Ukrainian</source>
         <translation>Українська</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="247"/>
-        <location filename="../mainwindow.cpp" line="251"/>
+        <location filename="../mainwindow.cpp" line="246"/>
+        <location filename="../mainwindow.cpp" line="250"/>
         <source>Russian</source>
         <translation>Російська</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="294"/>
-        <source>Logging To Server</source>
-        <translation type="unfinished"></translation>
+        <location filename="../mainwindow.cpp" line="293"/>
+        <source>Connecting To Server</source>
+        <translation>Підключення До Серверу</translation>
     </message>
 </context>
 <context>
@@ -297,13 +297,13 @@
     </message>
     <message>
         <location filename="../rhe_widget.ui" line="789"/>
-        <location filename="../rhe_widget.cpp" line="466"/>
+        <location filename="../rhe_widget.cpp" line="471"/>
         <source>Start Debug</source>
         <translation>  Почати Відлагодження  </translation>
     </message>
     <message>
         <location filename="../rhe_widget.ui" line="1090"/>
-        <location filename="../rhe_widget.cpp" line="467"/>
+        <location filename="../rhe_widget.cpp" line="472"/>
         <source>Stop Debug</source>
         <translation>  Зупинити Відлагодження  </translation>
     </message>
@@ -373,7 +373,7 @@
     </message>
     <message>
         <location filename="../rhe_widget.cpp" line="48"/>
-        <location filename="../rhe_widget.cpp" line="478"/>
+        <location filename="../rhe_widget.cpp" line="483"/>
         <source>Debugging</source>
         <translation>Відлагодження</translation>
     </message>
@@ -392,13 +392,13 @@
     </message>
     <message>
         <location filename="../rhe_widget.cpp" line="48"/>
-        <location filename="../rhe_widget.cpp" line="478"/>
+        <location filename="../rhe_widget.cpp" line="483"/>
         <source>Sequence Of Signals File Sending</source>
         <translation>Надсилання Файлу Послідовності Сигналів</translation>
     </message>
     <message>
         <location filename="../rhe_widget.cpp" line="48"/>
-        <location filename="../rhe_widget.cpp" line="478"/>
+        <location filename="../rhe_widget.cpp" line="483"/>
         <source>Sequence Of Signals File Sended</source>
         <translation>Файл Послідовності Сигналів Надіслано</translation>
     </message>
@@ -444,44 +444,44 @@
     </message>
     <message>
         <location filename="../rhe_widget.cpp" line="330"/>
-        <location filename="../rhe_widget.cpp" line="708"/>
+        <location filename="../rhe_widget.cpp" line="713"/>
         <source>svf-file not generated</source>
         <translation>svf-file не сгенеровано</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="532"/>
+        <location filename="../rhe_widget.cpp" line="537"/>
         <source>Board picture at: </source>
         <translation>Зображення плати за шляхом: </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="796"/>
+        <location filename="../rhe_widget.cpp" line="801"/>
         <source>File-list of boards and their parameters at: </source>
         <translation>Файл-список плат та їх параметрів за шляхом: </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="806"/>
+        <location filename="../rhe_widget.cpp" line="811"/>
         <source> not found. Please, contact with teacher or administrator</source>
         <translation>не знайдено. Будь-ласка, зв&apos;яжіться з викладачем або адміністратором</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="478"/>
+        <location filename="../rhe_widget.cpp" line="483"/>
         <source>Firmware sending</source>
         <translation>Надсилання прошивки</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="468"/>
+        <location filename="../rhe_widget.cpp" line="473"/>
         <source>Hello, </source>
         <translation>Привіт, </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="470"/>
-        <location filename="../rhe_widget.cpp" line="474"/>
+        <location filename="../rhe_widget.cpp" line="475"/>
+        <location filename="../rhe_widget.cpp" line="479"/>
         <source>s</source>
         <translation>с</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="471"/>
-        <location filename="../rhe_widget.cpp" line="475"/>
+        <location filename="../rhe_widget.cpp" line="476"/>
+        <location filename="../rhe_widget.cpp" line="480"/>
         <source>ms</source>
         <translation>мс</translation>
     </message>
@@ -490,54 +490,54 @@
         <translation type="vanished">мкс</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="646"/>
+        <location filename="../rhe_widget.cpp" line="651"/>
         <source>Root-folder cannot be as project-folder</source>
         <translation>Коренева папка не може бути папкою проекту</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="686"/>
+        <location filename="../rhe_widget.cpp" line="691"/>
         <source>Folder with project not chosen</source>
         <translation>Папка з проектом не вибрана</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="691"/>
+        <location filename="../rhe_widget.cpp" line="696"/>
         <source>Project not fittered</source>
         <translation>У проекті не пройдений етап fitter&apos;a</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="701"/>
+        <location filename="../rhe_widget.cpp" line="706"/>
         <source>sof-file not generated</source>
         <translation>sof-file не сгенеровано</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="766"/>
+        <location filename="../rhe_widget.cpp" line="771"/>
         <source>Count of pins in board list are greater than in project(for current FPGA: </source>
         <translation>Кількість контактів у списку плат більша, ніж у проекті (для поточної ПЛІС: </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="774"/>
-        <location filename="../rhe_widget.cpp" line="777"/>
+        <location filename="../rhe_widget.cpp" line="779"/>
+        <location filename="../rhe_widget.cpp" line="782"/>
         <source>&apos; for pin </source>
         <translation>&apos; для піна </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="774"/>
+        <location filename="../rhe_widget.cpp" line="779"/>
         <source>In project, direction &apos;</source>
         <translation>У проекті, напрямок &apos;</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="774"/>
-        <location filename="../rhe_widget.cpp" line="777"/>
+        <location filename="../rhe_widget.cpp" line="779"/>
+        <location filename="../rhe_widget.cpp" line="782"/>
         <source> isn&apos;t correct, set &apos;</source>
         <translation> неправильне, встановіть &apos;</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="777"/>
+        <location filename="../rhe_widget.cpp" line="782"/>
         <source>In project, I/O Standart &apos;</source>
         <translation>В проекті, I/O Стандарт</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="752"/>
+        <location filename="../rhe_widget.cpp" line="757"/>
         <source> for board </source>
         <translation> для плати </translation>
     </message>
@@ -546,17 +546,17 @@
         <translation type="vanished">Зображення плати за шляхом </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="532"/>
+        <location filename="../rhe_widget.cpp" line="537"/>
         <source> not found</source>
         <translation> не знайдено</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="752"/>
+        <location filename="../rhe_widget.cpp" line="757"/>
         <source>FPGA in project isn&apos;t </source>
         <translation>ПЛІС в проекті не </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="786"/>
+        <location filename="../rhe_widget.cpp" line="791"/>
         <source>Pins in board list doesn&apos;t exist in project(for current FPGA: </source>
         <translation>Піни в списку дошки не існують у проекті (для поточної ПЛІС: </translation>
     </message>
@@ -569,25 +569,25 @@
         <translation type="vanished">Неможливо відкрити </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="840"/>
+        <location filename="../rhe_widget.cpp" line="845"/>
         <source>&apos;jtag_id_code&apos; in board list doesn&apos;t exist for board: </source>
         <translation>&apos;jtag_id_code&apos; у списку плат не існує для плати: </translation>
     </message>
     <message>
         <location filename="../rhe_widget.cpp" line="48"/>
-        <location filename="../rhe_widget.cpp" line="478"/>
+        <location filename="../rhe_widget.cpp" line="483"/>
         <source>Firmware Sended</source>
         <translation>Прошивка Надіслана</translation>
     </message>
     <message>
         <location filename="../rhe_widget.cpp" line="48"/>
-        <location filename="../rhe_widget.cpp" line="478"/>
+        <location filename="../rhe_widget.cpp" line="483"/>
         <source>FPGA Flashing</source>
         <translation>Прошивка ПЛІС</translation>
     </message>
     <message>
         <location filename="../rhe_widget.cpp" line="48"/>
-        <location filename="../rhe_widget.cpp" line="478"/>
+        <location filename="../rhe_widget.cpp" line="483"/>
         <source>FPGA Flashed</source>
         <translation>ПЛІС Прошита</translation>
     </message>
@@ -809,68 +809,68 @@
 <context>
     <name>Waveform_Viewer_Widget</name>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="284"/>
+        <location filename="../waveform_viewer_widget.cpp" line="283"/>
         <source>Open waveform</source>
         <translation>  Відкрити часову діаграму  </translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="286"/>
+        <location filename="../waveform_viewer_widget.cpp" line="285"/>
         <source>Save waveform</source>
         <translation>  Зберегти часову діаграму  </translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="282"/>
+        <location filename="../waveform_viewer_widget.cpp" line="281"/>
         <source>Waveform Viewer</source>
         <translation>Переглядач часових діаграм</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="289"/>
-        <location filename="../waveform_viewer_widget.cpp" line="293"/>
+        <location filename="../waveform_viewer_widget.cpp" line="288"/>
+        <location filename="../waveform_viewer_widget.cpp" line="292"/>
         <source>s</source>
         <translation>c</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="290"/>
-        <location filename="../waveform_viewer_widget.cpp" line="294"/>
+        <location filename="../waveform_viewer_widget.cpp" line="289"/>
+        <location filename="../waveform_viewer_widget.cpp" line="293"/>
         <source>ms</source>
         <translation>мс</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="291"/>
-        <location filename="../waveform_viewer_widget.cpp" line="295"/>
+        <location filename="../waveform_viewer_widget.cpp" line="290"/>
+        <location filename="../waveform_viewer_widget.cpp" line="294"/>
         <source>us</source>
         <translation>мкс</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="396"/>
+        <location filename="../waveform_viewer_widget.cpp" line="395"/>
         <source>Choose waveform file</source>
         <translation>Вибрати файл з часовими діаграмами</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="396"/>
-        <location filename="../waveform_viewer_widget.cpp" line="508"/>
-        <location filename="../waveform_viewer_widget.cpp" line="523"/>
+        <location filename="../waveform_viewer_widget.cpp" line="395"/>
+        <location filename="../waveform_viewer_widget.cpp" line="507"/>
+        <location filename="../waveform_viewer_widget.cpp" line="522"/>
         <source>Waveform (*.wvfrm)</source>
         <translation>Waveform (*.wvfrm)</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="405"/>
+        <location filename="../waveform_viewer_widget.cpp" line="404"/>
         <source>Error</source>
         <translation>Помилка</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="405"/>
+        <location filename="../waveform_viewer_widget.cpp" line="404"/>
         <source>Waveform file not choosed</source>
         <translation>Файл з часовими діаграмами не обрано</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="508"/>
-        <location filename="../waveform_viewer_widget.cpp" line="523"/>
+        <location filename="../waveform_viewer_widget.cpp" line="507"/>
+        <location filename="../waveform_viewer_widget.cpp" line="522"/>
         <source>Saving waveform</source>
         <translation>Збереження часової діаграми</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="533"/>
+        <location filename="../waveform_viewer_widget.cpp" line="532"/>
         <source>No data for saving</source>
         <translation>Немає даних для збереження</translation>
     </message>

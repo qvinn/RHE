@@ -420,7 +420,6 @@ void RHE_Widget::initialize_ui() {
     pshBttn_chk_prj_stat_set_enabled(false);
     ui->pshBttn_snd_sgnls_sqnc->setEnabled(false);
     ui->prgrssBr_fl_sts->setStyleSheet("QProgressBar { border: 2px solid grey; border-radius: 5px; color: #FFFFFF; background-color: #000000; } QProgressBar::chunk { background-color: #0020FF; width: 10px; margin: 0.5px; }");
-    ui->prgrssBr_fl_sts->setValue(0);
     ui->chckBx_strt_dbg_aftr_flsh->setCheckState(static_cast<Qt::CheckState>(abs(gen_widg->get_setting("settings/START_DEBUG_AFTER_FPGA_FLASHING").toInt() - 2)));
     ui->chckBx_strt_sqnc_of_sgn_with_dbg->setCheckState(static_cast<Qt::CheckState>(abs(gen_widg->get_setting("settings/START_SEQUENCE_OF_SIGNALS_WITH_DEBUG").toInt() - 2)));
     ui->cmbBx_chs_brd->setCurrentIndex(abs(gen_widg->get_setting("settings/CURRENT_BOARD").toInt() - 1));
@@ -445,6 +444,8 @@ void RHE_Widget::post_initialize_ui() {
     ui_initialized = true;
     csv_exist = false;
     csv_sended = false;
+    dbg_strtd = false;
+    sqnc_of_sgnls_strtd = false;
     set_ui_text();
     prev_board_index = gen_widg->get_setting("settings/CURRENT_BOARD").toInt();
     ui->cmbBx_chs_brd->setCurrentIndex(prev_board_index);
@@ -456,6 +457,10 @@ void RHE_Widget::post_initialize_ui() {
     ui->chckBx_strt_sqnc_of_sgn_with_dbg->setEnabled(false);
     pshBttn_strt_sgnls_sqnc_set_enabled(false);
     set_enable_board_power_led(false);
+    set_buttons_state_enabled(true);
+    crrnt_state_strs = 7;
+    ui->prgrssBr_fl_sts->setFormat(state_strs.at(crrnt_state_strs));
+    ui->prgrssBr_fl_sts->setValue(ui->prgrssBr_fl_sts->minimum());
 }
 
 //-------------------------------------------------------------------------

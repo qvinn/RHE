@@ -6,8 +6,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     QDir::setCurrent(qApp->applicationDirPath());
     gen_widg = new General_Widget();
     snd_rcv_module = new Send_Recieve_Module(gen_widg->get_setting("settings/SERVER_IP").toString(), gen_widg->get_setting("settings/SERVER_PORT").toInt(), gen_widg);
-    snd_rcv_module->moveToThread(&thread_1);
-    thread_1.start();
+    snd_rcv_module->moveToThread(&thread);
+    thread.start();
     ptr_registration_widg = new RegistrationWidget(this, gen_widg, snd_rcv_module);
     ptr_RHE_widg = new RHE_Widget(this, gen_widg, snd_rcv_module);
     ui->stackedWidget->addWidget(ptr_registration_widg);
@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 }
 
 MainWindow::~MainWindow() {
-    thread_1.quit();
+    thread.quit();
     disconnect(tmr_waveform_viewer, &QTimer::timeout, this, &MainWindow::slot_timer_waveform_viewer_timeout);
     slot_timer_waveform_viewer_timeout();
     delete tmr_waveform_viewer;
@@ -189,7 +189,6 @@ void MainWindow::on_button_register_clicked() {
 void MainWindow::initialize_ui() {
     ui->prgrssBr_cnnctn_stat->setValue(ui->prgrssBr_cnnctn_stat->minimum());
     ui->prgrssBr_cnnctn_stat->setStyleSheet("QProgressBar { border: 2px solid grey; border-radius: 5px; color: #FFFFFF; background-color: #000000; } QProgressBar::chunk { background-color: #0020FF; width: 10px; margin: 0.5px; }");
-    ui->prgrssBr_cnnctn_stat->setValue(0);
     ui->prgrssBr_cnnctn_stat->setVisible(false);
     menu_bar = new QMenuBar(this);
     menu_bar->setStyleSheet("QMenuBar { background-color: #F5F5F5 } QMenuBar::item:selected { background: #9D9D90; } QMenuBar::item:pressed { background: #5D5D50; }" );
@@ -291,7 +290,7 @@ void MainWindow::load_settings() {
 void MainWindow::login() {
     if(ui->stackedWidget->currentWidget() == ptr_registration_widg) {
         ui->prgrssBr_cnnctn_stat->setVisible(true);
-        ui->prgrssBr_cnnctn_stat->setFormat(tr("Logging To Server"));
+        ui->prgrssBr_cnnctn_stat->setFormat(tr("Connecting To Server"));
         tmr_progress_bar->setInterval(200);
         tmr_progress_bar->start();
         ptr_registration_widg->login();
@@ -299,10 +298,11 @@ void MainWindow::login() {
 }
 
 //-------------------------------------------------------------------------
-//
+// USER LOGINED
 //-------------------------------------------------------------------------
 void MainWindow::logined(bool flg) {
     tmr_progress_bar->stop();
+    ui->prgrssBr_cnnctn_stat->setValue(ui->prgrssBr_cnnctn_stat->minimum());
     ui->prgrssBr_cnnctn_stat->setFormat("");
     ui->prgrssBr_cnnctn_stat->setVisible(false);
     if(flg) {

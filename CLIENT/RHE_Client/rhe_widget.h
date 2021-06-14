@@ -95,7 +95,7 @@
             bool dbg_strtd = false;
             bool sqnc_of_sgnls_strtd = false;
 
-            int prev_board_index;
+            int prev_board_index = -1;
             int crrnt_state_strs = 7;
             int dbg_tm_tp_lmt = 0;
 
