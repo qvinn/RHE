@@ -12,8 +12,18 @@ General_Widget::General_Widget() {
 #endif
     language_translator = new QTranslator();
     current_pos = new QPoint(-1, -1);
+    palette.setColor(QPalette::WindowText, QColor(0, 0, 0, 255));
+    palette.setColor(QPalette::Button, QColor(246, 246, 246, 255));
+    palette.setColor(QPalette::Text, QColor(0, 0, 0, 255));
+    palette.setColor(QPalette::ButtonText, QColor(0, 0, 0, 255));
+    palette.setColor(QPalette::Base, QColor(246, 246, 246, 255));
+    palette.setColor(QPalette::Window, QColor(246, 246, 246, 255));
+    palette.setColor(QPalette::Highlight, QColor(48, 140, 198, 255));
+    palette.setColor(QPalette::HighlightedText, QColor(255, 255, 255, 255));
+    palette.setColor(QPalette::PlaceholderText, QColor(0, 0, 0, 255));
     QString sub_style_sheet = "background-color: lightblue; border-style: outset; color: black; font: bold 10p; border-style: outset; border-width: 1px; border-radius: 0px; border-color: blue; padding: 0px 0px;";
-    style_sheet.append("pattern { background-color: rgb(245, 245, 245); }"
+    style_sheet.append("pattern_1 { background-color: #F5F5F5; }"
+                       "pattern_2"
                        "QPushButton:checked { " + sub_style_sheet + " }"
                        "QPushButton:pressed { " + sub_style_sheet + " }"
                        "QPushButton:disabled { " + sub_style_sheet + " }"
@@ -152,9 +162,9 @@ void General_Widget::check_is_icon_exist(QString path) {
 //-------------------------------------------------------------------------
 // GET STYLE_SHEET TO CUSTOMIZE SOME WINDOWS
 //-------------------------------------------------------------------------
-QString General_Widget::get_style_sheet(QString pattern) {
+QString General_Widget::get_style_sheet(QString pattern_1, QString pattern_2) {
     QString str = style_sheet;
-    return str.replace("pattern", pattern);
+    return str.replace("pattern_1", pattern_1).replace("pattern_2", pattern_2);
 }
 
 //-------------------------------------------------------------------------
@@ -172,7 +182,13 @@ QStringList* General_Widget::load_files(QWidget *prnt, QString title, QString fi
     } else {
         dialog.setFileMode(QFileDialog::ExistingFile);
     }
-    dialog.setStyleSheet(get_style_sheet("QFileDialog"));
+    dialog.setStyleSheet(get_style_sheet("QFileDialog", "QFileDialog QLineEdit { background-color: #FFFFFF; color: #000000; }"
+                                                        "QFileDialog QLabel { color: #000000; }"
+                                                        "QFileDialog QToolButton { background-color: darkGrey; color: #000000; }"));
+    QList<QWidget*> widgets = dialog.findChildren<QWidget*>();
+    for(int i = 0; i < widgets.count(); i++) {
+        widgets.at(i)->setPalette(palette);
+    }
     if(dialog.exec() == QDialog::Accepted) {
         files_list->clear();
         files_list->append(dialog.selectedFiles());
@@ -199,7 +215,13 @@ void General_Widget::save_file(QWidget *prnt, QString title, QString filter, QSt
         dialog.resize(800, 600);
         dialog.setFileMode(QFileDialog::AnyFile);
         dialog.setAcceptMode(QFileDialog::AcceptSave);
-        dialog.setStyleSheet(get_style_sheet("QFileDialog"));
+        dialog.setStyleSheet(get_style_sheet("QFileDialog", "QFileDialog QLineEdit { background-color: #FFFFFF; color: #000000; }"
+                                                            "QFileDialog QLabel { color: #000000; }"
+                                                            "QFileDialog QToolButton { background-color: darkGrey; color: #000000; }"));
+        QList<QWidget*> widgets = dialog.findChildren<QWidget*>();
+        for(int i = 0; i < widgets.count(); i++) {
+            widgets.at(i)->setPalette(palette);
+        }
         if(dialog.exec() == QDialog::Accepted) {
             fileName = dialog.selectedFiles().at(0);
             QStringList lst_1 = filter.split("*");
@@ -287,7 +309,7 @@ int General_Widget::show_message_box(QString title, QString message, int type, Q
     msgBox.setWindowModality(Qt::ApplicationModal);
     msgBox.setModal(true);
     msgBox.setWindowFlags(msgBox.windowFlags() | Qt::WindowStaysOnTopHint);
-    msgBox.setStyleSheet(get_style_sheet("QMessageBox"));
+    msgBox.setStyleSheet(get_style_sheet("QMessageBox", "QMessageBox QLabel { color: #000000; }"));
     //hack to place message window at centre of window with 'position' coordinates
     msgBox.show();
     msgBox.hide();

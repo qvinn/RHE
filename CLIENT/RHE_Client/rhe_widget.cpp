@@ -275,7 +275,7 @@ void RHE_Widget::on_spnBx_dbg_tm_valueChanged(int value) {
 void RHE_Widget::on_cmbBx_dbg_tm_tp_currentIndexChanged(int index) {
     if(ui_initialized && language_changed) {
         gen_widg->save_setting("settings/DEBUG_DISCRETENESS_TIME_TYPE", index);
-        ui->spnBx_dbg_tm->setMinimum(pow(50, index));                               //50 ms - minimum debug dicreteness time value
+        ui->spnBx_dbg_tm->setMinimum(static_cast<int>(pow(50, index)));                               //50 ms - minimum debug dicreteness time value
     }
 }
 
@@ -913,7 +913,7 @@ void RHE_Widget::add_data_to_qpoint(QList<QPoint> *lst, int val, bool is_x) {
 void RHE_Widget::slot_input_val_changed(int val) {
     int pos = (val - (val % 2)) / 2;
     inpt_stts->at(pos)->display(val % 2);
-    Send_Recieve_Module::set_state_Packet *switches_states = (Send_Recieve_Module::set_state_Packet*)malloc(sizeof(Send_Recieve_Module::set_state_Packet));
+    Send_Recieve_Module::set_state_Packet *switches_states = reinterpret_cast<Send_Recieve_Module::set_state_Packet*>(malloc(sizeof(Send_Recieve_Module::set_state_Packet)));
     memset(switches_states, 0, sizeof(Send_Recieve_Module::set_state_Packet));
     switches_states->pin_count = static_cast<uint8_t>(inpt_sldrs->count());
     for(int i = 0; i < inpt_sldrs->count(); i++) {
@@ -922,7 +922,9 @@ void RHE_Widget::slot_input_val_changed(int val) {
         switch_state.state = static_cast<uint8_t>(inpt_sldrs->at(i)->value() % 2);
         switches_states->pins[i] = switch_state;
     }
-    emit send_swtches_states_signal(QByteArray::fromRawData(reinterpret_cast<const char*>(switches_states), sizeof(Send_Recieve_Module::set_state_Packet)));
+    input_pins_states.clear();
+    input_pins_states.append(QByteArray::fromRawData(reinterpret_cast<const char*>(switches_states), sizeof(Send_Recieve_Module::set_state_Packet)));
+    emit send_swtches_states_signal(input_pins_states);
     free(switches_states);
 }
 
@@ -1062,8 +1064,8 @@ void RHE_Widget::slot_accept_output_data_table(QByteArray output_data_table) {
     int hop = 5; // bytes
     pi_pins_nums->clear();
     memcpy(&pin_count, output_data_table.data(), sizeof(uint8_t));
-    while(ui->verticalLayout_4->itemAt(0) != 0) {
-        while(ui->verticalLayout_4->itemAt(0)->layout()->takeAt(0) != 0) {
+    while(ui->verticalLayout_4->itemAt(0) != nullptr) {
+        while(ui->verticalLayout_4->itemAt(0)->layout()->takeAt(0) != nullptr) {
             ui->verticalLayout_4->itemAt(0)->layout()->removeItem(ui->verticalLayout_4->itemAt(0)->layout()->takeAt(0));
         }
         ui->verticalLayout_4->removeItem(ui->verticalLayout_4->itemAt(0));
@@ -1098,7 +1100,7 @@ void RHE_Widget::slot_accept_output_data_table(QByteArray output_data_table) {
         wvfrm_vwr->add_pin_names(pin_name_str);
         pin_name->setFixedSize(40, 21);
         pin_name->setFont(ui->lbl_chs_brd->font());
-        pin_name->setStyleSheet("QLabel:disabled { color: #393939; }");
+        pin_name->setStyleSheet("QLabel { color: #000000; } QLabel:disabled { color: #393939; }");
         inpt_lbls->append(pin_name);
         h_layout->addWidget(pin_name);
         QSpacerItem *hrzntl_1 = new QSpacerItem(20, 20, QSizePolicy::Preferred, QSizePolicy::Minimum);
@@ -1110,6 +1112,7 @@ void RHE_Widget::slot_accept_output_data_table(QByteArray output_data_table) {
         sldr->setMaximum(i * 2 + 1);
         sldr->setSingleStep(1);
         sldr->setBaseSize(100, 21);
+        sldr->setStyleSheet("QSlider { background-color: #F5F5F5; color: #000000; selection-background-color: #308CC6; selection-color: #FFFFFF; } QSlider:disabled { color: #393939; }");
         sldr->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
         connect(sldr, &QSlider::valueChanged, this, &RHE_Widget::slot_input_val_changed);
         connect(sldr, &QSlider::sliderPressed, this, &RHE_Widget::slot_slider_pressed);

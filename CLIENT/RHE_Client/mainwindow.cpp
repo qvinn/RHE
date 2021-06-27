@@ -192,11 +192,11 @@ void MainWindow::initialize_ui() {
     ui->prgrssBr_cnnctn_stat->setStyleSheet("QProgressBar { border: 2px solid grey; border-radius: 5px; color: #FFFFFF; background-color: #000000; } QProgressBar::chunk { background-color: #0020FF; width: 10px; margin: 0.5px; }");
     ui->prgrssBr_cnnctn_stat->setVisible(false);
     menu_bar = new QMenuBar(this);
-    menu_bar->setStyleSheet("QMenuBar { background-color: #F5F5F5 } QMenuBar::item:selected { background: #9D9D90; } QMenuBar::item:pressed { background: #5D5D50; }" );
+    menu_bar->setStyleSheet("QMenuBar { background-color: #F5F5F5; color: #000000; } QMenu:disabled { color: #898989; } QMenuBar::item:selected { background: #9D9D90; color: #FFFFFF; } QMenuBar::item:pressed { background: #5D5D50; color: #FFFFFF; }");
     menu_bar->setNativeMenuBar(false);
     ui->verticalLayout->insertWidget(0, menu_bar);
     menu_file = new QMenu(menu_bar);
-    menu_file->setStyleSheet("QMenu { background-color: #F5F5F5 } QMenu::item:selected { background: #9D9D90; }" );
+    menu_file->setStyleSheet("QMenu { background-color: #F5F5F5; color: #000000; border: 1px solid black; } QMenu:disabled { color: #898989; } QMenu::item:selected { background: #9D9D90; color: #FFFFFF; } QMenu::item:pressed { background: #5D5D50; color: #FFFFFF; }");
     menu_bar->addMenu(menu_file);
     wvfrm_vwr_actn = new QAction(menu_file);
     menu_file->addAction(wvfrm_vwr_actn);
@@ -204,7 +204,7 @@ void MainWindow::initialize_ui() {
     ext_actn = new QAction(menu_file);
     menu_file->addAction(ext_actn);
     menu_settngs = new QMenu(menu_bar);
-    menu_settngs->setStyleSheet("QMenu { background-color: #F5F5F5 } QMenu::item:selected { background: #9D9D90; }" );
+    menu_settngs->setStyleSheet("QMenu { background-color: #F5F5F5; color: #000000; border: 1px solid black; } QMenu:disabled { color: #898989; } QMenu::item:selected { background: #9D9D90; color: #FFFFFF; } QMenu::item:pressed { background: #5D5D50; color: #FFFFFF; }");
     menu_bar->addMenu(menu_settngs);
     chkBx_fls_chckng_actn = new QAction(menu_settngs);
     chkBx_fls_chckng_actn->setCheckable(true);
@@ -217,6 +217,8 @@ void MainWindow::initialize_ui() {
     menu_settngs->addAction(chkBx_ld_mnl_frmwr_actn);
     menu_settngs->addSeparator();
     cmbBx_lng_chs = new QComboBox(menu_settngs);
+    cmbBx_lng_chs->setStyleSheet("QComboBox { background-color: #F6F6F6; color: #000000; selection-background-color: #308CC6; selection-color: #FFFFFF; }"
+                                 "QComboBox QAbstractItemView { background-color: #EFEFEF; color: #000000; selection-background-color: #308CC6; selection-color: #FFFFFF; }");
     cmbBx_lng_chs_actn = new QWidgetAction(menu_settngs);
     cmbBx_lng_chs_actn->setDefaultWidget(cmbBx_lng_chs);
     menu_settngs->addAction(cmbBx_lng_chs_actn);

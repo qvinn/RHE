@@ -142,12 +142,12 @@
         <translation>Отображаемые пины:</translation>
     </message>
     <message>
-        <location filename="../dialog_select_displayable_pins.ui" line="493"/>
+        <location filename="../dialog_select_displayable_pins.ui" line="729"/>
         <source>Ok</source>
         <translation>Ок</translation>
     </message>
     <message>
-        <location filename="../dialog_select_displayable_pins.ui" line="570"/>
+        <location filename="../dialog_select_displayable_pins.ui" line="806"/>
         <source>Cancel</source>
         <translation>Отмена</translation>
     </message>
@@ -168,27 +168,27 @@
 <context>
     <name>General_Widget</name>
     <message>
-        <location filename="../general_widget.cpp" line="269"/>
+        <location filename="../general_widget.cpp" line="291"/>
         <source>Warning</source>
         <translation>Внимание</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="274"/>
+        <location filename="../general_widget.cpp" line="296"/>
         <source>Question</source>
         <translation>Вопрос</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="279"/>
+        <location filename="../general_widget.cpp" line="301"/>
         <source>Yes</source>
         <translation>Да</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="280"/>
+        <location filename="../general_widget.cpp" line="302"/>
         <source>No</source>
         <translation>Нет</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="283"/>
+        <location filename="../general_widget.cpp" line="305"/>
         <source>Information</source>
         <translation>Информация</translation>
     </message>
@@ -202,84 +202,84 @@
     </message>
     <message>
         <location filename="../mainwindow.ui" line="515"/>
-        <location filename="../mainwindow.cpp" line="259"/>
+        <location filename="../mainwindow.cpp" line="261"/>
         <source>Register</source>
         <translation>  Регистрация  </translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="800"/>
-        <location filename="../mainwindow.cpp" line="254"/>
-        <location filename="../mainwindow.cpp" line="332"/>
+        <location filename="../mainwindow.cpp" line="256"/>
+        <location filename="../mainwindow.cpp" line="334"/>
         <source>Login</source>
         <translation>Войти</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="256"/>
-        <location filename="../mainwindow.cpp" line="323"/>
+        <location filename="../mainwindow.cpp" line="258"/>
+        <location filename="../mainwindow.cpp" line="325"/>
         <source>Logout</source>
         <translation>Выйти</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="237"/>
+        <location filename="../mainwindow.cpp" line="239"/>
         <source>File</source>
         <translation>Файл</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="236"/>
+        <location filename="../mainwindow.cpp" line="238"/>
         <source>Remote Hardware Education</source>
         <translation>Удаленное Аппаратное Обучение</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="238"/>
+        <location filename="../mainwindow.cpp" line="240"/>
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="239"/>
+        <location filename="../mainwindow.cpp" line="241"/>
         <source>Open waveform viewer</source>
         <translation>Открыть просмотрщик временных диаграмм</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="240"/>
+        <location filename="../mainwindow.cpp" line="242"/>
         <source>Exit</source>
         <translation>Выход</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="241"/>
+        <location filename="../mainwindow.cpp" line="243"/>
         <source>Files checking</source>
         <translation>Проверка файлов</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="242"/>
+        <location filename="../mainwindow.cpp" line="244"/>
         <source>Pins checking</source>
         <translation>Проверка пинов</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="243"/>
+        <location filename="../mainwindow.cpp" line="245"/>
         <source>Manualy load firmware</source>
         <translation>Загрузить прошивку вручную</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="245"/>
-        <location filename="../mainwindow.cpp" line="249"/>
+        <location filename="../mainwindow.cpp" line="247"/>
+        <location filename="../mainwindow.cpp" line="251"/>
         <source>English</source>
         <translation>Английский</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="246"/>
-        <location filename="../mainwindow.cpp" line="250"/>
+        <location filename="../mainwindow.cpp" line="248"/>
+        <location filename="../mainwindow.cpp" line="252"/>
         <source>Ukrainian</source>
         <translation>Украинский</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="247"/>
-        <location filename="../mainwindow.cpp" line="251"/>
+        <location filename="../mainwindow.cpp" line="249"/>
+        <location filename="../mainwindow.cpp" line="253"/>
         <source>Russian</source>
         <translation>Русский</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="27"/>
-        <location filename="../mainwindow.cpp" line="261"/>
+        <location filename="../mainwindow.cpp" line="263"/>
         <source>Connecting To Server</source>
         <translation>Подключение К Серверу</translation>
     </message>
@@ -297,64 +297,64 @@
         <translation>Выберите плату:</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="789"/>
+        <location filename="../rhe_widget.ui" line="803"/>
         <location filename="../rhe_widget.cpp" line="471"/>
         <source>Start Debug</source>
         <translation>  Начать Отладку  </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="1090"/>
+        <location filename="../rhe_widget.ui" line="1104"/>
         <location filename="../rhe_widget.cpp" line="472"/>
         <source>Stop Debug</source>
         <translation>  Остановить Отладку  </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="1181"/>
+        <location filename="../rhe_widget.ui" line="1249"/>
         <source>Start debug after FPGA flashing</source>
         <translation>Начать отладку после прошивки ПЛИС</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="1479"/>
+        <location filename="../rhe_widget.ui" line="1547"/>
         <source>Choose Sequence Of Signals File</source>
         <translation>Выберите Файл Последовательности Сигналов</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="1780"/>
+        <location filename="../rhe_widget.ui" line="1848"/>
         <source>Send Sequence Of Signals File</source>
         <translation>Послать Файл Последовательности Сигналов</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="2081"/>
+        <location filename="../rhe_widget.ui" line="2149"/>
         <source>Start Sequence Of Signals</source>
         <translation>Начать Последовательность Сигналов</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="2170"/>
+        <location filename="../rhe_widget.ui" line="2292"/>
         <source>Start sequence with debug</source>
         <translation>Начать последовательность вместе с отладкой</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="2219"/>
+        <location filename="../rhe_widget.ui" line="2341"/>
         <source>Debug time discreteness:</source>
         <translation>Дискретность времени отладки:</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="2345"/>
+        <location filename="../rhe_widget.ui" line="2489"/>
         <source>Debug time limit, </source>
         <translation>Ограничение времени отладки, </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="2742"/>
+        <location filename="../rhe_widget.ui" line="2886"/>
         <source>FPGA Inputs:</source>
         <translation>Входы ПЛИС:</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="3330"/>
+        <location filename="../rhe_widget.ui" line="3511"/>
         <source>Send Firmware</source>
         <translation>  Отправить Прошивку  </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="3615"/>
+        <location filename="../rhe_widget.ui" line="3796"/>
         <source>Choose Firmware</source>
         <translation>  Выбрать Прошивку  </translation>
     </message>
@@ -363,12 +363,12 @@
         <translation type="vanished">  Загрузить Прошивку  </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="3900"/>
+        <location filename="../rhe_widget.ui" line="4081"/>
         <source>Check Project State</source>
         <translation>  Проверить Состояние Проекта  </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="4185"/>
+        <location filename="../rhe_widget.ui" line="4366"/>
         <source>Choose project directory</source>
         <translation>  Выбрать папку проекта  </translation>
     </message>
@@ -658,17 +658,17 @@
         <translation>Логин</translation>
     </message>
     <message>
-        <location filename="../registration_widget.ui" line="545"/>
+        <location filename="../registration_widget.ui" line="572"/>
         <source>Password</source>
         <translation>Пароль</translation>
     </message>
     <message>
-        <location filename="../registration_widget.ui" line="752"/>
+        <location filename="../registration_widget.ui" line="806"/>
         <source>First Name</source>
         <translation>Имя</translation>
     </message>
     <message>
-        <location filename="../registration_widget.ui" line="904"/>
+        <location filename="../registration_widget.ui" line="985"/>
         <source>Last Name</source>
         <translation>Фамилия</translation>
     </message>
@@ -762,47 +762,47 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="197"/>
+        <location filename="../waveform_viewer.ui" line="325"/>
         <source>Attach cursor to axis</source>
         <translation>Прикреплять курсор к оси</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="567"/>
+        <location filename="../waveform_viewer.ui" line="781"/>
         <source>Change Settings</source>
         <translation>  Изменить Настройки  </translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="887"/>
+        <location filename="../waveform_viewer.ui" line="1101"/>
         <source>Full scale</source>
         <translation>  Полный масштаб  </translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="1742"/>
+        <location filename="../waveform_viewer.ui" line="1956"/>
         <source>Measurement</source>
         <translation>Измерение</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="178"/>
+        <location filename="../waveform_viewer.ui" line="242"/>
         <source>As window</source>
         <translation>Как оконо</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="216"/>
+        <location filename="../waveform_viewer.ui" line="408"/>
         <source>Fit size</source>
         <translation>Подгонять размер</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="1172"/>
+        <location filename="../waveform_viewer.ui" line="1386"/>
         <source>Clear</source>
         <translation>  Очистить  </translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="1457"/>
+        <location filename="../waveform_viewer.ui" line="1671"/>
         <source>Select Displayable Pins</source>
         <translation>  Выбрать Отображаемые пины  </translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="2043"/>
+        <location filename="../waveform_viewer.ui" line="2257"/>
         <source>Waveform</source>
         <translation>Временная диаграмма</translation>
     </message>

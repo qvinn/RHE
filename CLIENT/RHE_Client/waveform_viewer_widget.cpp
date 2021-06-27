@@ -223,9 +223,9 @@ void Waveform_Viewer_Widget::pshBttn_open_save_wvfrm_set_enabled(bool flg) {
 //-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::initialize_ui() {
     ui->diagram->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom/* | QCP::iSelectPlottables*//* | QCP::iSelectAxes*/);     //iSelectAxes
-    ui->diagram->addLayer("layerCursor", 0, QCustomPlot::limAbove);
+    ui->diagram->addLayer("layerCursor", nullptr, QCustomPlot::limAbove);
     ui->diagram->layer("layerCursor")->setMode(QCPLayer::lmBuffered);
-    ui->diagram->addLayer("layerMeasure", 0, QCustomPlot::limAbove);
+    ui->diagram->addLayer("layerMeasure", nullptr, QCustomPlot::limAbove);
     ui->diagram->layer("layerMeasure")->setMode(QCPLayer::lmBuffered);
     ui->diagram->xAxis->setSubTicks(false);
     ui->diagram->yAxis->setSubTicks(false);
@@ -1442,7 +1442,10 @@ QList<QString> Dialog_Select_Diagram_Settings::get_diagram_settings() {
 void Dialog_Select_Diagram_Settings::change_color(int value) {
     QColorDialog dlg(this);
     dlg.setOption(QColorDialog::DontUseNativeDialog, true);
-    dlg.setStyleSheet(gen_widg->get_style_sheet("QColorDialog"));
+    dlg.setStyleSheet(gen_widg->get_style_sheet("QColorDialog", "QColorDialog QLabel { color: #000000; }"
+                                                                "QColorDialog QSpinBox { background-color: #FFFFFF; color: #000000; selection-background-color: #308CC6; selection-color: #FFFFFF; }"
+                                                                "QColorDialog QLineEdit { background-color: #FFFFFF; color: #000000; selection-background-color: #308CC6; selection-color: #FFFFFF; }"
+                                                                "QColorDialog QColorLuminancePicker { background-color: #F5F5F5; color: #000000; }"));
     dlg.setCurrentColor(QColor(sttngs_lst.at(value)));
     if(dlg.exec() == QDialog::Accepted) {
         QColor color = dlg.selectedColor();

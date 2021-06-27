@@ -36,7 +36,7 @@ void Send_Recieve_Module::init_connection() {
 // GET UNIQE CLIENT-ID FOR SERVER
 //-------------------------------------------------------------------------
 void Send_Recieve_Module::get_id_for_client() {
-    char *send_buff = (char*)malloc(DATA_BUFFER);
+    char *send_buff = reinterpret_cast<char*>(malloc(DATA_BUFFER));
     int init_id = INIT_ID;
     memcpy(send_buff, &init_id, sizeof(int));
     send_U_Packet(CLIENT_WANT_INIT_CONNECTION, send_buff);
@@ -312,7 +312,7 @@ void Send_Recieve_Module::reset_ID() {
 // ESTABLISH SOCKET
 //-------------------------------------------------------------------------
 bool Send_Recieve_Module::establish_socket() {
-    socket->connectToHost(server_ip, server_port, QIODevice::ReadWrite);
+    socket->connectToHost(server_ip, static_cast<quint16>(server_port), QIODevice::ReadWrite);
     if(!socket->isOpen() || !socket->isValid()) {
         return false;
     }
@@ -324,11 +324,11 @@ bool Send_Recieve_Module::establish_socket() {
 //-------------------------------------------------------------------------
 void Send_Recieve_Module::send_U_Packet(int code_op, QByteArray data) {
     if(connected) {
-        U_packet *send_packet = (U_packet*)malloc(sizeof(U_packet));
+        U_packet *send_packet = reinterpret_cast<U_packet*>(malloc(sizeof(U_packet)));
         memset(send_packet->data, 0, DATA_BUFFER);    // Для надежности заполним DATA_BUFFER байта send_packet->data значениями NULL
         send_packet->code_op = code_op;
         if(data.count() > 0) {
-            memcpy(send_packet->data, data.data(), data.count());
+            memcpy(send_packet->data, data.data(), static_cast<size_t>(data.count()));
         }
         QByteArray send_buf = QByteArray::fromRawData(reinterpret_cast<const char*>(send_packet), sizeof(U_packet));
         socket->write(send_buf.data(), sizeof(U_packet));
@@ -370,7 +370,7 @@ int Send_Recieve_Module::start_recive_file() {
 // SERVER CONTINOUS SEND FILE TO CLIENT
 //-------------------------------------------------------------------------
 int Send_Recieve_Module::rcv_new_data_for_file(char *buf) {
-    file->write(buf + sizeof (int8_t));
+    file->write(buf + sizeof(int8_t));
     return CS_OK;
 }
 

@@ -37,9 +37,10 @@
             void save_setting(QString type, QVariant val);
 
             /*
-             * QString pattern - name of window class which needed to be customize
+             * QString pattern_1 - name of window class which needed to be customize
+             * QString pattern_2 - additional parameter for style sheet
              */
-            QString get_style_sheet(QString pattern);
+            QString get_style_sheet(QString pattern_1, QString pattern_2);
 
             /*
              * QWidget *prnt - pointer to parental widget
@@ -102,7 +103,8 @@
             QTranslator *language_translator = nullptr;
             QPoint *current_pos = nullptr;
             QString style_sheet = "";
-            QLocale cur_locale;  
+            QLocale cur_locale;
+            QPalette palette;
 
         signals:
             void re_translate_signal();

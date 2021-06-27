@@ -699,6 +699,14 @@ QPushButton:hover{
        <height>24</height>
       </size>
      </property>
+     <property name="styleSheet">
+      <string notr="true">QSpinBox {
+	background-color: #FFFFFF;
+	color: #000000;
+	selection-background-color: #308CC6;
+	selection-color: #FFFFFF;
+}</string>
+     </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
      </property>

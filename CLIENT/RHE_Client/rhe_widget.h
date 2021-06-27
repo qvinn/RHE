@@ -82,6 +82,7 @@
             QList<QString> state_strs;
             QString lname_fname;
             QPixmap pixmp_brd;
+            QByteArray input_pins_states;
 
             bool qpf_exist = false;
             bool fit_exist = false;

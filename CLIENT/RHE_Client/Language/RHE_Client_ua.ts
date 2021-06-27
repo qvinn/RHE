@@ -142,12 +142,12 @@
         <translation>Відображувані піни:</translation>
     </message>
     <message>
-        <location filename="../dialog_select_displayable_pins.ui" line="493"/>
+        <location filename="../dialog_select_displayable_pins.ui" line="729"/>
         <source>Ok</source>
         <translation>Ок</translation>
     </message>
     <message>
-        <location filename="../dialog_select_displayable_pins.ui" line="570"/>
+        <location filename="../dialog_select_displayable_pins.ui" line="806"/>
         <source>Cancel</source>
         <translation>Відміна</translation>
     </message>
@@ -168,27 +168,27 @@
 <context>
     <name>General_Widget</name>
     <message>
-        <location filename="../general_widget.cpp" line="269"/>
+        <location filename="../general_widget.cpp" line="291"/>
         <source>Warning</source>
         <translation>Увага</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="274"/>
+        <location filename="../general_widget.cpp" line="296"/>
         <source>Question</source>
         <translation>Питання</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="279"/>
+        <location filename="../general_widget.cpp" line="301"/>
         <source>Yes</source>
         <translation>Так</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="280"/>
+        <location filename="../general_widget.cpp" line="302"/>
         <source>No</source>
         <translation>Ні</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="283"/>
+        <location filename="../general_widget.cpp" line="305"/>
         <source>Information</source>
         <translation>Інформація</translation>
     </message>
@@ -202,84 +202,84 @@
     </message>
     <message>
         <location filename="../mainwindow.ui" line="515"/>
-        <location filename="../mainwindow.cpp" line="259"/>
+        <location filename="../mainwindow.cpp" line="261"/>
         <source>Register</source>
         <translation>  Реєстрація  </translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="800"/>
-        <location filename="../mainwindow.cpp" line="254"/>
-        <location filename="../mainwindow.cpp" line="332"/>
+        <location filename="../mainwindow.cpp" line="256"/>
+        <location filename="../mainwindow.cpp" line="334"/>
         <source>Login</source>
         <translation>Війти</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="256"/>
-        <location filename="../mainwindow.cpp" line="323"/>
+        <location filename="../mainwindow.cpp" line="258"/>
+        <location filename="../mainwindow.cpp" line="325"/>
         <source>Logout</source>
         <translation>Вийти</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="237"/>
+        <location filename="../mainwindow.cpp" line="239"/>
         <source>File</source>
         <translation>Файл</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="236"/>
+        <location filename="../mainwindow.cpp" line="238"/>
         <source>Remote Hardware Education</source>
         <translation>Віддалене Апаратне Навчання</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="238"/>
+        <location filename="../mainwindow.cpp" line="240"/>
         <source>Settings</source>
         <translation>Налаштування</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="239"/>
+        <location filename="../mainwindow.cpp" line="241"/>
         <source>Open waveform viewer</source>
         <translation>Відкрити переглядач часових діаграм</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="240"/>
+        <location filename="../mainwindow.cpp" line="242"/>
         <source>Exit</source>
         <translation>Вихід</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="241"/>
+        <location filename="../mainwindow.cpp" line="243"/>
         <source>Files checking</source>
         <translation>Перевірка файлів</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="242"/>
+        <location filename="../mainwindow.cpp" line="244"/>
         <source>Pins checking</source>
         <translation>Перевірка пінів</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="243"/>
+        <location filename="../mainwindow.cpp" line="245"/>
         <source>Manualy load firmware</source>
         <translation>Завантажити прошивку власноруч</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="245"/>
-        <location filename="../mainwindow.cpp" line="249"/>
+        <location filename="../mainwindow.cpp" line="247"/>
+        <location filename="../mainwindow.cpp" line="251"/>
         <source>English</source>
         <translation>Англійська</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="246"/>
-        <location filename="../mainwindow.cpp" line="250"/>
+        <location filename="../mainwindow.cpp" line="248"/>
+        <location filename="../mainwindow.cpp" line="252"/>
         <source>Ukrainian</source>
         <translation>Українська</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="247"/>
-        <location filename="../mainwindow.cpp" line="251"/>
+        <location filename="../mainwindow.cpp" line="249"/>
+        <location filename="../mainwindow.cpp" line="253"/>
         <source>Russian</source>
         <translation>Російська</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="27"/>
-        <location filename="../mainwindow.cpp" line="261"/>
+        <location filename="../mainwindow.cpp" line="263"/>
         <source>Connecting To Server</source>
         <translation>Підключення До Серверу</translation>
     </message>
@@ -297,64 +297,64 @@
         <translation>Виберіть плату:</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="789"/>
+        <location filename="../rhe_widget.ui" line="803"/>
         <location filename="../rhe_widget.cpp" line="471"/>
         <source>Start Debug</source>
         <translation>  Почати Відлагодження  </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="1090"/>
+        <location filename="../rhe_widget.ui" line="1104"/>
         <location filename="../rhe_widget.cpp" line="472"/>
         <source>Stop Debug</source>
         <translation>  Зупинити Відлагодження  </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="1181"/>
+        <location filename="../rhe_widget.ui" line="1249"/>
         <source>Start debug after FPGA flashing</source>
         <translation>Почати відлагодження після прошивання ПЛІС</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="1479"/>
+        <location filename="../rhe_widget.ui" line="1547"/>
         <source>Choose Sequence Of Signals File</source>
         <translation>Виберіть Файл Послідовності Сигналів</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="1780"/>
+        <location filename="../rhe_widget.ui" line="1848"/>
         <source>Send Sequence Of Signals File</source>
         <translation>Надіслати Файл Послідовності Сигналів</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="2081"/>
+        <location filename="../rhe_widget.ui" line="2149"/>
         <source>Start Sequence Of Signals</source>
         <translation>Почати Послідовность Сигналів</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="2170"/>
+        <location filename="../rhe_widget.ui" line="2292"/>
         <source>Start sequence with debug</source>
         <translation>Почати послідовність разом з відлагодженням</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="2219"/>
+        <location filename="../rhe_widget.ui" line="2341"/>
         <source>Debug time discreteness:</source>
         <translation>Дискретність часу відлагодження:</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="2345"/>
+        <location filename="../rhe_widget.ui" line="2489"/>
         <source>Debug time limit, </source>
         <translation>Обмеження часу відлагодження, </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="2742"/>
+        <location filename="../rhe_widget.ui" line="2886"/>
         <source>FPGA Inputs:</source>
         <translation>Входи ПЛІС:</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="3330"/>
+        <location filename="../rhe_widget.ui" line="3511"/>
         <source>Send Firmware</source>
         <translation>  Надіслати Прошивку  </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="3615"/>
+        <location filename="../rhe_widget.ui" line="3796"/>
         <source>Choose Firmware</source>
         <translation>  Вибрати Прошивку  </translation>
     </message>
@@ -363,12 +363,12 @@
         <translation type="vanished">  Завантажити Прошивку  </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="3900"/>
+        <location filename="../rhe_widget.ui" line="4081"/>
         <source>Check Project State</source>
         <translation>  Перевірити Стан Проекту  </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="4185"/>
+        <location filename="../rhe_widget.ui" line="4366"/>
         <source>Choose project directory</source>
         <translation>  Вибрати папку проекту  </translation>
     </message>
@@ -658,17 +658,17 @@
         <translation>Логін</translation>
     </message>
     <message>
-        <location filename="../registration_widget.ui" line="545"/>
+        <location filename="../registration_widget.ui" line="572"/>
         <source>Password</source>
         <translation>Пароль</translation>
     </message>
     <message>
-        <location filename="../registration_widget.ui" line="752"/>
+        <location filename="../registration_widget.ui" line="806"/>
         <source>First Name</source>
         <translation>Ім&apos;я</translation>
     </message>
     <message>
-        <location filename="../registration_widget.ui" line="904"/>
+        <location filename="../registration_widget.ui" line="985"/>
         <source>Last Name</source>
         <translation>Прізвище</translation>
     </message>
@@ -762,47 +762,47 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="197"/>
+        <location filename="../waveform_viewer.ui" line="325"/>
         <source>Attach cursor to axis</source>
         <translation>Прикріплювати курсор до осі</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="567"/>
+        <location filename="../waveform_viewer.ui" line="781"/>
         <source>Change Settings</source>
         <translation>  Змінити Налаштування  </translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="887"/>
+        <location filename="../waveform_viewer.ui" line="1101"/>
         <source>Full scale</source>
         <translation>  Повний масштаб  </translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="1742"/>
+        <location filename="../waveform_viewer.ui" line="1956"/>
         <source>Measurement</source>
         <translation>  Вимірювання  </translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="178"/>
+        <location filename="../waveform_viewer.ui" line="242"/>
         <source>As window</source>
         <translation>Як вікно</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="216"/>
+        <location filename="../waveform_viewer.ui" line="408"/>
         <source>Fit size</source>
         <translation>Підганяти розмір</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="1172"/>
+        <location filename="../waveform_viewer.ui" line="1386"/>
         <source>Clear</source>
         <translation>  Очистити  </translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="1457"/>
+        <location filename="../waveform_viewer.ui" line="1671"/>
         <source>Select Displayable Pins</source>
         <translation>  Вибрати Відображувані піни  </translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="2043"/>
+        <location filename="../waveform_viewer.ui" line="2257"/>
         <source>Waveform</source>
         <translation>Часова діаграма</translation>
     </message>
