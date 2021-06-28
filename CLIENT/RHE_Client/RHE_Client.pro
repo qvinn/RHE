@@ -46,7 +46,8 @@ win32:RC_ICONS += icons/1.ico
 
 RESOURCES += \
     RHE_Client_Languages.qrc \
-    icons.qrc
+    icons.qrc \
+    fonts.qrc
 
 system(lrelease \"$$_PRO_FILE_\")
 tr.commands = lupdate \"$$_PRO_FILE_\" && lrelease \"$$_PRO_FILE_\"

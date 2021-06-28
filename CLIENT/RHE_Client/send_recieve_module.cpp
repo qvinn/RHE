@@ -158,7 +158,8 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 break;
             }            
             case RUN_DEBUG_FIRSTLY: {
-                emit debug_not_started();
+//                emit debug_not_started();
+                emit show_message_box_signal("", tr("Run debug firstly"), 0, gen_widg->get_position());
                 break;
             }
             case S_SERVER_SEND_FPGA_ID: {

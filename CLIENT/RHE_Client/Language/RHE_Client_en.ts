@@ -719,7 +719,7 @@
         <location filename="../send_recieve_module.cpp" line="80"/>
         <location filename="../send_recieve_module.cpp" line="85"/>
         <location filename="../send_recieve_module.cpp" line="113"/>
-        <location filename="../send_recieve_module.cpp" line="287"/>
+        <location filename="../send_recieve_module.cpp" line="288"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
@@ -749,7 +749,12 @@
         <translation>Selected board not available</translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="287"/>
+        <location filename="../send_recieve_module.cpp" line="162"/>
+        <source>Run debug firstly</source>
+        <translation>Run debug firstly</translation>
+    </message>
+    <message>
+        <location filename="../send_recieve_module.cpp" line="288"/>
         <source>Server disconnected</source>
         <translation>Server disconnected</translation>
     </message>
