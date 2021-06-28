@@ -749,9 +749,8 @@
         <translation>Вибрана плата недоступна</translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="162"/>
         <source>Run debug firstly</source>
-        <translation>Спочатку запустіть відлагодження</translation>
+        <translation type="vanished">Спочатку запустіть відлагодження</translation>
     </message>
     <message>
         <location filename="../send_recieve_module.cpp" line="288"/>

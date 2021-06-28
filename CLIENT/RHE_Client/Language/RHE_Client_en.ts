@@ -749,9 +749,8 @@
         <translation>Selected board not available</translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="162"/>
         <source>Run debug firstly</source>
-        <translation>Run debug firstly</translation>
+        <translation type="vanished">Run debug firstly</translation>
     </message>
     <message>
         <location filename="../send_recieve_module.cpp" line="288"/>
