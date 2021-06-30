@@ -415,7 +415,7 @@ void RHE_Widget::initialize_ui() {
     ui->prgrssBr_fl_sts->setValue(ui->prgrssBr_fl_sts->minimum());
     on_pshBttn_stp_dbg_clicked();
     path_to_proj->clear();
-    QDir::setCurrent(qApp->applicationDirPath());
+    QDir::setCurrent(gen_widg->get_app_path());
     pshBttn_snd_frmwr_set_enabled(false);
     pshBttn_chk_prj_stat_set_enabled(false);
     ui->pshBttn_snd_sgnls_sqnc->setEnabled(false);
@@ -524,7 +524,7 @@ void RHE_Widget::change_board_pixmap() {
             QPixmap tmp;
             pixmp_brd.swap(tmp);
         } else {
-            QString path(qApp->applicationDirPath() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString() + pixmp_names->at(ui->cmbBx_chs_brd->currentIndex()));
+            QString path(gen_widg->get_app_path() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString() + pixmp_names->at(ui->cmbBx_chs_brd->currentIndex()));
             if(pixmp_brd.load(path)) {
                 remove_horizontal_spacer();
                 showEvent(nullptr);
@@ -805,7 +805,7 @@ bool RHE_Widget::read_xml_file(bool read_board_params, QString *cur_fpga, QList<
     } else {
         pos = QPoint((QGuiApplication::primaryScreen()->geometry().width() / 2), (QGuiApplication::primaryScreen()->geometry().height() / 2));
     }
-    QString path(qApp->applicationDirPath() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString() + gen_widg->get_setting("settings/BOARDS_LIST_FILENAME").toString());
+    QString path(gen_widg->get_app_path() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString() + gen_widg->get_setting("settings/BOARDS_LIST_FILENAME").toString());
     QFile xml_file(path);
     if(!xml_file.open(QFile::ReadOnly | QFile::Text)) {
         gen_widg->show_message_box("", (fl_lst_str + path + tr(" not found. Please, contact with teacher or administrator")), 0, pos);

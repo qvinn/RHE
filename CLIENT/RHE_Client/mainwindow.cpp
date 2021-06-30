@@ -3,8 +3,8 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
-    QDir::setCurrent(qApp->applicationDirPath());
     gen_widg = new General_Widget();
+    QDir::setCurrent(gen_widg->get_app_path());
     snd_rcv_module = new Send_Recieve_Module(gen_widg->get_setting("settings/SERVER_IP").toString(), gen_widg->get_setting("settings/SERVER_PORT").toInt(), gen_widg);
     snd_rcv_module->moveToThread(&thread);
     thread.start();

@@ -1,12 +1,24 @@
 #include "general_widget.h"
 
 General_Widget::General_Widget() {
+#ifdef __linux__
+    app_path.append(QProcessEnvironment::systemEnvironment().value(QStringLiteral("APPIMAGE")));        //Path Of Image Deployed with 'linuxdeployqt'
+#endif
+    if(app_path.count() == 0) {
+        app_path.append(qApp->applicationDirPath());
+    } else {
+        QRegExp tagExp("/");
+        QStringList lst = app_path.split(tagExp);
+        app_path.clear();
+        for(int i = 0; i < (lst.count() - 1); i++) {
+            app_path.append("/" + QString(lst.at(i)).remove("/"));
+        }
+    }
     files_list = new QStringList();
-    QString path = qApp->applicationDirPath();
-    settings = new QSettings(path + "/settings.cfg", QSettings::IniFormat);
+    settings = new QSettings(app_path + "/settings.cfg", QSettings::IniFormat);
     create_base_settings();
 #ifdef __linux__
-    QString icon_path = (path + "/" + get_setting("settings/PATH_TO_DATA").toString() + "icon.png");
+    QString icon_path = (app_path + "/" + get_setting("settings/PATH_TO_DATA").toString() + "icon.png");
     check_is_icon_exist(icon_path);
     qApp->setWindowIcon(QIcon(icon_path));
 #endif
@@ -38,6 +50,13 @@ General_Widget::~General_Widget() {
     delete settings;
     delete current_pos;
     delete language_translator;
+}
+
+//-------------------------------------------------------------------------
+// GET PATH TO CURRENT APPLICATION
+//-------------------------------------------------------------------------
+QString General_Widget::get_app_path() {
+    return app_path;
 }
 
 //-------------------------------------------------------------------------

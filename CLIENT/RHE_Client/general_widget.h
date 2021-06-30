@@ -11,12 +11,15 @@
     #include <QFileDialog>
     #include <QApplication>
     #include <QCryptographicHash>
+    #include <QProcessEnvironment>
 
     class General_Widget : public QWidget {
         Q_OBJECT
         public:
             General_Widget();
             ~General_Widget() override;
+
+            QString get_app_path();
 
             QPoint get_position();
 
@@ -103,6 +106,7 @@
             QTranslator *language_translator = nullptr;
             QPoint *current_pos = nullptr;
             QString style_sheet = "";
+            QString app_path = "";
             QLocale cur_locale;
             QPalette palette;
 

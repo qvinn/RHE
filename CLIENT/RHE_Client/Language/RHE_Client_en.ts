@@ -168,27 +168,27 @@
 <context>
     <name>General_Widget</name>
     <message>
-        <location filename="../general_widget.cpp" line="291"/>
+        <location filename="../general_widget.cpp" line="310"/>
         <source>Warning</source>
         <translation>Warning</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="296"/>
+        <location filename="../general_widget.cpp" line="315"/>
         <source>Question</source>
         <translation>Question</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="301"/>
+        <location filename="../general_widget.cpp" line="320"/>
         <source>Yes</source>
         <translation>Yes</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="302"/>
+        <location filename="../general_widget.cpp" line="321"/>
         <source>No</source>
         <translation>No</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="305"/>
+        <location filename="../general_widget.cpp" line="324"/>
         <source>Information</source>
         <translation>Information</translation>
     </message>

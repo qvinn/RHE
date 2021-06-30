@@ -7,7 +7,7 @@ Send_Recieve_Module::Send_Recieve_Module(QString _server_ip, int _server_port, G
     this->server_port = _server_port;
     gen_widg = widg;
     socket = new QTcpSocket(this);
-    file = new QFile(qApp->applicationDirPath() + "/DEBUG_from_s_server.txt");
+    file = new QFile(gen_widg->get_app_path() + "/DEBUG_from_s_server.txt");
     socket->setReadBufferSize(RECIVE_BUFFER_SIZE);
     connect(socket, &QAbstractSocket::readyRead, this, &Send_Recieve_Module::wait_analize_recv_data);
     connect(socket, &QAbstractSocket::disconnected, this, &Send_Recieve_Module::server_disconnected);
