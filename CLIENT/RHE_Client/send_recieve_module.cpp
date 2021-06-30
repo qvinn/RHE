@@ -13,6 +13,9 @@ Send_Recieve_Module::Send_Recieve_Module(QString _server_ip, int _server_port, G
     connect(socket, &QAbstractSocket::disconnected, this, &Send_Recieve_Module::server_disconnected);
     connect(qApp, &QApplication::aboutToQuit, this, &Send_Recieve_Module::set_disconnected);
     connect(this, &Send_Recieve_Module::show_message_box_signal, gen_widg, &General_Widget::show_message_box);
+
+    // Проанализируем папку data и создадим хэши для всех файлов
+    this->analyze_data_dir();
 }
 
 Send_Recieve_Module::~Send_Recieve_Module() {
@@ -65,6 +68,9 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 // Как только мы получили ID и убедились в том, что соединение установено успешно, запросим таблицы с инофрмацией о портах ввода-вывода на slave-serverе
                 send_U_Packet(CLIENT_WANT_IDT, "");
                 send_U_Packet(CLIENT_WANT_ODT, "");
+
+                send_file_to_ss_universal(this->upd_file,CLIENT_UPD_LIST);
+                send_U_Packet(NEED_UPDATE, "");
                 break;
             }
             case PING_TO_SERVER: {
@@ -248,6 +254,42 @@ bool Send_Recieve_Module::send_file_to_ss(QByteArray File_byteArray, int strt_sn
     return true;
 }
 
+bool Send_Recieve_Module::send_file_to_ss_universal(QByteArray File_byteArray, int file_code)
+{
+
+    int fileSize = File_byteArray.size();
+
+
+    int hops = fileSize / SEND_FILE_BUFFER;
+    if(hops < 1) {      // Если данные помещаются в одну посылку
+        QByteArray Result_byteArray = form_send_file_packet(&File_byteArray);
+        send_U_Packet(CLIENT_START_SEND_FILE_U_TO_SERVER, QString(file_code).toLatin1());
+        send_U_Packet(CLIENT_SENDING_FILE_U_TO_SERVER, Result_byteArray);
+        send_U_Packet(CLIENT_FINISH_SEND_FILE_U_TO_SERVER, "");
+    } else {
+        QVector<QByteArray> packets;
+        QByteArray tmp_data;
+        QByteArray packet;
+        // Чтобы было удобней отсчитывать в цикле, определим первую посылку отдельно
+        tmp_data = File_byteArray.mid(0, SEND_FILE_BUFFER).data();
+        //packet = form_send_file_packet(&tmp_data);
+        packets.push_back(tmp_data);
+        for(int i = 1; i < hops + 1; i++) {
+            tmp_data = File_byteArray.mid((i * SEND_FILE_BUFFER), SEND_FILE_BUFFER).data();
+            //packet = form_send_file_packet(&tmp_data);
+            packets.push_back(tmp_data);
+        }
+        last_send_file_bytes = 0;
+        send_U_Packet(CLIENT_START_SEND_FILE_U_TO_SERVER, QString(file_code).toLatin1());
+        for(int i = 0; i < packets.size(); i++) {
+            send_U_Packet(CLIENT_SENDING_FILE_U_TO_SERVER, packets.at(i));
+        }
+        last_send_file_bytes = File_byteArray.length();
+        send_U_Packet(CLIENT_FINISH_SEND_FILE_U_TO_SERVER, "");
+    }
+    return true;
+}
+
 //-------------------------------------------------------------------------
 // MANUAL DISCONNECTION FROM SERVER
 //-------------------------------------------------------------------------
@@ -381,4 +423,35 @@ int Send_Recieve_Module::rcv_new_data_for_file(char *buf) {
 int Send_Recieve_Module::end_recive_file() {
     file->close();
     return CS_OK;
+}
+
+void Send_Recieve_Module::analyze_data_dir()
+{
+    QString dir_path = gen_widg->get_app_path() + + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString();
+
+    QDir dir_name(dir_path);
+    QFileInfoList dirContent = dir_name.entryInfoList(QStringList() << "*.*",QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
+
+    QRegExp tagExp("/");
+    QStringList lst;
+
+        for(int i = 0; i < dirContent.size(); i++)
+        {
+            QByteArray hash = gen_widg->get_file_checksum(dirContent.at(i).filePath(),QCryptographicHash::Md5);
+            hash = hash.toHex();
+
+            // FIXME: Потом удалить запись в этот вектор
+            dir_vec.push_back(file_info{dirContent.at(i).filePath(),QString(hash)});
+
+            //this->upd_file->write(QString(dirContent.at(i).filePath() + "\t" + hash).toLatin1());
+
+
+            lst = dirContent.at(i).filePath().split(tagExp);
+            this->upd_file.append(QString(lst.last() + "\t" + hash + "\n").toLatin1());
+        }
+
+    for (int i = 0; i < dir_vec.size(); i++) {
+        qDebug() << "dir_vec---> " << "file_name: " << dir_vec.at(i).file_name << "hash: " << dir_vec.at(i).hash;
+    }
+
 }

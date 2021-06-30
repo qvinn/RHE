@@ -58,6 +58,19 @@
     #define RUN_DEBUG_FIRSTLY 54
     #define CLIENT_WANT_GET_FPGA_ID	55
     #define S_SERVER_SEND_FPGA_ID 56
+    #define NEED_UPDATE 57
+    #define SERVER_START_SEND_FILE_U 58
+    #define SERVER_SENDING_FILE_U 59
+    #define SERVER_FINISH_SEND_FILE_U 60
+    #define CLIENT_START_SEND_FILE_U_TO_SERVER 61
+    #define CLIENT_SENDING_FILE_U_TO_SERVER 62
+    #define CLIENT_FINISH_SEND_FILE_U_TO_SERVER 63
+
+    #define FILE_FIRMWARE			0
+    #define FILE_DSQ				1
+    #define CLIENT_UPD_LIST			2
+    #define SERVER_UPD_TASKS_LIST	3
+    #define FILE_UPDATE				4
 
     class Send_Recieve_Module : public QObject {
         Q_OBJECT
@@ -80,6 +93,7 @@
             void stop_debug();
             void start_sequence_of_signals();
             bool send_file_to_ss(QByteArray File_byteArray, int strt_sndng_val, int cntns_sndng_val, int end_sndng_val);
+            bool send_file_to_ss_universal(QByteArray File_byteArray, int file_code);
             void set_disconnected();
             void set_FPGA_id(QString FPGA_id);
             void flash_FPGA();
@@ -113,6 +127,12 @@
                 set_state pins[8];              // 2 байт * PIN_MAX = 16 байт
             } set_state_Packet;
 
+            // Структура, которая описывает файл, который можно обновить
+            typedef struct file_info{
+                QString file_name;	// Название файла
+                QString hash;		// Хэш-сумма файла
+            }file_info;
+
         private:
             void server_disconnected();
             void close_connection();
@@ -124,6 +144,7 @@
             int start_recive_file();
             int rcv_new_data_for_file(char *buf);
             int end_recive_file();
+            void analyze_data_dir();
 
             General_Widget *gen_widg = nullptr;
             QTcpSocket *socket = nullptr;
@@ -137,6 +158,10 @@
             int server_port;
             bool manual_disconnect = false;
             bool connected = false;
+
+            QVector<file_info> dir_vec;
+
+            QByteArray upd_file;
 
         signals:
             void link_established(bool flg);
