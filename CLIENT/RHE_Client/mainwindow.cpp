@@ -1,11 +1,12 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "ui_dialog_set_server_ip.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
     gen_widg = new General_Widget();
     QDir::setCurrent(gen_widg->get_app_path());
-    snd_rcv_module = new Send_Recieve_Module(gen_widg->get_setting("settings/SERVER_IP").toString(), gen_widg->get_setting("settings/SERVER_PORT").toInt(), gen_widg);
+    snd_rcv_module = new Send_Recieve_Module(gen_widg);
     snd_rcv_module->moveToThread(&thread);
     thread.start();
     ptr_registration_widg = new RegistrationWidget(this, gen_widg, snd_rcv_module);
@@ -33,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 }
 
 MainWindow::~MainWindow() {
+//    thread.terminate();
     thread.quit();
     disconnect(tmr_waveform_viewer, &QTimer::timeout, this, &MainWindow::slot_timer_waveform_viewer_timeout);
     slot_timer_waveform_viewer_timeout();
@@ -73,6 +75,7 @@ void MainWindow::resizeEvent(QResizeEvent *) {
     ui->horizontalLayoutWidget->setGeometry(0, (this->height() - ui->horizontalLayoutWidget->height()), this->width(), ui->horizontalLayoutWidget->height());
     ui->verticalLayoutWidget->resize(this->width(), (this->height() - ui->horizontalLayoutWidget->height()));
     ui->stackedWidget->setGeometry(0, (menu_bar->height() + ui->line_1->height()), this->width(), (ui->verticalLayoutWidget->height() - menu_bar->height() - (2 * ui->line_1->height())));
+//    gen_widg->set_position(QPoint((this->pos().x() + (this->width() / 2)), (this->pos().y() + (this->height() / 2))));
 }
 
 //-------------------------------------------------------------------------
@@ -155,6 +158,14 @@ void MainWindow::onChkBxLdMnlFrmwrStateChanged() {
 }
 
 //-------------------------------------------------------------------------
+// PUSH BUTTON 'SET SERVER IP' CLICKED
+//-------------------------------------------------------------------------
+void MainWindow::onPshBttnClickedSetSrvrIP() {
+    Dialog_Set_Server_IP set_server_ip(gen_widg, this);
+    set_server_ip.exec();
+}
+
+//-------------------------------------------------------------------------
 // CHOOSING LANGUAUGE OF APPLICATION
 //-------------------------------------------------------------------------
 void MainWindow::onCmbBxLngChsCurrentIndexChanged(int index) {
@@ -216,6 +227,9 @@ void MainWindow::initialize_ui() {
     chkBx_ld_mnl_frmwr_actn->setCheckable(true);
     menu_settngs->addAction(chkBx_ld_mnl_frmwr_actn);
     menu_settngs->addSeparator();
+    pshBttn_set_srvr_ip = new QAction(menu_settngs);
+    menu_settngs->addAction(pshBttn_set_srvr_ip);
+    menu_settngs->addSeparator();
     cmbBx_lng_chs = new QComboBox(menu_settngs);
     cmbBx_lng_chs->setStyleSheet("QComboBox { background-color: #F6F6F6; color: #000000; selection-background-color: #308CC6; selection-color: #FFFFFF; }"
                                  "QComboBox QAbstractItemView { background-color: #EFEFEF; color: #000000; selection-background-color: #308CC6; selection-color: #FFFFFF; }");
@@ -227,6 +241,7 @@ void MainWindow::initialize_ui() {
     connect(chkBx_fls_chckng_actn, &QAction::changed, this, &MainWindow::onChkBxFlsChckngStateChanged);
     connect(chkBx_pins_chckng_actn, &QAction::changed, this, &MainWindow::onChkBxPinsChckngStateChanged);
     connect(chkBx_ld_mnl_frmwr_actn, &QAction::changed, this, &MainWindow::onChkBxLdMnlFrmwrStateChanged);
+    connect(pshBttn_set_srvr_ip, &QAction::triggered, this, &MainWindow::onPshBttnClickedSetSrvrIP);
     connect(cmbBx_lng_chs, SIGNAL(currentIndexChanged(int)), this, SLOT(onCmbBxLngChsCurrentIndexChanged(int)));
 }
 
@@ -243,6 +258,7 @@ void MainWindow::set_ui_text() {
     chkBx_fls_chckng_actn->setText(tr("Files checking"));
     chkBx_pins_chckng_actn->setText(tr("Pins checking"));
     chkBx_ld_mnl_frmwr_actn->setText(tr("Manualy load firmware"));
+    pshBttn_set_srvr_ip->setText(tr("Set server IP"));
     if(cmbBx_lng_chs->count() == 0) {
         cmbBx_lng_chs->addItem(tr("English"));
         cmbBx_lng_chs->addItem(tr("Ukrainian"));
@@ -296,6 +312,13 @@ void MainWindow::load_settings() {
 //-------------------------------------------------------------------------
 void MainWindow::login() {
     if(ui->stackedWidget->currentWidget() == ptr_registration_widg) {
+        if(gen_widg->get_setting("settings/SERVER_IP").toString().compare("0.0.0.0", Qt::CaseInsensitive) == 0) {
+            gen_widg->show_message_box(tr("Warning"), tr("Change server-IP in settings"), 0, gen_widg->get_position());
+            return;
+        } else if(gen_widg->get_setting("settings/SERVER_PORT").toInt() == -1) {
+            gen_widg->show_message_box(tr("Warning"), tr("Change server-port in settings"), 0, gen_widg->get_position());
+            return;
+        }
         ui->prgrssBr_cnnctn_stat->setVisible(true);
         crrnt_state_strs = 0;
         ui->prgrssBr_cnnctn_stat->setFormat(state_strs.at(crrnt_state_strs));
@@ -303,6 +326,7 @@ void MainWindow::login() {
         tmr_progress_bar->start();
         ui->pshBttn_register->setEnabled(false);
         ui->pshBttn_login_logout->setEnabled(false);
+        pshBttn_set_srvr_ip->setEnabled(false);
         ptr_registration_widg->login();
     }
 }
@@ -318,6 +342,7 @@ void MainWindow::logined(bool flg) {
     ui->prgrssBr_cnnctn_stat->setVisible(false);
     ui->pshBttn_register->setEnabled(true);
     ui->pshBttn_login_logout->setEnabled(true);
+    pshBttn_set_srvr_ip->setEnabled(true);
     if(flg) {
         ptr_RHE_widg->set_fname_lname(ptr_registration_widg->get_user_fname() + " " + ptr_registration_widg->get_user_lname());
         ui->pshBttn_register->hide();
@@ -390,4 +415,177 @@ void MainWindow::slot_timer_progress_bar_timeout() {
 void MainWindow::slot_re_translate() {
     ui->retranslateUi(this);
     set_ui_text();
+}
+
+////////////////////////////////////////////////////DIALOG SET SERVER IP///////////////////////////////////////////////////
+Dialog_Set_Server_IP::Dialog_Set_Server_IP(General_Widget *widg, QWidget *parent) : QDialog(parent), ui(new Ui::Dialog_Set_Server_IP) {
+    ui->setupUi(this);
+    gen_widg = widg;
+    this->setWindowTitle(tr("Setting of server IP"));
+    this->setFixedSize(450, 110);
+    this->updateGeometry();
+    octt_lst = new QList<QSpinBox*>{ui->spnBx_frst_octt, ui->spnBx_scnd_octt, ui->spnBx_thrd_octt, ui->spnBx_frth_octt};
+    QList<QString> lst = gen_widg->get_setting("settings/SERVER_IP").toString().split(".");
+    for(int i = 0; i < lst.count(); i++) {
+        octt_lst->at(i)->setValue(lst.at(i).toInt());
+    }
+    int serv_port = gen_widg->get_setting("settings/SERVER_PORT").toInt();
+    if(serv_port > -1) {
+        ui->lnEdt_port->setText(QString::number(serv_port));
+    }
+    connect(ui->spnBx_frst_octt->findChild<QLineEdit*>(), SIGNAL(textEdited(const QString &)), this, SLOT(onLineEditFirstOctetTextEdited(const QString &)));
+    connect(ui->spnBx_scnd_octt->findChild<QLineEdit*>(), SIGNAL(textEdited(const QString &)), this, SLOT(onLineEditSecondOctetTextEdited(const QString &)));
+    connect(ui->spnBx_thrd_octt->findChild<QLineEdit*>(), SIGNAL(textEdited(const QString &)), this, SLOT(onLineEditThirdOctetTextEdited(const QString &)));
+    connect(ui->spnBx_frth_octt->findChild<QLineEdit*>(), SIGNAL(textEdited(const QString &)), this, SLOT(onLineEditFourthOctetTextEdited(const QString &)));
+    ui_initialized = true;
+}
+
+Dialog_Set_Server_IP::~Dialog_Set_Server_IP() {
+    delete octt_lst;
+    delete ui;
+}
+
+//-------------------------------------------------------------------------
+// PUSH BUTTON 'OK' CLICKED
+//-------------------------------------------------------------------------
+void Dialog_Set_Server_IP::on_pshBttn_ok_clicked() {
+    int port = ui->lnEdt_port->text().toInt();
+    if((port < 0) || (port > 65535)) {
+        gen_widg->show_message_box(tr("Error"), tr("Wrong server port!"), 0, gen_widg->get_position());
+    } else {
+        QString ip = "";
+        for(int i = 0; i < octt_lst->count(); i++) {
+            if(i != 0) {
+                ip.append(".");
+            }
+            ip.append(QString::number(octt_lst->at(i)->value()));
+        }
+        gen_widg->save_setting("settings/SERVER_IP", ip);
+        gen_widg->save_setting("settings/SERVER_PORT", port);
+        QDialog::done(1);
+    }
+}
+
+//-------------------------------------------------------------------------
+// PUSH BUTTON 'CANCEL' CLICKED
+//-------------------------------------------------------------------------
+void Dialog_Set_Server_IP::on_pshBttn_cncl_clicked() {
+    QDialog::done(0);
+}
+
+//-------------------------------------------------------------------------
+// SET FIRST OCTET OF SERVER IP
+//-------------------------------------------------------------------------
+void Dialog_Set_Server_IP::on_spnBx_frst_octt_valueChanged(int val) {
+    if(ui_initialized) {
+        if(val < 0) {
+            ui->spnBx_frst_octt->setValue(ui->spnBx_frst_octt->maximum() - ui->spnBx_frst_octt->singleStep());
+        } else if((ui->spnBx_frst_octt->maximum() == val) || (val > ui->spnBx_frst_octt->maximum())) {
+            ui->spnBx_frst_octt->setValue(0);
+        }
+    }
+}
+
+//-------------------------------------------------------------------------
+// SET SECOND OCTET OF SERVER IP
+//-------------------------------------------------------------------------
+void Dialog_Set_Server_IP::on_spnBx_scnd_octt_valueChanged(int val) {
+    if(ui_initialized) {
+        if(val < 0) {
+            ui->spnBx_scnd_octt->setValue(ui->spnBx_scnd_octt->maximum() - ui->spnBx_scnd_octt->singleStep());
+        } else if((ui->spnBx_scnd_octt->maximum() == val) || (val > ui->spnBx_scnd_octt->maximum())) {
+            ui->spnBx_scnd_octt->setValue(0);
+        }
+    }
+}
+
+//-------------------------------------------------------------------------
+// SET THIRD OCTET OF SERVER IP
+//-------------------------------------------------------------------------
+void Dialog_Set_Server_IP::on_spnBx_thrd_octt_valueChanged(int val) {
+    if(ui_initialized) {
+        if(val < 0) {
+            ui->spnBx_thrd_octt->setValue(ui->spnBx_thrd_octt->maximum() - ui->spnBx_thrd_octt->singleStep());
+        } else if((ui->spnBx_thrd_octt->maximum() == val) || (val > ui->spnBx_thrd_octt->maximum())) {
+            ui->spnBx_thrd_octt->setValue(0);
+        }
+    }
+}
+
+//-------------------------------------------------------------------------
+// SET FOURTH OCTET OF SERVER IP
+//-------------------------------------------------------------------------
+void Dialog_Set_Server_IP::on_spnBx_frth_octt_valueChanged(int val) {
+    if(ui_initialized) {
+        if(val < 0) {
+            ui->spnBx_frth_octt->setValue(ui->spnBx_frth_octt->maximum() - ui->spnBx_frth_octt->singleStep());
+        } else if((ui->spnBx_frth_octt->maximum() == val) || (val > ui->spnBx_frth_octt->maximum())) {
+            ui->spnBx_frth_octt->setValue(0);
+        }
+    }
+}
+
+//-------------------------------------------------------------------------
+// TEXT EDITED OF QLINEEDIT WHICH CHILD OF QSPINBOX 'FIRST_OCTET'
+//-------------------------------------------------------------------------
+void Dialog_Set_Server_IP::onLineEditFirstOctetTextEdited(const QString &val) {
+    if(val.toInt() > 99) {
+        ui->spnBx_frst_octt->setValue(val.toInt());
+        ui->spnBx_scnd_octt->setFocus();
+    }
+}
+
+//-------------------------------------------------------------------------
+// TEXT EDITED OF QLINEEDIT WHICH CHILD OF QSPINBOX 'SECOND_OCTET'
+//-------------------------------------------------------------------------
+void Dialog_Set_Server_IP::onLineEditSecondOctetTextEdited(const QString &val) {
+    if(val.toInt() > 99) {
+        ui->spnBx_scnd_octt->setValue(val.toInt());
+        ui->spnBx_thrd_octt->setFocus();
+    }
+}
+
+//-------------------------------------------------------------------------
+// TEXT EDITED OF QLINEEDIT WHICH CHILD OF QSPINBOX 'THIRD_OCTET'
+//-------------------------------------------------------------------------
+void Dialog_Set_Server_IP::onLineEditThirdOctetTextEdited(const QString &val) {
+    if(val.toInt() > 99) {
+        ui->spnBx_thrd_octt->setValue(val.toInt());
+        ui->spnBx_frth_octt->setFocus();
+    }
+}
+
+//-------------------------------------------------------------------------
+// TEXT EDITED OF QLINEEDIT WHICH CHILD OF QSPINBOX 'FOURTH_OCTET'
+//-------------------------------------------------------------------------
+void Dialog_Set_Server_IP::onLineEditFourthOctetTextEdited(const QString &val) {
+    if(val.toInt() > 99) {
+        ui->spnBx_frth_octt->setValue(val.toInt());
+        ui->lnEdt_port->setFocus();
+    }
+}
+
+//-------------------------------------------------------------------------
+// SET SERVER PORT
+//-------------------------------------------------------------------------
+void Dialog_Set_Server_IP::on_lnEdt_port_textEdited(const QString &val) {
+    if(ui_initialized) {
+        QString tmp = val;
+        bool end = false;
+        while(!end) {
+            int cnt = 0;
+            for(int i = 0; i < tmp.count(); i++) {
+                if(!tmp.at(i).isNumber()) {
+                    tmp.remove(i, 1);
+                    break;
+                } else {
+                    cnt++;
+                }
+            }
+            if(cnt == tmp.count()) {
+                end = true;
+            }
+        }
+        ui->lnEdt_port->setText(tmp);
+    }
 }

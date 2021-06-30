@@ -298,7 +298,7 @@ void Waveform_Viewer_Widget::set_ui_text() {
 }
 
 //-------------------------------------------------------------------------
-//
+// DISPLAYING OF MEASURED TIME ON GRAPH
 //-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::set_measurement_label_text() {
     if(msr_time->visible()) {

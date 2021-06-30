@@ -21,6 +21,7 @@ SOURCES += \
 FORMS += \
     dialog_select_diagram_settings.ui \
     dialog_select_displayable_pins.ui \
+    dialog_set_server_ip.ui \
     mainwindow.ui \
     registration_widget.ui \
     rhe_widget.ui \

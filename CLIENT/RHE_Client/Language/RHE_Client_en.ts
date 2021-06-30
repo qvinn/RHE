@@ -166,29 +166,83 @@
     </message>
 </context>
 <context>
+    <name>Dialog_Set_Server_IP</name>
+    <message>
+        <source>Select pins for display</source>
+        <translation type="obsolete">Select pins for display</translation>
+    </message>
+    <message>
+        <source>Set server IP</source>
+        <translation type="obsolete">Set server IP</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="454"/>
+        <source>Error</source>
+        <translation>Error</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="454"/>
+        <source>Wrong server port!</source>
+        <translation>Wrong server port!</translation>
+    </message>
+    <message>
+        <source>Select displayable pins</source>
+        <translation type="obsolete">Select displayable pins</translation>
+    </message>
+    <message>
+        <source>Available pins:</source>
+        <translation type="obsolete">Available pins:</translation>
+    </message>
+    <message>
+        <source>Displayable pins:</source>
+        <translation type="obsolete">Displayable pins:</translation>
+    </message>
+    <message>
+        <location filename="../dialog_set_server_ip.ui" line="137"/>
+        <location filename="../mainwindow.cpp" line="424"/>
+        <source>Setting of server IP</source>
+        <translation>Setting of server IP</translation>
+    </message>
+    <message>
+        <location filename="../dialog_set_server_ip.ui" line="221"/>
+        <source>Ok</source>
+        <translation>Ok</translation>
+    </message>
+    <message>
+        <location filename="../dialog_set_server_ip.ui" line="298"/>
+        <source>Cancel</source>
+        <translation>Cancel</translation>
+    </message>
+    <message>
+        <location filename="../dialog_set_server_ip.ui" line="384"/>
+        <source>Server IP</source>
+        <translation>Server IP</translation>
+    </message>
+</context>
+<context>
     <name>General_Widget</name>
     <message>
-        <location filename="../general_widget.cpp" line="310"/>
+        <location filename="../general_widget.cpp" line="311"/>
         <source>Warning</source>
         <translation>Warning</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="315"/>
+        <location filename="../general_widget.cpp" line="316"/>
         <source>Question</source>
         <translation>Question</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="320"/>
+        <location filename="../general_widget.cpp" line="321"/>
         <source>Yes</source>
         <translation>Yes</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="321"/>
+        <location filename="../general_widget.cpp" line="322"/>
         <source>No</source>
         <translation>No</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="324"/>
+        <location filename="../general_widget.cpp" line="325"/>
         <source>Information</source>
         <translation>Information</translation>
     </message>
@@ -202,84 +256,105 @@
     </message>
     <message>
         <location filename="../mainwindow.ui" line="515"/>
-        <location filename="../mainwindow.cpp" line="261"/>
+        <location filename="../mainwindow.cpp" line="277"/>
         <source>Register</source>
         <translation>  Register  </translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="800"/>
-        <location filename="../mainwindow.cpp" line="256"/>
-        <location filename="../mainwindow.cpp" line="334"/>
+        <location filename="../mainwindow.cpp" line="272"/>
+        <location filename="../mainwindow.cpp" line="359"/>
         <source>Login</source>
         <translation>Login</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="258"/>
-        <location filename="../mainwindow.cpp" line="325"/>
+        <location filename="../mainwindow.cpp" line="274"/>
+        <location filename="../mainwindow.cpp" line="350"/>
         <source>Logout</source>
         <translation>Logout</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="239"/>
+        <location filename="../mainwindow.cpp" line="254"/>
         <source>File</source>
         <translation>File</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="238"/>
+        <location filename="../mainwindow.cpp" line="253"/>
         <source>Remote Hardware Education</source>
         <translation>Remote Hardware Education</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="240"/>
+        <location filename="../mainwindow.cpp" line="255"/>
         <source>Settings</source>
         <translation>Settings</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="241"/>
+        <location filename="../mainwindow.cpp" line="256"/>
         <source>Open waveform viewer</source>
         <translation>Open waveform viewer</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="242"/>
+        <location filename="../mainwindow.cpp" line="257"/>
         <source>Exit</source>
         <translation>Exit</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="243"/>
+        <location filename="../mainwindow.cpp" line="258"/>
         <source>Files checking</source>
         <translation>Files checking</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="244"/>
+        <location filename="../mainwindow.cpp" line="259"/>
         <source>Pins checking</source>
         <translation>Pins checking</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="245"/>
+        <location filename="../mainwindow.cpp" line="260"/>
         <source>Manualy load firmware</source>
         <translation>Manualy load firmware</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="247"/>
-        <location filename="../mainwindow.cpp" line="251"/>
+        <location filename="../mainwindow.cpp" line="261"/>
+        <source>Set server IP</source>
+        <translation>Set server IP</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="263"/>
+        <location filename="../mainwindow.cpp" line="267"/>
         <source>English</source>
         <translation>English</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="248"/>
-        <location filename="../mainwindow.cpp" line="252"/>
+        <location filename="../mainwindow.cpp" line="264"/>
+        <location filename="../mainwindow.cpp" line="268"/>
         <source>Ukrainian</source>
         <translation>Ukrainian</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="249"/>
-        <location filename="../mainwindow.cpp" line="253"/>
+        <location filename="../mainwindow.cpp" line="265"/>
+        <location filename="../mainwindow.cpp" line="269"/>
         <source>Russian</source>
         <translation>Russian</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="27"/>
-        <location filename="../mainwindow.cpp" line="263"/>
+        <location filename="../mainwindow.cpp" line="316"/>
+        <location filename="../mainwindow.cpp" line="319"/>
+        <source>Warning</source>
+        <translation>Warning</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="316"/>
+        <source>Change server-IP in settings</source>
+        <translation>Change server-IP in settings</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="319"/>
+        <source>Change server-port in settings</source>
+        <translation>Change server-port in settings</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="28"/>
+        <location filename="../mainwindow.cpp" line="279"/>
         <source>Connecting To Server</source>
         <translation>Connecting To Server</translation>
     </message>
@@ -716,35 +791,35 @@
 <context>
     <name>Send_Recieve_Module</name>
     <message>
-        <location filename="../send_recieve_module.cpp" line="80"/>
-        <location filename="../send_recieve_module.cpp" line="85"/>
-        <location filename="../send_recieve_module.cpp" line="113"/>
-        <location filename="../send_recieve_module.cpp" line="288"/>
+        <location filename="../send_recieve_module.cpp" line="84"/>
+        <location filename="../send_recieve_module.cpp" line="89"/>
+        <location filename="../send_recieve_module.cpp" line="117"/>
+        <location filename="../send_recieve_module.cpp" line="324"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="71"/>
+        <location filename="../send_recieve_module.cpp" line="75"/>
         <source>Server answer PING</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="75"/>
+        <location filename="../send_recieve_module.cpp" line="79"/>
         <source>Slave server answer PING</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="80"/>
+        <location filename="../send_recieve_module.cpp" line="84"/>
         <source>You are dropped</source>
         <translation>Server disabled</translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="85"/>
+        <location filename="../send_recieve_module.cpp" line="89"/>
         <source>Can&apos;t get ID from Server - no more places</source>
         <translation>Can&apos;t get ID from Server - no more places</translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="113"/>
+        <location filename="../send_recieve_module.cpp" line="117"/>
         <source>Selected board not available</source>
         <translation>Selected board not available</translation>
     </message>
@@ -753,7 +828,7 @@
         <translation type="vanished">Run debug firstly</translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="288"/>
+        <location filename="../send_recieve_module.cpp" line="324"/>
         <source>Server disconnected</source>
         <translation>Server disconnected</translation>
     </message>
@@ -771,17 +846,17 @@
         <translation>Attach cursor to axis</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="781"/>
+        <location filename="../waveform_viewer.ui" line="793"/>
         <source>Change Settings</source>
         <translation>  Change Settings  </translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="1101"/>
+        <location filename="../waveform_viewer.ui" line="1113"/>
         <source>Full scale</source>
         <translation>  Full scale  </translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="1956"/>
+        <location filename="../waveform_viewer.ui" line="1968"/>
         <source>Measurement</source>
         <translation>  Measurement  </translation>
     </message>
@@ -796,17 +871,17 @@
         <translation>Fit size</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="1386"/>
+        <location filename="../waveform_viewer.ui" line="1398"/>
         <source>Clear</source>
         <translation>  Clear  </translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="1671"/>
+        <location filename="../waveform_viewer.ui" line="1683"/>
         <source>Select Displayable Pins</source>
         <translation>  Select Displayable Pins  </translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="2257"/>
+        <location filename="../waveform_viewer.ui" line="2269"/>
         <source>Waveform</source>
         <translation>Waveform</translation>
     </message>

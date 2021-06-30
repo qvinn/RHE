@@ -111,14 +111,15 @@ void General_Widget::save_setting(QString type, QVariant val) {
 // CREATING OF INITIAL SETTING (IF SETTINGS-FILE OR CERTAIN SETTING DOESN'T EXIST)
 //-------------------------------------------------------------------------
 void General_Widget::create_base_settings() {
+    check_setting_exist("settings/ENABLE_FILE_CHEKING", 1);
     check_setting_exist("settings/ENABLE_PINS_CHEKING", 1);
     check_setting_exist("settings/MANUALY_LOAD_FIRMWARE", 0);
     check_setting_exist("settings/LANGUAGE", 0);
     check_setting_exist("settings/CURRENT_BOARD", 0);
     check_setting_exist("settings/PATH_TO_DATA", "data/");
     check_setting_exist("settings/BOARDS_LIST_FILENAME", "Boards_List.xml");
-    check_setting_exist("settings/SERVER_IP", "192.168.1.10");
-    check_setting_exist("settings/SERVER_PORT", 3425);
+    check_setting_exist("settings/SERVER_IP", "0.0.0.0");
+    check_setting_exist("settings/SERVER_PORT", -1);
     check_setting_exist("settings/VERSION", "1.0");
     check_setting_exist("settings/DEBUG_DISCRETENESS_TIME", 1);
     check_setting_exist("settings/DEBUG_DISCRETENESS_TIME_TYPE", 0);

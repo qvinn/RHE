@@ -122,7 +122,7 @@
 
             Ui::Waveform_Viewer *ui;
             General_Widget *gen_widg = nullptr;
-            QList<QCPGraph *> *graph_list = nullptr;
+            QList<QCPGraph*> *graph_list = nullptr;
             QList<QString> *pin_names = nullptr;
             QList<QString> *pin_names_board = nullptr;
             QSharedPointer<QCPAxisTickerText> *textTicker = nullptr;

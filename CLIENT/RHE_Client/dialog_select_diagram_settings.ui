@@ -699,6 +699,12 @@ QPushButton:hover{
        <height>24</height>
       </size>
      </property>
+     <property name="font">
+      <font>
+       <family>Tahoma</family>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
      <property name="styleSheet">
       <string notr="true">QSpinBox {
 	background-color: #FFFFFF;

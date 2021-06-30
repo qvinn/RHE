@@ -40,6 +40,7 @@
             QAction *chkBx_fls_chckng_actn = nullptr;
             QAction *chkBx_pins_chckng_actn = nullptr;
             QAction *chkBx_ld_mnl_frmwr_actn = nullptr;
+            QAction *pshBttn_set_srvr_ip = nullptr;
             QAction *wvfrm_vwr_actn = nullptr;
             QAction *ext_actn = nullptr;
             QMenu *menu_file = nullptr;
@@ -71,6 +72,7 @@
             void onChkBxFlsChckngStateChanged();
             void onChkBxPinsChckngStateChanged();
             void onChkBxLdMnlFrmwrStateChanged();
+            void onPshBttnClickedSetSrvrIP();
             void onCmbBxLngChsCurrentIndexChanged(int index);
             void slot_re_size();
             void slot_waveform_viewer_closed();
@@ -79,6 +81,40 @@
 
         signals:
             void set_disconnected_signal();
+    };
+
+    //////////////////////////////////////////////////DIALOG SET SERVER IP///////////////////////////////////////////////////
+    QT_BEGIN_NAMESPACE
+    namespace Ui {
+        class Dialog_Set_Server_IP;
+    }
+    QT_END_NAMESPACE
+
+    class Dialog_Set_Server_IP : public QDialog {
+        Q_OBJECT
+        public:
+            Dialog_Set_Server_IP(General_Widget *widg, QWidget *parent = nullptr);
+            ~Dialog_Set_Server_IP() override;
+
+        private:
+            Ui::Dialog_Set_Server_IP *ui;
+            General_Widget *gen_widg = nullptr;
+            QList<QSpinBox*> *octt_lst = nullptr;
+
+            bool ui_initialized = false;
+
+        private slots:
+            void on_pshBttn_ok_clicked();
+            void on_pshBttn_cncl_clicked();
+            void on_spnBx_frst_octt_valueChanged(int val);
+            void on_spnBx_scnd_octt_valueChanged(int val);
+            void on_spnBx_thrd_octt_valueChanged(int val);
+            void on_spnBx_frth_octt_valueChanged(int val);
+            void onLineEditFirstOctetTextEdited(const QString &val);
+            void onLineEditSecondOctetTextEdited(const QString &val);
+            void onLineEditThirdOctetTextEdited(const QString &val);
+            void onLineEditFourthOctetTextEdited(const QString &val);
+            void on_lnEdt_port_textEdited(const QString &val);
     };
 
 #endif // MAINWINDOW_H

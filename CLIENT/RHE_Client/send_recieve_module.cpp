@@ -2,9 +2,7 @@
 
 #define INIT_ID -1
 
-Send_Recieve_Module::Send_Recieve_Module(QString _server_ip, int _server_port, General_Widget *widg) {
-    this->server_ip = _server_ip;
-    this->server_port = _server_port;
+Send_Recieve_Module::Send_Recieve_Module(General_Widget *widg) {
     gen_widg = widg;
     socket = new QTcpSocket(this);
     file = new QFile(gen_widg->get_app_path() + "/DEBUG_from_s_server.txt");
@@ -69,7 +67,7 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 send_U_Packet(CLIENT_WANT_IDT, "");
                 send_U_Packet(CLIENT_WANT_ODT, "");
 
-                send_file_to_ss_universal(this->upd_file,CLIENT_UPD_LIST);
+                send_file_to_ss_universal(this->upd_file, CLIENT_UPD_LIST);
                 send_U_Packet(NEED_UPDATE, "");
                 break;
             }
@@ -199,10 +197,10 @@ void Send_Recieve_Module::ping_to_S_server() {
 void Send_Recieve_Module::start_debug(quint16 dscrt_tm, quint8 dscrt_tm_tp, int flag) {
     //for variable dscrt_tm_tp: 0 - seconds, 1 - miliseconds, 2 - microseconds
     char buff[DATA_BUFFER];
-    memset(buff,0,DATA_BUFFER);
+    memset(buff, 0, DATA_BUFFER);
     memcpy(buff, &dscrt_tm, sizeof(quint16));
-    memcpy(buff+sizeof(quint16), &dscrt_tm_tp, sizeof(quint8));
-    send_U_Packet(CLIENT_WANT_CHANGE_DEBUG_SETTINGS, QByteArray(buff,(sizeof (quint16) + sizeof (quint8))));
+    memcpy((buff + sizeof(quint16)), &dscrt_tm_tp, sizeof(quint8));
+    send_U_Packet(CLIENT_WANT_CHANGE_DEBUG_SETTINGS, QByteArray(buff, (sizeof(quint16) + sizeof(quint8))));
     send_U_Packet(flag, "");
 }
 
@@ -238,7 +236,7 @@ bool Send_Recieve_Module::send_file_to_ss(QByteArray File_byteArray, int strt_sn
         tmp_data = File_byteArray.mid(0, SEND_FILE_BUFFER).data();
         packet = form_send_file_packet(&tmp_data);
         packets.push_back(packet);
-        for(int i = 1; i < hops + 1; i++) {
+        for(int i = 1; i < (hops + 1); i++) {
             tmp_data = File_byteArray.mid((i * SEND_FILE_BUFFER), SEND_FILE_BUFFER).data();
             packet = form_send_file_packet(&tmp_data);
             packets.push_back(packet);
@@ -254,12 +252,8 @@ bool Send_Recieve_Module::send_file_to_ss(QByteArray File_byteArray, int strt_sn
     return true;
 }
 
-bool Send_Recieve_Module::send_file_to_ss_universal(QByteArray File_byteArray, int file_code)
-{
-
+bool Send_Recieve_Module::send_file_to_ss_universal(QByteArray File_byteArray, int file_code) {
     int fileSize = File_byteArray.size();
-
-
     int hops = fileSize / SEND_FILE_BUFFER;
     if(hops < 1) {      // Если данные помещаются в одну посылку
         QByteArray Result_byteArray = form_send_file_packet(&File_byteArray);
@@ -274,7 +268,7 @@ bool Send_Recieve_Module::send_file_to_ss_universal(QByteArray File_byteArray, i
         tmp_data = File_byteArray.mid(0, SEND_FILE_BUFFER).data();
         //packet = form_send_file_packet(&tmp_data);
         packets.push_back(tmp_data);
-        for(int i = 1; i < hops + 1; i++) {
+        for(int i = 1; i < (hops + 1); i++) {
             tmp_data = File_byteArray.mid((i * SEND_FILE_BUFFER), SEND_FILE_BUFFER).data();
             //packet = form_send_file_packet(&tmp_data);
             packets.push_back(tmp_data);
@@ -355,7 +349,7 @@ void Send_Recieve_Module::reset_ID() {
 // ESTABLISH SOCKET
 //-------------------------------------------------------------------------
 bool Send_Recieve_Module::establish_socket() {
-    socket->connectToHost(server_ip, static_cast<quint16>(server_port), QIODevice::ReadWrite);
+    socket->connectToHost(gen_widg->get_setting("settings/SERVER_IP").toString(), static_cast<quint16>(gen_widg->get_setting("settings/SERVER_PORT").toInt()), QIODevice::ReadWrite);
     if(!socket->isOpen() || !socket->isValid()) {
         return false;
     }
@@ -427,31 +421,27 @@ int Send_Recieve_Module::end_recive_file() {
 
 void Send_Recieve_Module::analyze_data_dir()
 {
-    QString dir_path = gen_widg->get_app_path() + + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString();
+    QString dir_path = gen_widg->get_app_path() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString();
 
     QDir dir_name(dir_path);
-    QFileInfoList dirContent = dir_name.entryInfoList(QStringList() << "*.*",QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
+    QFileInfoList dirContent = dir_name.entryInfoList(QStringList() << "*.*", QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
 
     QRegExp tagExp("/");
     QStringList lst;
 
-        for(int i = 0; i < dirContent.size(); i++)
-        {
-            QByteArray hash = gen_widg->get_file_checksum(dirContent.at(i).filePath(),QCryptographicHash::Md5);
-            hash = hash.toHex();
+    for(int i = 0; i < dirContent.size(); i++)
+    {
+        QByteArray hash = gen_widg->get_file_checksum(dirContent.at(i).filePath(), QCryptographicHash::Md5);
+        hash = hash.toHex();
 
-            // FIXME: Потом удалить запись в этот вектор
-            dir_vec.push_back(file_info{dirContent.at(i).filePath(),QString(hash)});
+        // FIXME: Потом удалить запись в этот вектор
+        dir_vec.push_back(file_info{dirContent.at(i).filePath(), QString(hash)});
 
-            //this->upd_file->write(QString(dirContent.at(i).filePath() + "\t" + hash).toLatin1());
+        //this->upd_file->write(QString(dirContent.at(i).filePath() + "\t" + hash).toLatin1());
 
 
-            lst = dirContent.at(i).filePath().split(tagExp);
-            this->upd_file.append(QString(lst.last() + "\t" + hash + "\n").toLatin1());
-        }
-
-    for (int i = 0; i < dir_vec.size(); i++) {
-        qDebug() << "dir_vec---> " << "file_name: " << dir_vec.at(i).file_name << "hash: " << dir_vec.at(i).hash;
+        lst = dirContent.at(i).filePath().split(tagExp);
+        this->upd_file.append(QString(lst.last() + "\t" + hash + "\n").toLatin1());
     }
-
+    qDebug() << upd_file.data();
 }

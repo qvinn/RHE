@@ -81,7 +81,7 @@
         };
 
         public:
-            Send_Recieve_Module(QString _server_ip, int _server_port, General_Widget *widg = nullptr);
+            Send_Recieve_Module(General_Widget *widg = nullptr);
             ~Send_Recieve_Module() override;
 
             void init_connection();
@@ -131,7 +131,7 @@
             typedef struct file_info{
                 QString file_name;	// Название файла
                 QString hash;		// Хэш-сумма файла
-            }file_info;
+            } file_info;
 
         private:
             void server_disconnected();
@@ -149,13 +149,11 @@
             General_Widget *gen_widg = nullptr;
             QTcpSocket *socket = nullptr;
             QFile *file = nullptr;
-            QString server_ip;
             QString FPGA_id_code = "";
 
             int file_rcv_bytes_count = 0;
             int last_send_file_bytes = 0;
             int my_client_ID = -1;              // INIT_ID
-            int server_port;
             bool manual_disconnect = false;
             bool connected = false;
 
