@@ -536,6 +536,7 @@ void Dialog_Set_Server_IP::onLineEditFirstOctetTextEdited(const QString &val) {
     if(val.toInt() > 99) {
         ui->spnBx_frst_octt->setValue(val.toInt());
         ui->spnBx_scnd_octt->setFocus();
+        ui->spnBx_scnd_octt->selectAll();
     }
 }
 
@@ -546,6 +547,7 @@ void Dialog_Set_Server_IP::onLineEditSecondOctetTextEdited(const QString &val) {
     if(val.toInt() > 99) {
         ui->spnBx_scnd_octt->setValue(val.toInt());
         ui->spnBx_thrd_octt->setFocus();
+        ui->spnBx_thrd_octt->selectAll();
     }
 }
 
@@ -556,6 +558,7 @@ void Dialog_Set_Server_IP::onLineEditThirdOctetTextEdited(const QString &val) {
     if(val.toInt() > 99) {
         ui->spnBx_thrd_octt->setValue(val.toInt());
         ui->spnBx_frth_octt->setFocus();
+        ui->spnBx_frth_octt->selectAll();
     }
 }
 
@@ -566,6 +569,7 @@ void Dialog_Set_Server_IP::onLineEditFourthOctetTextEdited(const QString &val) {
     if(val.toInt() > 99) {
         ui->spnBx_frth_octt->setValue(val.toInt());
         ui->lnEdt_port->setFocus();
+        ui->lnEdt_port->selectAll();
     }
 }
 
