@@ -176,14 +176,19 @@
         <translation type="obsolete">Встановити IP серверу</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="454"/>
+        <location filename="../mainwindow.cpp" line="455"/>
         <source>Error</source>
         <translation>Помилка</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="454"/>
+        <location filename="../mainwindow.cpp" line="455"/>
         <source>Wrong server port!</source>
         <translation>Неправильний порт серверу!</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="469"/>
+        <source>Set port value</source>
+        <translation>Встановіть значення порту</translation>
     </message>
     <message>
         <source>Select displayable pins</source>
@@ -201,7 +206,7 @@
         <location filename="../dialog_set_server_ip.ui" line="137"/>
         <location filename="../mainwindow.cpp" line="424"/>
         <source>Setting of server IP</source>
-        <translation>Встановлення IP сервера</translation>
+        <translation>Встановлення IP серверу</translation>
     </message>
     <message>
         <location filename="../dialog_set_server_ip.ui" line="221"/>

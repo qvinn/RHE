@@ -87,7 +87,7 @@ void Waveform_Viewer_Widget::closeEvent(QCloseEvent *) {
 void Waveform_Viewer_Widget::on_chckBx_as_wndw_stateChanged(int state) {
     change_margin(5 * (state / 2));
     as_window = static_cast<bool>(state);
-    if(state == 2) {
+    if(as_window) {
         this->setWindowFlags(Qt::Window | Qt::WindowMaximizeButtonHint | Qt::WindowTitleHint);
         shw_at_cntr = true;
         this->show();

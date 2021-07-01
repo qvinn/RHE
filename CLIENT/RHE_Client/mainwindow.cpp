@@ -422,7 +422,7 @@ Dialog_Set_Server_IP::Dialog_Set_Server_IP(General_Widget *widg, QWidget *parent
     ui->setupUi(this);
     gen_widg = widg;
     this->setWindowTitle(tr("Setting of server IP"));
-    this->setFixedSize(450, 110);
+    this->setFixedSize(450, 105);
     this->updateGeometry();
     octt_lst = new QList<QSpinBox*>{ui->spnBx_frst_octt, ui->spnBx_scnd_octt, ui->spnBx_thrd_octt, ui->spnBx_frth_octt};
     QList<QString> lst = gen_widg->get_setting("settings/SERVER_IP").toString().split(".");
@@ -449,20 +449,24 @@ Dialog_Set_Server_IP::~Dialog_Set_Server_IP() {
 // PUSH BUTTON 'OK' CLICKED
 //-------------------------------------------------------------------------
 void Dialog_Set_Server_IP::on_pshBttn_ok_clicked() {
-    int port = ui->lnEdt_port->text().toInt();
-    if((port < 0) || (port > 65535)) {
-        gen_widg->show_message_box(tr("Error"), tr("Wrong server port!"), 0, gen_widg->get_position());
-    } else {
-        QString ip = "";
-        for(int i = 0; i < octt_lst->count(); i++) {
-            if(i != 0) {
-                ip.append(".");
+    if(ui->lnEdt_port->text().count() != 0) {
+        int port = ui->lnEdt_port->text().toInt();
+        if((port < 0) || (port > 65535)) {
+            gen_widg->show_message_box(tr("Error"), tr("Wrong server port!"), 0, gen_widg->get_position());
+        } else {
+            QString ip = "";
+            for(int i = 0; i < octt_lst->count(); i++) {
+                if(i != 0) {
+                    ip.append(".");
+                }
+                ip.append(QString::number(octt_lst->at(i)->value()));
             }
-            ip.append(QString::number(octt_lst->at(i)->value()));
+            gen_widg->save_setting("settings/SERVER_IP", ip);
+            gen_widg->save_setting("settings/SERVER_PORT", port);
+            QDialog::done(1);
         }
-        gen_widg->save_setting("settings/SERVER_IP", ip);
-        gen_widg->save_setting("settings/SERVER_PORT", port);
-        QDialog::done(1);
+    } else {
+        gen_widg->show_message_box("Error", tr("Set port value"), 0, gen_widg->get_position());
     }
 }
 

@@ -176,14 +176,19 @@
         <translation type="obsolete">Set server IP</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="454"/>
+        <location filename="../mainwindow.cpp" line="455"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="454"/>
+        <location filename="../mainwindow.cpp" line="455"/>
         <source>Wrong server port!</source>
         <translation>Wrong server port!</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="469"/>
+        <source>Set port value</source>
+        <translation>Set port value</translation>
     </message>
     <message>
         <source>Select displayable pins</source>
