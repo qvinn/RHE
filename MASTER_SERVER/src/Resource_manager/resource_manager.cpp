@@ -86,8 +86,22 @@ bool Resource_manager::get_dir_info(std::string _resource_dir)
 	}
 	
 	// Убрать такие элементы из списка, как "." и ".."
-	dir_vec.erase(dir_vec.begin() + 0);
-	dir_vec.erase(dir_vec.begin() + 0);
+
+	int counter = 0;
+	while(counter != dir_vec.size())
+	{
+		counter = 0;
+		for(int i = 0; i < dir_vec.size(); i++)
+		{
+			if((dir_vec.at(i).file_name.compare(".") == 0) || (dir_vec.at(i).file_name.compare("..") == 0))
+			{
+				dir_vec.erase(dir_vec.begin() + i);
+			} else 
+			{
+				counter++;
+			}
+		}
+	}
 	
 	return true;
 }
