@@ -72,11 +72,11 @@
             QList<QPoint> *led_width_height = nullptr;
             QList<int> *prev_vals = nullptr;
             QList<int> *pi_pins_nums = nullptr;
-            QList<QHBoxLayout*> *inpt_hbxs = nullptr;
-            QList<QLabel*> *inpt_lbls = nullptr;
-            QList<QSpacerItem*> *inpt_spcrs = nullptr;
-            QList<QSlider*> *inpt_sldrs = nullptr;
-            QList<QLCDNumber*> *inpt_stts = nullptr;
+            QList<QHBoxLayout *> *inpt_hbxs = nullptr;
+            QList<QLabel *> *inpt_lbls = nullptr;
+            QList<QSpacerItem *> *inpt_spcrs = nullptr;
+            QList<QSlider *> *inpt_sldrs = nullptr;
+            QList<QLCDNumber *> *inpt_stts = nullptr;
             QTimer *send_file_status = nullptr;
             QSpacerItem *hrzntl_spcr = nullptr;
             QList<QString> state_strs;

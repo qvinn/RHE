@@ -89,13 +89,13 @@ void MainWindow::moveEvent(QMoveEvent *) {
 // CLOSING OF APPLICATION
 //-------------------------------------------------------------------------
 void MainWindow::closeEvent(QCloseEvent *) {
-    onPshBttnExt();
+    pshBttn_exit();
 }
 
 //-------------------------------------------------------------------------
 // PUSH BUTTON 'WAVEFORM VIEWER' CLICKED
 //-------------------------------------------------------------------------
-void MainWindow::onPshBttnWvfrmVwr() {
+void MainWindow::pshBttn_wvfrm_vwr() {
     wvfrm_vwr = new Waveform_Viewer_Widget(nullptr, gen_widg, true);
     connect(gen_widg, &General_Widget::re_translate_signal, wvfrm_vwr, &Waveform_Viewer_Widget::slot_re_translate);
     connect(wvfrm_vwr, &Waveform_Viewer_Widget::waveform_viewer_closed_signal, this, &MainWindow::slot_waveform_viewer_closed);
@@ -107,14 +107,14 @@ void MainWindow::onPshBttnWvfrmVwr() {
 //-------------------------------------------------------------------------
 // PUSH BUTTON 'EXIT' CLICKED
 //-------------------------------------------------------------------------
-void MainWindow::onPshBttnExt() {
+void MainWindow::pshBttn_exit() {
     QApplication::quit();
 }
 
 //-------------------------------------------------------------------------
 // CHECK BOX 'FILES CHECKING' CHECKED
 //-------------------------------------------------------------------------
-void MainWindow::onChkBxFlsChckngStateChanged() {
+void MainWindow::chkBx_fls_chckng_state_changed() {
     if(ui_initialized) {
         ptr_RHE_widg->pshBttn_chk_prj_stat_set_visible(chkBx_fls_chckng_actn->isChecked());
         ptr_RHE_widg->pshBttn_chk_prj_stat_set_enabled(chkBx_fls_chckng_actn->isChecked());
@@ -137,7 +137,7 @@ void MainWindow::onChkBxFlsChckngStateChanged() {
 //-------------------------------------------------------------------------
 // CHECK BOX 'PINS CHECKING' CHECKED
 //-------------------------------------------------------------------------
-void MainWindow::onChkBxPinsChckngStateChanged() {
+void MainWindow::chkBx_pins_chckng_state_changed() {
     if(ui_initialized) {
         if(gen_widg->get_setting("settings/ENABLE_PINS_CHEKING").toInt() != -1) {
             ptr_RHE_widg->pins_chk = chkBx_pins_chckng_actn->isChecked();
@@ -149,7 +149,7 @@ void MainWindow::onChkBxPinsChckngStateChanged() {
 //-------------------------------------------------------------------------
 // CHECK BOX 'MANUALY LOAD FIRMWARE' CHECKED
 //-------------------------------------------------------------------------
-void MainWindow::onChkBxLdMnlFrmwrStateChanged() {
+void MainWindow::chkBx_ld_mnl_frmwr_state_changed() {
     if(ui_initialized) {
         ptr_RHE_widg->pshBttn_chs_frmwr_set_visible(chkBx_ld_mnl_frmwr_actn->isChecked());
         gen_widg->save_setting("settings/MANUALY_LOAD_FIRMWARE", (static_cast<int>(chkBx_ld_mnl_frmwr_actn->isChecked())));
@@ -160,7 +160,7 @@ void MainWindow::onChkBxLdMnlFrmwrStateChanged() {
 //-------------------------------------------------------------------------
 // PUSH BUTTON 'SET SERVER IP' CLICKED
 //-------------------------------------------------------------------------
-void MainWindow::onPshBttnClickedSetSrvrIP() {
+void MainWindow::pshBttn_set_srvr_IP() {
     Dialog_Set_Server_IP set_server_ip(gen_widg, this);
     set_server_ip.exec();
 }
@@ -168,7 +168,7 @@ void MainWindow::onPshBttnClickedSetSrvrIP() {
 //-------------------------------------------------------------------------
 // CHOOSING LANGUAUGE OF APPLICATION
 //-------------------------------------------------------------------------
-void MainWindow::onCmbBxLngChsCurrentIndexChanged(int index) {
+void MainWindow::cmbBx_lng_chs_current_index_changed(int index) {
     if(ui_initialized && language_changed) {
         gen_widg->save_setting("settings/LANGUAGE", index);
         gen_widg->change_current_locale();
@@ -231,18 +231,20 @@ void MainWindow::initialize_ui() {
     menu_settngs->addAction(pshBttn_set_srvr_ip);
     menu_settngs->addSeparator();
     cmbBx_lng_chs = new QComboBox(menu_settngs);
+    cmbBx_lng_chs->setMinimumHeight(21);
+    cmbBx_lng_chs->setMaximumHeight(21);
     cmbBx_lng_chs->setStyleSheet("QComboBox { background-color: #F6F6F6; color: #000000; selection-background-color: #308CC6; selection-color: #FFFFFF; }"
                                  "QComboBox QAbstractItemView { background-color: #EFEFEF; color: #000000; selection-background-color: #308CC6; selection-color: #FFFFFF; }");
     cmbBx_lng_chs_actn = new QWidgetAction(menu_settngs);
     cmbBx_lng_chs_actn->setDefaultWidget(cmbBx_lng_chs);
     menu_settngs->addAction(cmbBx_lng_chs_actn);
-    connect(wvfrm_vwr_actn, &QAction::triggered, this, &MainWindow::onPshBttnWvfrmVwr);
-    connect(ext_actn, &QAction::triggered, this, &MainWindow::onPshBttnExt);
-    connect(chkBx_fls_chckng_actn, &QAction::changed, this, &MainWindow::onChkBxFlsChckngStateChanged);
-    connect(chkBx_pins_chckng_actn, &QAction::changed, this, &MainWindow::onChkBxPinsChckngStateChanged);
-    connect(chkBx_ld_mnl_frmwr_actn, &QAction::changed, this, &MainWindow::onChkBxLdMnlFrmwrStateChanged);
-    connect(pshBttn_set_srvr_ip, &QAction::triggered, this, &MainWindow::onPshBttnClickedSetSrvrIP);
-    connect(cmbBx_lng_chs, SIGNAL(currentIndexChanged(int)), this, SLOT(onCmbBxLngChsCurrentIndexChanged(int)));
+    connect(wvfrm_vwr_actn, &QAction::triggered, this, &MainWindow::pshBttn_wvfrm_vwr);
+    connect(ext_actn, &QAction::triggered, this, &MainWindow::pshBttn_exit);
+    connect(chkBx_fls_chckng_actn, &QAction::changed, this, &MainWindow::chkBx_fls_chckng_state_changed);
+    connect(chkBx_pins_chckng_actn, &QAction::changed, this, &MainWindow::chkBx_pins_chckng_state_changed);
+    connect(chkBx_ld_mnl_frmwr_actn, &QAction::changed, this, &MainWindow::chkBx_ld_mnl_frmwr_state_changed);
+    connect(pshBttn_set_srvr_ip, &QAction::triggered, this, &MainWindow::pshBttn_set_srvr_IP);
+    connect(cmbBx_lng_chs, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbBx_lng_chs_current_index_changed(int)));
 }
 
 //-------------------------------------------------------------------------
@@ -424,7 +426,7 @@ Dialog_Set_Server_IP::Dialog_Set_Server_IP(General_Widget *widg, QWidget *parent
     this->setWindowTitle(tr("Setting of server IP"));
     this->setFixedSize(450, 105);
     this->updateGeometry();
-    octt_lst = new QList<QSpinBox*>{ui->spnBx_frst_octt, ui->spnBx_scnd_octt, ui->spnBx_thrd_octt, ui->spnBx_frth_octt};
+    octt_lst = new QList<QSpinBox *>{ui->spnBx_frst_octt, ui->spnBx_scnd_octt, ui->spnBx_thrd_octt, ui->spnBx_frth_octt};
     QList<QString> lst = gen_widg->get_setting("settings/SERVER_IP").toString().split(".");
     for(int i = 0; i < lst.count(); i++) {
         octt_lst->at(i)->setValue(lst.at(i).toInt());
@@ -433,10 +435,10 @@ Dialog_Set_Server_IP::Dialog_Set_Server_IP(General_Widget *widg, QWidget *parent
     if(serv_port > -1) {
         ui->lnEdt_port->setText(QString::number(serv_port));
     }
-    connect(ui->spnBx_frst_octt->findChild<QLineEdit*>(), SIGNAL(textEdited(const QString &)), this, SLOT(onLineEditFirstOctetTextEdited(const QString &)));
-    connect(ui->spnBx_scnd_octt->findChild<QLineEdit*>(), SIGNAL(textEdited(const QString &)), this, SLOT(onLineEditSecondOctetTextEdited(const QString &)));
-    connect(ui->spnBx_thrd_octt->findChild<QLineEdit*>(), SIGNAL(textEdited(const QString &)), this, SLOT(onLineEditThirdOctetTextEdited(const QString &)));
-    connect(ui->spnBx_frth_octt->findChild<QLineEdit*>(), SIGNAL(textEdited(const QString &)), this, SLOT(onLineEditFourthOctetTextEdited(const QString &)));
+    connect(ui->spnBx_frst_octt->findChild<QLineEdit *>(), SIGNAL(textEdited(const QString &)), this, SLOT(lineEdit_frst_octet_text_edited(const QString &)));
+    connect(ui->spnBx_scnd_octt->findChild<QLineEdit *>(), SIGNAL(textEdited(const QString &)), this, SLOT(lineEdit_scnd_octet_text_edited(const QString &)));
+    connect(ui->spnBx_thrd_octt->findChild<QLineEdit *>(), SIGNAL(textEdited(const QString &)), this, SLOT(lineEdit_thrd_octet_text_edited(const QString &)));
+    connect(ui->spnBx_frth_octt->findChild<QLineEdit *>(), SIGNAL(textEdited(const QString &)), this, SLOT(lineEdit_frth_octet_text_edited(const QString &)));
     ui_initialized = true;
 }
 
@@ -532,45 +534,29 @@ void Dialog_Set_Server_IP::on_spnBx_frth_octt_valueChanged(int val) {
 //-------------------------------------------------------------------------
 // TEXT EDITED OF QLINEEDIT WHICH CHILD OF QSPINBOX 'FIRST_OCTET'
 //-------------------------------------------------------------------------
-void Dialog_Set_Server_IP::onLineEditFirstOctetTextEdited(const QString &val) {
-    if(val.toInt() > 99) {
-        ui->spnBx_frst_octt->setValue(val.toInt());
-        ui->spnBx_scnd_octt->setFocus();
-        ui->spnBx_scnd_octt->selectAll();
-    }
+void Dialog_Set_Server_IP::lineEdit_frst_octet_text_edited(const QString &val) {
+    change_IP_item_focus(val.toInt(), 0, 1);
 }
 
 //-------------------------------------------------------------------------
 // TEXT EDITED OF QLINEEDIT WHICH CHILD OF QSPINBOX 'SECOND_OCTET'
 //-------------------------------------------------------------------------
-void Dialog_Set_Server_IP::onLineEditSecondOctetTextEdited(const QString &val) {
-    if(val.toInt() > 99) {
-        ui->spnBx_scnd_octt->setValue(val.toInt());
-        ui->spnBx_thrd_octt->setFocus();
-        ui->spnBx_thrd_octt->selectAll();
-    }
+void Dialog_Set_Server_IP::lineEdit_scnd_octet_text_edited(const QString &val) {
+    change_IP_item_focus(val.toInt(), 1, 2);
 }
 
 //-------------------------------------------------------------------------
 // TEXT EDITED OF QLINEEDIT WHICH CHILD OF QSPINBOX 'THIRD_OCTET'
 //-------------------------------------------------------------------------
-void Dialog_Set_Server_IP::onLineEditThirdOctetTextEdited(const QString &val) {
-    if(val.toInt() > 99) {
-        ui->spnBx_thrd_octt->setValue(val.toInt());
-        ui->spnBx_frth_octt->setFocus();
-        ui->spnBx_frth_octt->selectAll();
-    }
+void Dialog_Set_Server_IP::lineEdit_thrd_octet_text_edited(const QString &val) {
+    change_IP_item_focus(val.toInt(), 2, 3);
 }
 
 //-------------------------------------------------------------------------
 // TEXT EDITED OF QLINEEDIT WHICH CHILD OF QSPINBOX 'FOURTH_OCTET'
 //-------------------------------------------------------------------------
-void Dialog_Set_Server_IP::onLineEditFourthOctetTextEdited(const QString &val) {
-    if(val.toInt() > 99) {
-        ui->spnBx_frth_octt->setValue(val.toInt());
-        ui->lnEdt_port->setFocus();
-        ui->lnEdt_port->selectAll();
-    }
+void Dialog_Set_Server_IP::lineEdit_frth_octet_text_edited(const QString &val) {
+    change_IP_item_focus(val.toInt(), 3, 4);
 }
 
 //-------------------------------------------------------------------------
@@ -595,5 +581,21 @@ void Dialog_Set_Server_IP::on_lnEdt_port_textEdited(const QString &val) {
             }
         }
         ui->lnEdt_port->setText(tmp);
+    }
+}
+
+//-------------------------------------------------------------------------
+// CHANGE FOCUS OF IP-ITEM IF INPUTED VALUE HAS 3 DIGITS
+//-------------------------------------------------------------------------
+void Dialog_Set_Server_IP::change_IP_item_focus(int val, int crrnt_item, int next_item) {
+    if(val > 99) {
+        octt_lst->at(crrnt_item)->setValue(val);
+        if(next_item == 4) {
+            ui->lnEdt_port->setFocus();
+            ui->lnEdt_port->selectAll();
+        } else {
+            octt_lst->at(next_item)->setFocus();
+            octt_lst->at(next_item)->selectAll();
+        }
     }
 }

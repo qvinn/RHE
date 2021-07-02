@@ -176,17 +176,17 @@
         <translation type="obsolete">Встановити IP серверу</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="455"/>
+        <location filename="../mainwindow.cpp" line="457"/>
         <source>Error</source>
         <translation>Помилка</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="455"/>
+        <location filename="../mainwindow.cpp" line="457"/>
         <source>Wrong server port!</source>
         <translation>Неправильний порт серверу!</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="469"/>
+        <location filename="../mainwindow.cpp" line="471"/>
         <source>Set port value</source>
         <translation>Встановіть значення порту</translation>
     </message>
@@ -204,7 +204,7 @@
     </message>
     <message>
         <location filename="../dialog_set_server_ip.ui" line="137"/>
-        <location filename="../mainwindow.cpp" line="424"/>
+        <location filename="../mainwindow.cpp" line="426"/>
         <source>Setting of server IP</source>
         <translation>Встановлення IP серверу</translation>
     </message>
@@ -261,105 +261,105 @@
     </message>
     <message>
         <location filename="../mainwindow.ui" line="515"/>
-        <location filename="../mainwindow.cpp" line="277"/>
+        <location filename="../mainwindow.cpp" line="279"/>
         <source>Register</source>
         <translation>  Реєстрація  </translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="800"/>
-        <location filename="../mainwindow.cpp" line="272"/>
-        <location filename="../mainwindow.cpp" line="359"/>
+        <location filename="../mainwindow.cpp" line="274"/>
+        <location filename="../mainwindow.cpp" line="361"/>
         <source>Login</source>
         <translation>Війти</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="274"/>
-        <location filename="../mainwindow.cpp" line="350"/>
+        <location filename="../mainwindow.cpp" line="276"/>
+        <location filename="../mainwindow.cpp" line="352"/>
         <source>Logout</source>
         <translation>Вийти</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="254"/>
+        <location filename="../mainwindow.cpp" line="256"/>
         <source>File</source>
         <translation>Файл</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="253"/>
+        <location filename="../mainwindow.cpp" line="255"/>
         <source>Remote Hardware Education</source>
         <translation>Віддалене Апаратне Навчання</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="255"/>
+        <location filename="../mainwindow.cpp" line="257"/>
         <source>Settings</source>
         <translation>Налаштування</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="256"/>
+        <location filename="../mainwindow.cpp" line="258"/>
         <source>Open waveform viewer</source>
         <translation>Відкрити переглядач часових діаграм</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="257"/>
+        <location filename="../mainwindow.cpp" line="259"/>
         <source>Exit</source>
         <translation>Вихід</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="258"/>
+        <location filename="../mainwindow.cpp" line="260"/>
         <source>Files checking</source>
         <translation>Перевірка файлів</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="259"/>
+        <location filename="../mainwindow.cpp" line="261"/>
         <source>Pins checking</source>
         <translation>Перевірка пінів</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="260"/>
+        <location filename="../mainwindow.cpp" line="262"/>
         <source>Manualy load firmware</source>
         <translation>Завантажити прошивку власноруч</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="261"/>
+        <location filename="../mainwindow.cpp" line="263"/>
         <source>Set server IP</source>
         <translation>Встановити IP серверу</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="263"/>
-        <location filename="../mainwindow.cpp" line="267"/>
+        <location filename="../mainwindow.cpp" line="265"/>
+        <location filename="../mainwindow.cpp" line="269"/>
         <source>English</source>
         <translation>Англійська</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="264"/>
-        <location filename="../mainwindow.cpp" line="268"/>
+        <location filename="../mainwindow.cpp" line="266"/>
+        <location filename="../mainwindow.cpp" line="270"/>
         <source>Ukrainian</source>
         <translation>Українська</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="265"/>
-        <location filename="../mainwindow.cpp" line="269"/>
+        <location filename="../mainwindow.cpp" line="267"/>
+        <location filename="../mainwindow.cpp" line="271"/>
         <source>Russian</source>
         <translation>Російська</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="316"/>
-        <location filename="../mainwindow.cpp" line="319"/>
+        <location filename="../mainwindow.cpp" line="318"/>
+        <location filename="../mainwindow.cpp" line="321"/>
         <source>Warning</source>
         <translation>Увага</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="316"/>
+        <location filename="../mainwindow.cpp" line="318"/>
         <source>Change server-IP in settings</source>
         <translation>Змініть IP серверу в налаштуваннях</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="319"/>
+        <location filename="../mainwindow.cpp" line="321"/>
         <source>Change server-port in settings</source>
         <translation>Змініть порт серверу в налаштуваннях</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="28"/>
-        <location filename="../mainwindow.cpp" line="279"/>
+        <location filename="../mainwindow.cpp" line="281"/>
         <source>Connecting To Server</source>
         <translation>Підключення До Серверу</translation>
     </message>
@@ -753,42 +753,42 @@
         <translation>Прізвище</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="48"/>
-        <location filename="../registration_widget.cpp" line="56"/>
-        <location filename="../registration_widget.cpp" line="79"/>
-        <location filename="../registration_widget.cpp" line="83"/>
-        <location filename="../registration_widget.cpp" line="93"/>
-        <location filename="../registration_widget.cpp" line="105"/>
+        <location filename="../registration_widget.cpp" line="49"/>
+        <location filename="../registration_widget.cpp" line="57"/>
+        <location filename="../registration_widget.cpp" line="81"/>
+        <location filename="../registration_widget.cpp" line="85"/>
+        <location filename="../registration_widget.cpp" line="95"/>
+        <location filename="../registration_widget.cpp" line="107"/>
         <source>Error</source>
         <translation>Помилка</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="48"/>
+        <location filename="../registration_widget.cpp" line="49"/>
         <source>The same login does already exist</source>
         <translation>Такий логін вже існує</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="56"/>
+        <location filename="../registration_widget.cpp" line="57"/>
         <source>Enter login, password, first and last names</source>
         <translation>Введіть логін, пароль, ім&apos;я та прізвище</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="93"/>
+        <location filename="../registration_widget.cpp" line="95"/>
         <source>Can&apos;t init connection</source>
         <translation>Не вдається ініціювати підключення</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="105"/>
+        <location filename="../registration_widget.cpp" line="107"/>
         <source>Can&apos;t get ID</source>
         <translation>Неможливо отримати ID</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="79"/>
+        <location filename="../registration_widget.cpp" line="81"/>
         <source>You enter wrong login or password</source>
         <translation>Ви неправильно ввели логін або пароль</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="83"/>
+        <location filename="../registration_widget.cpp" line="85"/>
         <source>Enter login and password</source>
         <translation>Введіть логін та пароль</translation>
     </message>
@@ -796,35 +796,35 @@
 <context>
     <name>Send_Recieve_Module</name>
     <message>
-        <location filename="../send_recieve_module.cpp" line="84"/>
-        <location filename="../send_recieve_module.cpp" line="89"/>
-        <location filename="../send_recieve_module.cpp" line="117"/>
-        <location filename="../send_recieve_module.cpp" line="324"/>
+        <location filename="../send_recieve_module.cpp" line="88"/>
+        <location filename="../send_recieve_module.cpp" line="93"/>
+        <location filename="../send_recieve_module.cpp" line="121"/>
+        <location filename="../send_recieve_module.cpp" line="344"/>
         <source>Error</source>
         <translation>Помилка</translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="75"/>
+        <location filename="../send_recieve_module.cpp" line="79"/>
         <source>Server answer PING</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="79"/>
+        <location filename="../send_recieve_module.cpp" line="83"/>
         <source>Slave server answer PING</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="84"/>
+        <location filename="../send_recieve_module.cpp" line="88"/>
         <source>You are dropped</source>
         <translation>Сервер вимкнено</translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="89"/>
+        <location filename="../send_recieve_module.cpp" line="93"/>
         <source>Can&apos;t get ID from Server - no more places</source>
         <translation>Не вдається отримати ID з сервера - більше немає місць</translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="117"/>
+        <location filename="../send_recieve_module.cpp" line="121"/>
         <source>Selected board not available</source>
         <translation>Вибрана плата недоступна</translation>
     </message>
@@ -833,7 +833,7 @@
         <translation type="vanished">Спочатку запустіть відлагодження</translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="324"/>
+        <location filename="../send_recieve_module.cpp" line="344"/>
         <source>Server disconnected</source>
         <translation>Сервер вимкнено</translation>
     </message>

@@ -67,13 +67,13 @@
             void closeEvent(QCloseEvent *) override;
             void on_pshBttn_login_logout_clicked();
             void on_pshBttn_register_clicked();
-            void onPshBttnWvfrmVwr();
-            void onPshBttnExt();
-            void onChkBxFlsChckngStateChanged();
-            void onChkBxPinsChckngStateChanged();
-            void onChkBxLdMnlFrmwrStateChanged();
-            void onPshBttnClickedSetSrvrIP();
-            void onCmbBxLngChsCurrentIndexChanged(int index);
+            void pshBttn_wvfrm_vwr();
+            void pshBttn_exit();
+            void chkBx_fls_chckng_state_changed();
+            void chkBx_pins_chckng_state_changed();
+            void chkBx_ld_mnl_frmwr_state_changed();
+            void pshBttn_set_srvr_IP();
+            void cmbBx_lng_chs_current_index_changed(int index);
             void slot_re_size();
             void slot_waveform_viewer_closed();
             void slot_timer_waveform_viewer_timeout();
@@ -97,9 +97,11 @@
             ~Dialog_Set_Server_IP() override;
 
         private:
+            void change_IP_item_focus(int val, int crrnt_item, int next_item);
+
             Ui::Dialog_Set_Server_IP *ui;
             General_Widget *gen_widg = nullptr;
-            QList<QSpinBox*> *octt_lst = nullptr;
+            QList<QSpinBox *> *octt_lst = nullptr;
 
             bool ui_initialized = false;
 
@@ -110,10 +112,10 @@
             void on_spnBx_scnd_octt_valueChanged(int val);
             void on_spnBx_thrd_octt_valueChanged(int val);
             void on_spnBx_frth_octt_valueChanged(int val);
-            void onLineEditFirstOctetTextEdited(const QString &val);
-            void onLineEditSecondOctetTextEdited(const QString &val);
-            void onLineEditThirdOctetTextEdited(const QString &val);
-            void onLineEditFourthOctetTextEdited(const QString &val);
+            void lineEdit_frst_octet_text_edited(const QString &val);
+            void lineEdit_scnd_octet_text_edited(const QString &val);
+            void lineEdit_thrd_octet_text_edited(const QString &val);
+            void lineEdit_frth_octet_text_edited(const QString &val);
             void on_lnEdt_port_textEdited(const QString &val);
     };
 

@@ -176,17 +176,17 @@
         <translation type="obsolete">Set server IP</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="455"/>
+        <location filename="../mainwindow.cpp" line="457"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="455"/>
+        <location filename="../mainwindow.cpp" line="457"/>
         <source>Wrong server port!</source>
         <translation>Wrong server port!</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="469"/>
+        <location filename="../mainwindow.cpp" line="471"/>
         <source>Set port value</source>
         <translation>Set port value</translation>
     </message>
@@ -204,7 +204,7 @@
     </message>
     <message>
         <location filename="../dialog_set_server_ip.ui" line="137"/>
-        <location filename="../mainwindow.cpp" line="424"/>
+        <location filename="../mainwindow.cpp" line="426"/>
         <source>Setting of server IP</source>
         <translation>Setting of server IP</translation>
     </message>
@@ -261,105 +261,105 @@
     </message>
     <message>
         <location filename="../mainwindow.ui" line="515"/>
-        <location filename="../mainwindow.cpp" line="277"/>
+        <location filename="../mainwindow.cpp" line="279"/>
         <source>Register</source>
         <translation>  Register  </translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="800"/>
-        <location filename="../mainwindow.cpp" line="272"/>
-        <location filename="../mainwindow.cpp" line="359"/>
+        <location filename="../mainwindow.cpp" line="274"/>
+        <location filename="../mainwindow.cpp" line="361"/>
         <source>Login</source>
         <translation>Login</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="274"/>
-        <location filename="../mainwindow.cpp" line="350"/>
+        <location filename="../mainwindow.cpp" line="276"/>
+        <location filename="../mainwindow.cpp" line="352"/>
         <source>Logout</source>
         <translation>Logout</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="254"/>
+        <location filename="../mainwindow.cpp" line="256"/>
         <source>File</source>
         <translation>File</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="253"/>
+        <location filename="../mainwindow.cpp" line="255"/>
         <source>Remote Hardware Education</source>
         <translation>Remote Hardware Education</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="255"/>
+        <location filename="../mainwindow.cpp" line="257"/>
         <source>Settings</source>
         <translation>Settings</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="256"/>
+        <location filename="../mainwindow.cpp" line="258"/>
         <source>Open waveform viewer</source>
         <translation>Open waveform viewer</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="257"/>
+        <location filename="../mainwindow.cpp" line="259"/>
         <source>Exit</source>
         <translation>Exit</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="258"/>
+        <location filename="../mainwindow.cpp" line="260"/>
         <source>Files checking</source>
         <translation>Files checking</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="259"/>
+        <location filename="../mainwindow.cpp" line="261"/>
         <source>Pins checking</source>
         <translation>Pins checking</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="260"/>
+        <location filename="../mainwindow.cpp" line="262"/>
         <source>Manualy load firmware</source>
         <translation>Manualy load firmware</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="261"/>
+        <location filename="../mainwindow.cpp" line="263"/>
         <source>Set server IP</source>
         <translation>Set server IP</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="263"/>
-        <location filename="../mainwindow.cpp" line="267"/>
+        <location filename="../mainwindow.cpp" line="265"/>
+        <location filename="../mainwindow.cpp" line="269"/>
         <source>English</source>
         <translation>English</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="264"/>
-        <location filename="../mainwindow.cpp" line="268"/>
+        <location filename="../mainwindow.cpp" line="266"/>
+        <location filename="../mainwindow.cpp" line="270"/>
         <source>Ukrainian</source>
         <translation>Ukrainian</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="265"/>
-        <location filename="../mainwindow.cpp" line="269"/>
+        <location filename="../mainwindow.cpp" line="267"/>
+        <location filename="../mainwindow.cpp" line="271"/>
         <source>Russian</source>
         <translation>Russian</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="316"/>
-        <location filename="../mainwindow.cpp" line="319"/>
+        <location filename="../mainwindow.cpp" line="318"/>
+        <location filename="../mainwindow.cpp" line="321"/>
         <source>Warning</source>
         <translation>Warning</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="316"/>
+        <location filename="../mainwindow.cpp" line="318"/>
         <source>Change server-IP in settings</source>
         <translation>Change server-IP in settings</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="319"/>
+        <location filename="../mainwindow.cpp" line="321"/>
         <source>Change server-port in settings</source>
         <translation>Change server-port in settings</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="28"/>
-        <location filename="../mainwindow.cpp" line="279"/>
+        <location filename="../mainwindow.cpp" line="281"/>
         <source>Connecting To Server</source>
         <translation>Connecting To Server</translation>
     </message>
@@ -753,42 +753,42 @@
         <translation>Last Name</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="48"/>
-        <location filename="../registration_widget.cpp" line="56"/>
-        <location filename="../registration_widget.cpp" line="79"/>
-        <location filename="../registration_widget.cpp" line="83"/>
-        <location filename="../registration_widget.cpp" line="93"/>
-        <location filename="../registration_widget.cpp" line="105"/>
+        <location filename="../registration_widget.cpp" line="49"/>
+        <location filename="../registration_widget.cpp" line="57"/>
+        <location filename="../registration_widget.cpp" line="81"/>
+        <location filename="../registration_widget.cpp" line="85"/>
+        <location filename="../registration_widget.cpp" line="95"/>
+        <location filename="../registration_widget.cpp" line="107"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="48"/>
+        <location filename="../registration_widget.cpp" line="49"/>
         <source>The same login does already exist</source>
         <translation>The same login does already exist</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="56"/>
+        <location filename="../registration_widget.cpp" line="57"/>
         <source>Enter login, password, first and last names</source>
         <translation>Enter login, password, first and last names</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="93"/>
+        <location filename="../registration_widget.cpp" line="95"/>
         <source>Can&apos;t init connection</source>
         <translation>Can&apos;t init connection</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="105"/>
+        <location filename="../registration_widget.cpp" line="107"/>
         <source>Can&apos;t get ID</source>
         <translation>Can&apos;t get ID</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="79"/>
+        <location filename="../registration_widget.cpp" line="81"/>
         <source>You enter wrong login or password</source>
         <translation>You enter wrong login or password</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="83"/>
+        <location filename="../registration_widget.cpp" line="85"/>
         <source>Enter login and password</source>
         <translation>Enter login and password</translation>
     </message>
@@ -796,35 +796,35 @@
 <context>
     <name>Send_Recieve_Module</name>
     <message>
-        <location filename="../send_recieve_module.cpp" line="84"/>
-        <location filename="../send_recieve_module.cpp" line="89"/>
-        <location filename="../send_recieve_module.cpp" line="117"/>
-        <location filename="../send_recieve_module.cpp" line="324"/>
+        <location filename="../send_recieve_module.cpp" line="88"/>
+        <location filename="../send_recieve_module.cpp" line="93"/>
+        <location filename="../send_recieve_module.cpp" line="121"/>
+        <location filename="../send_recieve_module.cpp" line="344"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="75"/>
+        <location filename="../send_recieve_module.cpp" line="79"/>
         <source>Server answer PING</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="79"/>
+        <location filename="../send_recieve_module.cpp" line="83"/>
         <source>Slave server answer PING</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="84"/>
+        <location filename="../send_recieve_module.cpp" line="88"/>
         <source>You are dropped</source>
         <translation>Server disabled</translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="89"/>
+        <location filename="../send_recieve_module.cpp" line="93"/>
         <source>Can&apos;t get ID from Server - no more places</source>
         <translation>Can&apos;t get ID from Server - no more places</translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="117"/>
+        <location filename="../send_recieve_module.cpp" line="121"/>
         <source>Selected board not available</source>
         <translation>Selected board not available</translation>
     </message>
@@ -833,7 +833,7 @@
         <translation type="vanished">Run debug firstly</translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="324"/>
+        <location filename="../send_recieve_module.cpp" line="344"/>
         <source>Server disconnected</source>
         <translation>Server disconnected</translation>
     </message>

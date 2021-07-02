@@ -26,7 +26,7 @@ Waveform_Viewer_Widget::Waveform_Viewer_Widget(QWidget *parent, General_Widget *
     graph_list = new QList<QCPGraph *>();
     pin_names = new QList<QString>();
     pin_names_board = new QList<QString>();
-    svd_vals = new QList<QList<int>*>();
+    svd_vals = new QList<QList<int> *>();
     svd_dbg_time = new QList<double>();
     flags = this->windowFlags();
 }
@@ -1332,7 +1332,7 @@ Dialog_Select_Diagram_Settings::Dialog_Select_Diagram_Settings(QList<QString> _s
     this->setFixedSize(600, 300);
     this->updateGeometry();
     sttngs_lst = _sttngs_lst;
-    bttns_lst = new QList<QPushButton*>();
+    bttns_lst = new QList<QPushButton *>();
     bttns_lst->append(ui->pshBttn_axs_lbls_clr);
     bttns_lst->append(ui->pshBttn_dgrm_grd_clr);
     bttns_lst->append(ui->pshBttn_dgrm_bckgrnd_clr);

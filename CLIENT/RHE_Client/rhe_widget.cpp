@@ -9,11 +9,11 @@ RHE_Widget::RHE_Widget(QWidget *parent, General_Widget *widg, Send_Recieve_Modul
     prev_path_to_proj = new QString("");
     svf_file = new QFile();
     csv_file = new QFile();
-    inpt_hbxs = new QList<QHBoxLayout*>();
-    inpt_spcrs = new QList<QSpacerItem*>();
-    inpt_lbls = new QList<QLabel*>();
-    inpt_sldrs = new QList<QSlider*>();
-    inpt_stts = new QList<QLCDNumber*>();
+    inpt_hbxs = new QList<QHBoxLayout *>();
+    inpt_spcrs = new QList<QSpacerItem *>();
+    inpt_lbls = new QList<QLabel *>();
+    inpt_sldrs = new QList<QSlider *>();
+    inpt_stts = new QList<QLCDNumber *>();
     pixmp_names = new QList<QString>();
     jtag_id_codes = new QList<QString>();
     led_colors = new QList<QString>();
@@ -913,7 +913,7 @@ void RHE_Widget::add_data_to_qpoint(QList<QPoint> *lst, int val, bool is_x) {
 void RHE_Widget::slot_input_val_changed(int val) {
     int pos = (val - (val % 2)) / 2;
     inpt_stts->at(pos)->display(val % 2);
-    Send_Recieve_Module::set_state_Packet *switches_states = reinterpret_cast<Send_Recieve_Module::set_state_Packet*>(malloc(sizeof(Send_Recieve_Module::set_state_Packet)));
+    Send_Recieve_Module::set_state_Packet *switches_states = reinterpret_cast<Send_Recieve_Module::set_state_Packet *>(malloc(sizeof(Send_Recieve_Module::set_state_Packet)));
     memset(switches_states, 0, sizeof(Send_Recieve_Module::set_state_Packet));
     switches_states->pin_count = static_cast<uint8_t>(inpt_sldrs->count());
     for(int i = 0; i < inpt_sldrs->count(); i++) {

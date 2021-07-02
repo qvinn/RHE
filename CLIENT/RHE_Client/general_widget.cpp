@@ -205,7 +205,7 @@ QStringList* General_Widget::load_files(QWidget *prnt, QString title, QString fi
     dialog.setStyleSheet(get_style_sheet("QFileDialog", "QFileDialog QLineEdit { background-color: #FFFFFF; color: #000000; }"
                                                         "QFileDialog QLabel { color: #000000; }"
                                                         "QFileDialog QToolButton { background-color: darkGrey; color: #000000; }"));
-    QList<QWidget*> widgets = dialog.findChildren<QWidget*>();
+    QList<QWidget *> widgets = dialog.findChildren<QWidget *>();
     for(int i = 0; i < widgets.count(); i++) {
         widgets.at(i)->setPalette(palette);
     }
@@ -238,7 +238,7 @@ void General_Widget::save_file(QWidget *prnt, QString title, QString filter, QSt
         dialog.setStyleSheet(get_style_sheet("QFileDialog", "QFileDialog QLineEdit { background-color: #FFFFFF; color: #000000; }"
                                                             "QFileDialog QLabel { color: #000000; }"
                                                             "QFileDialog QToolButton { background-color: darkGrey; color: #000000; }"));
-        QList<QWidget*> widgets = dialog.findChildren<QWidget*>();
+        QList<QWidget *> widgets = dialog.findChildren<QWidget *>();
         for(int i = 0; i < widgets.count(); i++) {
             widgets.at(i)->setPalette(palette);
         }
