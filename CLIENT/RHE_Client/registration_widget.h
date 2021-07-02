@@ -43,7 +43,8 @@
         signals:
             void init_connection_signal();
             void get_id_for_client_signal();
-            void logined(bool flg);
+            void logined_signal(bool flg);
+            void analyze_data_dir_signal();
     };
 
 #endif // REGISTRATION_H

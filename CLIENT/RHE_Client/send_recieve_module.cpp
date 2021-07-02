@@ -1,5 +1,9 @@
 #include "send_recieve_module.h"
 
+#include <iostream>			// for write to wile with c++
+#include <fstream>			// for write to wile with c++
+#include <sstream> 			// for file reader
+
 #define INIT_ID -1
 
 Send_Recieve_Module::Send_Recieve_Module(General_Widget *widg) {
@@ -168,6 +172,22 @@ void Send_Recieve_Module::wait_analize_recv_data() {
             }
             case S_SERVER_SEND_FPGA_ID: {
                 emit choose_board_signal(tmp_packet->data);
+                break;
+            }
+            case SERVER_START_SEND_FILE_U: {
+                start_rcv_U_File(tmp_packet->data);
+                break;
+            }
+            case SERVER_SENDING_FILE_U: {
+                this->rcv_U_File(tmp_packet->data);
+                break;
+            }
+            case SERVER_FINISH_SEND_FILE_U: {
+                end_rcv_U_File(tmp_packet->data);
+                break;
+            }
+            case SERVER_END_TAKE_UPDATE: {
+                analyze_data_dir();
                 break;
             }
             default: {
@@ -421,6 +441,7 @@ int Send_Recieve_Module::end_recive_file() {
 
 void Send_Recieve_Module::analyze_data_dir()
 {
+    upd_file.clear();
     QString dir_path = gen_widg->get_app_path() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString();
 
     QDir dir_name(dir_path);
@@ -434,14 +455,168 @@ void Send_Recieve_Module::analyze_data_dir()
         QByteArray hash = gen_widg->get_file_checksum(dirContent.at(i).filePath(), QCryptographicHash::Md5);
         hash = hash.toHex();
 
-        // FIXME: Потом удалить запись в этот вектор
-        dir_vec.push_back(file_info{dirContent.at(i).filePath(), QString(hash)});
-
-        //this->upd_file->write(QString(dirContent.at(i).filePath() + "\t" + hash).toLatin1());
-
-
         lst = dirContent.at(i).filePath().split(tagExp);
         this->upd_file.append(QString(lst.last() + "\t" + hash + "\n").toLatin1());
     }
     qDebug() << upd_file.data();
+}
+
+void Send_Recieve_Module::start_rcv_U_File(char *data)
+{
+    memcpy(&this->curr_rcv_file,data,sizeof(int));
+    this->create_empty_U_File(this->curr_rcv_file);
+}
+
+void Send_Recieve_Module::create_empty_U_File(int file_code)
+{
+    QFile tmp_file;
+    switch(file_code)
+    {
+        case FILE_FIRMWARE:{break;} // Этот файл сервер не обрабатывает
+
+        case FILE_DSQ:{break;} // Этот файл сервер не обрабатывает
+
+        case CLIENT_UPD_LIST:{break;} // Этот файл сервер не обрабатывает
+
+        case SERVER_UPD_TASKS_LIST:
+        {
+            QString dir_path = gen_widg->get_app_path() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString();
+            tmp_file.setFileName(dir_path + "upd_task");
+            break;
+        }
+
+        case FILE_UPDATE:
+        {
+            QString dir_path = gen_widg->get_app_path() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString();
+            tmp_file.setFileName(dir_path + upd_files_list.at(this->upd_files_counter));
+            break;
+        }
+
+        default:{break;}
+    }
+    tmp_file.open(QFile::WriteOnly | QFile::Truncate);     //clear file
+    tmp_file.close();
+}
+
+void Send_Recieve_Module::rcv_U_File(char *data)
+{
+    QFile tmp_file;
+    switch(this->curr_rcv_file)
+    {
+        case FILE_FIRMWARE:{break;} // Этот файл клиент не обрабатывает
+
+        case FILE_DSQ:{break;}      // Этот файл клиент не обрабатывает
+
+        case CLIENT_UPD_LIST:
+        {
+            break;
+        }
+
+        case SERVER_UPD_TASKS_LIST:
+        {
+            QString dir_path = gen_widg->get_app_path() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString();
+            tmp_file.setFileName(dir_path + "upd_task");
+            break;
+        }
+        case FILE_UPDATE:
+        {
+            QString dir_path = gen_widg->get_app_path() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString();
+            tmp_file.setFileName(dir_path + upd_files_list.at(this->upd_files_counter));
+            break;
+        }
+
+        default:{break;}
+    }
+
+    if(tmp_file.open(QIODevice::Append)) {
+        tmp_file.write(data);
+        tmp_file.close();
+    }
+}
+
+void Send_Recieve_Module::end_rcv_U_File(char *data)
+{
+    Q_UNUSED(data);
+    switch(this->curr_rcv_file)
+    {
+        case FILE_FIRMWARE:{break;} // Этот файл клиент не обрабатывает
+
+        case FILE_DSQ:{break;}      // Этот файл клиент не обрабатывает
+
+        case CLIENT_UPD_LIST:
+        {
+            break;
+        }
+
+        case SERVER_UPD_TASKS_LIST:
+        {
+            std::vector<std::string> upd_task_files;
+            std::vector<int> upd_task_file_codes;
+            QString dir_path = gen_widg->get_app_path() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString();
+            QString tmp_file = dir_path + "upd_task";
+            this->read_upd_task_file(tmp_file.toStdString(),&upd_task_files,&upd_task_file_codes);
+            this->upd_files_counter = 0; // Обновим счетчик принятых фалов(ADD|UPDATE файлы)
+            this->upd_files_list = {};
+            // Составим сисок файлов, которые будут приходить для операций ADD|UPDATE и сохраним их имена
+            // Позже по upd_files_counter мы будем знать, какое имя из "upd_files_list" необходимо взять
+            for(uint i = 0; i < upd_task_file_codes.size(); i++)
+            {
+                if(upd_task_file_codes.at(i) < 2) // Условие < 2, т.к. ADD - 0, UPDATE - 1, DELETE - 2
+                {
+                    upd_files_list.push_back(QByteArray::fromStdString(upd_task_files.at(i)));
+                }
+            }
+            qDebug() << "upd_files_list" << upd_files_list;
+            break;
+        }
+        case FILE_UPDATE:
+        {
+            this->upd_files_counter++;
+            break;
+        }
+
+        default:{break;}
+    }
+}
+
+void Send_Recieve_Module::read_upd_task_file(std::string filename, std::vector<std::string> *file_names, std::vector<int> *tasks_codes)
+{
+    std::string line;
+        std::string word;
+        std::ifstream file(filename);
+        int column_count = 1;
+        if(file.good())
+        {
+            // Пока не пройдем по всем строкам в файле
+            while(std::getline(file, line))
+            {
+                std::istringstream s(line);
+                // Пока не пройдем по всем словам в строке(по всем колонкам, их у нас только 2)
+                while (getline(s, word, '\t'))
+                {
+                    switch(column_count)
+                    {
+                        case 1: // Первая колонка: значение имени порта ввода-вывода
+                        {
+                            file_names->push_back(word);
+                            break;
+                        }
+                        case 2: // Вторая колонка: номер WiPi порта ввода-вывода
+                        {
+                            tasks_codes->push_back(std::stoi(word));
+                            break;
+                        }
+                        default:
+                        {
+                            break;
+                        }
+                    }
+                    column_count++;
+                }
+                column_count = 1;
+            }
+        } else
+        {
+            qDebug() << "Can't open file: " << QByteArray::fromStdString(filename);
+        }
 }

@@ -65,12 +65,17 @@
     #define CLIENT_START_SEND_FILE_U_TO_SERVER 61
     #define CLIENT_SENDING_FILE_U_TO_SERVER 62
     #define CLIENT_FINISH_SEND_FILE_U_TO_SERVER 63
+    #define SERVER_END_TAKE_UPDATE 64
 
     #define FILE_FIRMWARE			0
     #define FILE_DSQ				1
     #define CLIENT_UPD_LIST			2
     #define SERVER_UPD_TASKS_LIST	3
     #define FILE_UPDATE				4
+
+    #define FILE_D_ADD		0
+    #define FILE_D_UPDATE	1
+    #define FILE_D_DELETE	2
 
     class Send_Recieve_Module : public QObject {
         Q_OBJECT
@@ -98,6 +103,7 @@
             void set_FPGA_id(QString FPGA_id);
             void flash_FPGA();
             void send_swtches_states(QByteArray data);
+            void analyze_data_dir();
 
             typedef struct pin_in_Packet {		// 48 байта
                 char pinName[5];                // 5 байт
@@ -127,12 +133,6 @@
                 set_state pins[8];              // 2 байт * PIN_MAX = 16 байт
             } set_state_Packet;
 
-            // Структура, которая описывает файл, который можно обновить
-            typedef struct file_info{
-                QString file_name;	// Название файла
-                QString hash;		// Хэш-сумма файла
-            } file_info;
-
         private:
             void server_disconnected();
             void close_connection();
@@ -144,7 +144,12 @@
             int start_recive_file();
             int rcv_new_data_for_file(char *buf);
             int end_recive_file();
-            void analyze_data_dir();
+
+            void start_rcv_U_File(char *data);
+            void create_empty_U_File(int file_code);
+            void rcv_U_File(char *data);
+            void end_rcv_U_File(char *data);
+            void read_upd_task_file(std::string filename, std::vector<std::string> *file_names, std::vector<int> *tasks_codes);
 
             General_Widget *gen_widg = nullptr;
             QTcpSocket *socket = nullptr;
@@ -157,9 +162,11 @@
             bool manual_disconnect = false;
             bool connected = false;
 
-            QVector<file_info> dir_vec;
-
             QByteArray upd_file;
+            int upd_files_counter = 0;
+            QVector<QString> upd_files_list;
+
+            int curr_rcv_file; // Переменная, которая оозначает тип файла, который может приниматься в текущий момент
 
         signals:
             void link_established(bool flg);
