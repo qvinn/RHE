@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <iostream>			// for write to wile with c++
 #include <fstream>			// for write to wile with c++
+#include <sstream> 			// for file reader
 #include <vector>			// for vector
 #include <mutex>          	// std::mutex
 #include <thread>			// std::thread
@@ -15,6 +16,7 @@
 #include <unistd.h>			// for close()
 #include <signal.h>			// for SIGPIPE
 #include "iniparser.h"		// for .ini parse
+#include "resource_manager.h"	// for work with resource files
 
 // Предварительные настройки сервера
 //#define SERVER_PORT 3425
@@ -22,6 +24,7 @@
 
 #define DATA_BUFFER 76
 #define RECIVE_BUFFER_SIZE (DATA_BUFFER+4) // DATA_BUFFER+20 DATA_BUFFER+4
+#define SEND_FILE_BUFFER (DATA_BUFFER-1)
 // Предварительные настройки сервера - КОНЕЦ
 
 // Вспомогательные флаги
@@ -29,6 +32,8 @@
 #define ERROR		-1
 #define INIT_ID		-1				// Начальное ID для клиента/slave-сервера
 // Вспомогательные флаги - КОНЕЦ
+
+#define RESOURCE_DIR "./resources/"
 
 // Карта code_op 
 #define CLIENT_WANT_INIT_CONNECTION 10
@@ -78,7 +83,27 @@
 #define RUN_DEBUG_FIRSTLY 54
 #define CLIENT_WANT_GET_FPGA_ID	55
 #define S_SERVER_SEND_FPGA_ID 56
+#define NEED_UPDATE 57
+#define SERVER_START_SEND_FILE_U 58
+#define SERVER_SENDING_FILE_U 59
+#define SERVER_FINISH_SEND_FILE_U 60
+#define CLIENT_START_SEND_FILE_U_TO_SERVER 61
+#define CLIENT_SENDING_FILE_U_TO_SERVER 62
+#define CLIENT_FINISH_SEND_FILE_U_TO_SERVER 63
+#define SERVER_END_TAKE_UPDATE 64
 
+//-------------------------------------------------------------
+// КОДЫ НАЗНАЧЕНИЯ ФАЙЛОВ
+#define FILE_FIRMWARE			0
+#define FILE_DSQ				1
+#define CLIENT_UPD_LIST			2
+#define SERVER_UPD_TASKS_LIST	3
+#define FILE_UPDATE				4
+
+
+#define FILE_D_ADD		0
+#define FILE_D_UPDATE	1
+#define FILE_D_DELETE	2
 
 // Карта code_op - КОНЕЦ
 
@@ -89,6 +114,8 @@ int server_listen_port = 0;
 int total_clients = 0;
 int total_slave_servers = 0;
 // Параметры сервера, которые считываются с .ini-файла - КОНЕЦ
+
+Resource_manager *r_manager;
 
 // Packet Description
 struct U_packet {
@@ -107,15 +134,18 @@ typedef struct Chain_Pair {
 	int id_SS;		// (-1 | ID slave-сервер)
 	std::string FPGA_id;
 	int id_Cl;		// (-1 | ID клиента)
+	int client_curr_rcv_file; // параметр, который определяет текущий принимаемый файл от устройства
+	int s_server_curr_rcv_file; // параметр, который определяет текущий принимаемый файл от устройства
 } Chain_Pair;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void explore_byte_buff(char *data, int size);
 
 // Метод для отправки данных в сокет
 /*
-	* int sock - FD(номер сокета)
-	* int code_op - КОД ОПЕРАЦИИ (см. Коды операций для сервера)
-	* const char *data - данные, которые передадутся в сокет
+	* int sock			- FD(номер сокета)
+	* int code_op		- КОД ОПЕРАЦИИ (см. Коды операций для сервера)
+	* const char *data	- данные, которые передадутся в сокет
 */
 void send_U_Packet(int sock, int code_op, const char *data);
 
@@ -151,17 +181,54 @@ std::string find_FPGA_ID_for(int id);
 */
 int change_FPGA(int curr_client_id, std::string FPGA_id);
 
+// Метод для поиска свободного Slave_server(который не соединен с клиентом)
+// int ignore_index - ID Slave_server(а), которое не учитывается при поиске
 int find_available_s_server(int ignore_index);
 
+// Передать клиену такую информацию, как IDT, ODT, FPGA_ID, TIME_OUT_INFO
+// int for_client_id - ID клиента, которому необходимо передать информацию
 void reqest_IDT_ODT_from_s_server(int for_client_id);
+
+// Метод запроса обновления для клиента
+// int id - ID клиента, которому необходимо передать обновление
+void take_update(int id);
+
+// Прочитатать файл с информацией про обновления
+//(структура файла: два столбика, разделитель \t, информация -строки) 
+/*
+* std::string filename						- имя файла
+* std::vector<std::string> *_files_names	- вектор к которые будет сохранен первый столбик
+* std::vector<string> *_files_hashes		- вектор к которые будет сохранен второй столбик
+*/
+void read_upd_file(std::string filename, std::vector<std::string> *_files_names, std::vector<string> *_files_hashes);
+
+void form_send_file_packet(int8_t size, char *data_in, char *data_out);
+
+// Метод для отправки файла(универсальный)
+// Отличается тем, что для отпраки фала не нужно использовать отдельный код операции
+// В самое начало файла помещается <имя фала\n>
+// std::string filename	- имя файла
+// int id				- id устройства
+// int file_code		- код, который определяет предназначение файла(см. КОДЫ НАЗНАЧЕНИЯ ФАЙЛОВ)
+void send_file_universal(std::string filename, int id, int file_code);
+
+bool start_rcv_U_File(int id, char *data);
+
+void create_empty_U_File(int id, int file_code);
+
+void rcv_U_File(int id, char *data);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 std::vector<Chain_Pair> Pairs;								// Вектор, который будет хранить "пары-связки" slave-серверов и клиентов
 std::mutex Chain_Pair_mutex;								// Мьютекс для доступа к данным
+std::mutex Resource_manager_mutex;							// Мьютекс для доступа к данным
 
 int main()
 {
+	// Создадим объект менеджера ресурсов
+	r_manager = new Resource_manager(RESOURCE_DIR); // "./resources" RESOURCE_DIR
+	
 	// Проверим наличие .ini-файла
 	std::ifstream ini_file("server.ini");
 	if(!ini_file.good())
@@ -207,7 +274,7 @@ int main()
 	Chain_Pair_mutex.lock();
 	for(int i=0; i<total_slave_servers; i++)
 	{
-		Pairs.push_back(Chain_Pair{INIT_ID,std::string(),INIT_ID});
+		Pairs.push_back(Chain_Pair{INIT_ID,std::string(),INIT_ID, -1,-1});
 	}
 	Chain_Pair_mutex.unlock();
 	// Инициализация структур перед использованием - КОНЕЦ
@@ -335,6 +402,14 @@ int main()
 	printf("End program\n");
     
     return 0;
+}
+
+void explore_byte_buff(char *data, int size)
+{
+	for(int i = 0; i < size; i++)
+	{
+		printf("byte n: %i -> %hhx\n",i,data[i]);
+	}
 }
 
 void send_U_Packet(int sock, int code_op, const char *data)
@@ -914,6 +989,36 @@ void recive_new_data(char *buf, int sock)
 			break;	
 		}
 		
+		case NEED_UPDATE:
+		{
+			take_update(sock);			
+			break;	
+		}
+		
+		case CLIENT_START_SEND_FILE_U_TO_SERVER:
+		{		
+			printf("\t|___Client with id %i give UPD list\n", sock);
+			//explore_byte_buff(tmp_packet->data, DATA_BUFFER);
+			if(start_rcv_U_File(sock,tmp_packet->data) == false)
+			{
+				printf("Can't rcv_U_File\n");
+			}			
+			break;	
+		}
+		
+		case CLIENT_SENDING_FILE_U_TO_SERVER:
+		{		
+			rcv_U_File(sock,tmp_packet->data);
+			printf("\t|___Client with id %i give SENDING_FILE_U_TO_SERVER\n", sock);		
+			break;	
+		}
+		
+		case CLIENT_FINISH_SEND_FILE_U_TO_SERVER:
+		{							
+			printf("\t|___Client with id %i give FINISH_SEND_FILE_U_TO_SERVER\n", sock);
+			break;	
+		}
+		
         default:
 		{
 			printf("\t|___UNKNOWN PACKET\n");
@@ -924,7 +1029,6 @@ void recive_new_data(char *buf, int sock)
 	return;
 }
 
-// FIXME: Добавить автоматический поиск свободного slave-сервера
 void reset_Pair( int id)
 {
 	Chain_Pair_mutex.lock();
@@ -1105,4 +1209,381 @@ void reqest_IDT_ODT_from_s_server(int for_client_id)
 		
 		printf("\t|___MASTER-SERVER request IDT__ODT__TIME_OUT_INFO for Client with id %i from slave-server with id %i\n", for_client_id, finded_s_server);
 	}	
+}
+
+void take_update(int id)
+{
+	// При попадании в этот метод, первое, что мы должны сделать, это получить
+	// копию списка файлов на сервере(с их хэш-суммами)
+	
+	std::vector<Resource_manager::file_info> server_upd_list;
+	Resource_manager_mutex.lock();
+	server_upd_list = r_manager->get_dir_vec();
+	Resource_manager_mutex.unlock();
+	
+	// ДЛЯ ОТЛАДКИ
+	std::cout << "Start UPDATE PROCESS WITH MACHINE WITH ID " << id << "\n";
+	std::cout << "server_upd_list.size(): " << server_upd_list.size() << "\n";
+	for(int i = 0; i < server_upd_list.size(); i++)
+	{
+		std::cout << "server file name: " << server_upd_list.at(i).file_name << "\tserver file hash:" << server_upd_list.at(i).hash << "\n";
+	}
+	// ДЛЯ ОТЛАДКИ
+	
+	// На данном этапе условимся, что клиент уже присылает необходимый файл с описанием
+	// состояния его ресурсов, поэтому просто считываем файл по пути
+	
+	std::vector<std::string> files_names;
+	std::vector<string> files_hashes;
+	std::vector<Resource_manager::file_info> client_upd_list;
+	std::string client_upd_file_name = "./tmp/client_upd_file_" + std::to_string(id);
+	read_upd_file(client_upd_file_name,&files_names,&files_hashes);
+	
+	for(int i = 0; i < files_names.size(); i++)
+	{
+		client_upd_list.push_back(Resource_manager::file_info{files_names.at(i),files_hashes.at(i)});
+	}
+	
+	// ДЛЯ ОТЛАДКИ
+	for(int i = 0; i < client_upd_list.size(); i++)
+	{
+		std::cout << "file name: " << client_upd_list.at(i).file_name << "\tfile hash: " << client_upd_list.at(i).hash << "\n";
+	}
+	// ДЛЯ ОТЛАДКИ
+	
+	// После того, как мы имеем два списка файлов: эталонный на сервере и тот, который прислал
+	// клиент, выполним сравнение и определим необходимые операции над файлами
+	
+	// Пройдем по эталонному списку и выполним сравнение
+	// Перед этим создадим файл, в который мы запишем результат анализа
+	std::string client_upd_compare = "./tmp/client_upd_compare_" + std::to_string(id);
+	std::ifstream client_upd_compare_ifs(client_upd_compare);
+	
+	bool file_finded = false;
+	int i = 0;
+	int j = 0;
+	std::vector<std::string> files_send;
+	
+	if(!client_upd_compare_ifs.good())
+	{
+		std::ofstream client_upd_compare_ofs (client_upd_compare);
+		if (client_upd_compare_ofs.is_open())
+		{
+			for(i = 0; i < server_upd_list.size(); i++)
+			{				
+				// Теперь попытаемся найти в списке файлов клиента файл с таким названием
+				for(j = 0; j < client_upd_list.size(); j++)
+				{
+					// Сначала убедимся в том, что такой файл существует у клиента
+					if(server_upd_list.at(i).file_name.compare(client_upd_list.at(j).file_name) == 0)
+					{
+						file_finded = true;
+						// Теперь проверим то, на сколько валидный это файл
+						if(server_upd_list.at(i).hash.compare(client_upd_list.at(j).hash) == 0)
+						{
+							// Все хорошо -> с файлом ничего не нужно делать
+							//client_upd_compare_ofs << client_upd_list.at(j).file_name << "\tGOOD\n";
+							std::cout << client_upd_list.at(j).file_name << "\tGOOD\n";
+							break;
+						} else 
+						{
+							// Файл необходимо обновить!
+							client_upd_compare_ofs << client_upd_list.at(j).file_name << "\t" << std::to_string(FILE_D_UPDATE) << "\n"; // NEED UPDATE
+							files_send.push_back(client_upd_list.at(j).file_name);
+							std::cout << client_upd_list.at(j).file_name << "\tNEED UPDATE\n";
+							break;
+						}						
+					}
+				}
+				if(file_finded == false)
+				{
+					// Такого файла у клиента не существует - нужно его отправить
+					client_upd_compare_ofs << server_upd_list.at(i).file_name << "\t" << std::to_string(FILE_D_ADD) << "\n"; // NEED ADD
+					files_send.push_back(server_upd_list.at(i).file_name);
+					std::cout << server_upd_list.at(i).file_name << "\tNEED ADD\n";
+					
+				}
+				file_finded = false;
+			}
+			// После этого пройдемся еще одним циклом, только уже на этот раз, проходя элементы
+			// списка клиентской части, сравнивая с серверной. Суть такого цикла заключается в том,
+			// чтобы определить файлы, которые есть у клиента, но которых нет на сервере -> такие
+			// файлы необходимо удалить
+			bool finded = false;
+			// Пройдем по всем файлам клиента
+			for(i = 0; i < client_upd_list.size(); i++)
+			{				
+				// Попытаемся для этого файла клиента найти подходящий по имени файл на сервере
+				for(j = 0; j < server_upd_list.size(); j++)
+				{
+					// Если файл найден
+					if(client_upd_list.at(i).file_name.compare(server_upd_list.at(j).file_name) == 0)
+					{
+						finded = true;	// Взводим флаг, который говорит о том, что файл найден
+						break;			// Выходим из внутреннего цикла
+					}
+				}
+				// Если внутренний цикл закончился и при этом флаг определения стал взведен в "true",
+				// то это означает, такой файл найден и все в порядке
+				if(finded == false)
+				{
+					// Если внутренний цикл закончился и при этом флаг остался опущенным, то
+					// то это означает, что такого фалйа на сервере нет и его нужно удалить на
+					// стороне клиента
+					client_upd_compare_ofs << client_upd_list.at(i).file_name << "\t" << std::to_string(FILE_D_DELETE) << "\n"; // NEED DELETE
+					std::cout << client_upd_list.at(i).file_name << "\tNEED DELETE\n";
+				}
+				finded = false; // Перед следующим проходм опускаем флаг "файл найден"
+			}
+			client_upd_compare_ofs.close(); 
+		} else 
+		{
+			printf("Unable to open client_upd_compare_file\n");
+		}
+	}
+	
+	// После того, как был сформирован файл с требованиями по файлам, отправим его клиенту
+	
+	std::cout << "Sending SERVER_UPD_TASKS_LIST ...\n";
+	send_file_universal(client_upd_compare,id,SERVER_UPD_TASKS_LIST);
+	for(int q = 0; q < files_send.size(); q++)
+	{
+		std::cout << "Sending FILE " << files_send.at(q) << " ...\n";
+		send_file_universal(std::string(RESOURCE_DIR + files_send.at(q)),id,FILE_UPDATE);
+	}	
+	send_U_Packet(id, SERVER_END_TAKE_UPDATE, NULL);
+	if(files_send.size() < 1)
+	{
+		std::cout << "END OF UPDATE PROCESS(NOTHING FOR SEND)\n";
+	} else 
+	{
+		std::cout << "END OF UPDATE PROCESS\n";
+	}
+	
+	std::string cmd = "rm " +  client_upd_file_name + " " + client_upd_compare;
+	system(cmd.c_str());
+
+}
+
+void read_upd_file(std::string filename, std::vector<std::string> *_files_names, std::vector<string> *_files_hashes)
+{
+	std::string line;
+	std::string word;
+	std::ifstream file(filename);
+	int column_count = 1;
+	if(file.good())
+	{
+		// Пока не пройдем по всем строкам в файле
+		while(std::getline(file, line))
+		{
+			std::istringstream s(line);
+			// Пока не пройдем по всем словам в строке(по всем колонкам, их у нас только 2)
+			while (getline(s, word, '\t'))
+			{
+				switch(column_count)
+				{
+					case 1: // Первая колонка: <имя файла>
+					{
+						_files_names->push_back(word);
+						break;
+					}
+					case 2: // Вторая колонка: <хэш-сумма для файла>
+					{
+						_files_hashes->push_back(word);
+						break;
+					}
+					default:
+					{
+						break;
+					}
+				}
+				column_count++;				
+			}
+			column_count = 1;
+		}
+	} else
+	{
+		//printf("Can't open file: %s\n",filename.c_str());
+		std::cout << "Can't open file: " << filename;
+	}
+}
+
+void form_send_file_packet(int8_t size, char *data_in, char *data_out)
+{
+	int8_t file_size = size;
+	memcpy(data_out, &file_size, sizeof(int8_t));
+	memcpy(data_out+sizeof(int8_t), data_in, file_size);
+}
+
+void send_file_universal(std::string filename, int id, int file_code)
+{
+	// open the file:
+    std::ifstream file(filename, std::ifstream::binary); // std::ios::in | std::ios::binary | std::ios::ate \\\ std::ifstream::binary
+
+    // get its size:
+	int  fileSize;
+    file.seekg(0, std::ios::end);
+    fileSize = file.tellg();
+    file.seekg(0, std::ios::beg);
+	
+	//std::cout << "File size: " << fileSize << "\n";	
+	
+	char *file_buf = new char [fileSize+1];
+	char *part_of_file = new char [SEND_FILE_BUFFER];
+	memset(file_buf,0,fileSize+1);
+	//read file
+	file.read(file_buf, fileSize);
+	
+	//std::cout << "Prepare string: " << std::string(file_buf) << "\n";
+	//explore_byte_buff(file_buf, 200);	
+	
+	int hops = fileSize / SEND_FILE_BUFFER;
+	
+	char *file_code_buff = new char [sizeof(int)];
+	memset(file_code_buff,0,sizeof(int));
+	memcpy(file_code_buff,&file_code,sizeof(int));
+	
+	if(hops < 1) // Если данные помещаются в одну посылку
+    {
+		char *buff = (char *)malloc(DATA_BUFFER);
+		form_send_file_packet(fileSize,file_buf,buff);
+		send_U_Packet(id, SERVER_START_SEND_FILE_U,file_code_buff); // std::to_string(file_code).c_str()
+		send_U_Packet(id, SERVER_SENDING_FILE_U, buff);
+		send_U_Packet(id, SERVER_FINISH_SEND_FILE_U, NULL);		
+		free(buff);
+    }else 
+	{
+		send_U_Packet(id, SERVER_START_SEND_FILE_U, file_code_buff); // std::to_string(file_code).c_str()
+		
+		// Чтобы было удобней отсчитывать в цикле, определим первую посылку отдельно
+		memcpy(part_of_file,file_buf,SEND_FILE_BUFFER);
+		char *buff = (char *)malloc(DATA_BUFFER);
+		form_send_file_packet(SEND_FILE_BUFFER,part_of_file,buff);
+		send_U_Packet(id, SERVER_SENDING_FILE_U, buff);
+		free(buff);
+		
+		for(int i = 1; i < hops + 1; i++)
+        {
+			memcpy(part_of_file,(file_buf+(i*SEND_FILE_BUFFER)),SEND_FILE_BUFFER);
+			char *buff = (char *)malloc(DATA_BUFFER);
+			if(i != hops) 
+			{
+				form_send_file_packet(SEND_FILE_BUFFER,part_of_file,buff);
+			} else // Последняя посылка
+			{
+				form_send_file_packet(fileSize - (hops*SEND_FILE_BUFFER),part_of_file,buff);
+			}
+			send_U_Packet(id, SERVER_SENDING_FILE_U, buff);
+			free(buff);
+		}
+		send_U_Packet(id, SERVER_FINISH_SEND_FILE_U, NULL);
+	}
+	
+	//std::cout << "HOPS_COUNT: " << hops << "\n";
+	
+	file.close();
+	
+	delete[] file_buf;
+	delete[] part_of_file;
+	delete[] file_code_buff;
+}
+
+bool start_rcv_U_File(int id, char *data)
+{
+	int file_code;
+	memcpy(&file_code,data,sizeof(int));
+	
+	//printf("file_code: %i\n",file_code);
+	
+	Chain_Pair_mutex.lock();
+	for(int i=0; i<Pairs.size(); i++)
+	{
+		if(Pairs.at(i).id_Cl == id)
+		{
+			Pairs[i].client_curr_rcv_file = file_code;
+			Chain_Pair_mutex.unlock();
+			create_empty_U_File(id,file_code);
+			return true;
+		}
+		if(Pairs.at(i).id_SS == id)
+		{
+			Pairs[i].s_server_curr_rcv_file = file_code;
+			Chain_Pair_mutex.unlock();
+			create_empty_U_File(id,file_code);
+			return true;
+		}
+	}
+	Chain_Pair_mutex.unlock();
+	return false;
+}
+
+void create_empty_U_File(int id, int file_code)
+{
+	std::ofstream ofs;
+	switch(file_code)
+	{
+		case FILE_FIRMWARE:{break;} // Этот файл сервер не обрабатывает
+		
+		case FILE_DSQ:{break;} // Этот файл сервер не обрабатывает
+		
+		case CLIENT_UPD_LIST:
+		{
+			std::string client_upd_file_name = "./tmp/client_upd_file_" + std::to_string(id);
+			ofs.open(client_upd_file_name, std::ofstream::out | std::ofstream::trunc);
+			break;
+		}
+		
+		case SERVER_UPD_TASKS_LIST:{break;} // Этот файл сервер не обрабатывает
+		
+		case FILE_UPDATE:{break;} // Этот файл сервер не обрабатывает
+		
+		default:{break;}
+	}
+	ofs.close();
+}
+
+void rcv_U_File(int id, char *data)
+{
+	int file_code = -1;
+	Chain_Pair_mutex.lock();
+	int result;
+	for(int i=0; i<Pairs.size(); i++)
+	{
+		if(Pairs.at(i).id_Cl == id)
+		{
+			file_code = Pairs.at(i).client_curr_rcv_file;
+			break;
+		}
+		if(Pairs.at(i).id_SS == id)
+		{
+			file_code = Pairs.at(i).s_server_curr_rcv_file;
+			break;
+		}
+	}
+	Chain_Pair_mutex.unlock();
+	
+	std::string choose_file_name;
+
+	switch(file_code)
+	{
+		case FILE_FIRMWARE:{break;} // Этот файл сервер не обрабатывает
+		
+		case FILE_DSQ:{break;} // Этот файл сервер не обрабатывает
+		
+		case CLIENT_UPD_LIST:
+		{
+			choose_file_name = "./tmp/client_upd_file_" + std::to_string(id);			
+		}
+		
+		case SERVER_UPD_TASKS_LIST:{break;} // Этот файл сервер не обрабатывает
+		
+		case FILE_UPDATE:{break;} // Этот файл сервер не обрабатывает
+		
+		default:{break;}
+	}
+	
+	std::ofstream ofs;
+	ofs.open(choose_file_name, std::ios::app);  // открываем файл для записи в конец
+	ofs << data;								// сама запись
+	ofs.close();                          		// закрываем файл
 }

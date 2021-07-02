@@ -1,7 +1,8 @@
 CC		= g++
 CFLAGS  += -g -std=c++11
-LFLAGS  += -L./lib -lpthread -liniparser -lsqlite3
-IFLAG	+= -I./src/Parser -I./src/DB/
+LFLAGS  += -L./lib -lpthread -liniparser -lsqlite3 -lssl -lcrypto
+IFLAG	+= -I./src/Parser -I./src/DB/ -I./src/Resource_manager/
+FILES	+= ./src/server/server_v2.cpp ./src/Resource_manager/resource_manager.cpp
 
 BUILD_DIR_NAME = ./build
 
@@ -9,7 +10,8 @@ all: server_build_v2
 
 server_build_v2:
 	mkdir -p $(BUILD_DIR_NAME)
-	$(CC) $(CFLAGS) $(IFLAG) ./src/server/server_v2.c -o $(BUILD_DIR_NAME)/server $(LFLAGS) -fstack-protector
+	mkdir -p $(BUILD_DIR_NAME)/resources
+	$(CC) $(CFLAGS) $(IFLAG) $(FILES) -o $(BUILD_DIR_NAME)/server $(LFLAGS) -fstack-protector
 	
 manage_DB_build:
 	mkdir -p $(BUILD_DIR_NAME)
