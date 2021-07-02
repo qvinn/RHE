@@ -47,6 +47,27 @@
 #define RUN_DEBUG_FIRSTLY 54
 #define CLIENT_WANT_GET_FPGA_ID	55
 #define S_SERVER_SEND_FPGA_ID 56
+#define NEED_UPDATE 57
+#define SERVER_START_SEND_FILE_U 58
+#define SERVER_SENDING_FILE_U 59
+#define SERVER_FINISH_SEND_FILE_U 60
+#define CLIENT_START_SEND_FILE_U_TO_SERVER 61
+#define CLIENT_SENDING_FILE_U_TO_SERVER 62
+#define CLIENT_FINISH_SEND_FILE_U_TO_SERVER 63
+#define SERVER_END_TAKE_UPDATE 64
+
+//-------------------------------------------------------------
+// КОДЫ НАЗНАЧЕНИЯ ФАЙЛОВ
+#define FILE_FIRMWARE			0
+#define FILE_DSQ				1
+#define CLIENT_UPD_LIST			2
+#define SERVER_UPD_TASKS_LIST	3
+#define FILE_UPDATE				4
+
+
+#define FILE_D_ADD		0
+#define FILE_D_UPDATE	1
+#define FILE_D_DELETE	2
 
 #define DATA_EXIST 1
 #define DATA_NOT_EXIST 0
