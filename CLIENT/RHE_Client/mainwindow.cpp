@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(gen_widg, &General_Widget::re_translate_signal, ptr_RHE_widg, &RHE_Widget::slot_re_translate);
     connect(snd_rcv_module, &Send_Recieve_Module::logout_signal, this, &MainWindow::logout);
     connect(this, &MainWindow::set_disconnected_signal, snd_rcv_module, &Send_Recieve_Module::set_disconnected);
-    connect(ptr_registration_widg, &RegistrationWidget::logined, this, &MainWindow::logined);
+    connect(ptr_registration_widg, &RegistrationWidget::logined_signal, this, &MainWindow::logined);
     gen_widg->change_current_locale();
     state_strs = {tr("Connecting To Server"), ""};
     tmr_waveform_viewer = new QTimer(this);
