@@ -15,9 +15,6 @@ Send_Recieve_Module::Send_Recieve_Module(General_Widget *widg) {
     connect(socket, &QAbstractSocket::disconnected, this, &Send_Recieve_Module::server_disconnected);
     connect(qApp, &QApplication::aboutToQuit, this, &Send_Recieve_Module::set_disconnected);
     connect(this, &Send_Recieve_Module::show_message_box_signal, gen_widg, &General_Widget::show_message_box);
-
-    // Проанализируем папку data и создадим хэши для всех файлов
-    this->analyze_data_dir();
 }
 
 Send_Recieve_Module::~Send_Recieve_Module() {
@@ -46,7 +43,6 @@ void Send_Recieve_Module::get_id_for_client() {
     memcpy(send_buff, &init_id, sizeof(int));
     send_U_Packet(CLIENT_WANT_INIT_CONNECTION, send_buff);
     free(send_buff);
-    emit id_received(CS_OK);
 }
 
 //-------------------------------------------------------------------------
@@ -60,6 +56,9 @@ void Send_Recieve_Module::wait_analize_recv_data() {
             case CLIENT_WANT_INIT_CONNECTION: {
                 info_about_new_device *info = reinterpret_cast<info_about_new_device *>(tmp_packet->data);
                 set_client_id(info->id);
+
+                send_file_to_ss_universal(this->upd_file, CLIENT_UPD_LIST);
+                send_U_Packet(NEED_UPDATE, "");
                 if(FPGA_id_code.count() == 0) {
                     emit choose_board_signal(info->FPGA_id);
                 } else {
@@ -71,8 +70,6 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 send_U_Packet(CLIENT_WANT_IDT, "");
                 send_U_Packet(CLIENT_WANT_ODT, "");
 
-                send_file_to_ss_universal(this->upd_file, CLIENT_UPD_LIST);
-                send_U_Packet(NEED_UPDATE, "");
                 break;
             }
             case PING_TO_SERVER: {
@@ -187,7 +184,8 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 break;
             }
             case SERVER_END_TAKE_UPDATE: {
-                analyze_data_dir();
+                //analyze_data_dir();
+                emit id_received(CS_OK);
                 break;
             }
             default: {
@@ -528,8 +526,15 @@ void Send_Recieve_Module::rcv_U_File(char *data)
         default:{break;}
     }
 
+    int f_size;
+    memcpy(&f_size,data,sizeof(uint8_t));
+
+    //qDebug() << "Packet size: " << f_size;
+
     if(tmp_file.open(QIODevice::Append)) {
-        tmp_file.write(data);
+        //tmp_file.write(data);
+        QDataStream out(&tmp_file);
+        out.writeRawData(data+sizeof(uint8_t), f_size);
         tmp_file.close();
     }
 }
@@ -572,6 +577,7 @@ void Send_Recieve_Module::end_rcv_U_File(char *data)
         case FILE_UPDATE:
         {
             this->upd_files_counter++;
+            qDebug() << "upd_files_counter: " << upd_files_counter;
             break;
         }
 

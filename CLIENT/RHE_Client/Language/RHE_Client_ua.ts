@@ -796,35 +796,35 @@
 <context>
     <name>Send_Recieve_Module</name>
     <message>
-        <location filename="../send_recieve_module.cpp" line="88"/>
-        <location filename="../send_recieve_module.cpp" line="93"/>
-        <location filename="../send_recieve_module.cpp" line="121"/>
-        <location filename="../send_recieve_module.cpp" line="344"/>
+        <location filename="../send_recieve_module.cpp" line="85"/>
+        <location filename="../send_recieve_module.cpp" line="90"/>
+        <location filename="../send_recieve_module.cpp" line="118"/>
+        <location filename="../send_recieve_module.cpp" line="342"/>
         <source>Error</source>
         <translation>Помилка</translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="79"/>
+        <location filename="../send_recieve_module.cpp" line="76"/>
         <source>Server answer PING</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="83"/>
+        <location filename="../send_recieve_module.cpp" line="80"/>
         <source>Slave server answer PING</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="88"/>
+        <location filename="../send_recieve_module.cpp" line="85"/>
         <source>You are dropped</source>
         <translation>Сервер вимкнено</translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="93"/>
+        <location filename="../send_recieve_module.cpp" line="90"/>
         <source>Can&apos;t get ID from Server - no more places</source>
         <translation>Не вдається отримати ID з сервера - більше немає місць</translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="121"/>
+        <location filename="../send_recieve_module.cpp" line="118"/>
         <source>Selected board not available</source>
         <translation>Вибрана плата недоступна</translation>
     </message>
@@ -833,7 +833,7 @@
         <translation type="vanished">Спочатку запустіть відлагодження</translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="344"/>
+        <location filename="../send_recieve_module.cpp" line="342"/>
         <source>Server disconnected</source>
         <translation>Сервер вимкнено</translation>
     </message>

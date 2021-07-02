@@ -430,7 +430,7 @@ void RHE_Widget::initialize_ui() {
         if(read_xml_file(false)) {
             post_initialize_ui();
         } else {
-            QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
+//            QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
         }
     } else {
         post_initialize_ui();
