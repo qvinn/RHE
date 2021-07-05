@@ -42,6 +42,7 @@ RHE_Widget::RHE_Widget(QWidget *parent, General_Widget *widg, Send_Recieve_Modul
     connect(this, &RHE_Widget::stop_debug_signal, snd_rcv_mod, &Send_Recieve_Module::stop_debug);
     connect(this, &RHE_Widget::start_sequence_of_signals_signal, snd_rcv_mod, &Send_Recieve_Module::start_sequence_of_signals);
     connect(this, &RHE_Widget::send_swtches_states_signal, snd_rcv_mod, &Send_Recieve_Module::send_swtches_states);
+    snd_rcv_module = snd_rcv_mod;
     prev_vals = new QList<int>();
     pi_pins_nums = new QList<int>();
     send_file_status = new QTimer(nullptr);
@@ -403,7 +404,7 @@ void RHE_Widget::scrll_area_sgnls_set_enabled(bool flag) {
 void RHE_Widget::pre_initialize_ui() {
     wvfrm_vwr->initialize_ui();
     ui->verticalLayout_3->addWidget(wvfrm_vwr);
-    initialize_ui();
+//    initialize_ui();
 }
 
 //-------------------------------------------------------------------------
@@ -429,7 +430,7 @@ void RHE_Widget::initialize_ui() {
     if(ui->cmbBx_chs_brd->count() == 0) {
         if(read_xml_file(false)) {
             post_initialize_ui();
-        } else {
+//        } else {
 //            QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
         }
     } else {
@@ -447,8 +448,12 @@ void RHE_Widget::post_initialize_ui() {
     dbg_strtd = false;
     sqnc_of_sgnls_strtd = false;
     set_ui_text();
-    prev_board_index = gen_widg->get_setting("settings/CURRENT_BOARD").toInt();
-    ui->cmbBx_chs_brd->setCurrentIndex(prev_board_index);
+    for(int i = 0; i < jtag_id_codes->count(); i++) {
+        if(jtag_id_codes->at(i).compare(snd_rcv_module->get_FPGA_id(), Qt::CaseInsensitive) == 0) {
+            prev_board_index = i;
+        }
+    }
+    ui->cmbBx_chs_brd->setCurrentIndex(gen_widg->get_setting("settings/CURRENT_BOARD").toInt());
     change_cnt_of_dbg_pins(16);
     ui->spnBx_dbg_tm->setValue(gen_widg->get_setting("settings/DEBUG_DISCRETENESS_TIME").toInt());
     ui->cmbBx_dbg_tm_tp->setCurrentIndex(gen_widg->get_setting("settings/DEBUG_DISCRETENESS_TIME_TYPE").toInt());
@@ -967,7 +972,7 @@ void RHE_Widget::slot_choose_board(QString jtag_code) {
 //-------------------------------------------------------------------------
 // SERVER ACCEPT/NOT ACCEPT SELECTED BY USER BOARD
 //-------------------------------------------------------------------------
-void RHE_Widget::slot_accept_board(bool flg) { 
+void RHE_Widget::slot_accept_board(bool flg) {
     if(flg) {
         prev_board_index = ui->cmbBx_chs_brd->currentIndex();
     } else {

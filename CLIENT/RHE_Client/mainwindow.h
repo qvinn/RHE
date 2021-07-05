@@ -25,9 +25,11 @@
             void initialize_ui();
             void set_ui_text();
             void load_settings();
+            void set_enable_login_buttons(bool flg);
             void login();
             void logout();
             void logined(bool flg);
+            void data_updated(bool flg);
 
             Ui::MainWindow *ui;
             General_Widget *gen_widg = nullptr;
@@ -80,7 +82,8 @@
             void slot_timer_progress_bar_timeout();
 
         signals:
-            void set_disconnected_signal();
+            void update_data_signal();
+            void set_disconnected_signal();      
     };
 
     //////////////////////////////////////////////////DIALOG SET SERVER IP///////////////////////////////////////////////////

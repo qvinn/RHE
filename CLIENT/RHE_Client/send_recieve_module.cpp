@@ -1,8 +1,4 @@
-#include "send_recieve_module.h"
-
-#include <iostream>			// for write to wile with c++
-#include <fstream>			// for write to wile with c++
-#include <sstream> 			// for file reader
+﻿#include "send_recieve_module.h"
 
 #define INIT_ID -1
 
@@ -10,6 +6,7 @@ Send_Recieve_Module::Send_Recieve_Module(General_Widget *widg) {
     gen_widg = widg;
     socket = new QTcpSocket(this);
     file = new QFile(gen_widg->get_app_path() + "/DEBUG_from_s_server.txt");
+//    socket->setSocketOption(QAbstractSocket::ReceiveBufferSizeSocketOption, (8 * 1024 * 1024 * 64));        //64MB SIZE OF RECEIVE BUFFER
     socket->setReadBufferSize(RECIVE_BUFFER_SIZE);
     connect(socket, &QAbstractSocket::readyRead, this, &Send_Recieve_Module::wait_analize_recv_data);
     connect(socket, &QAbstractSocket::disconnected, this, &Send_Recieve_Module::server_disconnected);
@@ -31,7 +28,7 @@ void Send_Recieve_Module::init_connection() {
         reset_ID();
         socket->close();
     }
-    emit link_established(connected);
+    emit link_established_signal(connected);
 }
 
 //-------------------------------------------------------------------------
@@ -46,6 +43,14 @@ void Send_Recieve_Module::get_id_for_client() {
 }
 
 //-------------------------------------------------------------------------
+// GET UPDATE REQUEST OF DATA-FILES
+//-------------------------------------------------------------------------
+void Send_Recieve_Module::get_update_data() {
+    send_file_to_ss_universal(analyze_data_dir(), CLIENT_UPD_LIST);
+    send_U_Packet(NEED_UPDATE, "");
+}
+
+//-------------------------------------------------------------------------
 // SOCKET LISTENER (HANDLER OF INPUT PACKETS)
 //-------------------------------------------------------------------------
 void Send_Recieve_Module::wait_analize_recv_data() {
@@ -56,20 +61,8 @@ void Send_Recieve_Module::wait_analize_recv_data() {
             case CLIENT_WANT_INIT_CONNECTION: {
                 info_about_new_device *info = reinterpret_cast<info_about_new_device *>(tmp_packet->data);
                 set_client_id(info->id);
-
-                send_file_to_ss_universal(this->upd_file, CLIENT_UPD_LIST);
-                send_U_Packet(NEED_UPDATE, "");
-                if(FPGA_id_code.count() == 0) {
-                    emit choose_board_signal(info->FPGA_id);
-                } else {
-                    set_FPGA_id(FPGA_id_code);
-                }
-                // Запросим информацию о максимальном допустимом врмени отладки
-                send_U_Packet(CLIENT_WANT_GET_TIMEOUT_INFO, "");    // обработка в S_SERVER_SEND_TIMEOUT_INFO
-                // Как только мы получили ID и убедились в том, что соединение установено успешно, запросим таблицы с инофрмацией о портах ввода-вывода на slave-serverе
-                send_U_Packet(CLIENT_WANT_IDT, "");
-                send_U_Packet(CLIENT_WANT_ODT, "");
-
+                FPGA_id_code = info->FPGA_id;
+                emit id_received_signal(true);
                 break;
             }
             case PING_TO_SERVER: {
@@ -136,8 +129,8 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 break;
             }
             case S_SERVER_SEND_TIMEOUT_INFO: {
-                int max_duration;
-                quint8 tm_tp;
+                int max_duration = -1;
+                quint8 tm_tp = 0;
                 memcpy(&max_duration, tmp_packet->data, sizeof(int));
                 memcpy(&tm_tp, (tmp_packet->data + sizeof(int)), sizeof(quint8));
                 emit accept_debug_time_limit_signal(max_duration, tm_tp);
@@ -163,7 +156,7 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 break;
             }            
             case RUN_DEBUG_FIRSTLY: {
-                emit debug_not_started();
+                emit debug_not_started_signal();
 //                emit show_message_box_signal("", tr("Run debug firstly"), 0, gen_widg->get_position());
                 break;
             }
@@ -172,23 +165,27 @@ void Send_Recieve_Module::wait_analize_recv_data() {
                 break;
             }
             case SERVER_START_SEND_FILE_U: {
-                start_rcv_U_File(tmp_packet->data);
+                curr_rcv_file = -1;
+                memcpy(&curr_rcv_file, tmp_packet->data, sizeof(int));
+                start_rcv_U_File();
                 break;
             }
             case SERVER_SENDING_FILE_U: {
-                this->rcv_U_File(tmp_packet->data);
+                rcv_U_File(tmp_packet->data);
                 break;
             }
             case SERVER_FINISH_SEND_FILE_U: {
-                end_rcv_U_File(tmp_packet->data);
+                end_rcv_U_File();
                 break;
             }
             case SERVER_END_TAKE_UPDATE: {
-                //analyze_data_dir();
-                emit id_received(CS_OK);
+                QFile tmp_file(gen_widg->get_app_path() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString() + "upd_task");
+                tmp_file.remove();
+                emit data_updated_signal(true);
                 break;
             }
             default: {
+                qDebug() << "UNKNOWN PACKET";
                 break;
             }
         }
@@ -270,6 +267,9 @@ bool Send_Recieve_Module::send_file_to_ss(QByteArray File_byteArray, int strt_sn
     return true;
 }
 
+//-------------------------------------------------------------------------
+// SEND DATA ON SERVER (DIVIDING IF IT GREATER, THAN 1 PACKET SIZE)
+//-------------------------------------------------------------------------
 bool Send_Recieve_Module::send_file_to_ss_universal(QByteArray File_byteArray, int file_code) {
     int fileSize = File_byteArray.size();
     int hops = fileSize / SEND_FILE_BUFFER;
@@ -279,17 +279,15 @@ bool Send_Recieve_Module::send_file_to_ss_universal(QByteArray File_byteArray, i
         send_U_Packet(CLIENT_SENDING_FILE_U_TO_SERVER, Result_byteArray);
         send_U_Packet(CLIENT_FINISH_SEND_FILE_U_TO_SERVER, "");
     } else {
-        QVector<QByteArray> packets;
+        QList<QByteArray> packets;
         QByteArray tmp_data;
         QByteArray packet;
         // Чтобы было удобней отсчитывать в цикле, определим первую посылку отдельно
         tmp_data = File_byteArray.mid(0, SEND_FILE_BUFFER).data();
-        //packet = form_send_file_packet(&tmp_data);
-        packets.push_back(tmp_data);
+        packets.append(tmp_data);
         for(int i = 1; i < (hops + 1); i++) {
             tmp_data = File_byteArray.mid((i * SEND_FILE_BUFFER), SEND_FILE_BUFFER).data();
-            //packet = form_send_file_packet(&tmp_data);
-            packets.push_back(tmp_data);
+            packets.append(tmp_data);
         }
         last_send_file_bytes = 0;
         send_U_Packet(CLIENT_START_SEND_FILE_U_TO_SERVER, QString(file_code).toLatin1());
@@ -309,6 +307,13 @@ void Send_Recieve_Module::set_disconnected() {
     manual_disconnect = true;
     close_connection();
     manual_disconnect = false;
+}
+
+//-------------------------------------------------------------------------
+// GET JTAG ID CODE OF CURRENT BOARD'S FPGA
+//-------------------------------------------------------------------------
+QString Send_Recieve_Module::get_FPGA_id() {
+    return FPGA_id_code;
 }
 
 //-------------------------------------------------------------------------
@@ -409,7 +414,7 @@ QByteArray Send_Recieve_Module::form_send_file_packet(QByteArray *data) {
 }
 
 //-------------------------------------------------------------------------
-// SERVER STARTS SEND FILE TO CLIENT
+// SLAVE-SERVER STARTS SEND FILE TO CLIENT
 //-------------------------------------------------------------------------
 int Send_Recieve_Module::start_recive_file() {
     file->open(QFile::WriteOnly | QFile::Truncate);     //clear file
@@ -422,7 +427,7 @@ int Send_Recieve_Module::start_recive_file() {
 }
 
 //-------------------------------------------------------------------------
-// SERVER CONTINOUS SEND FILE TO CLIENT
+// SLAVE-SERVER CONTINOUS SEND FILE TO CLIENT
 //-------------------------------------------------------------------------
 int Send_Recieve_Module::rcv_new_data_for_file(char *buf) {
     file->write(buf + sizeof(int8_t));
@@ -430,199 +435,156 @@ int Send_Recieve_Module::rcv_new_data_for_file(char *buf) {
 }
 
 //-------------------------------------------------------------------------
-// SERVER ENDS SEND FILE TO CLIENT
+// SLAVE-SERVER ENDS SEND FILE TO CLIENT
 //-------------------------------------------------------------------------
 int Send_Recieve_Module::end_recive_file() {
     file->close();
     return CS_OK;
 }
 
-void Send_Recieve_Module::analyze_data_dir()
-{
-    upd_file.clear();
-    QString dir_path = gen_widg->get_app_path() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString();
-
-    QDir dir_name(dir_path);
-    QFileInfoList dirContent = dir_name.entryInfoList(QStringList() << "*.*", QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
-
+//-------------------------------------------------------------------------
+// FORMING FILE WITH NAMES AND HASHES OF DATA-FILES
+//-------------------------------------------------------------------------
+QByteArray Send_Recieve_Module::analyze_data_dir() {
+    QByteArray upd_file;
+    QDir dir_name(gen_widg->get_app_path() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString());
+    QFileInfoList dirContent = dir_name.entryInfoList(QStringList() << "*", (QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot));
     QRegExp tagExp("/");
     QStringList lst;
-
-    for(int i = 0; i < dirContent.size(); i++)
-    {
+    for(int i = 0; i < dirContent.size(); i++) {
         QByteArray hash = gen_widg->get_file_checksum(dirContent.at(i).filePath(), QCryptographicHash::Md5);
-        hash = hash.toHex();
-
         lst = dirContent.at(i).filePath().split(tagExp);
-        this->upd_file.append(QString(lst.last() + "\t" + hash + "\n").toLatin1());
+        upd_file.append(QString(lst.last() + "\t" + hash.toHex() + "\n").toLatin1());
     }
-    qDebug() << upd_file.data();
+    return upd_file;
 }
 
-void Send_Recieve_Module::start_rcv_U_File(char *data)
-{
-    memcpy(&this->curr_rcv_file,data,sizeof(int));
-    this->create_empty_U_File(this->curr_rcv_file);
-}
-
-void Send_Recieve_Module::create_empty_U_File(int file_code)
-{
+//-------------------------------------------------------------------------
+// SERVER STARTS SEND FILE TO CLIENT
+//-------------------------------------------------------------------------
+void Send_Recieve_Module::start_rcv_U_File() {
     QFile tmp_file;
-    switch(file_code)
-    {
-        case FILE_FIRMWARE:{break;} // Этот файл сервер не обрабатывает
-
-        case FILE_DSQ:{break;} // Этот файл сервер не обрабатывает
-
-        case CLIENT_UPD_LIST:{break;} // Этот файл сервер не обрабатывает
-
-        case SERVER_UPD_TASKS_LIST:
-        {
-            QString dir_path = gen_widg->get_app_path() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString();
+    QString dir_path = gen_widg->get_app_path() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString();
+    switch(curr_rcv_file) {
+        case FILE_FIRMWARE: {       // Этот файл сервер не обрабатывает
+            break;
+        }
+        case FILE_DSQ: {            // Этот файл сервер не обрабатывает
+            break;
+        }
+        case CLIENT_UPD_LIST: {     // Этот файл сервер не обрабатывает
+            break;
+        }
+        case SERVER_UPD_TASKS_LIST: {
             tmp_file.setFileName(dir_path + "upd_task");
             break;
         }
-
-        case FILE_UPDATE:
-        {
-            QString dir_path = gen_widg->get_app_path() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString();
-            tmp_file.setFileName(dir_path + upd_files_list.at(this->upd_files_counter));
+        case FILE_UPDATE: {
+            tmp_file.setFileName(dir_path + upd_files_list.at(upd_files_counter));
             break;
         }
-
-        default:{break;}
+        default: {
+            break;
+        }
     }
-    tmp_file.open(QFile::WriteOnly | QFile::Truncate);     //clear file
+    tmp_file.open(QIODevice::WriteOnly | QFile::Truncate);     //clear file
     tmp_file.close();
 }
 
-void Send_Recieve_Module::rcv_U_File(char *data)
-{
+//-------------------------------------------------------------------------
+// SERVER CONTINOUS SEND FILE TO CLIENT
+//-------------------------------------------------------------------------
+void Send_Recieve_Module::rcv_U_File(char *data) {
     QFile tmp_file;
-    switch(this->curr_rcv_file)
-    {
-        case FILE_FIRMWARE:{break;} // Этот файл клиент не обрабатывает
-
-        case FILE_DSQ:{break;}      // Этот файл клиент не обрабатывает
-
-        case CLIENT_UPD_LIST:
-        {
+    QString dir_path = gen_widg->get_app_path() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString();
+    switch(curr_rcv_file) {
+        case FILE_FIRMWARE: {   // Этот файл клиент не обрабатывает
             break;
         }
-
-        case SERVER_UPD_TASKS_LIST:
-        {
-            QString dir_path = gen_widg->get_app_path() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString();
+        case FILE_DSQ: {        // Этот файл клиент не обрабатывает
+            break;
+        }
+        case CLIENT_UPD_LIST: {
+            break;
+        }
+        case SERVER_UPD_TASKS_LIST: {
             tmp_file.setFileName(dir_path + "upd_task");
             break;
         }
-        case FILE_UPDATE:
-        {
-            QString dir_path = gen_widg->get_app_path() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString();
-            tmp_file.setFileName(dir_path + upd_files_list.at(this->upd_files_counter));
+        case FILE_UPDATE: {
+            tmp_file.setFileName(dir_path + upd_files_list.at(upd_files_counter));
             break;
         }
-
-        default:{break;}
+        default: {
+            break;
+        }
     }
-
-    int f_size;
-    memcpy(&f_size,data,sizeof(uint8_t));
-
-    //qDebug() << "Packet size: " << f_size;
-
+    int f_size = 0;
+    memcpy(&f_size, data, sizeof(quint8));
     if(tmp_file.open(QIODevice::Append)) {
-        //tmp_file.write(data);
-        QDataStream out(&tmp_file);
-        out.writeRawData(data+sizeof(uint8_t), f_size);
+        tmp_file.write((data + sizeof(quint8)), f_size);
         tmp_file.close();
     }
 }
 
-void Send_Recieve_Module::end_rcv_U_File(char *data)
-{
-    Q_UNUSED(data);
-    switch(this->curr_rcv_file)
-    {
-        case FILE_FIRMWARE:{break;} // Этот файл клиент не обрабатывает
-
-        case FILE_DSQ:{break;}      // Этот файл клиент не обрабатывает
-
-        case CLIENT_UPD_LIST:
-        {
+//-------------------------------------------------------------------------
+// SERVER ENDS SEND FILE TO CLIENT
+//-------------------------------------------------------------------------
+void Send_Recieve_Module::end_rcv_U_File() {
+    switch(curr_rcv_file) {
+        case FILE_FIRMWARE: {   // Этот файл клиент не обрабатывает
             break;
         }
-
-        case SERVER_UPD_TASKS_LIST:
-        {
-            std::vector<std::string> upd_task_files;
-            std::vector<int> upd_task_file_codes;
+        case FILE_DSQ: {        // Этот файл клиент не обрабатывает
+            break;
+        }
+        case CLIENT_UPD_LIST: {
+            break;
+        }
+        case SERVER_UPD_TASKS_LIST: {
+            QList<QString> upd_task_files;
+            QList<int> upd_task_file_codes;
+            upd_task_files.clear();
+            upd_task_file_codes.clear();
             QString dir_path = gen_widg->get_app_path() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString();
-            QString tmp_file = dir_path + "upd_task";
-            this->read_upd_task_file(tmp_file.toStdString(),&upd_task_files,&upd_task_file_codes);
-            this->upd_files_counter = 0; // Обновим счетчик принятых фалов(ADD|UPDATE файлы)
-            this->upd_files_list = {};
-            // Составим сисок файлов, которые будут приходить для операций ADD|UPDATE и сохраним их имена
+            read_upd_task_file((dir_path + "upd_task"), &upd_task_files, &upd_task_file_codes);
+            upd_files_counter = 0;        // Обновим счетчик принятых фалов(ADD|UPDATE файлы)
+            upd_files_list.clear();
+            // Составим список файлов, которые будут приходить для операций ADD|UPDATE и сохраним их имена
             // Позже по upd_files_counter мы будем знать, какое имя из "upd_files_list" необходимо взять
-            for(uint i = 0; i < upd_task_file_codes.size(); i++)
-            {
-                if(upd_task_file_codes.at(i) < 2) // Условие < 2, т.к. ADD - 0, UPDATE - 1, DELETE - 2
-                {
-                    upd_files_list.push_back(QByteArray::fromStdString(upd_task_files.at(i)));
+            for(int i = 0; i < upd_task_file_codes.count(); i++) {
+                if(upd_task_file_codes.at(i) < 2) {         // Условие < 2, т.к. ADD - 0, UPDATE - 1, DELETE - 2
+                    upd_files_list.append(upd_task_files.at(i));
+                } else {
+                    QFile tmp_file(dir_path + upd_task_files.at(i));
+                    tmp_file.remove();
                 }
             }
-            qDebug() << "upd_files_list" << upd_files_list;
             break;
         }
-        case FILE_UPDATE:
-        {
-            this->upd_files_counter++;
-            qDebug() << "upd_files_counter: " << upd_files_counter;
+        case FILE_UPDATE: {
+            upd_files_counter++;
             break;
         }
-
-        default:{break;}
+        default: {
+            break;
+        }
     }
 }
 
-void Send_Recieve_Module::read_upd_task_file(std::string filename, std::vector<std::string> *file_names, std::vector<int> *tasks_codes)
-{
-    std::string line;
-        std::string word;
-        std::ifstream file(filename);
-        int column_count = 1;
-        if(file.good())
-        {
-            // Пока не пройдем по всем строкам в файле
-            while(std::getline(file, line))
-            {
-                std::istringstream s(line);
-                // Пока не пройдем по всем словам в строке(по всем колонкам, их у нас только 2)
-                while (getline(s, word, '\t'))
-                {
-                    switch(column_count)
-                    {
-                        case 1: // Первая колонка: значение имени порта ввода-вывода
-                        {
-                            file_names->push_back(word);
-                            break;
-                        }
-                        case 2: // Вторая колонка: номер WiPi порта ввода-вывода
-                        {
-                            tasks_codes->push_back(std::stoi(word));
-                            break;
-                        }
-                        default:
-                        {
-                            break;
-                        }
-                    }
-                    column_count++;
-                }
-                column_count = 1;
-            }
-        } else
-        {
-            qDebug() << "Can't open file: " << QByteArray::fromStdString(filename);
+//-------------------------------------------------------------------------
+// PARSING OF 'UPDATE-TASK' FILE
+//-------------------------------------------------------------------------
+void Send_Recieve_Module::read_upd_task_file(QString filename, QList<QString> *file_names, QList<int> *tasks_codes) {
+    QFile tmp_file(filename);
+    if(tmp_file.open(QIODevice::ReadOnly)) {
+        while(!tmp_file.atEnd()) {       // Пока не пройдем по всем строкам в файле
+            QString line = tmp_file.readLine();
+            line.replace("\n", "");
+            QStringList lst = line.split(QChar('\t'));
+            file_names->append(lst.first());
+            tasks_codes->append(lst.last().toInt());
         }
+        tmp_file.close();
+    }
 }
