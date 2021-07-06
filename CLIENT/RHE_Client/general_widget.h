@@ -39,6 +39,8 @@
              */
             void save_setting(QString type, QVariant val);
 
+            void check_is_data_dir_exist();
+
             /*
              * QString pattern_1 - name of window class which needed to be customize
              * QString pattern_2 - additional parameter for style sheet

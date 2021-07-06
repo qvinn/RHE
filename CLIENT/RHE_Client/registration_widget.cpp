@@ -7,9 +7,8 @@ RegistrationWidget::RegistrationWidget(QWidget *parent, General_Widget *widg, Se
     gen_widg = widg;
     connect(this, &RegistrationWidget::init_connection_signal, snd_rcv_mod, &Send_Recieve_Module::init_connection);
     connect(this, &RegistrationWidget::get_id_for_client_signal, snd_rcv_mod, &Send_Recieve_Module::get_id_for_client);
-    connect(this, &RegistrationWidget::analyze_data_dir_signal, snd_rcv_mod, &Send_Recieve_Module::analyze_data_dir);
-    connect(snd_rcv_mod, &Send_Recieve_Module::link_established, this, &RegistrationWidget::link_established);
-    connect(snd_rcv_mod, &Send_Recieve_Module::id_received, this, &RegistrationWidget::id_received);
+    connect(snd_rcv_mod, &Send_Recieve_Module::link_established_signal, this, &RegistrationWidget::link_established);
+    connect(snd_rcv_mod, &Send_Recieve_Module::id_received_signal, this, &RegistrationWidget::id_received);
     account_info = new QSettings("TestRegistration.cfg", QSettings::IniFormat);
     ui->lineEdit_password->setEchoMode(QLineEdit::Password);
 }
@@ -74,7 +73,6 @@ void RegistrationWidget::login() {
             ui->lineEdit_password->setText("");
             ui->lineEdit_FName->setText("");
             ui->lineEdit_LName->setText("");
-            emit analyze_data_dir_signal();
             emit init_connection_signal();      // Иницализируем поключение
         } else {
             emit logined_signal(false);
@@ -101,8 +99,8 @@ void RegistrationWidget::link_established(bool flg) {
 //-------------------------------------------------------------------------
 // SERVER RECIEVED USER ID
 //-------------------------------------------------------------------------
-void RegistrationWidget::id_received(int state) {
-    if(state != CS_OK) {
+void RegistrationWidget::id_received(bool flg) {
+    if(!flg) {
         emit logined_signal(false);
         gen_widg->show_message_box(tr("Error"), tr("Can't get ID"), 0, gen_widg->get_position());
         return;

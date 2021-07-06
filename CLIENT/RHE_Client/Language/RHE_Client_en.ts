@@ -176,17 +176,17 @@
         <translation type="obsolete">Set server IP</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="457"/>
+        <location filename="../mainwindow.cpp" line="482"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="457"/>
+        <location filename="../mainwindow.cpp" line="482"/>
         <source>Wrong server port!</source>
         <translation>Wrong server port!</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="471"/>
+        <location filename="../mainwindow.cpp" line="496"/>
         <source>Set port value</source>
         <translation>Set port value</translation>
     </message>
@@ -204,7 +204,7 @@
     </message>
     <message>
         <location filename="../dialog_set_server_ip.ui" line="137"/>
-        <location filename="../mainwindow.cpp" line="426"/>
+        <location filename="../mainwindow.cpp" line="451"/>
         <source>Setting of server IP</source>
         <translation>Setting of server IP</translation>
     </message>
@@ -227,27 +227,27 @@
 <context>
     <name>General_Widget</name>
     <message>
-        <location filename="../general_widget.cpp" line="311"/>
+        <location filename="../general_widget.cpp" line="321"/>
         <source>Warning</source>
         <translation>Warning</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="316"/>
+        <location filename="../general_widget.cpp" line="326"/>
         <source>Question</source>
         <translation>Question</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="321"/>
+        <location filename="../general_widget.cpp" line="331"/>
         <source>Yes</source>
         <translation>Yes</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="322"/>
+        <location filename="../general_widget.cpp" line="332"/>
         <source>No</source>
         <translation>No</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="325"/>
+        <location filename="../general_widget.cpp" line="335"/>
         <source>Information</source>
         <translation>Information</translation>
     </message>
@@ -261,105 +261,110 @@
     </message>
     <message>
         <location filename="../mainwindow.ui" line="515"/>
-        <location filename="../mainwindow.cpp" line="279"/>
+        <location filename="../mainwindow.cpp" line="281"/>
         <source>Register</source>
         <translation>  Register  </translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="800"/>
-        <location filename="../mainwindow.cpp" line="274"/>
-        <location filename="../mainwindow.cpp" line="361"/>
+        <location filename="../mainwindow.cpp" line="276"/>
+        <location filename="../mainwindow.cpp" line="385"/>
         <source>Login</source>
         <translation>Login</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="276"/>
-        <location filename="../mainwindow.cpp" line="352"/>
+        <location filename="../mainwindow.cpp" line="278"/>
+        <location filename="../mainwindow.cpp" line="376"/>
         <source>Logout</source>
         <translation>Logout</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="256"/>
+        <location filename="../mainwindow.cpp" line="258"/>
         <source>File</source>
         <translation>File</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="255"/>
+        <location filename="../mainwindow.cpp" line="30"/>
+        <source>Updating Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="257"/>
         <source>Remote Hardware Education</source>
         <translation>Remote Hardware Education</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="257"/>
+        <location filename="../mainwindow.cpp" line="259"/>
         <source>Settings</source>
         <translation>Settings</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="258"/>
+        <location filename="../mainwindow.cpp" line="260"/>
         <source>Open waveform viewer</source>
         <translation>Open waveform viewer</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="259"/>
+        <location filename="../mainwindow.cpp" line="261"/>
         <source>Exit</source>
         <translation>Exit</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="260"/>
+        <location filename="../mainwindow.cpp" line="262"/>
         <source>Files checking</source>
         <translation>Files checking</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="261"/>
+        <location filename="../mainwindow.cpp" line="263"/>
         <source>Pins checking</source>
         <translation>Pins checking</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="262"/>
+        <location filename="../mainwindow.cpp" line="264"/>
         <source>Manualy load firmware</source>
         <translation>Manualy load firmware</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="263"/>
+        <location filename="../mainwindow.cpp" line="265"/>
         <source>Set server IP</source>
         <translation>Set server IP</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="265"/>
-        <location filename="../mainwindow.cpp" line="269"/>
+        <location filename="../mainwindow.cpp" line="267"/>
+        <location filename="../mainwindow.cpp" line="271"/>
         <source>English</source>
         <translation>English</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="266"/>
-        <location filename="../mainwindow.cpp" line="270"/>
+        <location filename="../mainwindow.cpp" line="268"/>
+        <location filename="../mainwindow.cpp" line="272"/>
         <source>Ukrainian</source>
         <translation>Ukrainian</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="267"/>
-        <location filename="../mainwindow.cpp" line="271"/>
+        <location filename="../mainwindow.cpp" line="269"/>
+        <location filename="../mainwindow.cpp" line="273"/>
         <source>Russian</source>
         <translation>Russian</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="318"/>
-        <location filename="../mainwindow.cpp" line="321"/>
+        <location filename="../mainwindow.cpp" line="331"/>
+        <location filename="../mainwindow.cpp" line="334"/>
         <source>Warning</source>
         <translation>Warning</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="318"/>
+        <location filename="../mainwindow.cpp" line="331"/>
         <source>Change server-IP in settings</source>
         <translation>Change server-IP in settings</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="321"/>
+        <location filename="../mainwindow.cpp" line="334"/>
         <source>Change server-port in settings</source>
         <translation>Change server-port in settings</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="28"/>
-        <location filename="../mainwindow.cpp" line="281"/>
+        <location filename="../mainwindow.cpp" line="30"/>
+        <location filename="../mainwindow.cpp" line="283"/>
         <source>Connecting To Server</source>
         <translation>Connecting To Server</translation>
     </message>
@@ -378,13 +383,13 @@
     </message>
     <message>
         <location filename="../rhe_widget.ui" line="803"/>
-        <location filename="../rhe_widget.cpp" line="471"/>
+        <location filename="../rhe_widget.cpp" line="476"/>
         <source>Start Debug</source>
         <translation>  Start Debug  </translation>
     </message>
     <message>
         <location filename="../rhe_widget.ui" line="1104"/>
-        <location filename="../rhe_widget.cpp" line="472"/>
+        <location filename="../rhe_widget.cpp" line="477"/>
         <source>Stop Debug</source>
         <translation>  Stop Debug  </translation>
     </message>
@@ -453,8 +458,8 @@
         <translation>  Choose project directory  </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="48"/>
-        <location filename="../rhe_widget.cpp" line="483"/>
+        <location filename="../rhe_widget.cpp" line="49"/>
+        <location filename="../rhe_widget.cpp" line="488"/>
         <source>Debugging</source>
         <translation>Debugging</translation>
     </message>
@@ -467,102 +472,102 @@
         <translation type="vanished">Sequence Of Signals Sended</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="48"/>
+        <location filename="../rhe_widget.cpp" line="49"/>
         <source>Firmware Sending</source>
         <translation>Firmware Sending</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="48"/>
-        <location filename="../rhe_widget.cpp" line="483"/>
+        <location filename="../rhe_widget.cpp" line="49"/>
+        <location filename="../rhe_widget.cpp" line="488"/>
         <source>Sequence Of Signals File Sending</source>
         <translation>Sequence Of Signals File Sending</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="48"/>
-        <location filename="../rhe_widget.cpp" line="483"/>
+        <location filename="../rhe_widget.cpp" line="49"/>
+        <location filename="../rhe_widget.cpp" line="488"/>
         <source>Sequence Of Signals File Sended</source>
         <translation>Sequence Of Signals File Sended</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="200"/>
+        <location filename="../rhe_widget.cpp" line="201"/>
         <source>Choose csv-file with sequence of signals</source>
         <translation>Choose csv-file with sequence of signals</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="200"/>
+        <location filename="../rhe_widget.cpp" line="201"/>
         <source>Comma-Separated Values files (*.csv)</source>
         <translation>Comma-Separated Values files (*.csv)</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="208"/>
+        <location filename="../rhe_widget.cpp" line="209"/>
         <source>File with sequence of signals not choosed</source>
         <translation>File with sequence of signals not choosed</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="239"/>
+        <location filename="../rhe_widget.cpp" line="240"/>
         <source>Debug not started</source>
         <translation>Debug not started</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="307"/>
+        <location filename="../rhe_widget.cpp" line="308"/>
         <source>Choose svf-file with firmware</source>
         <translation>Choose svf-file with firmware</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="307"/>
+        <location filename="../rhe_widget.cpp" line="308"/>
         <source>Serial Vector Format files (*.svf)</source>
         <translation>Serial Vector Format files (*.svf)</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="321"/>
+        <location filename="../rhe_widget.cpp" line="322"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="321"/>
+        <location filename="../rhe_widget.cpp" line="322"/>
         <source>svf-file with firmware not choosed</source>
         <translation>svf-file with firmware not choosed</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="330"/>
-        <location filename="../rhe_widget.cpp" line="713"/>
+        <location filename="../rhe_widget.cpp" line="331"/>
+        <location filename="../rhe_widget.cpp" line="718"/>
         <source>svf-file not generated</source>
         <translation>svf-file not generated</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="537"/>
+        <location filename="../rhe_widget.cpp" line="542"/>
         <source>Board picture at: </source>
         <translation>Board picture at: </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="801"/>
+        <location filename="../rhe_widget.cpp" line="806"/>
         <source>File-list of boards and their parameters at: </source>
         <translation>File-list of boards and their parameters at: </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="811"/>
+        <location filename="../rhe_widget.cpp" line="816"/>
         <source> not found. Please, contact with teacher or administrator</source>
         <translation> not found. Please, contact with teacher or administrator</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="483"/>
+        <location filename="../rhe_widget.cpp" line="488"/>
         <source>Firmware sending</source>
         <translation>Firmware sending</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="473"/>
+        <location filename="../rhe_widget.cpp" line="478"/>
         <source>Hello, </source>
         <translation>Hello, </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="475"/>
-        <location filename="../rhe_widget.cpp" line="479"/>
+        <location filename="../rhe_widget.cpp" line="480"/>
+        <location filename="../rhe_widget.cpp" line="484"/>
         <source>s</source>
         <translation>s</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="476"/>
-        <location filename="../rhe_widget.cpp" line="480"/>
+        <location filename="../rhe_widget.cpp" line="481"/>
+        <location filename="../rhe_widget.cpp" line="485"/>
         <source>ms</source>
         <translation>ms</translation>
     </message>
@@ -571,54 +576,54 @@
         <translation type="vanished">us</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="651"/>
+        <location filename="../rhe_widget.cpp" line="656"/>
         <source>Root-folder cannot be as project-folder</source>
         <translation>Root-folder cannot be as project-folder</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="691"/>
+        <location filename="../rhe_widget.cpp" line="696"/>
         <source>Folder with project not chosen</source>
         <translation>Folder with project not chosen</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="696"/>
+        <location filename="../rhe_widget.cpp" line="701"/>
         <source>Project not fittered</source>
         <translation>Project not fittered</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="706"/>
+        <location filename="../rhe_widget.cpp" line="711"/>
         <source>sof-file not generated</source>
         <translation>sof-file not generated</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="771"/>
+        <location filename="../rhe_widget.cpp" line="776"/>
         <source>Count of pins in board list are greater than in project(for current FPGA: </source>
         <translation>Count of pins in board list are greater than in project(for current FPGA: </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="779"/>
-        <location filename="../rhe_widget.cpp" line="782"/>
+        <location filename="../rhe_widget.cpp" line="784"/>
+        <location filename="../rhe_widget.cpp" line="787"/>
         <source>&apos; for pin </source>
         <translation>&apos; for pin </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="779"/>
+        <location filename="../rhe_widget.cpp" line="784"/>
         <source>In project, direction &apos;</source>
         <translation>In project, direction &apos;</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="779"/>
-        <location filename="../rhe_widget.cpp" line="782"/>
+        <location filename="../rhe_widget.cpp" line="784"/>
+        <location filename="../rhe_widget.cpp" line="787"/>
         <source> isn&apos;t correct, set &apos;</source>
         <translation> isn&apos;t correct, set &apos;</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="782"/>
+        <location filename="../rhe_widget.cpp" line="787"/>
         <source>In project, I/O Standart &apos;</source>
         <translation>In project, I/O Standart &apos;</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="757"/>
+        <location filename="../rhe_widget.cpp" line="762"/>
         <source> for board </source>
         <translation> for board </translation>
     </message>
@@ -627,17 +632,17 @@
         <translation type="vanished">Board picture at </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="537"/>
+        <location filename="../rhe_widget.cpp" line="542"/>
         <source> not found</source>
         <translation> not found</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="757"/>
+        <location filename="../rhe_widget.cpp" line="762"/>
         <source>FPGA in project isn&apos;t </source>
         <translation>FPGA in project isn&apos;t </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="791"/>
+        <location filename="../rhe_widget.cpp" line="796"/>
         <source>Pins in board list doesn&apos;t exist in project(for current FPGA: </source>
         <translation>Pins in board list doesn&apos;t exist in project(for current FPGA: </translation>
     </message>
@@ -650,25 +655,25 @@
         <translation type="vanished">Cannot open </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="845"/>
+        <location filename="../rhe_widget.cpp" line="850"/>
         <source>&apos;jtag_id_code&apos; in board list doesn&apos;t exist for board: </source>
         <translation>&apos;jtag_id_code&apos; in board list doesn&apos;t exist for board: </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="48"/>
-        <location filename="../rhe_widget.cpp" line="483"/>
+        <location filename="../rhe_widget.cpp" line="49"/>
+        <location filename="../rhe_widget.cpp" line="488"/>
         <source>Firmware Sended</source>
         <translation>Firmware Sended</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="48"/>
-        <location filename="../rhe_widget.cpp" line="483"/>
+        <location filename="../rhe_widget.cpp" line="49"/>
+        <location filename="../rhe_widget.cpp" line="488"/>
         <source>FPGA Flashing</source>
         <translation>FPGA Flashing</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.cpp" line="48"/>
-        <location filename="../rhe_widget.cpp" line="483"/>
+        <location filename="../rhe_widget.cpp" line="49"/>
+        <location filename="../rhe_widget.cpp" line="488"/>
         <source>FPGA Flashed</source>
         <translation>FPGA Flashed</translation>
     </message>
@@ -753,42 +758,42 @@
         <translation>Last Name</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="49"/>
-        <location filename="../registration_widget.cpp" line="57"/>
-        <location filename="../registration_widget.cpp" line="81"/>
-        <location filename="../registration_widget.cpp" line="85"/>
-        <location filename="../registration_widget.cpp" line="95"/>
-        <location filename="../registration_widget.cpp" line="107"/>
+        <location filename="../registration_widget.cpp" line="48"/>
+        <location filename="../registration_widget.cpp" line="56"/>
+        <location filename="../registration_widget.cpp" line="79"/>
+        <location filename="../registration_widget.cpp" line="83"/>
+        <location filename="../registration_widget.cpp" line="93"/>
+        <location filename="../registration_widget.cpp" line="105"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="49"/>
+        <location filename="../registration_widget.cpp" line="48"/>
         <source>The same login does already exist</source>
         <translation>The same login does already exist</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="57"/>
+        <location filename="../registration_widget.cpp" line="56"/>
         <source>Enter login, password, first and last names</source>
         <translation>Enter login, password, first and last names</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="95"/>
+        <location filename="../registration_widget.cpp" line="93"/>
         <source>Can&apos;t init connection</source>
         <translation>Can&apos;t init connection</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="107"/>
+        <location filename="../registration_widget.cpp" line="105"/>
         <source>Can&apos;t get ID</source>
         <translation>Can&apos;t get ID</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="81"/>
+        <location filename="../registration_widget.cpp" line="79"/>
         <source>You enter wrong login or password</source>
         <translation>You enter wrong login or password</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="85"/>
+        <location filename="../registration_widget.cpp" line="83"/>
         <source>Enter login and password</source>
         <translation>Enter login and password</translation>
     </message>
@@ -796,35 +801,35 @@
 <context>
     <name>Send_Recieve_Module</name>
     <message>
-        <location filename="../send_recieve_module.cpp" line="85"/>
-        <location filename="../send_recieve_module.cpp" line="90"/>
-        <location filename="../send_recieve_module.cpp" line="118"/>
-        <location filename="../send_recieve_module.cpp" line="342"/>
+        <location filename="../send_recieve_module.cpp" line="78"/>
+        <location filename="../send_recieve_module.cpp" line="83"/>
+        <location filename="../send_recieve_module.cpp" line="111"/>
+        <location filename="../send_recieve_module.cpp" line="347"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="76"/>
+        <location filename="../send_recieve_module.cpp" line="69"/>
         <source>Server answer PING</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="80"/>
+        <location filename="../send_recieve_module.cpp" line="73"/>
         <source>Slave server answer PING</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="85"/>
+        <location filename="../send_recieve_module.cpp" line="78"/>
         <source>You are dropped</source>
         <translation>Server disabled</translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="90"/>
+        <location filename="../send_recieve_module.cpp" line="83"/>
         <source>Can&apos;t get ID from Server - no more places</source>
         <translation>Can&apos;t get ID from Server - no more places</translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="118"/>
+        <location filename="../send_recieve_module.cpp" line="111"/>
         <source>Selected board not available</source>
         <translation>Selected board not available</translation>
     </message>
@@ -833,7 +838,7 @@
         <translation type="vanished">Run debug firstly</translation>
     </message>
     <message>
-        <location filename="../send_recieve_module.cpp" line="342"/>
+        <location filename="../send_recieve_module.cpp" line="347"/>
         <source>Server disconnected</source>
         <translation>Server disconnected</translation>
     </message>

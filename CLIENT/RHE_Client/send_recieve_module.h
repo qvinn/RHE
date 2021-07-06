@@ -2,6 +2,7 @@
     #define SEND_RECIEVE_MODULE_H
 
     #include <QTcpSocket>
+    #include <QWriteLocker>
     #include "general_widget.h"
 
     #define CS_ERROR 1
@@ -91,6 +92,7 @@
 
             void init_connection();
             void get_id_for_client();
+            void get_update_data();
             void wait_analize_recv_data();
             void ping_to_server();
             void ping_to_S_server();
@@ -100,10 +102,11 @@
             bool send_file_to_ss(QByteArray File_byteArray, int strt_sndng_val, int cntns_sndng_val, int end_sndng_val);
             bool send_file_to_ss_universal(QByteArray File_byteArray, int file_code);
             void set_disconnected();
+            QString get_FPGA_id();
             void set_FPGA_id(QString FPGA_id);
             void flash_FPGA();
             void send_swtches_states(QByteArray data);
-            void analyze_data_dir();
+
 
             typedef struct pin_in_Packet {		// 48 байта
                 char pinName[5];                // 5 байт
@@ -140,16 +143,16 @@
             bool establish_socket();
             void send_U_Packet(int code_op, QByteArray data);
             void set_client_id(int id);
+            QByteArray analyze_data_dir();
             QByteArray form_send_file_packet(QByteArray *data);
             int start_recive_file();
             int rcv_new_data_for_file(char *buf);
             int end_recive_file();
 
-            void start_rcv_U_File(char *data);
-            void create_empty_U_File(int file_code);
+            void start_rcv_U_File();
             void rcv_U_File(char *data);
-            void end_rcv_U_File(char *data);
-            void read_upd_task_file(std::string filename, std::vector<std::string> *file_names, std::vector<int> *tasks_codes);
+            void end_rcv_U_File();
+            void read_upd_task_file(QString filename, QList<QString> *file_names, QList<int> *tasks_codes);
 
             General_Widget *gen_widg = nullptr;
             QTcpSocket *socket = nullptr;
@@ -162,20 +165,20 @@
             bool manual_disconnect = false;
             bool connected = false;
 
-            QByteArray upd_file;
             int upd_files_counter = 0;
-            QVector<QString> upd_files_list;
+            QList<QString> upd_files_list;
 
             int curr_rcv_file; // Переменная, которая оозначает тип файла, который может приниматься в текущий момент
 
         signals:
-            void link_established(bool flg);
-            void id_received(int state);
+            void link_established_signal(bool flg);
+            void id_received_signal(bool flg);
+            void data_updated_signal(bool flg);
             void logout_signal();
             void firmware_file_recieved_signal();
             void sequence_file_recieved_signal(bool flg);
             void fpga_flashed_signal();
-            void debug_not_started();
+            void debug_not_started_signal();
             void end_debugging_signal();
             void end_sequence_of_signals_signal();
             void choose_board_signal(QString jtag_code);

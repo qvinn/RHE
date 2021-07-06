@@ -25,7 +25,7 @@
 
         private:
             void link_established(bool flg);
-            void id_received(int state);
+            void id_received(bool flg);
 
             Ui::RegistrationWidget *ui;
             General_Widget *gen_widg = nullptr;
@@ -44,7 +44,6 @@
             void init_connection_signal();
             void get_id_for_client_signal();
             void logined_signal(bool flg);
-            void analyze_data_dir_signal();
     };
 
 #endif // REGISTRATION_H

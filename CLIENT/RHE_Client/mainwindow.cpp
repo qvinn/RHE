@@ -21,11 +21,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(gen_widg, &General_Widget::re_translate_signal, this, &MainWindow::slot_re_translate);
     connect(gen_widg, &General_Widget::re_translate_signal, ptr_registration_widg, &RegistrationWidget::slot_re_translate);
     connect(gen_widg, &General_Widget::re_translate_signal, ptr_RHE_widg, &RHE_Widget::slot_re_translate);
-    connect(snd_rcv_module, &Send_Recieve_Module::logout_signal, this, &MainWindow::logout);
-    connect(this, &MainWindow::set_disconnected_signal, snd_rcv_module, &Send_Recieve_Module::set_disconnected);
     connect(ptr_registration_widg, &RegistrationWidget::logined_signal, this, &MainWindow::logined);
+    connect(this, &MainWindow::update_data_signal, snd_rcv_module, &Send_Recieve_Module::get_update_data);
+    connect(this, &MainWindow::set_disconnected_signal, snd_rcv_module, &Send_Recieve_Module::set_disconnected);
+    connect(snd_rcv_module, &Send_Recieve_Module::data_updated_signal, this, &MainWindow::data_updated);
+    connect(snd_rcv_module, &Send_Recieve_Module::logout_signal, this, &MainWindow::logout);
     gen_widg->change_current_locale();
-    state_strs = {tr("Connecting To Server"), ""};
+    state_strs = {tr("Connecting To Server"), tr("Updating Data"), ""};
     tmr_waveform_viewer = new QTimer(this);
     connect(tmr_waveform_viewer, &QTimer::timeout, this, &MainWindow::slot_timer_waveform_viewer_timeout);
     tmr_waveform_viewer->stop();
@@ -310,6 +312,17 @@ void MainWindow::load_settings() {
 }
 
 //-------------------------------------------------------------------------
+// ENABLE/DISABLE OF SOME PUSH BUTTONS ON LOGIN STARTS
+//-------------------------------------------------------------------------
+void MainWindow::set_enable_login_buttons(bool flg) {
+    ui->prgrssBr_cnnctn_stat->setVisible(!flg);
+    ui->pshBttn_register->setEnabled(flg);
+    ui->pshBttn_login_logout->setEnabled(flg);
+    pshBttn_set_srvr_ip->setEnabled(flg);
+    ui->prgrssBr_cnnctn_stat->setFormat(state_strs.at(crrnt_state_strs));
+}
+
+//-------------------------------------------------------------------------
 // START OF USER SESSION ON SERVER
 //-------------------------------------------------------------------------
 void MainWindow::login() {
@@ -321,14 +334,10 @@ void MainWindow::login() {
             gen_widg->show_message_box(tr("Warning"), tr("Change server-port in settings"), 0, gen_widg->get_position());
             return;
         }
-        ui->prgrssBr_cnnctn_stat->setVisible(true);
         crrnt_state_strs = 0;
-        ui->prgrssBr_cnnctn_stat->setFormat(state_strs.at(crrnt_state_strs));
         tmr_progress_bar->setInterval(200);
         tmr_progress_bar->start();
-        ui->pshBttn_register->setEnabled(false);
-        ui->pshBttn_login_logout->setEnabled(false);
-        pshBttn_set_srvr_ip->setEnabled(false);
+        set_enable_login_buttons(false);
         ptr_registration_widg->login();
     }
 }
@@ -339,13 +348,28 @@ void MainWindow::login() {
 void MainWindow::logined(bool flg) {
     tmr_progress_bar->stop();
     ui->prgrssBr_cnnctn_stat->setValue(ui->prgrssBr_cnnctn_stat->minimum());
-    crrnt_state_strs = 1;
-    ui->prgrssBr_cnnctn_stat->setFormat(state_strs.at(crrnt_state_strs));
-    ui->prgrssBr_cnnctn_stat->setVisible(false);
-    ui->pshBttn_register->setEnabled(true);
-    ui->pshBttn_login_logout->setEnabled(true);
-    pshBttn_set_srvr_ip->setEnabled(true);
     if(flg) {
+        gen_widg->check_is_data_dir_exist();
+        crrnt_state_strs = 1;
+        tmr_progress_bar->setInterval(200);
+        tmr_progress_bar->start();
+        emit update_data_signal();
+    } else {
+        crrnt_state_strs = 2;
+    }
+    set_enable_login_buttons(!flg);
+}
+
+//-------------------------------------------------------------------------
+// USER DATA UPDATED
+//-------------------------------------------------------------------------
+void MainWindow::data_updated(bool flg) {
+    tmr_progress_bar->stop();
+    ui->prgrssBr_cnnctn_stat->setValue(ui->prgrssBr_cnnctn_stat->minimum());
+    crrnt_state_strs = 2;
+    set_enable_login_buttons(true);
+    if(flg) {
+        ptr_RHE_widg->initialize_ui();
         ptr_RHE_widg->set_fname_lname(ptr_registration_widg->get_user_fname() + " " + ptr_registration_widg->get_user_lname());
         ui->pshBttn_register->hide();
         ui->stackedWidget->setCurrentWidget(ptr_RHE_widg);
@@ -361,7 +385,8 @@ void MainWindow::logout() {
         ui->pshBttn_login_logout->setText(tr("Login"));
         ui->pshBttn_register->show();
         ui->stackedWidget->setCurrentWidget(ptr_registration_widg);
-        ptr_RHE_widg->initialize_ui();
+    } else {
+        logined(false);
     }
 }
 

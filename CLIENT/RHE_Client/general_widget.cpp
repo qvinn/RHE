@@ -17,6 +17,7 @@ General_Widget::General_Widget() {
     files_list = new QStringList();
     settings = new QSettings(app_path + "/settings.cfg", QSettings::IniFormat);
     create_base_settings();
+    check_is_data_dir_exist();
 #ifdef __linux__
     QString icon_path = (app_path + "/" + get_setting("settings/PATH_TO_DATA").toString() + "icon.png");
     check_is_icon_exist(icon_path);
@@ -120,7 +121,6 @@ void General_Widget::create_base_settings() {
     check_setting_exist("settings/BOARDS_LIST_FILENAME", "Boards_List.xml");
     check_setting_exist("settings/SERVER_IP", "0.0.0.0");
     check_setting_exist("settings/SERVER_PORT", -1);
-    check_setting_exist("settings/VERSION", "1.0");
     check_setting_exist("settings/DEBUG_DISCRETENESS_TIME", 1);
     check_setting_exist("settings/DEBUG_DISCRETENESS_TIME_TYPE", 0);
     check_setting_exist("settings/START_DEBUG_AFTER_FPGA_FLASHING", 0);
@@ -158,6 +158,16 @@ void General_Widget::create_base_settings() {
 void General_Widget::check_setting_exist(QString type, QVariant val) {
     if(!settings->contains(type)) {
         save_setting(type, val);
+    }
+}
+
+//-------------------------------------------------------------------------
+// CHECK EXISTANCE OF DATA DIRECTORY
+//-------------------------------------------------------------------------
+void General_Widget::check_is_data_dir_exist() {
+    QString data_path = (app_path + "/" + get_setting("settings/PATH_TO_DATA").toString());
+    if(!QDir(data_path).exists()) {
+        QDir().mkdir(data_path);
     }
 }
 

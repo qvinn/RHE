@@ -84,6 +84,8 @@
             QPixmap pixmp_brd;
             QByteArray input_pins_states;
 
+            Send_Recieve_Module *snd_rcv_module = nullptr;
+
             bool qpf_exist = false;
             bool fit_exist = false;
             bool path_exist = false;
