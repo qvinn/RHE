@@ -33,7 +33,8 @@
 
             Ui::MainWindow *ui;
             General_Widget *gen_widg = nullptr;
-            Send_Recieve_Module *snd_rcv_module = nullptr;
+            Send_Receive_Module *snd_rcv_module;
+            Data_Transfer_Module *data_transfer_module = nullptr;
             RegistrationWidget *ptr_registration_widg = nullptr;
             RHE_Widget *ptr_RHE_widg = nullptr;
             Waveform_Viewer_Widget *wvfrm_vwr = nullptr;
@@ -51,7 +52,8 @@
             QTimer *tmr_waveform_viewer = nullptr;
             QTimer *tmr_progress_bar = nullptr;
             QList<QString> state_strs;
-            QThread thread;
+            QThread thread_data_trnsfr_mod;
+            QThread thread_send_recv_mod;
 
             bool ui_initialized = false;
             bool language_changed = false;

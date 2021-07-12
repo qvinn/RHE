@@ -19,7 +19,7 @@ General_Widget::General_Widget() {
     create_base_settings();
     check_is_data_dir_exist();
 #ifdef __linux__
-    QString icon_path = (app_path + "/" + get_setting("settings/PATH_TO_DATA").toString() + "icon.png");
+    QString icon_path = (app_path + "/" + "icon.png");
     check_is_icon_exist(icon_path);
     qApp->setWindowIcon(QIcon(icon_path));
 #endif

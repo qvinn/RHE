@@ -6,11 +6,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->setupUi(this);
     gen_widg = new General_Widget();
     QDir::setCurrent(gen_widg->get_app_path());
-    snd_rcv_module = new Send_Recieve_Module(gen_widg);
-    snd_rcv_module->moveToThread(&thread);
-    thread.start();
-    ptr_registration_widg = new RegistrationWidget(this, gen_widg, snd_rcv_module);
-    ptr_RHE_widg = new RHE_Widget(this, gen_widg, snd_rcv_module);
+    snd_rcv_module = new Send_Receive_Module(gen_widg);
+    data_transfer_module = new Data_Transfer_Module(gen_widg);
+    ptr_registration_widg = new RegistrationWidget(this, gen_widg, data_transfer_module, snd_rcv_module);
+    ptr_RHE_widg = new RHE_Widget(this, gen_widg, data_transfer_module);
     ui->stackedWidget->addWidget(ptr_registration_widg);
     ui->stackedWidget->addWidget(ptr_RHE_widg);
     ui->stackedWidget->setCurrentWidget(ptr_registration_widg);
@@ -18,14 +17,24 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     set_ui_text();
     load_settings();
     connect(ptr_RHE_widg, &RHE_Widget::resize_signal, this, &MainWindow::slot_re_size);
+    connect(ptr_RHE_widg, &RHE_Widget::set_disconnected_signal, snd_rcv_module, &Send_Receive_Module::set_disconnected);
     connect(gen_widg, &General_Widget::re_translate_signal, this, &MainWindow::slot_re_translate);
     connect(gen_widg, &General_Widget::re_translate_signal, ptr_registration_widg, &RegistrationWidget::slot_re_translate);
     connect(gen_widg, &General_Widget::re_translate_signal, ptr_RHE_widg, &RHE_Widget::slot_re_translate);
     connect(ptr_registration_widg, &RegistrationWidget::logined_signal, this, &MainWindow::logined);
-    connect(this, &MainWindow::update_data_signal, snd_rcv_module, &Send_Recieve_Module::get_update_data);
-    connect(this, &MainWindow::set_disconnected_signal, snd_rcv_module, &Send_Recieve_Module::set_disconnected);
-    connect(snd_rcv_module, &Send_Recieve_Module::data_updated_signal, this, &MainWindow::data_updated);
-    connect(snd_rcv_module, &Send_Recieve_Module::logout_signal, this, &MainWindow::logout);
+    connect(this, &MainWindow::update_data_signal, data_transfer_module, &Data_Transfer_Module::get_update_data);
+    connect(this, &MainWindow::set_disconnected_signal, snd_rcv_module, &Send_Receive_Module::set_disconnected);
+    connect(snd_rcv_module, &Send_Receive_Module::logout_signal, this, &MainWindow::logout);
+    connect(snd_rcv_module, &Send_Receive_Module::received_data, data_transfer_module, &Data_Transfer_Module::analyze_recv_data, Qt::QueuedConnection);
+    connect(snd_rcv_module, &Send_Receive_Module::reset_ID_signal, data_transfer_module, &Data_Transfer_Module::reset_ID);
+    connect(snd_rcv_module, &Send_Receive_Module::clear_FPGA_id_code_signal, data_transfer_module, &Data_Transfer_Module::clear_FPGA_id_code_slot);
+    connect(data_transfer_module, &Data_Transfer_Module::data_updated_signal, this, &MainWindow::data_updated);
+    connect(data_transfer_module, &Data_Transfer_Module::set_disconnected_signal, snd_rcv_module, &Send_Receive_Module::set_disconnected);
+    connect(data_transfer_module, &Data_Transfer_Module::send_data_signal, snd_rcv_module, &Send_Receive_Module::send_data, Qt::QueuedConnection);
+    snd_rcv_module->moveToThread(&thread_send_recv_mod);
+    data_transfer_module->moveToThread(&thread_data_trnsfr_mod);
+    thread_send_recv_mod.start();
+    thread_data_trnsfr_mod.start();
     gen_widg->change_current_locale();
     state_strs = {tr("Connecting To Server"), tr("Updating Data"), ""};
     tmr_waveform_viewer = new QTimer(this);
@@ -37,7 +46,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
 MainWindow::~MainWindow() {
 //    thread.terminate();
-    thread.quit();
+    thread_send_recv_mod.quit();
+    thread_data_trnsfr_mod.quit();
     disconnect(tmr_waveform_viewer, &QTimer::timeout, this, &MainWindow::slot_timer_waveform_viewer_timeout);
     slot_timer_waveform_viewer_timeout();
     delete tmr_waveform_viewer;
@@ -55,6 +65,7 @@ MainWindow::~MainWindow() {
     delete menu_settngs;
     delete menu_bar;
 //    delete snd_rcv_module;
+//    delete data_transfer_module
     delete gen_widg;
     delete ui;
 }
@@ -77,7 +88,6 @@ void MainWindow::resizeEvent(QResizeEvent *) {
     ui->horizontalLayoutWidget->setGeometry(0, (this->height() - ui->horizontalLayoutWidget->height()), this->width(), ui->horizontalLayoutWidget->height());
     ui->verticalLayoutWidget->resize(this->width(), (this->height() - ui->horizontalLayoutWidget->height()));
     ui->stackedWidget->setGeometry(0, (menu_bar->height() + ui->line_1->height()), this->width(), (ui->verticalLayoutWidget->height() - menu_bar->height() - (2 * ui->line_1->height())));
-//    gen_widg->set_position(QPoint((this->pos().x() + (this->width() / 2)), (this->pos().y() + (this->height() / 2))));
 }
 
 //-------------------------------------------------------------------------

@@ -1,8 +1,6 @@
-#ifndef SEND_RECIEVE_MODULE_H
-    #define SEND_RECIEVE_MODULE_H
+#ifndef DATA_TRANSFER_MODULE_H
+    #define DATA_TRANSFER_MODULE_H
 
-    #include <QTcpSocket>
-    #include <QWriteLocker>
     #include "general_widget.h"
 
     #define CS_ERROR 1
@@ -78,22 +76,16 @@
     #define FILE_D_UPDATE	1
     #define FILE_D_DELETE	2
 
-    class Send_Recieve_Module : public QObject {
+    class Data_Transfer_Module : public QObject {
         Q_OBJECT
-
-        struct U_packet {
-            int code_op;    // 4 байта
-            char data[DATA_BUFFER];
-        };
-
         public:
-            Send_Recieve_Module(General_Widget *widg = nullptr);
-            ~Send_Recieve_Module() override;
+            Data_Transfer_Module(General_Widget *widg = nullptr);
+            ~Data_Transfer_Module() override;
 
-            void init_connection();
+            void clear_FPGA_id_code_slot();
             void get_id_for_client();
             void get_update_data();
-            void wait_analize_recv_data();
+            void analyze_recv_data(QByteArray recv);
             void ping_to_server();
             void ping_to_S_server();
             void start_debug(quint16 dscrt_tm, quint8 dscrt_tm_tp, int flag);
@@ -101,12 +93,16 @@
             void start_sequence_of_signals();
             bool send_file_to_ss(QByteArray File_byteArray, int strt_sndng_val, int cntns_sndng_val, int end_sndng_val);
             bool send_file_to_ss_universal(QByteArray File_byteArray, int file_code);
-            void set_disconnected();
-            QString get_FPGA_id();
+            void get_FPGA_id();
             void set_FPGA_id(QString FPGA_id);
             void flash_FPGA();
             void send_swtches_states(QByteArray data);
+            void reset_ID();
 
+            struct U_packet {
+                int code_op;    // 4 байта
+                char data[DATA_BUFFER];
+            };
 
             typedef struct pin_in_Packet {		// 48 байта
                 char pinName[5];                // 5 байт
@@ -137,10 +133,6 @@
             } set_state_Packet;
 
         private:
-            void server_disconnected();
-            void close_connection();
-            void reset_ID();
-            bool establish_socket();
             void send_U_Packet(int code_op, QByteArray data);
             void set_client_id(int id);
             QByteArray analyze_data_dir();
@@ -148,35 +140,29 @@
             int start_recive_file();
             int rcv_new_data_for_file(char *buf);
             int end_recive_file();
-
             void start_rcv_U_File();
             void rcv_U_File(char *data);
             void end_rcv_U_File();
             void read_upd_task_file(QString filename, QList<QString> *file_names, QList<int> *tasks_codes);
 
             General_Widget *gen_widg = nullptr;
-            QTcpSocket *socket = nullptr;
             QFile *file = nullptr;
             QString FPGA_id_code = "";
+            QList<QString> upd_files_list;
+            QByteArray send_buff_arr;
 
             int file_rcv_bytes_count = 0;
             int last_send_file_bytes = 0;
             int my_client_ID = -1;              // INIT_ID
-            bool manual_disconnect = false;
-            bool connected = false;
-
             int upd_files_counter = 0;
-            QList<QString> upd_files_list;
-
             int curr_rcv_file; // Переменная, которая оозначает тип файла, который может приниматься в текущий момент
 
         signals:
-            void link_established_signal(bool flg);
             void id_received_signal(bool flg);
+            void set_FPGA_id_signal(QString jtag_id_code);
             void data_updated_signal(bool flg);
-            void logout_signal();
-            void firmware_file_recieved_signal();
-            void sequence_file_recieved_signal(bool flg);
+            void firmware_file_received_signal();
+            void sequence_file_received_signal(bool flg);
             void fpga_flashed_signal();
             void debug_not_started_signal();
             void end_debugging_signal();
@@ -188,6 +174,8 @@
             void accept_input_data_table_signal(QByteArray input_data_table);
             void accept_output_data_table_signal(QByteArray output_data_table);
             void show_message_box_signal(QString str1, QString str2, int type, QPoint position);
+            void set_disconnected_signal();
+            void send_data_signal(QByteArray send_buf);
     };
 
-#endif // SEND_RECIEVE_MODULE_H
+#endif // DATA_TRANSFER_MODULE_H

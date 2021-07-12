@@ -1,7 +1,7 @@
 #include "rhe_widget.h"
 #include "ui_rhe_widget.h"
 
-RHE_Widget::RHE_Widget(QWidget *parent, General_Widget *widg, Send_Recieve_Module *snd_rcv_mod) : QWidget(parent), ui(new Ui::RHE_Widget) {
+RHE_Widget::RHE_Widget(QWidget *parent, General_Widget *widg, Data_Transfer_Module *data_transfer_mod) : QWidget(parent), ui(new Ui::RHE_Widget) {
     ui->setupUi(this);
     this->setGeometry(parent->x(), parent->y(), parent->width(), parent->height());
     gen_widg = widg;
@@ -23,26 +23,27 @@ RHE_Widget::RHE_Widget(QWidget *parent, General_Widget *widg, Send_Recieve_Modul
     wvfrm_vwr = new Waveform_Viewer_Widget(this, gen_widg, false);
     connect(wvfrm_vwr, &Waveform_Viewer_Widget::as_window_signal, this, &RHE_Widget::slot_as_window);
     connect(gen_widg, &General_Widget::re_translate_signal, wvfrm_vwr, &Waveform_Viewer_Widget::slot_re_translate);
-    connect(snd_rcv_mod, &Send_Recieve_Module::fpga_flashed_signal, this, &RHE_Widget::slot_fpga_flashed);
-//    connect(snd_rcv_mod, &Send_Recieve_Module::debug_not_started, this, &RHE_Widget::slot_end_sequence_of_signals);            //////////////
-    connect(snd_rcv_mod, &Send_Recieve_Module::end_sequence_of_signals_signal, this, &RHE_Widget::slot_end_sequence_of_signals);
-    connect(snd_rcv_mod, &Send_Recieve_Module::firmware_file_recieved_signal, this, &RHE_Widget::slot_firmware_file_sended);
-    connect(snd_rcv_mod, &Send_Recieve_Module::sequence_file_recieved_signal, this, &RHE_Widget::slot_sequence_of_signals_file_sended);
-    connect(snd_rcv_mod, &Send_Recieve_Module::end_debugging_signal, this, &RHE_Widget::on_pshBttn_stp_dbg_clicked);
-    connect(snd_rcv_mod, &Send_Recieve_Module::choose_board_signal, this, &RHE_Widget::slot_choose_board);
-    connect(snd_rcv_mod, &Send_Recieve_Module::accept_board_signal, this, &RHE_Widget::slot_accept_board);
-    connect(snd_rcv_mod, &Send_Recieve_Module::accept_debug_time_limit_signal, this, &RHE_Widget::slot_accept_debug_time_limit);
-    connect(snd_rcv_mod, &Send_Recieve_Module::accept_debug_data_signal, this, &RHE_Widget::slot_accept_debug_data);
-    connect(snd_rcv_mod, &Send_Recieve_Module::accept_input_data_table_signal, this, &RHE_Widget::slot_accept_input_data_table);
-    connect(snd_rcv_mod, &Send_Recieve_Module::accept_output_data_table_signal, this, &RHE_Widget::slot_accept_output_data_table);
-    connect(this, &RHE_Widget::set_FPGA_id_signal, snd_rcv_mod, &Send_Recieve_Module::set_FPGA_id);
-    connect(this, &RHE_Widget::flash_FPGA_signal, snd_rcv_mod, &Send_Recieve_Module::flash_FPGA);
-    connect(this, &RHE_Widget::send_file_to_ss_signal, snd_rcv_mod, &Send_Recieve_Module::send_file_to_ss);
-    connect(this, &RHE_Widget::start_debug_signal, snd_rcv_mod, &Send_Recieve_Module::start_debug);
-    connect(this, &RHE_Widget::stop_debug_signal, snd_rcv_mod, &Send_Recieve_Module::stop_debug);
-    connect(this, &RHE_Widget::start_sequence_of_signals_signal, snd_rcv_mod, &Send_Recieve_Module::start_sequence_of_signals);
-    connect(this, &RHE_Widget::send_swtches_states_signal, snd_rcv_mod, &Send_Recieve_Module::send_swtches_states);
-    snd_rcv_module = snd_rcv_mod;
+    connect(data_transfer_mod, &Data_Transfer_Module::set_FPGA_id_signal, this, &RHE_Widget::post_post_initialize_ui);
+    connect(data_transfer_mod, &Data_Transfer_Module::fpga_flashed_signal, this, &RHE_Widget::slot_fpga_flashed);
+//    connect(data_transfer_mod, &Data_Transfer_Module::debug_not_started, this, &RHE_Widget::slot_end_sequence_of_signals);            //////////////
+    connect(data_transfer_mod, &Data_Transfer_Module::end_sequence_of_signals_signal, this, &RHE_Widget::slot_end_sequence_of_signals);
+    connect(data_transfer_mod, &Data_Transfer_Module::firmware_file_received_signal, this, &RHE_Widget::slot_firmware_file_sended);
+    connect(data_transfer_mod, &Data_Transfer_Module::sequence_file_received_signal, this, &RHE_Widget::slot_sequence_of_signals_file_sended);
+    connect(data_transfer_mod, &Data_Transfer_Module::end_debugging_signal, this, &RHE_Widget::on_pshBttn_stp_dbg_clicked);
+    connect(data_transfer_mod, &Data_Transfer_Module::choose_board_signal, this, &RHE_Widget::slot_choose_board);
+    connect(data_transfer_mod, &Data_Transfer_Module::accept_board_signal, this, &RHE_Widget::slot_accept_board);
+    connect(data_transfer_mod, &Data_Transfer_Module::accept_debug_time_limit_signal, this, &RHE_Widget::slot_accept_debug_time_limit);
+    connect(data_transfer_mod, &Data_Transfer_Module::accept_debug_data_signal, this, &RHE_Widget::slot_accept_debug_data);
+    connect(data_transfer_mod, &Data_Transfer_Module::accept_input_data_table_signal, this, &RHE_Widget::slot_accept_input_data_table);
+    connect(data_transfer_mod, &Data_Transfer_Module::accept_output_data_table_signal, this, &RHE_Widget::slot_accept_output_data_table);
+    connect(this, &RHE_Widget::get_FPGA_id_signal, data_transfer_mod, &Data_Transfer_Module::get_FPGA_id);
+    connect(this, &RHE_Widget::set_FPGA_id_signal, data_transfer_mod, &Data_Transfer_Module::set_FPGA_id);
+    connect(this, &RHE_Widget::flash_FPGA_signal, data_transfer_mod, &Data_Transfer_Module::flash_FPGA);
+    connect(this, &RHE_Widget::send_file_to_ss_signal, data_transfer_mod, &Data_Transfer_Module::send_file_to_ss);
+    connect(this, &RHE_Widget::start_debug_signal, data_transfer_mod, &Data_Transfer_Module::start_debug);
+    connect(this, &RHE_Widget::stop_debug_signal, data_transfer_mod, &Data_Transfer_Module::stop_debug);
+    connect(this, &RHE_Widget::start_sequence_of_signals_signal, data_transfer_mod, &Data_Transfer_Module::start_sequence_of_signals);
+    connect(this, &RHE_Widget::send_swtches_states_signal, data_transfer_mod, &Data_Transfer_Module::send_swtches_states);
     prev_vals = new QList<int>();
     pi_pins_nums = new QList<int>();
     send_file_status = new QTimer(nullptr);
@@ -404,7 +405,6 @@ void RHE_Widget::scrll_area_sgnls_set_enabled(bool flag) {
 void RHE_Widget::pre_initialize_ui() {
     wvfrm_vwr->initialize_ui();
     ui->verticalLayout_3->addWidget(wvfrm_vwr);
-//    initialize_ui();
 }
 
 //-------------------------------------------------------------------------
@@ -430,8 +430,9 @@ void RHE_Widget::initialize_ui() {
     if(ui->cmbBx_chs_brd->count() == 0) {
         if(read_xml_file(false)) {
             post_initialize_ui();
-//        } else {
+        } else {
 //            QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
+            emit set_disconnected_signal();
         }
     } else {
         post_initialize_ui();
@@ -448,8 +449,15 @@ void RHE_Widget::post_initialize_ui() {
     dbg_strtd = false;
     sqnc_of_sgnls_strtd = false;
     set_ui_text();
+    emit get_FPGA_id_signal();
+}
+
+//-------------------------------------------------------------------------
+// POST-POST-INITIALIZING OF UI COMPONENTS
+//-------------------------------------------------------------------------
+void RHE_Widget::post_post_initialize_ui(QString jtag_id_code) {
     for(int i = 0; i < jtag_id_codes->count(); i++) {
-        if(jtag_id_codes->at(i).compare(snd_rcv_module->get_FPGA_id(), Qt::CaseInsensitive) == 0) {
+        if(jtag_id_codes->at(i).compare(jtag_id_code, Qt::CaseInsensitive) == 0) {
             prev_board_index = i;
         }
     }
@@ -918,17 +926,17 @@ void RHE_Widget::add_data_to_qpoint(QList<QPoint> *lst, int val, bool is_x) {
 void RHE_Widget::slot_input_val_changed(int val) {
     int pos = (val - (val % 2)) / 2;
     inpt_stts->at(pos)->display(val % 2);
-    Send_Recieve_Module::set_state_Packet *switches_states = reinterpret_cast<Send_Recieve_Module::set_state_Packet *>(malloc(sizeof(Send_Recieve_Module::set_state_Packet)));
-    memset(switches_states, 0, sizeof(Send_Recieve_Module::set_state_Packet));
+    Data_Transfer_Module::set_state_Packet *switches_states = reinterpret_cast<Data_Transfer_Module::set_state_Packet *>(malloc(sizeof(Data_Transfer_Module::set_state_Packet)));
+    memset(switches_states, 0, sizeof(Data_Transfer_Module::set_state_Packet));
     switches_states->pin_count = static_cast<uint8_t>(inpt_sldrs->count());
     for(int i = 0; i < inpt_sldrs->count(); i++) {
-        Send_Recieve_Module::set_state switch_state;
+        Data_Transfer_Module::set_state switch_state;
         switch_state.pinNum = static_cast<uint8_t>(pi_pins_nums->at(i));
         switch_state.state = static_cast<uint8_t>(inpt_sldrs->at(i)->value() % 2);
         switches_states->pins[i] = switch_state;
     }
     input_pins_states.clear();
-    input_pins_states.append(QByteArray::fromRawData(reinterpret_cast<const char*>(switches_states), sizeof(Send_Recieve_Module::set_state_Packet)));
+    input_pins_states.append(QByteArray::fromRawData(reinterpret_cast<const char*>(switches_states), sizeof(Data_Transfer_Module::set_state_Packet)));
     emit send_swtches_states_signal(input_pins_states);
     free(switches_states);
 }
@@ -993,7 +1001,7 @@ void RHE_Widget::slot_accept_debug_time_limit(int time, int time_type) {
 // RECEIVE DEBUG DATA FROM SERVER
 //-------------------------------------------------------------------------
 void RHE_Widget::slot_accept_debug_data(QByteArray debug_data) {
-    Send_Recieve_Module::debug_log_Packet *tmp_packet = reinterpret_cast<Send_Recieve_Module::debug_log_Packet *>(debug_data.data());
+    Data_Transfer_Module::debug_log_Packet *tmp_packet = reinterpret_cast<Data_Transfer_Module::debug_log_Packet *>(debug_data.data());
     QList<int> val;
     val.clear();
     QList<QString> pin_names = *wvfrm_vwr->get_pin_names();

@@ -9,13 +9,14 @@ CONFIG += app c++11
 DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
+    data_transfer_module.cpp \
     general_widget.cpp \
     main.cpp \
     mainwindow.cpp \
     qcustomplot.cpp \
     registration_widget.cpp \
     rhe_widget.cpp \
-    send_recieve_module.cpp \
+    send_receive_module.cpp \
     waveform_viewer_widget.cpp
 
 FORMS += \
@@ -28,12 +29,13 @@ FORMS += \
     waveform_viewer.ui
 
 HEADERS += \
+    data_transfer_module.h \
     general_widget.h \
     mainwindow.h \
     qcustomplot.h \
     registration_widget.h \
     rhe_widget.h \
-    send_recieve_module.h \
+    send_receive_module.h \
     waveform_viewer_widget.h
 
 TRANSLATIONS += \

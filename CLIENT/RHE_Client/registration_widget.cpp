@@ -1,14 +1,14 @@
 #include "registration_widget.h"
 #include "ui_registration_widget.h"
 
-RegistrationWidget::RegistrationWidget(QWidget *parent, General_Widget *widg, Send_Recieve_Module *snd_rcv_mod) : QWidget(parent), ui(new Ui::RegistrationWidget) {
+RegistrationWidget::RegistrationWidget(QWidget *parent, General_Widget *widg, Data_Transfer_Module *data_transfer_mod, Send_Receive_Module *snd_rcv_mod) : QWidget(parent), ui(new Ui::RegistrationWidget) {
     ui->setupUi(this);
     this->setGeometry(parent->x(), parent->y(), parent->width(), parent->height());
     gen_widg = widg;
-    connect(this, &RegistrationWidget::init_connection_signal, snd_rcv_mod, &Send_Recieve_Module::init_connection);
-    connect(this, &RegistrationWidget::get_id_for_client_signal, snd_rcv_mod, &Send_Recieve_Module::get_id_for_client);
-    connect(snd_rcv_mod, &Send_Recieve_Module::link_established_signal, this, &RegistrationWidget::link_established);
-    connect(snd_rcv_mod, &Send_Recieve_Module::id_received_signal, this, &RegistrationWidget::id_received);
+    connect(this, &RegistrationWidget::init_connection_signal, snd_rcv_mod, &Send_Receive_Module::init_connection);
+    connect(this, &RegistrationWidget::get_id_for_client_signal, data_transfer_mod, &Data_Transfer_Module::get_id_for_client);
+    connect(snd_rcv_mod, &Send_Receive_Module::link_established_signal, this, &RegistrationWidget::link_established);
+    connect(data_transfer_mod, &Data_Transfer_Module::id_received_signal, this, &RegistrationWidget::id_received);
     account_info = new QSettings("TestRegistration.cfg", QSettings::IniFormat);
     ui->lineEdit_password->setEchoMode(QLineEdit::Password);
 }
@@ -97,7 +97,7 @@ void RegistrationWidget::link_established(bool flg) {
 }
 
 //-------------------------------------------------------------------------
-// SERVER RECIEVED USER ID
+// SERVER RECEIVED USER ID
 //-------------------------------------------------------------------------
 void RegistrationWidget::id_received(bool flg) {
     if(!flg) {

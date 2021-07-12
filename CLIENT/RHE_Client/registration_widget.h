@@ -2,8 +2,7 @@
     #define REGISTRATIONWIDGET_H
 
     #include <QRegularExpression>
-    #include "general_widget.h"
-    #include "send_recieve_module.h"
+    #include "send_receive_module.h"
 
     QT_BEGIN_NAMESPACE
     namespace Ui {
@@ -14,7 +13,7 @@
     class RegistrationWidget : public QWidget {
         Q_OBJECT
         public:
-            RegistrationWidget(QWidget *parent = nullptr, General_Widget *widg = nullptr, Send_Recieve_Module *snd_rcv_mod = nullptr);
+            RegistrationWidget(QWidget *parent = nullptr, General_Widget *widg = nullptr, Data_Transfer_Module *data_transfer_mod = nullptr, Send_Receive_Module *snd_rcv_mod = nullptr);
             ~RegistrationWidget() override;
 
             void login();

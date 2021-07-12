@@ -7,7 +7,7 @@
     #include <QResizeEvent>
     #include <QXmlStreamReader>
     #include "waveform_viewer_widget.h"
-    #include "send_recieve_module.h"
+    #include "data_transfer_module.h"
 
     QT_BEGIN_NAMESPACE
     namespace Ui {
@@ -18,7 +18,7 @@
     class RHE_Widget : public QWidget {
         Q_OBJECT
         public:
-            RHE_Widget(QWidget *parent = nullptr, General_Widget *widg = nullptr, Send_Recieve_Module *snd_rcv_mod = nullptr);
+            RHE_Widget(QWidget *parent = nullptr, General_Widget *widg = nullptr, Data_Transfer_Module *data_transfer_mod = nullptr);
             ~RHE_Widget() override;
 
             void pshBttn_set_path_to_proj_set_visible(bool flag);
@@ -37,6 +37,7 @@
         private:
             void pre_initialize_ui();
             void post_initialize_ui();
+            void post_post_initialize_ui(QString jtag_id_code);
             void set_ui_text();
             void change_cnt_of_dbg_pins(int value);
             void change_board_pixmap();
@@ -83,8 +84,6 @@
             QString lname_fname;
             QPixmap pixmp_brd;
             QByteArray input_pins_states;
-
-            Send_Recieve_Module *snd_rcv_module = nullptr;
 
             bool qpf_exist = false;
             bool fit_exist = false;
@@ -142,6 +141,8 @@
 
         signals:
             void resize_signal();
+            void set_disconnected_signal();
+            void get_FPGA_id_signal();
             void set_FPGA_id_signal(QString jtag_id_code);
             void flash_FPGA_signal();
             void send_file_to_ss_signal(QByteArray File_byteArray, int strt_sndng_val, int cntns_sndng_val, int end_sndng_val);
