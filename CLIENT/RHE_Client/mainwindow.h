@@ -102,6 +102,7 @@
             ~Dialog_Set_Server_IP() override;
 
         private:
+            void spinBox_roll_value(QSpinBox *spnBx, int val);
             void change_IP_item_focus(int val, int crrnt_item, int next_item);
 
             Ui::Dialog_Set_Server_IP *ui;

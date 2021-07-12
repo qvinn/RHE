@@ -518,52 +518,28 @@ void Dialog_Set_Server_IP::on_pshBttn_cncl_clicked() {
 // SET FIRST OCTET OF SERVER IP
 //-------------------------------------------------------------------------
 void Dialog_Set_Server_IP::on_spnBx_frst_octt_valueChanged(int val) {
-    if(ui_initialized) {
-        if(val < 0) {
-            ui->spnBx_frst_octt->setValue(ui->spnBx_frst_octt->maximum() - ui->spnBx_frst_octt->singleStep());
-        } else if((ui->spnBx_frst_octt->maximum() == val) || (val > ui->spnBx_frst_octt->maximum())) {
-            ui->spnBx_frst_octt->setValue(0);
-        }
-    }
+    spinBox_roll_value(ui->spnBx_frst_octt, val);
 }
 
 //-------------------------------------------------------------------------
 // SET SECOND OCTET OF SERVER IP
 //-------------------------------------------------------------------------
 void Dialog_Set_Server_IP::on_spnBx_scnd_octt_valueChanged(int val) {
-    if(ui_initialized) {
-        if(val < 0) {
-            ui->spnBx_scnd_octt->setValue(ui->spnBx_scnd_octt->maximum() - ui->spnBx_scnd_octt->singleStep());
-        } else if((ui->spnBx_scnd_octt->maximum() == val) || (val > ui->spnBx_scnd_octt->maximum())) {
-            ui->spnBx_scnd_octt->setValue(0);
-        }
-    }
+    spinBox_roll_value(ui->spnBx_scnd_octt, val);
 }
 
 //-------------------------------------------------------------------------
 // SET THIRD OCTET OF SERVER IP
 //-------------------------------------------------------------------------
 void Dialog_Set_Server_IP::on_spnBx_thrd_octt_valueChanged(int val) {
-    if(ui_initialized) {
-        if(val < 0) {
-            ui->spnBx_thrd_octt->setValue(ui->spnBx_thrd_octt->maximum() - ui->spnBx_thrd_octt->singleStep());
-        } else if((ui->spnBx_thrd_octt->maximum() == val) || (val > ui->spnBx_thrd_octt->maximum())) {
-            ui->spnBx_thrd_octt->setValue(0);
-        }
-    }
+    spinBox_roll_value(ui->spnBx_thrd_octt, val);
 }
 
 //-------------------------------------------------------------------------
 // SET FOURTH OCTET OF SERVER IP
 //-------------------------------------------------------------------------
 void Dialog_Set_Server_IP::on_spnBx_frth_octt_valueChanged(int val) {
-    if(ui_initialized) {
-        if(val < 0) {
-            ui->spnBx_frth_octt->setValue(ui->spnBx_frth_octt->maximum() - ui->spnBx_frth_octt->singleStep());
-        } else if((ui->spnBx_frth_octt->maximum() == val) || (val > ui->spnBx_frth_octt->maximum())) {
-            ui->spnBx_frth_octt->setValue(0);
-        }
-    }
+    spinBox_roll_value(ui->spnBx_frth_octt, val);
 }
 
 //-------------------------------------------------------------------------
@@ -616,6 +592,19 @@ void Dialog_Set_Server_IP::on_lnEdt_port_textEdited(const QString &val) {
             }
         }
         ui->lnEdt_port->setText(tmp);
+    }
+}
+
+//-------------------------------------------------------------------------
+// ROLL SPIN BOX VALUE
+//-------------------------------------------------------------------------
+void Dialog_Set_Server_IP::spinBox_roll_value(QSpinBox *spnBx, int val) {
+    if(ui_initialized) {
+        if(val < 0) {
+            spnBx->setValue(spnBx->maximum() - spnBx->singleStep());
+        } else if((spnBx->maximum() == val) || (val > spnBx->maximum())) {
+            spnBx->setValue(0);
+        }
     }
 }
 
