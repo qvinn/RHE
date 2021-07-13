@@ -259,12 +259,15 @@ bool Data_Transfer_Module::send_file_to_ss_universal(QByteArray File_byteArray, 
     } else {
         QList<QByteArray> packets;
         QByteArray tmp_data;
+        QByteArray tmp_data_1;
         QByteArray packet;
         // Чтобы было удобней отсчитывать в цикле, определим первую посылку отдельно
-        tmp_data = File_byteArray.mid(0, SEND_FILE_BUFFER).data();
+        tmp_data_1 = File_byteArray.mid(0, SEND_FILE_BUFFER).data();
+        tmp_data = form_send_file_packet(&tmp_data_1);
         packets.append(tmp_data);
         for(int i = 1; i < (hops + 1); i++) {
-            tmp_data = File_byteArray.mid((i * SEND_FILE_BUFFER), SEND_FILE_BUFFER).data();
+            tmp_data_1 = File_byteArray.mid((i * SEND_FILE_BUFFER), SEND_FILE_BUFFER).data();
+            tmp_data = form_send_file_packet(&tmp_data_1);
             packets.append(tmp_data);
         }
         last_send_file_bytes = 0;
@@ -453,10 +456,10 @@ void Data_Transfer_Module::rcv_U_File(char *data) {
             break;
         }
     }
-    int f_size = 0;
-    memcpy(&f_size, data, sizeof(quint8));
+    int8_t f_size = 0;
+    memcpy(&f_size, data, sizeof(int8_t));
     if(tmp_file.open(QIODevice::Append)) {
-        tmp_file.write((data + sizeof(quint8)), f_size);
+        tmp_file.write((data + sizeof(int8_t)), f_size);
         tmp_file.close();
     }
 }

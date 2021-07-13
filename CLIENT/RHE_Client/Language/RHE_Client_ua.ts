@@ -793,42 +793,38 @@
         <translation>Прізвище</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="48"/>
-        <location filename="../registration_widget.cpp" line="56"/>
-        <location filename="../registration_widget.cpp" line="79"/>
-        <location filename="../registration_widget.cpp" line="83"/>
-        <location filename="../registration_widget.cpp" line="93"/>
-        <location filename="../registration_widget.cpp" line="105"/>
+        <location filename="../registration_widget.cpp" line="61"/>
+        <location filename="../registration_widget.cpp" line="102"/>
+        <location filename="../registration_widget.cpp" line="112"/>
+        <location filename="../registration_widget.cpp" line="124"/>
         <source>Error</source>
         <translation>Помилка</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="48"/>
         <source>The same login does already exist</source>
-        <translation>Такий логін вже існує</translation>
+        <translation type="vanished">Такий логін вже існує</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="56"/>
+        <location filename="../registration_widget.cpp" line="61"/>
         <source>Enter login, password, first and last names</source>
         <translation>Введіть логін, пароль, ім&apos;я та прізвище</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="93"/>
+        <location filename="../registration_widget.cpp" line="112"/>
         <source>Can&apos;t init connection</source>
         <translation>Не вдається ініціювати підключення</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="105"/>
+        <location filename="../registration_widget.cpp" line="124"/>
         <source>Can&apos;t get ID</source>
         <translation>Неможливо отримати ID</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="79"/>
         <source>You enter wrong login or password</source>
-        <translation>Ви неправильно ввели логін або пароль</translation>
+        <translation type="vanished">Ви неправильно ввели логін або пароль</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="83"/>
+        <location filename="../registration_widget.cpp" line="102"/>
         <source>Enter login and password</source>
         <translation>Введіть логін та пароль</translation>
     </message>

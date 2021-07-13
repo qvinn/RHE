@@ -81,7 +81,7 @@ void Send_Receive_Module::receive_data() {
 }
 
 //-------------------------------------------------------------------------
-//
+// SENDING DATA TO SERVER
 //-------------------------------------------------------------------------
 void Send_Receive_Module::send_data(QByteArray data) {
     if(connected) {

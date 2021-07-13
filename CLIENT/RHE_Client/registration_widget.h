@@ -32,6 +32,10 @@
             QString user_lname;
             QString user_fname;
 
+            ////NEW////
+            QByteArray arr;
+            ////NEW-END////
+
         public slots:
             void slot_re_translate();
 
@@ -41,6 +45,11 @@
 
         signals:
             void init_connection_signal();
+
+            ////NEW////
+            void send_login_register_data_signal(QByteArray data, int flag);
+            ////NEW-END////
+
             void get_id_for_client_signal();
             void logined_signal(bool flg);
     };

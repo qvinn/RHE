@@ -122,7 +122,7 @@ void RHE_Widget::resizeEvent(QResizeEvent *) {
     ui->scrollArea->setMinimumSize(ui->prgrssBr_fl_sts->width(), 0);
     ui->scrollArea->adjustSize();
     ui->scrollArea->setMinimumSize(ui->scrollArea->width(), (ui->scrollAreaWidgetContents->height() + 2));
-    if(!wvfrm_vwr->as_window) {
+    if(!wvfrm_vwr->as_window && (ui->cmbBx_chs_brd->currentIndex() != -1)) {
         int val = static_cast<int>(!((pixmp_names->count() == 0) || (pixmp_names->at(ui->cmbBx_chs_brd->currentIndex()).count() == 0) || pixmp_brd.isNull()));      //USING HACK - CONVERTATION 'BOOL -> INT' TO AVOID UNNECESSARY 'IF...ELSE'
         ui->verticalLayout_3->contentsMargins().setTop(5 * val);
         ui->verticalLayout_3->contentsMargins().setBottom(7 * val);
