@@ -65,16 +65,29 @@
     #define CLIENT_SENDING_FILE_U_TO_SERVER 62
     #define CLIENT_FINISH_SEND_FILE_U_TO_SERVER 63
     #define SERVER_END_TAKE_UPDATE 64
+    #define CLIENT_WANT_REGISTRATION 65
+    #define CLIENT_WANT_LOGIN 66
+
 
     #define FILE_FIRMWARE			0
     #define FILE_DSQ				1
     #define CLIENT_UPD_LIST			2
     #define SERVER_UPD_TASKS_LIST	3
     #define FILE_UPDATE				4
+    #define FILE_LOGIN_REGIST		5
 
     #define FILE_D_ADD		0
     #define FILE_D_UPDATE	1
     #define FILE_D_DELETE	2
+
+
+    // CТРУКТУРА ФАЙЛА РЕГИСТРАЦИИ/ЛОГИНА:
+
+//    first_name  <>
+//    second_name <>
+//    login       <>
+//    password    <>
+
 
     class Data_Transfer_Module : public QObject {
         Q_OBJECT
