@@ -9,16 +9,45 @@ int main(int argc, char* argv[]){
 	while(1)
     {
         std::cin >> cmd;
+		
+/* 		switch(cmd)
+		{
+			case "create_db":
+			{
+				db->create_DB();
+				break;
+			}
+			
+			case "tst":
+			{
+				db->string form_sql_query(std::string("Please, ? the vowels in this sentence by asterisks."),std::vector<std::string>{"rep"});
+				break;
+			}
+			
+			case "t_insert":
+			{
+				break;
+			}
+			
+			case "t_select":
+			{
+				break;
+			}
+		} */
 
         if(cmd == "create_db")
         {
 			db->create_DB();
         } else if(cmd == "t_insert")
         {
-			
+			db->insert_new_user(user_info{"Barbos","Pupkin","V4a","V4a",0});
         } else if(cmd == "t_select")
         {
-			
+			db->select_all_users();
+        }
+		else if(cmd == "tst")
+        {
+			//std::cout << db->form_sql_query(std::string("Please, ? the vowels in this sentence by ?. ? end"),std::vector<std::string>{"replace", "asterisks", std::to_string(25)});
         }
     }
 }

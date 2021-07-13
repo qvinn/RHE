@@ -91,6 +91,8 @@
 #define CLIENT_SENDING_FILE_U_TO_SERVER 62
 #define CLIENT_FINISH_SEND_FILE_U_TO_SERVER 63
 #define SERVER_END_TAKE_UPDATE 64
+#define CLIENT_WANT_REGISTRATION 65
+#define CLIENT_WANT_LOGIN 66
 
 //-------------------------------------------------------------
 // КОДЫ НАЗНАЧЕНИЯ ФАЙЛОВ
@@ -99,11 +101,12 @@
 #define CLIENT_UPD_LIST			2
 #define SERVER_UPD_TASKS_LIST	3
 #define FILE_UPDATE				4
+#define FILE_LOGIN_REGIST		5
 
 
-#define FILE_D_ADD		0
-#define FILE_D_UPDATE	1
-#define FILE_D_DELETE	2
+#define FILE_D_ADD		0	// FILE_DO_ADD
+#define FILE_D_UPDATE	1	// FILE_DO_UPDATE
+#define FILE_D_DELETE	2	// FILE_D_DELETE
 
 // Карта code_op - КОНЕЦ
 
@@ -124,8 +127,8 @@ struct U_packet {
 };
 
 typedef struct info_about_new_device {
-	int id;
-	char FPGA_id[20];
+	int id;				// 4 байта
+	char FPGA_id[20];	// 20 байт
 } info_about_new_device;
 
 //----------------------------------------------
@@ -223,11 +226,14 @@ void rcv_U_File(int id, char *data);
 std::vector<Chain_Pair> Pairs;								// Вектор, который будет хранить "пары-связки" slave-серверов и клиентов
 std::mutex Chain_Pair_mutex;								// Мьютекс для доступа к данным
 std::mutex Resource_manager_mutex;							// Мьютекс для доступа к данным
+std::mutex DB_mutex;										// Мьютекс для доступа к БД
 
 int main()
 {
 	// Создадим объект менеджера ресурсов
 	r_manager = new Resource_manager(RESOURCE_DIR); // "./resources" RESOURCE_DIR
+	
+	
 	
 	// Проверим наличие .ini-файла
 	std::ifstream ini_file("server.ini");
@@ -335,11 +341,8 @@ int main()
 		std::string data(new_conn_info->FPGA_id);
 		printf("+DEVICE info: id: %i, FPGA_id: %s\n",new_conn_info->id,data.c_str());
 		free(new_conn_info);
-		// Проанализируем данные в поле tmp_packet->data - КОНЕЦ
-		
-		//int id = tmp_packet->id;
+		// Проанализируем данные в поле tmp_packet->data - КОНЕЦ		
 		int code_op = tmp_packet->code_op;
-		//std::string data(tmp_packet->data);
 		free(tmp_packet);	
 		
 		if(id == -1)
@@ -1537,6 +1540,13 @@ void create_empty_U_File(int id, int file_code)
 		
 		case FILE_UPDATE:{break;} // Этот файл сервер не обрабатывает
 		
+		case FILE_LOGIN_REGIST:
+		{
+			std::string client_upd_file_name = "./tmp/client_login_register_file_" + std::to_string(id);
+			ofs.open(client_upd_file_name, std::ofstream::out | std::ofstream::trunc);
+			break;
+		}
+		
 		default:{break;}
 	}
 	ofs.close();
@@ -1572,12 +1582,19 @@ void rcv_U_File(int id, char *data)
 		
 		case CLIENT_UPD_LIST:
 		{
-			choose_file_name = "./tmp/client_upd_file_" + std::to_string(id);			
+			choose_file_name = "./tmp/client_upd_file_" + std::to_string(id);
+			break;
 		}
 		
 		case SERVER_UPD_TASKS_LIST:{break;} // Этот файл сервер не обрабатывает
 		
 		case FILE_UPDATE:{break;} // Этот файл сервер не обрабатывает
+		
+		case FILE_LOGIN_REGIST:
+		{
+			choose_file_name = "./tmp/client_login_register_file_" + std::to_string(id);
+			break;
+		}
 		
 		default:{break;}
 	}
@@ -1586,4 +1603,47 @@ void rcv_U_File(int id, char *data)
 	ofs.open(choose_file_name, std::ios::app);  // открываем файл для записи в конец
 	ofs << data;								// сама запись
 	ofs.close();                          		// закрываем файл
+}
+
+void read_registration_login(std::string filename, std::vector<std::string> *_field_names, std::vector<string> *_fields)
+{
+	std::string line;
+	std::string word;
+	std::ifstream file(filename);
+	int column_count = 1;
+	if(file.good())
+	{
+		// Пока не пройдем по всем строкам в файле
+		while(std::getline(file, line))
+		{
+			std::istringstream s(line);
+			// Пока не пройдем по всем словам в строке(по всем колонкам, их у нас только 2)
+			while (getline(s, word, '\t'))
+			{
+				switch(column_count)
+				{
+					case 1: // Первая колонка: <название поля>
+					{
+						_field_names->push_back(word);
+						break;
+					}
+					case 2: // Вторая колонка: <значение поля>
+					{
+						_fields->push_back(word);
+						break;
+					}
+					default:
+					{
+						break;
+					}
+				}
+				column_count++;				
+			}
+			column_count = 1;
+		}
+	} else
+	{
+		//printf("Can't open file: %s\n",filename.c_str());
+		std::cout << "Can't open file: " << filename;
+	}
 }
