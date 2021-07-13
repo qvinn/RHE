@@ -67,6 +67,10 @@
     #define SERVER_END_TAKE_UPDATE 64
     #define CLIENT_WANT_REGISTRATION 65
     #define CLIENT_WANT_LOGIN 66
+    #define ERROR_REGISTRATION 67
+    #define SUCCES_REGISTRATION 68
+    #define ERROR_LOGIN 69
+    #define SUCCES_LOGIN 70
 
 
     #define FILE_FIRMWARE			0
