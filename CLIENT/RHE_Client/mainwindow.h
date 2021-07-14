@@ -38,16 +38,7 @@
             RegistrationWidget *ptr_registration_widg = nullptr;
             RHE_Widget *ptr_RHE_widg = nullptr;
             Waveform_Viewer_Widget *wvfrm_vwr = nullptr;
-            QMenuBar *menu_bar = nullptr;
             QComboBox *cmbBx_lng_chs = nullptr;
-            QAction *chkBx_fls_chckng_actn = nullptr;
-            QAction *chkBx_pins_chckng_actn = nullptr;
-            QAction *chkBx_ld_mnl_frmwr_actn = nullptr;
-            QAction *pshBttn_set_srvr_ip = nullptr;
-            QAction *wvfrm_vwr_actn = nullptr;
-            QAction *ext_actn = nullptr;
-            QMenu *menu_file = nullptr;
-            QMenu *menu_settngs = nullptr;
             QWidgetAction *cmbBx_lng_chs_actn = nullptr;
             QTimer *tmr_waveform_viewer = nullptr;
             QTimer *tmr_progress_bar = nullptr;
@@ -66,7 +57,6 @@
 
         private slots:
             void showEvent(QShowEvent *) override;
-            void resizeEvent(QResizeEvent *) override;
             void moveEvent(QMoveEvent *) override;
             void closeEvent(QCloseEvent *) override;
             void on_pshBttn_login_logout_clicked();

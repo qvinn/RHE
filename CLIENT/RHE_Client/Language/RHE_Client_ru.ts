@@ -211,17 +211,17 @@
         <translation type="obsolete">Установить IP сервера</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="492"/>
+        <location filename="../mainwindow.cpp" line="443"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="492"/>
+        <location filename="../mainwindow.cpp" line="443"/>
         <source>Wrong server port!</source>
         <translation>Неправильный порт сервера!</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="506"/>
+        <location filename="../mainwindow.cpp" line="457"/>
         <source>Set port value</source>
         <translation>Установите значение порта</translation>
     </message>
@@ -239,7 +239,7 @@
     </message>
     <message>
         <location filename="../dialog_set_server_ip.ui" line="137"/>
-        <location filename="../mainwindow.cpp" line="461"/>
+        <location filename="../mainwindow.cpp" line="412"/>
         <source>Setting of server IP</source>
         <translation>Установка IP сервера</translation>
     </message>
@@ -290,35 +290,31 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../mainwindow.ui" line="111"/>
-        <location filename="../mainwindow1.ui" line="198"/>
+        <location filename="../mainwindow.ui" line="279"/>
         <source>MainWindow</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="515"/>
-        <location filename="../mainwindow1.ui" line="741"/>
-        <location filename="../mainwindow.cpp" line="291"/>
+        <location filename="../mainwindow.ui" line="839"/>
+        <location filename="../mainwindow.cpp" line="242"/>
         <source>Register</source>
         <translation>  Регистрация  </translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="800"/>
-        <location filename="../mainwindow1.ui" line="1026"/>
-        <location filename="../mainwindow.cpp" line="286"/>
-        <location filename="../mainwindow.cpp" line="395"/>
+        <location filename="../mainwindow.ui" line="1124"/>
+        <location filename="../mainwindow.cpp" line="237"/>
+        <location filename="../mainwindow.cpp" line="346"/>
         <source>Login</source>
         <translation>Войти</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="288"/>
-        <location filename="../mainwindow.cpp" line="386"/>
+        <location filename="../mainwindow.cpp" line="239"/>
+        <location filename="../mainwindow.cpp" line="337"/>
         <source>Logout</source>
         <translation>Выйти</translation>
     </message>
     <message>
-        <location filename="../mainwindow1.ui" line="1048"/>
-        <location filename="../mainwindow.cpp" line="268"/>
+        <location filename="../mainwindow.ui" line="1174"/>
         <source>File</source>
         <translation>Файл</translation>
     </message>
@@ -328,89 +324,82 @@
         <translation>Обновление Данных</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="267"/>
+        <location filename="../mainwindow.cpp" line="226"/>
         <source>Remote Hardware Education</source>
         <translation>Удаленное Аппаратное Обучение</translation>
     </message>
     <message>
-        <location filename="../mainwindow1.ui" line="1061"/>
-        <location filename="../mainwindow.cpp" line="269"/>
+        <location filename="../mainwindow.ui" line="1187"/>
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="../mainwindow1.ui" line="1075"/>
-        <location filename="../mainwindow.cpp" line="270"/>
+        <location filename="../mainwindow.ui" line="1201"/>
         <source>Open waveform viewer</source>
         <translation>Открыть просмотрщик временных диаграмм</translation>
     </message>
     <message>
-        <location filename="../mainwindow1.ui" line="1086"/>
-        <location filename="../mainwindow.cpp" line="271"/>
+        <location filename="../mainwindow.ui" line="1212"/>
         <source>Exit</source>
         <translation>Выход</translation>
     </message>
     <message>
-        <location filename="../mainwindow1.ui" line="1100"/>
-        <location filename="../mainwindow.cpp" line="272"/>
+        <location filename="../mainwindow.ui" line="1226"/>
         <source>Files checking</source>
         <translation>Проверка файлов</translation>
     </message>
     <message>
-        <location filename="../mainwindow1.ui" line="1114"/>
-        <location filename="../mainwindow.cpp" line="273"/>
+        <location filename="../mainwindow.ui" line="1240"/>
         <source>Pins checking</source>
         <translation>Проверка пинов</translation>
     </message>
     <message>
-        <location filename="../mainwindow1.ui" line="1128"/>
-        <location filename="../mainwindow.cpp" line="274"/>
+        <location filename="../mainwindow.ui" line="1254"/>
         <source>Manualy load firmware</source>
         <translation>Загрузить прошивку вручную</translation>
     </message>
     <message>
-        <location filename="../mainwindow1.ui" line="1139"/>
-        <location filename="../mainwindow.cpp" line="275"/>
+        <location filename="../mainwindow.ui" line="1265"/>
         <source>Set server IP</source>
         <translation>Установить IP сервера</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="277"/>
-        <location filename="../mainwindow.cpp" line="281"/>
+        <location filename="../mainwindow.cpp" line="228"/>
+        <location filename="../mainwindow.cpp" line="232"/>
         <source>English</source>
         <translation>Английский</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="278"/>
-        <location filename="../mainwindow.cpp" line="282"/>
+        <location filename="../mainwindow.cpp" line="229"/>
+        <location filename="../mainwindow.cpp" line="233"/>
         <source>Ukrainian</source>
         <translation>Украинский</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="279"/>
-        <location filename="../mainwindow.cpp" line="283"/>
+        <location filename="../mainwindow.cpp" line="230"/>
+        <location filename="../mainwindow.cpp" line="234"/>
         <source>Russian</source>
         <translation>Русский</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="341"/>
-        <location filename="../mainwindow.cpp" line="344"/>
+        <location filename="../mainwindow.cpp" line="292"/>
+        <location filename="../mainwindow.cpp" line="295"/>
         <source>Warning</source>
         <translation>Внимание</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="341"/>
+        <location filename="../mainwindow.cpp" line="292"/>
         <source>Change server-IP in settings</source>
         <translation>Измените IP сервера в настройках</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="344"/>
+        <location filename="../mainwindow.cpp" line="295"/>
         <source>Change server-port in settings</source>
         <translation>Измените порт сервера в настройках</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="39"/>
-        <location filename="../mainwindow.cpp" line="293"/>
+        <location filename="../mainwindow.cpp" line="244"/>
         <source>Connecting To Server</source>
         <translation>Подключение К Серверу</translation>
     </message>
