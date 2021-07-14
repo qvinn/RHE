@@ -169,6 +169,7 @@
             void not_approved_signal();
             void registered_signal(bool flg);
             void logined_signal(bool flg);
+            void set_user_fname_lname_signal(QString f_name, QString l_name);
             void set_FPGA_id_signal(QString jtag_id_code);
             void data_updated_signal(bool flg);
             void firmware_file_received_signal();

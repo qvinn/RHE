@@ -13,28 +13,12 @@ RegistrationWidget::RegistrationWidget(QWidget *parent, General_Widget *widg, Da
     connect(data_transfer_mod, &Data_Transfer_Module::not_approved_signal, this, &RegistrationWidget::slot_not_approved);
     connect(data_transfer_mod, &Data_Transfer_Module::registered_signal, this, &RegistrationWidget::slot_client_registered);
     connect(data_transfer_mod, &Data_Transfer_Module::logined_signal, this, &RegistrationWidget::slot_client_logined);
+    connect(data_transfer_mod, &Data_Transfer_Module::set_user_fname_lname_signal, this, &RegistrationWidget::slot_set_user_fname_lname);
     ui->lineEdit_password->setEchoMode(QLineEdit::Password);
 }
 
 RegistrationWidget::~RegistrationWidget() {
     delete ui;
-}
-
-//-------------------------------------------------------------------------
-// DISPLAYING OF REGISTRATION WIDGET
-//-------------------------------------------------------------------------
-void RegistrationWidget::showEvent(QShowEvent *) {
-    resizeEvent(nullptr);
-}
-
-//-------------------------------------------------------------------------
-// RESIZING OF REGISTRATION WIDGET
-//-------------------------------------------------------------------------
-void RegistrationWidget::resizeEvent(QResizeEvent *) {
-    ui->verticalLayoutWidget_3->setGeometry(0, 0, this->width(), ui->verticalLayoutWidget_3->height());
-    ui->horizontalLayoutWidget->setGeometry(ui->grpBx_rgstr->contentsRect().x(), ui->grpBx_rgstr->contentsRect().y(), ui->grpBx_rgstr->contentsRect().width(), ui->grpBx_rgstr->contentsRect().height());
-    ui->verticalLayoutWidget_2->setGeometry(ui->grpBx_lgn->contentsRect().x(), ui->grpBx_lgn->contentsRect().y(), ui->grpBx_lgn->contentsRect().width(), ui->grpBx_lgn->contentsRect().height());
-    ui->verticalSpacer_2->changeSize(ui->verticalSpacer_2->geometry().width(), (ui->grpBx_rgstr->contentsMargins().top() + ui->verticalSpacer_4->sizeHint().height()));
 }
 
 //-------------------------------------------------------------------------
@@ -55,10 +39,7 @@ bool RegistrationWidget::register_user() {
 //-------------------------------------------------------------------------
 void RegistrationWidget::login() {
     if((ui->lineEdit_login->text().length() != 0) && (ui->lineEdit_password->text().length() != 0)) {
-        user_fname.clear();
-        user_lname.clear();
-        user_fname.append(ui->lineEdit_FName->text());
-        user_lname.append(ui->lineEdit_LName->text());
+        slot_set_user_fname_lname(ui->lineEdit_FName->text(), ui->lineEdit_LName->text());
         if(user_fname.count() == 0) {
             user_fname.append("-");
         }
@@ -107,7 +88,7 @@ void RegistrationWidget::slot_id_received(bool flg) {
 }
 
 //-------------------------------------------------------------------------
-//
+// USER ACCOUNT NOT APPROVED
 //-------------------------------------------------------------------------
 void RegistrationWidget::slot_not_approved() {
     gen_widg->show_message_box(tr("Error"), tr("Your account not approved"), 0, gen_widg->get_position());
@@ -115,7 +96,7 @@ void RegistrationWidget::slot_not_approved() {
 }
 
 //-------------------------------------------------------------------------
-//
+// CLIENT REGISTERED
 //-------------------------------------------------------------------------
 void RegistrationWidget::slot_client_registered(bool flg) {
     if(!flg) {
@@ -125,13 +106,23 @@ void RegistrationWidget::slot_client_registered(bool flg) {
 }
 
 //-------------------------------------------------------------------------
-//
+// CLIENT LOGINED
 //-------------------------------------------------------------------------
 void RegistrationWidget::slot_client_logined(bool flg) {
     if(!flg) {
         gen_widg->show_message_box(tr("Error"), tr("You enter wrong login or password"), 0, gen_widg->get_position());
     }
     emit logined_signal(flg);
+}
+
+//-------------------------------------------------------------------------
+// SET LOGINED USER NAME
+//-------------------------------------------------------------------------
+void RegistrationWidget::slot_set_user_fname_lname(QString f_name, QString l_name) {
+    user_fname.clear();
+    user_lname.clear();
+    user_fname.append(f_name);
+    user_lname.append(l_name);
 }
 
 //-------------------------------------------------------------------------

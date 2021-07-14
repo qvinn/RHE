@@ -3,6 +3,7 @@
 
     #include <QFile>
     #include <QIcon>
+    #include <QTimer>
     #include <QDebug>
     #include <QWidget>
     #include <QSettings>

@@ -36,7 +36,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     thread_send_recv_mod.start();
     thread_data_trnsfr_mod.start();
     gen_widg->change_current_locale();
-    state_strs = {tr("Connecting To Server"), tr("Updating Data"), ""};
     tmr_waveform_viewer = new QTimer(this);
     connect(tmr_waveform_viewer, &QTimer::timeout, this, &MainWindow::slot_timer_waveform_viewer_timeout);
     tmr_waveform_viewer->stop();
@@ -56,6 +55,8 @@ MainWindow::~MainWindow() {
     delete ptr_RHE_widg;
     delete cmbBx_lng_chs;
     delete cmbBx_lng_chs_actn;
+//    delete snd_rcv_module;
+//    delete data_transfer_module
     delete gen_widg;
     delete ui;
 }
@@ -241,7 +242,7 @@ void MainWindow::set_ui_text() {
     if(!ui->pshBttn_register->isHidden()) {
         ui->pshBttn_register->setText(tr("Register"));
     }
-    state_strs = {tr("Connecting To Server"), ""};
+    state_strs = {tr("Connecting To Server"), tr("Updating Data"), ""};
     if(!ui->prgrssBr_cnnctn_stat->isHidden()) {
         ui->prgrssBr_cnnctn_stat->setFormat(state_strs.at(crrnt_state_strs));
     }

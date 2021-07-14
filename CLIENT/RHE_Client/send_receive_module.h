@@ -22,10 +22,14 @@
 
             General_Widget *gen_widg = nullptr;
             QTcpSocket *socket = nullptr;
+            QTimer *close_sock_wait = nullptr;
             QByteArray recv_buff_arr;
 
             bool manual_disconnect = false;
             bool connected = false;
+
+        private slots:
+            void slot_timer_timeout();
 
         signals:
             void link_established_signal(bool connected);

@@ -719,7 +719,7 @@ void Waveform_Viewer_Widget::remove_data_from_saved_vals_list() {
 }
 
 //-------------------------------------------------------------------------
-//
+// REMOVING ALL DATA FROM GRAPH AND SAVED LISTS
 //-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::remove_all_data() {
     remove_data_from_graph();
