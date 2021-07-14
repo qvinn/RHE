@@ -206,7 +206,7 @@ void MainWindow::initialize_ui() {
 #ifdef __WIN32__
     font_size = 8;
     height = 18;
-#elif
+#else
     font_size = 10;
     height = 21;
 #endif

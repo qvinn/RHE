@@ -814,12 +814,12 @@
         <translation>Password</translation>
     </message>
     <message>
-        <location filename="../registration_widget.ui" line="767"/>
+        <location filename="../registration_widget.ui" line="770"/>
         <source>First Name</source>
         <translation>First Name</translation>
     </message>
     <message>
-        <location filename="../registration_widget.ui" line="946"/>
+        <location filename="../registration_widget.ui" line="949"/>
         <source>Last Name</source>
         <translation>Last Name</translation>
     </message>
