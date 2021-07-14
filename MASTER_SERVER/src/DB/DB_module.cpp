@@ -212,7 +212,7 @@ bool DB_module::user_set_approved(int user_id, int approve)
 		fprintf(stderr, "SQL error: %s\n", zErrMsg);
 		sqlite3_free(zErrMsg);
 		} else {
-		fprintf(stdout, "New user added successfully\n");
+		fprintf(stdout, "New user change \"approve parameter\" successfully\n");
 		return true;
 	}
 	sqlite3_close(db);
@@ -242,7 +242,7 @@ bool DB_module::delete_user(int user_id)
 		fprintf(stderr, "SQL error: %s\n", zErrMsg);
 		sqlite3_free(zErrMsg);
 		} else {
-		fprintf(stdout, "New user added successfully\n");
+		fprintf(stdout, "user deleted successfully\n");
 		return true;
 	}
 	sqlite3_close(db);
