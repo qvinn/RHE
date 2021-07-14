@@ -94,6 +94,7 @@
 #define SUCCES_REGISTRATION 66
 #define ERROR_LOGIN 67
 #define SUCCES_LOGIN 68
+#define CLIENT_NOT_APPROVE 69
 
 //-------------------------------------------------------------
 // КОДЫ НАЗНАЧЕНИЯ ФАЙЛОВ
@@ -1592,7 +1593,7 @@ void create_empty_U_File(int id, int file_code)
 		
 		case CLIENT_UPD_LIST:
 		{
-			std::string file_name = "./tmp/client_upd_file_" + std::to_string(id);
+			file_name = "./tmp/client_upd_file_" + std::to_string(id);
 			//ofs.open(file_name, std::ofstream::out | std::ofstream::trunc);
 			break;
 		}
@@ -1603,14 +1604,14 @@ void create_empty_U_File(int id, int file_code)
 		
 		case FILE_REGIST:
 		{
-			std::string file_name = "./tmp/client_register_file_" + std::to_string(id);
+			file_name = "./tmp/client_register_file_" + std::to_string(id);
 			//ofs.open(file_name, std::ofstream::out | std::ofstream::trunc);
 			break;
 		}
 		
 		case FILE_LOGIN:
 		{
-			std::string file_name = "./tmp/client_login_file_" + std::to_string(id);
+			file_name = "./tmp/client_login_file_" + std::to_string(id);
 			//ofs.open(file_name, std::ofstream::out | std::ofstream::trunc);
 			break;
 		}
@@ -1801,20 +1802,25 @@ void register_new_client_in_db(int id)
 	bool result = false;
 	
 	DB_mutex.lock();
-	result = db->user_exist(login,password);
+	db->select_all_users();
+	result = db->user_exist(login);
 	DB_mutex.unlock();
 	
 	if(result == true)
 	{
 		send_U_Packet(id, ERROR_REGISTRATION, NULL);
+		reset_Pair(id);
+		close(id);
 	} else 
 	{
 		DB_mutex.lock();
-		result = db->insert_new_user(user_info{first_name,second_name,login,password,0});
+		result = db->insert_new_user(user_info{0,first_name,second_name,login,password,0});
 		DB_mutex.unlock();
 		if(result == false)
 		{			
-			send_U_Packet(id, ERROR_REGISTRATION, NULL);
+			send_U_Packet(id, ERROR_REGISTRATION, NULL); // ERROR_LOGIN
+			reset_Pair(id);
+			close(id);
 		} else 
 		{
 			std::cout << "SUCCESSFULLY register new user ---> \n"
@@ -1823,7 +1829,10 @@ void register_new_client_in_db(int id)
 						<< "login: "		<< login		<< "\n"
 						<< "password: "		<< password		<< "\n";
 						
-			send_U_Packet(id, SUCCES_REGISTRATION, NULL);
+			//send_U_Packet(id, SUCCES_REGISTRATION, NULL);
+			send_U_Packet(id, CLIENT_NOT_APPROVE, NULL);
+			reset_Pair(id);
+			close(id);
 		}
 	}
 }
@@ -1851,8 +1860,11 @@ void login_user(int id)
 	bool result = false;
 	
 	DB_mutex.lock();
-	result = db->user_exist(login,password);
+	db->select_all_users();
+	result = db->user_exist_approved(login,password);
 	DB_mutex.unlock();
+	
+	std::cout << "login result: " << result << "\n";
 	
 	if(result == true)
 	{
