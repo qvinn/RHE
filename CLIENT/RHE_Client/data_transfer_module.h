@@ -166,6 +166,7 @@
 
         signals:
             void id_received_signal(bool flg);
+            void not_approved_signal();
             void registered_signal(bool flg);
             void logined_signal(bool flg);
             void set_FPGA_id_signal(QString jtag_id_code);

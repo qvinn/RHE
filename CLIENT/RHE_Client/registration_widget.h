@@ -33,6 +33,7 @@
 
         public slots:
             void slot_link_established(bool flg);
+            void slot_not_approved();
             void slot_id_received(bool flg);
             void slot_client_registered(bool flg);
             void slot_client_logined(bool flg);

@@ -10,6 +10,7 @@ RegistrationWidget::RegistrationWidget(QWidget *parent, General_Widget *widg, Da
     connect(this, &RegistrationWidget::send_login_register_data_signal, data_transfer_mod, &Data_Transfer_Module::send_file_to_ss_universal);
     connect(snd_rcv_mod, &Send_Receive_Module::link_established_signal, this, &RegistrationWidget::slot_link_established);
     connect(data_transfer_mod, &Data_Transfer_Module::id_received_signal, this, &RegistrationWidget::slot_id_received);
+    connect(data_transfer_mod, &Data_Transfer_Module::not_approved_signal, this, &RegistrationWidget::slot_not_approved);
     connect(data_transfer_mod, &Data_Transfer_Module::registered_signal, this, &RegistrationWidget::slot_client_registered);
     connect(data_transfer_mod, &Data_Transfer_Module::logined_signal, this, &RegistrationWidget::slot_client_logined);
     ui->lineEdit_password->setEchoMode(QLineEdit::Password);
@@ -103,6 +104,14 @@ void RegistrationWidget::slot_id_received(bool flg) {
     }
     emit send_login_register_data_signal(arr, flag);
     flag = -1;
+}
+
+//-------------------------------------------------------------------------
+//
+//-------------------------------------------------------------------------
+void RegistrationWidget::slot_not_approved() {
+    gen_widg->show_message_box(tr("Error"), tr("Your account not approved"), 0, gen_widg->get_position());
+    emit logined_signal(false);
 }
 
 //-------------------------------------------------------------------------

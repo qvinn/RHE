@@ -843,42 +843,48 @@
         <translation>Фамилия</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="47"/>
-        <location filename="../registration_widget.cpp" line="79"/>
-        <location filename="../registration_widget.cpp" line="89"/>
-        <location filename="../registration_widget.cpp" line="101"/>
+        <location filename="../registration_widget.cpp" line="48"/>
+        <location filename="../registration_widget.cpp" line="80"/>
+        <location filename="../registration_widget.cpp" line="90"/>
+        <location filename="../registration_widget.cpp" line="102"/>
         <location filename="../registration_widget.cpp" line="113"/>
-        <location filename="../registration_widget.cpp" line="123"/>
+        <location filename="../registration_widget.cpp" line="122"/>
+        <location filename="../registration_widget.cpp" line="132"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="113"/>
+        <location filename="../registration_widget.cpp" line="122"/>
         <source>The same login does already exist</source>
         <translation>Такой логин уже существует</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="47"/>
+        <location filename="../registration_widget.cpp" line="48"/>
         <source>Enter login, password, first and last names</source>
         <translation>Введите логин, пароль, имя и фамилию</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="89"/>
+        <location filename="../registration_widget.cpp" line="90"/>
         <source>Can&apos;t init connection</source>
         <translation>Не удается установить соединение</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="101"/>
+        <location filename="../registration_widget.cpp" line="102"/>
         <source>Can&apos;t get ID</source>
         <translation>Невозможно получить ID</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="123"/>
+        <location filename="../registration_widget.cpp" line="113"/>
+        <source>Your account not approved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../registration_widget.cpp" line="132"/>
         <source>You enter wrong login or password</source>
         <translation>Вы неправильно ввели логин или пароль</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="79"/>
+        <location filename="../registration_widget.cpp" line="80"/>
         <source>Enter login and password</source>
         <translation>Введите логин и  пароль</translation>
     </message>
