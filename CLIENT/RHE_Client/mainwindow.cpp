@@ -201,6 +201,17 @@ void MainWindow::initialize_ui() {
     ui->menu_bar->setStyleSheet("QMenuBar { background-color: #F5F5F5; color: #000000; } QMenu:disabled { color: #898989; } "
                                 "QMenuBar::item:selected { background: #9D9D90; color: #FFFFFF; } QMenuBar::item:pressed { background: #5D5D50; color: #FFFFFF; }");
     ui->menu_file->setStyleSheet(qmenu_stylesheet);
+    int font_size;
+    int height;
+#ifdef __WIN32__
+    font_size = 8;
+    height = 18;
+#elif
+    font_size = 10;
+    height = 21;
+#endif
+    ui->menu_bar->setFixedSize(ui->menu_file->width(), height);
+    ui->menu_bar->setFont(QFont("Tahoma", font_size));
     ui->menu_settings->setStyleSheet(qmenu_stylesheet);
     cmbBx_lng_chs = new QComboBox(ui->menu_settings);
     cmbBx_lng_chs->setMinimumHeight(21);
