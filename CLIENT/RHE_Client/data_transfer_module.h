@@ -69,6 +69,7 @@
     #define SUCCES_REGISTRATION 66
     #define ERROR_LOGIN 67
     #define SUCCES_LOGIN 68
+    #define CLIENT_NOT_APPROVE 69
 
     #define FILE_FIRMWARE			0
     #define FILE_DSQ				1
