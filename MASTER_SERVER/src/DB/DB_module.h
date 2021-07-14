@@ -24,7 +24,7 @@ class DB_module {
 		bool create_DB();
 		bool insert_new_user(user_info info);
 		bool select_all_users();
-		bool user_exist(std::string login, std::string password);
+		bool user_exist(std::string _login, std::string _password);
 		
 
 	private:

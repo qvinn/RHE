@@ -17,10 +17,7 @@
 #include <signal.h>			// for SIGPIPE
 #include "iniparser.h"		// for .ini parse
 #include "resource_manager.h"	// for work with resource files
-
-// Предварительные настройки сервера
-//#define SERVER_PORT 3425
-
+#include "DB_module.h"		// for work with DB
 
 #define DATA_BUFFER 76
 #define RECIVE_BUFFER_SIZE (DATA_BUFFER+4) // DATA_BUFFER+20 DATA_BUFFER+4
@@ -91,8 +88,12 @@
 #define CLIENT_SENDING_FILE_U_TO_SERVER 62
 #define CLIENT_FINISH_SEND_FILE_U_TO_SERVER 63
 #define SERVER_END_TAKE_UPDATE 64
-#define CLIENT_WANT_REGISTRATION 65
-#define CLIENT_WANT_LOGIN 66
+/* #define CLIENT_WANT_REGISTRATION 65
+#define CLIENT_WANT_LOGIN 66 */
+#define ERROR_REGISTRATION 65
+#define SUCCES_REGISTRATION 66
+#define ERROR_LOGIN 67
+#define SUCCES_LOGIN 68
 
 //-------------------------------------------------------------
 // КОДЫ НАЗНАЧЕНИЯ ФАЙЛОВ
@@ -101,7 +102,9 @@
 #define CLIENT_UPD_LIST			2
 #define SERVER_UPD_TASKS_LIST	3
 #define FILE_UPDATE				4
-#define FILE_LOGIN_REGIST		5
+#define FILE_REGIST				5
+#define FILE_LOGIN				6
+
 
 
 #define FILE_D_ADD		0	// FILE_DO_ADD
@@ -119,6 +122,8 @@ int total_slave_servers = 0;
 // Параметры сервера, которые считываются с .ini-файла - КОНЕЦ
 
 Resource_manager *r_manager;
+
+DB_module *db;
 
 // Packet Description
 struct U_packet {
@@ -192,6 +197,8 @@ int find_available_s_server(int ignore_index);
 // int for_client_id - ID клиента, которому необходимо передать информацию
 void reqest_IDT_ODT_from_s_server(int for_client_id);
 
+void read_2_str_column_file(std::string filename, std::vector<std::string> *column_1, std::vector<string> *column_2);
+
 // Метод запроса обновления для клиента
 // int id - ID клиента, которому необходимо передать обновление
 void take_update(int id);
@@ -221,6 +228,14 @@ void create_empty_U_File(int id, int file_code);
 
 void rcv_U_File(int id, char *data);
 
+void end_rcv_U_File(int id, char *data);
+
+void read_registration_login(std::string filename, std::vector<std::string> *_fields_names, std::vector<string> *_fields);
+
+void register_new_client_in_db(int id);
+
+void login_user(int id);
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 std::vector<Chain_Pair> Pairs;								// Вектор, который будет хранить "пары-связки" slave-серверов и клиентов
@@ -233,7 +248,7 @@ int main()
 	// Создадим объект менеджера ресурсов
 	r_manager = new Resource_manager(RESOURCE_DIR); // "./resources" RESOURCE_DIR
 	
-	
+	db = new DB_module();
 	
 	// Проверим наличие .ini-файла
 	std::ifstream ini_file("server.ini");
@@ -1017,7 +1032,8 @@ void recive_new_data(char *buf, int sock)
 		}
 		
 		case CLIENT_FINISH_SEND_FILE_U_TO_SERVER:
-		{							
+		{	
+			end_rcv_U_File(sock,tmp_packet->data);
 			printf("\t|___Client with id %i give FINISH_SEND_FILE_U_TO_SERVER\n", sock);
 			break;	
 		}
@@ -1214,6 +1230,49 @@ void reqest_IDT_ODT_from_s_server(int for_client_id)
 	}	
 }
 
+void read_2_str_column_file(std::string filename, std::vector<std::string> *column_1, std::vector<string> *column_2)
+{
+	std::string line;
+	std::string word;
+	std::ifstream file(filename);
+	int column_count = 1;
+	if(file.good())
+	{
+		// Пока не пройдем по всем строкам в файле
+		while(std::getline(file, line))
+		{
+			std::istringstream s(line);
+			// Пока не пройдем по всем словам в строке(по всем колонкам, их у нас только 2)
+			while (getline(s, word, '\t'))
+			{
+				switch(column_count)
+				{
+					case 1: // Первая колонка
+					{
+						column_1->push_back(word);
+						break;
+					}
+					case 2: // Вторая колонка
+					{
+						column_2->push_back(word);
+						break;
+					}
+					default:
+					{
+						break;
+					}
+				}
+				column_count++;				
+			}
+			column_count = 1;
+		}
+	} else
+	{
+		//printf("Can't open file: %s\n",filename.c_str());
+		std::cout << "Can't open file: " << filename;
+	}	
+}
+
 void take_update(int id)
 {
 	// При попадании в этот метод, первое, что мы должны сделать, это получить
@@ -1370,7 +1429,8 @@ void take_update(int id)
 
 void read_upd_file(std::string filename, std::vector<std::string> *_files_names, std::vector<string> *_files_hashes)
 {
-	std::string line;
+	read_2_str_column_file(filename,_files_names,_files_hashes);
+	/* std::string line;
 	std::string word;
 	std::ifstream file(filename);
 	int column_count = 1;
@@ -1408,7 +1468,7 @@ void read_upd_file(std::string filename, std::vector<std::string> *_files_names,
 	{
 		//printf("Can't open file: %s\n",filename.c_str());
 		std::cout << "Can't open file: " << filename;
-	}
+	} */
 }
 
 void form_send_file_packet(int8_t size, char *data_in, char *data_out)
@@ -1523,6 +1583,7 @@ bool start_rcv_U_File(int id, char *data)
 void create_empty_U_File(int id, int file_code)
 {
 	std::ofstream ofs;
+	std::string file_name;
 	switch(file_code)
 	{
 		case FILE_FIRMWARE:{break;} // Этот файл сервер не обрабатывает
@@ -1531,8 +1592,8 @@ void create_empty_U_File(int id, int file_code)
 		
 		case CLIENT_UPD_LIST:
 		{
-			std::string client_upd_file_name = "./tmp/client_upd_file_" + std::to_string(id);
-			ofs.open(client_upd_file_name, std::ofstream::out | std::ofstream::trunc);
+			std::string file_name = "./tmp/client_upd_file_" + std::to_string(id);
+			//ofs.open(file_name, std::ofstream::out | std::ofstream::trunc);
 			break;
 		}
 		
@@ -1540,15 +1601,23 @@ void create_empty_U_File(int id, int file_code)
 		
 		case FILE_UPDATE:{break;} // Этот файл сервер не обрабатывает
 		
-		case FILE_LOGIN_REGIST:
+		case FILE_REGIST:
 		{
-			std::string client_upd_file_name = "./tmp/client_login_register_file_" + std::to_string(id);
-			ofs.open(client_upd_file_name, std::ofstream::out | std::ofstream::trunc);
+			std::string file_name = "./tmp/client_register_file_" + std::to_string(id);
+			//ofs.open(file_name, std::ofstream::out | std::ofstream::trunc);
+			break;
+		}
+		
+		case FILE_LOGIN:
+		{
+			std::string file_name = "./tmp/client_login_file_" + std::to_string(id);
+			//ofs.open(file_name, std::ofstream::out | std::ofstream::trunc);
 			break;
 		}
 		
 		default:{break;}
 	}
+	ofs.open(file_name, std::ofstream::out | std::ofstream::trunc);
 	ofs.close();
 }
 
@@ -1590,24 +1659,85 @@ void rcv_U_File(int id, char *data)
 		
 		case FILE_UPDATE:{break;} // Этот файл сервер не обрабатывает
 		
-		case FILE_LOGIN_REGIST:
+		case FILE_REGIST:
 		{
-			choose_file_name = "./tmp/client_login_register_file_" + std::to_string(id);
+			choose_file_name = "./tmp/client_register_file_" + std::to_string(id);
+			break;
+		}
+		
+		case FILE_LOGIN:
+		{
+			choose_file_name = "./tmp/client_login_file_" + std::to_string(id);
 			break;
 		}
 		
 		default:{break;}
 	}
 	
+	int f_size = 0;
+    memcpy(&f_size, data, sizeof(int8_t));
+	
 	std::ofstream ofs;
-	ofs.open(choose_file_name, std::ios::app);  // открываем файл для записи в конец
-	ofs << data;								// сама запись
+	// ofs.open(choose_file_name, std::ios::app);  // открываем файл для записи в конец
+	// ofs << data;								// сама запись
+	ofs.open(choose_file_name, std::ios::app | std::ios::binary);  // открываем файл для записи в конец
+	ofs.write((data+sizeof(int8_t)),f_size);								// сама запись
 	ofs.close();                          		// закрываем файл
 }
 
-void read_registration_login(std::string filename, std::vector<std::string> *_field_names, std::vector<string> *_fields)
+void end_rcv_U_File(int id, char *data)
 {
-	std::string line;
+	int file_code = -1;
+	Chain_Pair_mutex.lock();
+	int result;
+	for(int i=0; i<Pairs.size(); i++)
+	{
+		if(Pairs.at(i).id_Cl == id)
+		{
+			file_code = Pairs.at(i).client_curr_rcv_file;
+			break;
+		}
+		if(Pairs.at(i).id_SS == id)
+		{
+			file_code = Pairs.at(i).s_server_curr_rcv_file;
+			break;
+		}
+	}
+	
+	Chain_Pair_mutex.unlock();
+	
+	switch(file_code)
+	{
+		case FILE_FIRMWARE:{break;} // Этот файл сервер не обрабатывает
+		
+		case FILE_DSQ:{break;} // Этот файл сервер не обрабатывает
+		
+		case CLIENT_UPD_LIST:{break;}
+		
+		case SERVER_UPD_TASKS_LIST:{break;} // Этот файл сервер не обрабатывает
+		
+		case FILE_UPDATE:{break;} // Этот файл сервер не обрабатывает
+		
+		case FILE_REGIST:
+		{
+			register_new_client_in_db(id);
+			break;
+		}
+		
+		case FILE_LOGIN:
+		{
+			login_user(id);
+			break;
+		}
+		
+		default:{break;}
+	}
+}
+
+void read_registration_login(std::string filename, std::vector<std::string> *_fields_names, std::vector<string> *_fields)
+{
+	read_2_str_column_file(filename,_fields_names,_fields);
+	/* std::string line;
 	std::string word;
 	std::ifstream file(filename);
 	int column_count = 1;
@@ -1624,7 +1754,7 @@ void read_registration_login(std::string filename, std::vector<std::string> *_fi
 				{
 					case 1: // Первая колонка: <название поля>
 					{
-						_field_names->push_back(word);
+						_fields_names->push_back(word);
 						break;
 					}
 					case 2: // Вторая колонка: <значение поля>
@@ -1645,5 +1775,92 @@ void read_registration_login(std::string filename, std::vector<std::string> *_fi
 	{
 		//printf("Can't open file: %s\n",filename.c_str());
 		std::cout << "Can't open file: " << filename;
+	} */
+}
+
+void register_new_client_in_db(int id)
+{
+	std::vector<std::string> fields_names;
+	std::vector<string> fields;
+	
+	std::string file_name = "./tmp/client_register_file_" + std::to_string(id);
+	
+	read_registration_login(file_name,&fields_names,&fields);
+	
+	if(fields.size() < 4)
+	{
+		send_U_Packet(id, ERROR_REGISTRATION, NULL);
+		return;
+	}
+	
+	std::string first_name	= fields.at(0);
+	std::string second_name	= fields.at(1);
+	std::string login		= fields.at(2);
+	std::string password	= fields.at(3);
+	
+	bool result = false;
+	
+	DB_mutex.lock();
+	result = db->user_exist(login,password);
+	DB_mutex.unlock();
+	
+	if(result == true)
+	{
+		send_U_Packet(id, ERROR_REGISTRATION, NULL);
+	} else 
+	{
+		DB_mutex.lock();
+		result = db->insert_new_user(user_info{first_name,second_name,login,password,0});
+		DB_mutex.unlock();
+		if(result == false)
+		{			
+			send_U_Packet(id, ERROR_REGISTRATION, NULL);
+		} else 
+		{
+			std::cout << "SUCCESSFULLY register new user ---> \n"
+						<< "first_name: "	<< first_name	<< "\n"
+						<< "second_name: "	<< second_name	<< "\n"
+						<< "login: "		<< login		<< "\n"
+						<< "password: "		<< password		<< "\n";
+						
+			send_U_Packet(id, SUCCES_REGISTRATION, NULL);
+		}
+	}
+}
+
+void login_user(int id)
+{
+	std::vector<std::string> fields_names;
+	std::vector<string> fields;
+	
+	std::string file_name = "./tmp/client_login_file_" + std::to_string(id);
+	
+	read_registration_login(file_name,&fields_names,&fields);
+	
+	if(fields.size() < 4)
+	{
+		send_U_Packet(id, ERROR_REGISTRATION, NULL);
+		return;
+	}
+	
+	std::string first_name	= fields.at(0);
+	std::string second_name	= fields.at(1);
+	std::string login		= fields.at(2);
+	std::string password	= fields.at(3);
+	
+	bool result = false;
+	
+	DB_mutex.lock();
+	result = db->user_exist(login,password);
+	DB_mutex.unlock();
+	
+	if(result == true)
+	{
+		send_U_Packet(id, SUCCES_LOGIN, NULL);
+	} else 
+	{
+		send_U_Packet(id, ERROR_LOGIN, NULL);
+		reset_Pair(id);
+		close(id);
 	}
 }

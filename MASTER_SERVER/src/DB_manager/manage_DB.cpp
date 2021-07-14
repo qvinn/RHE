@@ -8,7 +8,8 @@ int main(int argc, char* argv[]){
 	
 	while(1)
     {
-        std::cin >> cmd;
+        std::cout << "Enter command -> ";
+		std::cin >> cmd;
 		
 /* 		switch(cmd)
 		{
@@ -44,10 +45,11 @@ int main(int argc, char* argv[]){
         } else if(cmd == "t_select")
         {
 			db->select_all_users();
-        }
-		else if(cmd == "tst")
+        } else if(cmd == "help")
         {
-			//std::cout << db->form_sql_query(std::string("Please, ? the vowels in this sentence by ?. ? end"),std::vector<std::string>{"replace", "asterisks", std::to_string(25)});
-        }
+			std::cout << "*\t create_db \n"
+			<< "*\t t_select \n"
+			<< "*\t t_insert \n\n";
+        } 
     }
 }
