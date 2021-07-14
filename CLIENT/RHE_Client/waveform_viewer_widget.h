@@ -160,7 +160,6 @@
         private slots:
             void showEvent(QShowEvent *) override;
             void leaveEvent(QEvent *) override;
-            void resizeEvent(QResizeEvent *) override;
             void closeEvent(QCloseEvent *) override;
             void on_chckBx_as_wndw_stateChanged(int state);
             void on_chckBx_attch_crsr_stateChanged(int state);

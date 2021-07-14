@@ -7,19 +7,15 @@ RegistrationWidget::RegistrationWidget(QWidget *parent, General_Widget *widg, Da
     gen_widg = widg;
     connect(this, &RegistrationWidget::init_connection_signal, snd_rcv_mod, &Send_Receive_Module::init_connection);
     connect(this, &RegistrationWidget::get_id_for_client_signal, data_transfer_mod, &Data_Transfer_Module::get_id_for_client);
-
-    ////NEW////
     connect(this, &RegistrationWidget::send_login_register_data_signal, data_transfer_mod, &Data_Transfer_Module::send_file_to_ss_universal);
-    ////NEW-END////
-
-    connect(snd_rcv_mod, &Send_Receive_Module::link_established_signal, this, &RegistrationWidget::link_established);
-    connect(data_transfer_mod, &Data_Transfer_Module::id_received_signal, this, &RegistrationWidget::id_received);
-    account_info = new QSettings("TestRegistration.cfg", QSettings::IniFormat);
+    connect(snd_rcv_mod, &Send_Receive_Module::link_established_signal, this, &RegistrationWidget::slot_link_established);
+    connect(data_transfer_mod, &Data_Transfer_Module::id_received_signal, this, &RegistrationWidget::slot_id_received);
+    connect(data_transfer_mod, &Data_Transfer_Module::registered_signal, this, &RegistrationWidget::slot_client_registered);
+    connect(data_transfer_mod, &Data_Transfer_Module::logined_signal, this, &RegistrationWidget::slot_client_logined);
     ui->lineEdit_password->setEchoMode(QLineEdit::Password);
 }
 
 RegistrationWidget::~RegistrationWidget() {
-    delete account_info;
     delete ui;
 }
 
@@ -45,17 +41,7 @@ void RegistrationWidget::resizeEvent(QResizeEvent *) {
 //-------------------------------------------------------------------------
 bool RegistrationWidget::register_user() {
     if((ui->lineEdit_FName->text().length() != 0) && (ui->lineEdit_LName->text().length() != 0) && (ui->lineEdit_login->text().length() != 0) && (ui->lineEdit_password->text().length() != 0)) {
-//        QStringList lst = account_info->allKeys();
-//        for(int i = 0; i < lst.size(); i++) {
-//            QRegExp tagExp("_");
-//            QStringList log_pwd = lst.at(i).split(tagExp);
-//            if((log_pwd.at(0).compare(ui->lineEdit_login->text(), Qt::CaseSensitive)) == 0) {
-//                gen_widg->show_message_box(tr("Error"), tr("The same login does already exist"), 0, gen_widg->get_position());
-//                return false;
-//            }
-//        }
-//        account_info->setValue(ui->lineEdit_login->text() + "_" + ui->lineEdit_password->text(), ui->lineEdit_FName->text() + " " + ui->lineEdit_LName->text());
-//        account_info->sync();
+        flag = FILE_REGIST;
         return true;
     } else {
         gen_widg->show_message_box(tr("Error"), tr("Enter login, password, first and last names"), 0, gen_widg->get_position());
@@ -68,35 +54,26 @@ bool RegistrationWidget::register_user() {
 //-------------------------------------------------------------------------
 void RegistrationWidget::login() {
     if((ui->lineEdit_login->text().length() != 0) && (ui->lineEdit_password->text().length() != 0)) {
-//        if(account_info->contains(ui->lineEdit_login->text() + "_" + ui->lineEdit_password->text())) {
-//            QString data = account_info->value(ui->lineEdit_login->text() + "_" + ui->lineEdit_password->text()).toString();
-//            QRegExp tagExp(" ");
-//            QStringList lst = data.split(tagExp);
-//            user_fname = lst.at(0);
-//            user_lname = lst.at(1);
-
-            ////NEW////
-            QString frst_nm = ui->lineEdit_FName->text();
-            QString lst_nm = ui->lineEdit_LName->text();
-            if(frst_nm.count() == 0) {
-                frst_nm.append("-");
-            }
-            if(lst_nm.count() == 0) {
-                lst_nm.append("-");
-            }
-            arr.clear();
-            arr.append("first_name\t" + frst_nm + "\n" + "second_name\t" + lst_nm + "\n" + "login\t" + ui->lineEdit_login->text() + "\n" + "password\t" + ui->lineEdit_password->text());
-            ////NEW-END////
-
-            ui->lineEdit_login->setText("");
-            ui->lineEdit_password->setText("");
-            ui->lineEdit_FName->setText("");
-            ui->lineEdit_LName->setText("");
-            emit init_connection_signal();      // Иницализируем поключение
-//        } else {
-//            emit logined_signal(false);
-//            gen_widg->show_message_box(tr("Error"), tr("You enter wrong login or password"), 0, gen_widg->get_position());
-//        }
+        user_fname.clear();
+        user_lname.clear();
+        user_fname.append(ui->lineEdit_FName->text());
+        user_lname.append(ui->lineEdit_LName->text());
+        if(user_fname.count() == 0) {
+            user_fname.append("-");
+        }
+        if(user_lname.count() == 0) {
+            user_lname.append("-");
+        }
+        arr.clear();
+        arr.append("first_name\t" + user_fname + "\n" + "second_name\t" + user_lname + "\n" + "login\t" + ui->lineEdit_login->text() + "\n" + "password\t" + ui->lineEdit_password->text());
+        ui->lineEdit_login->setText("");
+        ui->lineEdit_password->setText("");
+        ui->lineEdit_FName->setText("");
+        ui->lineEdit_LName->setText("");
+        if(flag == -1) {
+            flag = FILE_LOGIN;
+        }
+        emit init_connection_signal();      // Иницализируем поключение
     } else {
         emit logined_signal(false);
         gen_widg->show_message_box(tr("Error"), tr("Enter login and password"), 0, gen_widg->get_position());
@@ -106,7 +83,7 @@ void RegistrationWidget::login() {
 //-------------------------------------------------------------------------
 // CONNECTION WITH SERVER ESTABLISHED
 //-------------------------------------------------------------------------
-void RegistrationWidget::link_established(bool flg) {
+void RegistrationWidget::slot_link_established(bool flg) {
     if(!flg) {
         emit logined_signal(false);
         gen_widg->show_message_box(tr("Error"), tr("Can't init connection"), 0, gen_widg->get_position());
@@ -118,16 +95,34 @@ void RegistrationWidget::link_established(bool flg) {
 //-------------------------------------------------------------------------
 // SERVER RECEIVED USER ID
 //-------------------------------------------------------------------------
-void RegistrationWidget::id_received(bool flg) {
+void RegistrationWidget::slot_id_received(bool flg) {
     if(!flg) {
         emit logined_signal(false);
         gen_widg->show_message_box(tr("Error"), tr("Can't get ID"), 0, gen_widg->get_position());
         return;
     }
-    ////NEW////
-    emit send_login_register_data_signal(arr, FILE_LOGIN_REGIST);
-    ////NEW-END////
-    emit logined_signal(true);
+    emit send_login_register_data_signal(arr, flag);
+    flag = -1;
+}
+
+//-------------------------------------------------------------------------
+//
+//-------------------------------------------------------------------------
+void RegistrationWidget::slot_client_registered(bool flg) {
+    if(!flg) {
+        gen_widg->show_message_box(tr("Error"), tr("The same login does already exist"), 0, gen_widg->get_position());
+    }
+    emit logined_signal(flg);
+}
+
+//-------------------------------------------------------------------------
+//
+//-------------------------------------------------------------------------
+void RegistrationWidget::slot_client_logined(bool flg) {
+    if(!flg) {
+        gen_widg->show_message_box(tr("Error"), tr("You enter wrong login or password"), 0, gen_widg->get_position());
+    }
+    emit logined_signal(flg);
 }
 
 //-------------------------------------------------------------------------

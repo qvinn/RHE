@@ -65,33 +65,22 @@
     #define CLIENT_SENDING_FILE_U_TO_SERVER 62
     #define CLIENT_FINISH_SEND_FILE_U_TO_SERVER 63
     #define SERVER_END_TAKE_UPDATE 64
-    #define CLIENT_WANT_REGISTRATION 65
-    #define CLIENT_WANT_LOGIN 66
-    #define ERROR_REGISTRATION 67
-    #define SUCCES_REGISTRATION 68
-    #define ERROR_LOGIN 69
-    #define SUCCES_LOGIN 70
-
+    #define ERROR_REGISTRATION 65
+    #define SUCCES_REGISTRATION 66
+    #define ERROR_LOGIN 67
+    #define SUCCES_LOGIN 68
 
     #define FILE_FIRMWARE			0
     #define FILE_DSQ				1
     #define CLIENT_UPD_LIST			2
     #define SERVER_UPD_TASKS_LIST	3
     #define FILE_UPDATE				4
-    #define FILE_LOGIN_REGIST		5
+    #define FILE_REGIST             5
+    #define FILE_LOGIN              6
 
     #define FILE_D_ADD		0
     #define FILE_D_UPDATE	1
     #define FILE_D_DELETE	2
-
-
-    // CТРУКТУРА ФАЙЛА РЕГИСТРАЦИИ/ЛОГИНА:
-
-//    first_name  <>
-//    second_name <>
-//    login       <>
-//    password    <>
-
 
     class Data_Transfer_Module : public QObject {
         Q_OBJECT
@@ -99,7 +88,6 @@
             Data_Transfer_Module(General_Widget *widg = nullptr);
             ~Data_Transfer_Module() override;
 
-            void clear_FPGA_id_code_slot();
             void get_id_for_client();
             void get_update_data();
             void analyze_recv_data(QByteArray recv);
@@ -115,6 +103,7 @@
             void flash_FPGA();
             void send_swtches_states(QByteArray data);
             void reset_ID();
+            void clear_FPGA_id_code_slot();
 
             struct U_packet {
                 int code_op;    // 4 байта
@@ -176,6 +165,8 @@
 
         signals:
             void id_received_signal(bool flg);
+            void registered_signal(bool flg);
+            void logined_signal(bool flg);
             void set_FPGA_id_signal(QString jtag_id_code);
             void data_updated_signal(bool flg);
             void firmware_file_received_signal();

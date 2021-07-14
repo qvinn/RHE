@@ -52,7 +52,6 @@ void Waveform_Viewer_Widget::showEvent(QShowEvent *) {
         shw_at_cntr = false;
         this->move((gen_widg->get_position().x() - (this->geometry().width() / 2)), (gen_widg->get_position().y() - (this->geometry().height() / 2)));
     }
-    resizeEvent(nullptr);
 }
 
 //-------------------------------------------------------------------------
@@ -62,14 +61,6 @@ void Waveform_Viewer_Widget::leaveEvent(QEvent *) {
     ui->diagram->layer("layerCursor")->setVisible(false);
     ui->diagram->replot();
     qApp->setOverrideCursor(QCursor(Qt::ArrowCursor));
-}
-
-//-------------------------------------------------------------------------
-// RESIZING OF WAVEFORM VIEWER WIDGET
-//-------------------------------------------------------------------------
-void Waveform_Viewer_Widget::resizeEvent(QResizeEvent *) {
-    ui->verticalLayoutWidget->resize(this->width(), this->height());
-    ui->diagram->resize(ui->verticalLayoutWidget->width(), (ui->verticalLayoutWidget->height() - ui->horizontalLayout->geometry().height() - ui->horizontalLayout_2->geometry().height()));
 }
 
 //-------------------------------------------------------------------------

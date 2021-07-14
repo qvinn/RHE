@@ -23,20 +23,19 @@
             QString get_user_lname();
 
         private:
-            void link_established(bool flg);
-            void id_received(bool flg);
-
             Ui::RegistrationWidget *ui;
             General_Widget *gen_widg = nullptr;
-            QSettings *account_info = nullptr;
             QString user_lname;
             QString user_fname;
-
-            ////NEW////
             QByteArray arr;
-            ////NEW-END////
+
+            int flag = -1;
 
         public slots:
+            void slot_link_established(bool flg);
+            void slot_id_received(bool flg);
+            void slot_client_registered(bool flg);
+            void slot_client_logined(bool flg);
             void slot_re_translate();
 
         private slots:
@@ -45,12 +44,8 @@
 
         signals:
             void init_connection_signal();
-
-            ////NEW////
-            void send_login_register_data_signal(QByteArray data, int flag);
-            ////NEW-END////
-
             void get_id_for_client_signal();
+            void send_login_register_data_signal(QByteArray data, int flag);
             void logined_signal(bool flg);
     };
 

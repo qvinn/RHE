@@ -163,6 +163,22 @@ void Data_Transfer_Module::analyze_recv_data(QByteArray recv) {
             emit data_updated_signal(true);
             break;
         }
+        case SUCCES_REGISTRATION: {
+            emit registered_signal(true);
+            break;
+        }
+        case ERROR_REGISTRATION: {
+            emit registered_signal(false);
+            break;
+        }
+        case SUCCES_LOGIN: {
+            emit logined_signal(true);
+            break;
+        }
+        case ERROR_LOGIN: {
+            emit logined_signal(false);
+            break;
+        }
         default: {
             qDebug() << "UNKNOWN PACKET";
             break;
