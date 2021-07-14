@@ -56,6 +56,8 @@ MainWindow::~MainWindow() {
     delete ptr_RHE_widg;
     delete cmbBx_lng_chs;
     delete cmbBx_lng_chs_actn;
+//    delete snd_rcv_module;
+//    delete data_transfer_module
     delete gen_widg;
     delete ui;
 }

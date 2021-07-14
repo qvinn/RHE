@@ -3,14 +3,18 @@
 Send_Receive_Module::Send_Receive_Module(General_Widget *widg) {
     gen_widg = widg;
     socket = new QTcpSocket(this);
+    close_sock_wait = new QTimer(this);
+    connect(close_sock_wait, &QTimer::timeout, this, &Send_Receive_Module::slot_timer_timeout);
     socket->setReadBufferSize(RECIVE_BUFFER_SIZE);
     connect(socket, &QAbstractSocket::readyRead, this, &Send_Receive_Module::receive_data);
     connect(socket, &QAbstractSocket::disconnected, this, &Send_Receive_Module::server_disconnected);
     connect(qApp, &QApplication::aboutToQuit, this, &Send_Receive_Module::set_disconnected);
     connect(this, &Send_Receive_Module::show_message_box_signal, gen_widg, &General_Widget::show_message_box);
+    close_sock_wait->stop();
 }
 
 Send_Receive_Module::~Send_Receive_Module() {
+    delete close_sock_wait;
     delete socket;
 }
 
@@ -56,17 +60,14 @@ void Send_Receive_Module::close_connection() {
 void Send_Receive_Module::set_disconnected() {
     manual_disconnect = true;
     close_connection();
-    manual_disconnect = false;
 }
 
 //-------------------------------------------------------------------------
 // SERVER DISCONNECTED
 //-------------------------------------------------------------------------
 void Send_Receive_Module::server_disconnected() {
-    if(!manual_disconnect) {
-        close_connection();
-        emit show_message_box_signal(tr("Error"), tr("Server disconnected"), 0, gen_widg->get_position());
-    }
+    close_sock_wait->setInterval(1000);
+    close_sock_wait->start();
 }
 
 //-------------------------------------------------------------------------
@@ -86,5 +87,18 @@ void Send_Receive_Module::receive_data() {
 void Send_Receive_Module::send_data(QByteArray data) {
     if(connected) {
         socket->write(data.data(), RECIVE_BUFFER_SIZE);
+    }
+}
+
+//-------------------------------------------------------------------------
+// TIMEOUT OF WAITING TO FORCE CLOSE SOCKET
+//-------------------------------------------------------------------------
+void Send_Receive_Module::slot_timer_timeout() {
+    close_sock_wait->stop();
+    if(!manual_disconnect) {
+        close_connection();
+        emit show_message_box_signal(tr("Error"), tr("Server disconnected"), 0, gen_widg->get_position());
+    } else {
+        manual_disconnect = false;
     }
 }

@@ -54,7 +54,7 @@ void Data_Transfer_Module::analyze_recv_data(QByteArray recv) {
         }
         case DROP_CONNECTION: {
             emit set_disconnected_signal();
-            emit show_message_box_signal(tr("Error"), tr("You are dropped"), 0, gen_widg->get_position());
+            emit show_message_box_signal(tr("Error"), tr("Server disabled"), 0, gen_widg->get_position());
             break;
         }
         case NO_MORE_PLACES: {
@@ -164,18 +164,25 @@ void Data_Transfer_Module::analyze_recv_data(QByteArray recv) {
             break;
         }
         case CLIENT_NOT_APPROVE: {
+            emit set_disconnected_signal();
             emit not_approved_signal();
             break;
         }
         case ERROR_REGISTRATION: {
+            emit set_disconnected_signal();
             emit registered_signal(false);
             break;
         }
         case SUCCES_LOGIN: {
+            QByteArray dat = QByteArray(tmp_packet->data, sizeof(tmp_packet->data));
+            QString f_name = dat.mid(0, (DATA_BUFFER / 2));
+            QString l_name = dat.mid((DATA_BUFFER / 2), (DATA_BUFFER / 2));
+            emit set_user_fname_lname_signal(f_name, l_name);
             emit logined_signal(true);
             break;
         }
         case ERROR_LOGIN: {
+            emit set_disconnected_signal();
             emit logined_signal(false);
             break;
         }
