@@ -1,5 +1,8 @@
 #include "DB_module.h"
 
+#include <iostream>			// for write to wile with c++
+#include <fstream>			// for write to wile with c++
+
 //---STATIC--!!!
 static int callback(void *data, int argc, char **argv, char **azColName) {
 	int i;
@@ -34,7 +37,13 @@ static int select_callback(void *data, int argc, char **argv, char **azColName) 
 
 DB_module::DB_module()
 {
-	
+	// Проверим наличие .ini-файла
+	std::ifstream db_file("users.db");
+	if(!db_file.good())
+	{
+		this->create_DB();
+		this->select_all_users();
+	}
 }
 
 bool DB_module::create_DB()
@@ -105,7 +114,7 @@ bool DB_module::insert_new_user(user_info info)
 		sqlite3_free(zErrMsg);
 		} else {
 		fprintf(stdout, "New user added successfully\n");
-		return false;
+		return true;
 	}
 	sqlite3_close(db);
 	return true;	
