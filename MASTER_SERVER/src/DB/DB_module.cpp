@@ -166,7 +166,7 @@ bool DB_module::user_exist(std::string _login)
 	return false;
 }
 
-bool DB_module::user_exist_approved(std::string _login, std::string _password)
+int DB_module::user_exist_approved(std::string _login, std::string _password)
 {
 	for(int i = 0; i < users_buffer.size(); i++)
 	{
@@ -175,11 +175,25 @@ bool DB_module::user_exist_approved(std::string _login, std::string _password)
 			// Нашли данного пользователя
 			if(users_buffer.at(i).approve > 0)
 			{
-				return true;
+				return 0;
 			} else 
 			{
-				return false;
+				return -2;
 			}				
+		}
+	}
+	return -1;
+}
+
+bool DB_module::get_first_name_second_name(std::string _login, std::string *_first_name, std::string *_second_name)
+{
+	for(int i = 0; i < users_buffer.size(); i++)
+	{
+		if(users_buffer.at(i).login.compare(_login) == 0)
+		{
+			*_first_name = users_buffer.at(i).first_name;
+			*_second_name = users_buffer.at(i).second_name;
+			return true;
 		}
 	}
 	return false;
@@ -221,6 +235,39 @@ bool DB_module::user_set_approved(int user_id, int approve)
 	}
 	sqlite3_close(db);
 	return true;
+}
+
+bool DB_module::delete_user(int user_id)
+{
+		/* Open database */
+	rc = sqlite3_open("users.db", &db);
+	
+	if( rc ) {
+		fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+		return(false);
+		} else {
+		fprintf(stdout, "Opened database successfully\n");
+	}
+	
+	/* Create SQL statement */
+	std::string sql = "DELETE FROM USERS WHERE USER_ID= ?;";
+	
+	std::vector<std::string> parameters{std::to_string(user_id)};								
+	
+	sql = form_sql_query(sql,parameters);
+	
+	/* Execute SQL statement */
+	rc = sqlite3_exec(db, sql.c_str(), callback, 0, &zErrMsg);
+	
+	if( rc != SQLITE_OK ){
+		fprintf(stderr, "SQL error: %s\n", zErrMsg);
+		sqlite3_free(zErrMsg);
+		} else {
+		fprintf(stdout, "New user added successfully\n");
+		return true;
+	}
+	sqlite3_close(db);
+	return true;	
 }
 
 //---PRIVATE--!!!
