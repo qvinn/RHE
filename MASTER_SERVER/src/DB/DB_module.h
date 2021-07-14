@@ -29,6 +29,7 @@ class DB_module {
 		int user_exist_approved(std::string _login, std::string _password);
 		bool user_set_approved(int user_id, int approve);
 		bool delete_user(int user_id);
+		bool get_first_name_second_name(std::string _login, std::string *_first_name, std::string *_second_name);
 		
 
 	private:

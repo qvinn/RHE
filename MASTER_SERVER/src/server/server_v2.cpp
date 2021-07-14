@@ -1864,19 +1864,38 @@ void login_user(int id)
 	DB_mutex.lock();
 	db->select_all_users();
 	result_2 = db->user_exist_approved(login,password);
+	db->get_first_name_second_name(login,&first_name,&second_name);
 	DB_mutex.unlock();
 	
 	switch(result_2)
 	{
 		case 0:
 		{
-			send_U_Packet(id, SUCCES_LOGIN, NULL);
+			char *buff = (char*)malloc(DATA_BUFFER);
+			memset(buff,0,DATA_BUFFER);
+			if(first_name.length() > 38) // 38 Макситально возможная длина для "first_name" 
+			{
+				memcpy(buff,first_name.c_str(),sizeof(char)*38);
+			} else 
+			{
+				memcpy(buff,first_name.c_str(),first_name.length());
+			}
+			
+			if(second_name.length() > 38) // 38 Макситально возможная длина для "first_name" 
+			{
+				memcpy(buff+38,second_name.c_str(),sizeof(char)*38);
+			} else 
+			{
+				memcpy(buff+38,second_name.c_str(),second_name.length());
+			}					
+			send_U_Packet(id, SUCCES_LOGIN, buff);
+			free(buff);
 			break;
 		}
 		
 		case -1:
-		{
-			send_U_Packet(id, ERROR_LOGIN, NULL);
+		{			
+			send_U_Packet(id, ERROR_LOGIN, NULL);			
 			reset_Pair(id);
 			close(id);
 			break;

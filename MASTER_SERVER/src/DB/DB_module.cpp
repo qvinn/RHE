@@ -185,6 +185,20 @@ int DB_module::user_exist_approved(std::string _login, std::string _password)
 	return -1;
 }
 
+bool DB_module::get_first_name_second_name(std::string _login, std::string *_first_name, std::string *_second_name)
+{
+	for(int i = 0; i < users_buffer.size(); i++)
+	{
+		if(users_buffer.at(i).login.compare(_login) == 0)
+		{
+			*_first_name = users_buffer.at(i).first_name;
+			*_second_name = users_buffer.at(i).second_name;
+			return true;
+		}
+	}
+	return false;
+}
+
 bool DB_module::user_set_approved(int user_id, int approve)
 {
 		/* Open database */
