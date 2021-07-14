@@ -22,7 +22,8 @@ static int select_callback(void *data, int argc, char **argv, char **azColName) 
 	} */
 	
 	//reinterpret_cast<std::vector<user_info>*>(data)->push_back(user_info{"Barbos","Pupkin","V4a","V4a",0});
-	reinterpret_cast<std::vector<user_info>*>(data)->push_back(user_info{std::string(argv[1]),
+	reinterpret_cast<std::vector<user_info>*>(data)->push_back(user_info{std::stoi(argv[0]),
+																		std::string(argv[1]),
 																		std::string(argv[2]),
 																		std::string(argv[3]),
 																		std::string(argv[4]),
@@ -61,7 +62,7 @@ bool DB_module::create_DB()
 	/* Create SQL statement */
 	//const char *
 	std::string sql = "CREATE TABLE USERS("  \
-	"USER_ID INT	SERIAL PRIMARY KEY," \
+	"USER_ID		INTEGER		PRIMARY KEY AUTOINCREMENT," \
 	"FIRST_NAME		CHAR(50)	NOT NULL," \
 	"SECOND_NAME	CHAR(50)	NOT NULL," \
 	"LOGIN			CHAR(50)	NOT NULL," \
@@ -153,17 +154,73 @@ bool DB_module::select_all_users()
 	return true;	
 }
 
-bool DB_module::user_exist(std::string _login, std::string _password)
+bool DB_module::user_exist(std::string _login)
 {
 	for(int i = 0; i < users_buffer.size(); i++)
 	{
-		if(users_buffer.at(i).login.compare(_login) == 0 && 
-			users_buffer.at(i).password.compare(_password) == 0)
+		if(users_buffer.at(i).login.compare(_login) == 0) // && users_buffer.at(i).password.compare(_password) == 0
 			{
 				return true;
 			}
 	}
 	return false;
+}
+
+bool DB_module::user_exist_approved(std::string _login, std::string _password)
+{
+	for(int i = 0; i < users_buffer.size(); i++)
+	{
+		if(users_buffer.at(i).login.compare(_login) == 0 &&  users_buffer.at(i).password.compare(_password) == 0)
+		{
+			// Нашли данного пользователя
+			if(users_buffer.at(i).approve > 0)
+			{
+				return true;
+			} else 
+			{
+				return false;
+			}				
+		}
+	}
+	return false;
+}
+
+bool DB_module::user_set_approved(int user_id, int approve)
+{
+		/* Open database */
+	rc = sqlite3_open("users.db", &db);
+	
+	if( rc ) {
+		fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+		return(false);
+		} else {
+		fprintf(stdout, "Opened database successfully\n");
+	}
+	
+	/* Create SQL statement */
+	std::string sql = "UPDATE USERS set APPROVE = ? WHERE USER_ID= ?;";
+	
+	std::vector<std::string> parameters{
+	std::to_string(approve),
+	std::to_string(user_id)
+							};								
+	
+	sql = form_sql_query(sql,parameters);
+	
+	//std::cout << "sql: " << sql << "\n";
+	
+	/* Execute SQL statement */
+	rc = sqlite3_exec(db, sql.c_str(), callback, 0, &zErrMsg);
+	
+	if( rc != SQLITE_OK ){
+		fprintf(stderr, "SQL error: %s\n", zErrMsg);
+		sqlite3_free(zErrMsg);
+		} else {
+		fprintf(stdout, "New user added successfully\n");
+		return true;
+	}
+	sqlite3_close(db);
+	return true;
 }
 
 //---PRIVATE--!!!
@@ -203,10 +260,12 @@ std::vector<std::string> DB_module::prepare_parameters(std::vector<std::string> 
 void DB_module::look_all_users(std::vector<user_info> users_vec)
 {
 	std::cout << "users size: " << users_vec.size() << "\n";
-	std::cout << "first_name\tsecond_name\tlogin\tpassword\tapprove\n";
+	std::cout << "user_id\tfirst_name\tsecond_name\tlogin\tpassword\tapprove\n";
 	for(int i = 0; i < users_vec.size(); i++)
 	{
-		std::cout << users_vec.at(i).first_name << "\t"
+
+		std::cout << users_vec.at(i).user_id << "\t"
+					<< users_vec.at(i).first_name << "\t"
 					<< users_vec.at(i).second_name << "\t"
 					<< users_vec.at(i).login << "\t"
 					<< users_vec.at(i).password << "\t"

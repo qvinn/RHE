@@ -6,6 +6,7 @@
 #include <sqlite3.h> 
 
 typedef struct user_info {
+			int user_id;
 			std::string first_name;
 			std::string second_name;
 			std::string login;
@@ -24,7 +25,9 @@ class DB_module {
 		bool create_DB();
 		bool insert_new_user(user_info info);
 		bool select_all_users();
-		bool user_exist(std::string _login, std::string _password);
+		bool user_exist(std::string _login);
+		bool user_exist_approved(std::string _login, std::string _password);
+		bool user_set_approved(int user_id, int approve);
 		
 
 	private:
