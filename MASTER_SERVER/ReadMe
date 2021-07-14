@@ -1,0 +1,10 @@
+#Main Server
+
+- make server_build_v2(цель по-умолчанию - просто make) - сборка сервера для PC
+	-- При такой сбоке появится папка "build" -> запускать "./server"
+	-- .ini При отсутствии сгенерируется по умолчанию
+
+- make manage_DB_build - Сборка менеджера отладки(ПОКА ЧТО НЕ ИСПОЛЬЗОВАТЬ)
+
+sudo apt-get install -y libsqlite3-dev
+sudo apt-get install -y libssl-dev

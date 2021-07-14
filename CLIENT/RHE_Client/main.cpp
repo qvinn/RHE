@@ -9,6 +9,7 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setLibraryPaths(paths);
     QApplication a(argc, argv);
     a.setStyle("windowsvista");
+    QFontDatabase::addApplicationFont(":/data/tahoma.ttf");
     MainWindow Mw;
     Mw.show();
     return a.exec();

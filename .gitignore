@@ -1,3 +1,9 @@
+*.ini
 CLIENT/build*
 *.user
 build*
+SLAVE_SERVER/slave_server/slave_server
+SLAVE_SERVER/slave_server/any_project.svf
+SLAVE_SERVER/slave_server/debug_result.txt
+SLAVE_SERVER/slave_server/OpenOCD_run.cfg
+MASTER_SERVER/server
