@@ -59,8 +59,6 @@ bool DB_module::create_DB()
 		fprintf(stdout, "Opened database successfully\n");
 	}
 	
-	/* Create SQL statement */
-	//const char *
 	std::string sql = "CREATE TABLE USERS("  \
 	"USER_ID		INTEGER		PRIMARY KEY AUTOINCREMENT," \
 	"FIRST_NAME		CHAR(50)	NOT NULL," \
@@ -69,7 +67,6 @@ bool DB_module::create_DB()
 	"PASSWORD		CHAR(50)	NOT NULL," \
 	"APPROVE		BOOL		NOT NULL);";
 	
-	/* Execute SQL statement */
 	rc = sqlite3_exec(db, sql.c_str(), callback, 0, &zErrMsg);
 	
 	if( rc != SQLITE_OK ){
@@ -85,7 +82,6 @@ bool DB_module::create_DB()
 
 bool DB_module::insert_new_user(user_info info)
 {
-	/* Open database */
 	rc = sqlite3_open("users.db", &db);
 	
 	if( rc ) {
@@ -95,7 +91,6 @@ bool DB_module::insert_new_user(user_info info)
 		fprintf(stdout, "Opened database successfully\n");
 	}
 	
-	/* Create SQL statement */
 	std::string sql = "INSERT INTO USERS(FIRST_NAME,SECOND_NAME,LOGIN,PASSWORD,APPROVE) " \
 						"VALUES(?,?,?,?,?)";
 	std::vector<std::string> parameters{info.first_name,
@@ -104,10 +99,7 @@ bool DB_module::insert_new_user(user_info info)
 										info.password,
 										std::to_string(info.approve)};
 	sql = form_sql_query(sql,parameters);
-/* 	std::string sql = "INSERT INTO USERS(FIRST_NAME,SECOND_NAME,LOGIN,PASSWORD,APPROVE) " \
-	"VALUES('Vasya','Pupkin','V4a','V4a','1')"; */
-	
-	/* Execute SQL statement */
+
 	rc = sqlite3_exec(db, sql.c_str(), callback, 0, &zErrMsg);
 	
 	if( rc != SQLITE_OK ){
@@ -123,11 +115,8 @@ bool DB_module::insert_new_user(user_info info)
 
 bool DB_module::select_all_users()
 {
-	/* Open database */
 	rc = sqlite3_open("users.db", &db);
-	//const char* data = "Callback function called";
-	//std::vector<user_info> data;
-	
+
 	if( rc ) {
 		fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
 		return(false);
@@ -135,10 +124,8 @@ bool DB_module::select_all_users()
 		fprintf(stdout, "Opened database successfully\n");
 	}
 	
-	/* Create SQL statement */
 	std::string sql = "SELECT * FROM USERS";
 	
-	/* Execute SQL statement */
 	users_buffer = {};
 	rc = sqlite3_exec(db, sql.c_str(), select_callback, &users_buffer, &zErrMsg);
 	look_all_users(users_buffer);
@@ -201,7 +188,6 @@ bool DB_module::get_first_name_second_name(std::string _login, std::string *_fir
 
 bool DB_module::user_set_approved(int user_id, int approve)
 {
-		/* Open database */
 	rc = sqlite3_open("users.db", &db);
 	
 	if( rc ) {
@@ -211,7 +197,6 @@ bool DB_module::user_set_approved(int user_id, int approve)
 		fprintf(stdout, "Opened database successfully\n");
 	}
 	
-	/* Create SQL statement */
 	std::string sql = "UPDATE USERS set APPROVE = ? WHERE USER_ID= ?;";
 	
 	std::vector<std::string> parameters{
@@ -221,9 +206,6 @@ bool DB_module::user_set_approved(int user_id, int approve)
 	
 	sql = form_sql_query(sql,parameters);
 	
-	//std::cout << "sql: " << sql << "\n";
-	
-	/* Execute SQL statement */
 	rc = sqlite3_exec(db, sql.c_str(), callback, 0, &zErrMsg);
 	
 	if( rc != SQLITE_OK ){
@@ -239,7 +221,6 @@ bool DB_module::user_set_approved(int user_id, int approve)
 
 bool DB_module::delete_user(int user_id)
 {
-		/* Open database */
 	rc = sqlite3_open("users.db", &db);
 	
 	if( rc ) {
@@ -249,14 +230,12 @@ bool DB_module::delete_user(int user_id)
 		fprintf(stdout, "Opened database successfully\n");
 	}
 	
-	/* Create SQL statement */
 	std::string sql = "DELETE FROM USERS WHERE USER_ID= ?;";
 	
 	std::vector<std::string> parameters{std::to_string(user_id)};								
 	
 	sql = form_sql_query(sql,parameters);
 	
-	/* Execute SQL statement */
 	rc = sqlite3_exec(db, sql.c_str(), callback, 0, &zErrMsg);
 	
 	if( rc != SQLITE_OK ){

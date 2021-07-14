@@ -106,11 +106,16 @@
 #define FILE_REGIST				5
 #define FILE_LOGIN				6
 
-
-
+// КОДЫ ОПЕРАЦИЙ НАД ФАЙЛАМИ
 #define FILE_D_ADD		0	// FILE_DO_ADD
 #define FILE_D_UPDATE	1	// FILE_DO_UPDATE
 #define FILE_D_DELETE	2	// FILE_D_DELETE
+
+// СТАНДАРТНЫЕ НАЗВАНИЯ ДЛЯ ФАЙЛОВ
+#define TMP_UPD_FILE_PATH		"./tmp/client_upd_file_"
+#define TMP_REGISTER_FILE_PATH	"./tmp/client_register_file_"
+#define TMP_LOGIN_FILE_PATH		"./tmp/client_login_file_"
+
 
 // Карта code_op - КОНЕЦ
 
@@ -147,6 +152,12 @@ typedef struct Chain_Pair {
 	int s_server_curr_rcv_file; // параметр, который определяет текущий принимаемый файл от устройства
 } Chain_Pair;
 
+// Структура для описания пользователей, которые в данный момент пользуются системой
+typedef struct user_online {
+	int id;				// Сокет, на котором обрабатывается подключение
+	std::string login;	// Логин пользователя 
+} user_online;
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void explore_byte_buff(char *data, int size);
 
@@ -161,6 +172,12 @@ void send_U_Packet(int sock, int code_op, const char *data);
 // Метод, который вызывается, как отдельный поток - слушает конкретного клиента/slave-сервера
 int new_listen_thread(int sock);
 
+// Метод для поиска свободного мета для поключения устройства
+/*
+	* int sock	- FD(номер сокета)
+	* int who	- Ключ, по которому определяем, что это за устройство // 0 - slave-сервер | 1 - client
+	* std::string _FPGA_id	- Если это SLAVE_SERVER, то это поле будет хранить FPGA_id
+	*/
 int check_avalible_Pair_place(int sock, int who, std::string _FPGA_id); // 0 - slave-сервер | 1 - client
 
 // Универсальный метод для приема новых данных
@@ -207,42 +224,94 @@ void take_update(int id);
 // Прочитатать файл с информацией про обновления
 //(структура файла: два столбика, разделитель \t, информация -строки) 
 /*
-* std::string filename						- имя файла
-* std::vector<std::string> *_files_names	- вектор к которые будет сохранен первый столбик
-* std::vector<string> *_files_hashes		- вектор к которые будет сохранен второй столбик
+	* std::string filename						- имя файла
+	* std::vector<std::string> *_files_names	- вектор к которые будет сохранен первый столбик
+	* std::vector<string> *_files_hashes		- вектор к которые будет сохранен второй столбик
 */
 void read_upd_file(std::string filename, std::vector<std::string> *_files_names, std::vector<string> *_files_hashes);
 
+// Метод для формирования пакета перед отправкой - необходим для добавления размера
+// посылки в ее начало
+/*
+	* int8_t size		- Размер посылки
+	* char *data_in		- Информация дял передачи
+	* char *data_out	- Сформированный пакет
+*/
 void form_send_file_packet(int8_t size, char *data_in, char *data_out);
 
 // Метод для отправки файла(универсальный)
 // Отличается тем, что для отпраки фала не нужно использовать отдельный код операции
 // В самое начало файла помещается <имя фала\n>
-// std::string filename	- имя файла
-// int id				- id устройства
-// int file_code		- код, который определяет предназначение файла(см. КОДЫ НАЗНАЧЕНИЯ ФАЙЛОВ)
+/*
+	* std::string filename	- Имя файла
+	* int id				- id устройства
+	* int file_code			- Код, который определяет предназначение файла(см. КОДЫ НАЗНАЧЕНИЯ ФАЙЛОВ)
+*/
 void send_file_universal(std::string filename, int id, int file_code);
 
+// Метод для начала приеме файла(универсальный)
+/*
+	* int id		- FD(номер сокета)(он же, id устройства)
+	* char *data	- Информация
+*/
 bool start_rcv_U_File(int id, char *data);
 
+/*
+	* int id		- FD(номер сокета)(он же, id устройства)
+	* int file_code	- Код, определяющий назначение файла(см. КОДЫ НАЗНАЧЕНИЯ ФАЙЛОВ)
+*/
 void create_empty_U_File(int id, int file_code);
 
+// Метод для приема части файла(универсальный)
+/*
+	* int id		- FD(номер сокета)(он же, id устройства)
+	* char *data	- Информация
+*/
 void rcv_U_File(int id, char *data);
 
+// Метод для оконочания приема фала(универсальный)
+/*
+	* int id		- FD(номер сокета)(он же, id устройства)
+	* char *data	- Информация
+*/
 void end_rcv_U_File(int id, char *data);
 
+// Метод для парсинга файла с информацией о пользователе при "регистрации" / "входе в систему"
+/*
+	* std::string filename	- Название файла
+	* std::vector<std::string> *_fields_names	- Первая колонка(названия полей)
+	* std::vector<string> *_fields				- Вторая колонка(значения полей)
+*/
 void read_registration_login(std::string filename, std::vector<std::string> *_fields_names, std::vector<string> *_fields);
 
+// Метод для регистрации нового пользователя в базе данных(перед этим сервер уже должен получить)
+// информацию об этом пользователе и хранить ее в фале
+// int id - ID устройства
 void register_new_client_in_db(int id);
 
+// Метод для входа в систему пользователя(перед этим сервер уже должен получить)
+// информацию об этом пользователе и хранить ее в фале
+// int id - ID устройства
 void login_user(int id);
+
+// Метод, который выполняет проверку на тот факт, что пользователь с конкретным ID 
+// уже онлайн
+// std::string login	- Логин пользователя
+bool users_online_checker(std::string login);
+
+// Метод для удаления пользователя из списка "Пользователи онлайн"
+// int id - ID устройства
+void delete_from_users_online(int id);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-std::vector<Chain_Pair> Pairs;								// Вектор, который будет хранить "пары-связки" slave-серверов и клиентов
-std::mutex Chain_Pair_mutex;								// Мьютекс для доступа к данным
-std::mutex Resource_manager_mutex;							// Мьютекс для доступа к данным
-std::mutex DB_mutex;										// Мьютекс для доступа к БД
+std::vector<Chain_Pair> Pairs;			// Вектор, который будет хранить "пары-связки" slave-серверов и клиентов
+std::vector<user_online> users_online; 	// Вектор, который будет хранить информацию о пользователях "онлайн"
+
+std::mutex Chain_Pair_mutex;		// Мьютекс для доступа к данным
+std::mutex users_online_mutex;		// Мьютекс для доступа к данным
+std::mutex Resource_manager_mutex;	// Мьютекс для доступа к данным
+std::mutex DB_mutex;				// Мьютекс для доступа к БД
 
 int main()
 {
@@ -1057,7 +1126,8 @@ void reset_Pair( int id)
 		if(Pairs.at(i).id_Cl == id) // Если отключаем Клиента
 		{
 			// Отсылаем пакет клиенту и говорим ему, что отключаем его
-			send_U_Packet(id, DROP_CONNECTION, NULL);
+				//send_U_Packet(id, DROP_CONNECTION, NULL); // В этом месте отправка этого пакета не нужна
+			delete_from_users_online(id);
 			// Отсылаем slave-серверу code_op с тем, что нужно отключить отладку(если она была защена)
 			// По скольку метод find_pair_for()  потокобезопасный и мы его вызываем из такого же
 			// потокобезопасного метода, то перед вызовом выполним .unlock()
@@ -1299,7 +1369,7 @@ void take_update(int id)
 	std::vector<std::string> files_names;
 	std::vector<string> files_hashes;
 	std::vector<Resource_manager::file_info> client_upd_list;
-	std::string client_upd_file_name = "./tmp/client_upd_file_" + std::to_string(id);
+	std::string client_upd_file_name = TMP_UPD_FILE_PATH + std::to_string(id);
 	read_upd_file(client_upd_file_name,&files_names,&files_hashes);
 	
 	for(int i = 0; i < files_names.size(); i++)
@@ -1431,45 +1501,6 @@ void take_update(int id)
 void read_upd_file(std::string filename, std::vector<std::string> *_files_names, std::vector<string> *_files_hashes)
 {
 	read_2_str_column_file(filename,_files_names,_files_hashes);
-	/* std::string line;
-	std::string word;
-	std::ifstream file(filename);
-	int column_count = 1;
-	if(file.good())
-	{
-		// Пока не пройдем по всем строкам в файле
-		while(std::getline(file, line))
-		{
-			std::istringstream s(line);
-			// Пока не пройдем по всем словам в строке(по всем колонкам, их у нас только 2)
-			while (getline(s, word, '\t'))
-			{
-				switch(column_count)
-				{
-					case 1: // Первая колонка: <имя файла>
-					{
-						_files_names->push_back(word);
-						break;
-					}
-					case 2: // Вторая колонка: <хэш-сумма для файла>
-					{
-						_files_hashes->push_back(word);
-						break;
-					}
-					default:
-					{
-						break;
-					}
-				}
-				column_count++;				
-			}
-			column_count = 1;
-		}
-	} else
-	{
-		//printf("Can't open file: %s\n",filename.c_str());
-		std::cout << "Can't open file: " << filename;
-	} */
 }
 
 void form_send_file_packet(int8_t size, char *data_in, char *data_out)
@@ -1481,10 +1512,10 @@ void form_send_file_packet(int8_t size, char *data_in, char *data_out)
 
 void send_file_universal(std::string filename, int id, int file_code)
 {
-	// open the file:
-    std::ifstream file(filename, std::ifstream::binary); // std::ios::in | std::ios::binary | std::ios::ate \\\ std::ifstream::binary
+	// Открываем фал в бинарном режиме
+    std::ifstream file(filename, std::ifstream::binary);
 
-    // get its size:
+    // Получаем размер файла
 	int  fileSize;
     file.seekg(0, std::ios::end);
     fileSize = file.tellg();
@@ -1495,11 +1526,8 @@ void send_file_universal(std::string filename, int id, int file_code)
 	char *file_buf = new char [fileSize+1];
 	char *part_of_file = new char [SEND_FILE_BUFFER];
 	memset(file_buf,0,fileSize+1);
-	//read file
-	file.read(file_buf, fileSize);
 	
-	//std::cout << "Prepare string: " << std::string(file_buf) << "\n";
-	//explore_byte_buff(file_buf, 200);	
+	file.read(file_buf, fileSize);
 	
 	int hops = fileSize / SEND_FILE_BUFFER;
 	
@@ -1593,8 +1621,7 @@ void create_empty_U_File(int id, int file_code)
 		
 		case CLIENT_UPD_LIST:
 		{
-			file_name = "./tmp/client_upd_file_" + std::to_string(id);
-			//ofs.open(file_name, std::ofstream::out | std::ofstream::trunc);
+			file_name = TMP_UPD_FILE_PATH + std::to_string(id);
 			break;
 		}
 		
@@ -1604,15 +1631,13 @@ void create_empty_U_File(int id, int file_code)
 		
 		case FILE_REGIST:
 		{
-			file_name = "./tmp/client_register_file_" + std::to_string(id);
-			//ofs.open(file_name, std::ofstream::out | std::ofstream::trunc);
+			file_name = TMP_REGISTER_FILE_PATH + std::to_string(id);
 			break;
 		}
 		
 		case FILE_LOGIN:
 		{
-			file_name = "./tmp/client_login_file_" + std::to_string(id);
-			//ofs.open(file_name, std::ofstream::out | std::ofstream::trunc);
+			file_name = TMP_LOGIN_FILE_PATH + std::to_string(id);
 			break;
 		}
 		
@@ -1652,7 +1677,7 @@ void rcv_U_File(int id, char *data)
 		
 		case CLIENT_UPD_LIST:
 		{
-			choose_file_name = "./tmp/client_upd_file_" + std::to_string(id);
+			choose_file_name = TMP_UPD_FILE_PATH + std::to_string(id);
 			break;
 		}
 		
@@ -1662,13 +1687,13 @@ void rcv_U_File(int id, char *data)
 		
 		case FILE_REGIST:
 		{
-			choose_file_name = "./tmp/client_register_file_" + std::to_string(id);
+			choose_file_name = TMP_REGISTER_FILE_PATH + std::to_string(id);
 			break;
 		}
 		
 		case FILE_LOGIN:
 		{
-			choose_file_name = "./tmp/client_login_file_" + std::to_string(id);
+			choose_file_name = TMP_LOGIN_FILE_PATH + std::to_string(id);
 			break;
 		}
 		
@@ -1679,8 +1704,6 @@ void rcv_U_File(int id, char *data)
     memcpy(&f_size, data, sizeof(int8_t));
 	
 	std::ofstream ofs;
-	// ofs.open(choose_file_name, std::ios::app);  // открываем файл для записи в конец
-	// ofs << data;								// сама запись
 	ofs.open(choose_file_name, std::ios::app | std::ios::binary);  // открываем файл для записи в конец
 	ofs.write((data+sizeof(int8_t)),f_size);								// сама запись
 	ofs.close();                          		// закрываем файл
@@ -1738,45 +1761,6 @@ void end_rcv_U_File(int id, char *data)
 void read_registration_login(std::string filename, std::vector<std::string> *_fields_names, std::vector<string> *_fields)
 {
 	read_2_str_column_file(filename,_fields_names,_fields);
-	/* std::string line;
-	std::string word;
-	std::ifstream file(filename);
-	int column_count = 1;
-	if(file.good())
-	{
-		// Пока не пройдем по всем строкам в файле
-		while(std::getline(file, line))
-		{
-			std::istringstream s(line);
-			// Пока не пройдем по всем словам в строке(по всем колонкам, их у нас только 2)
-			while (getline(s, word, '\t'))
-			{
-				switch(column_count)
-				{
-					case 1: // Первая колонка: <название поля>
-					{
-						_fields_names->push_back(word);
-						break;
-					}
-					case 2: // Вторая колонка: <значение поля>
-					{
-						_fields->push_back(word);
-						break;
-					}
-					default:
-					{
-						break;
-					}
-				}
-				column_count++;				
-			}
-			column_count = 1;
-		}
-	} else
-	{
-		//printf("Can't open file: %s\n",filename.c_str());
-		std::cout << "Can't open file: " << filename;
-	} */
 }
 
 void register_new_client_in_db(int id)
@@ -1784,10 +1768,15 @@ void register_new_client_in_db(int id)
 	std::vector<std::string> fields_names;
 	std::vector<string> fields;
 	
-	std::string file_name = "./tmp/client_register_file_" + std::to_string(id);
+	std::string file_name = TMP_REGISTER_FILE_PATH + std::to_string(id);
 	
+	// Прочитаем файл с информацией о пользователе
 	read_registration_login(file_name,&fields_names,&fields);
 	
+	// После того, как информация была прочитана, файл можно удалить
+	system(std::string("rm " + file_name).c_str());
+	
+	// Если структура файла неправильная
 	if(fields.size() < 4)
 	{
 		send_U_Packet(id, ERROR_REGISTRATION, NULL);
@@ -1802,26 +1791,28 @@ void register_new_client_in_db(int id)
 	bool result = false;
 	
 	DB_mutex.lock();
+	// Выполним выбоку пользователей, тем самым обновим данные в ОЗУ в db
 	db->select_all_users();
+	// Выполним проверку на тот факт, что такой пользователь существует
 	result = db->user_exist(login);
 	DB_mutex.unlock();
 	
-	if(result == true)
+	if(result == true) // Если такой пользователь существует
 	{
 		send_U_Packet(id, ERROR_REGISTRATION, NULL);
 		reset_Pair(id);
 		close(id);
-	} else 
+	} else				// // Если такой пользователь НЕ существует
 	{
 		DB_mutex.lock();
 		result = db->insert_new_user(user_info{0,first_name,second_name,login,password,0});
 		DB_mutex.unlock();
-		if(result == false)
+		if(result == false) // Если пользователя не удалось добавить по каким-то причинам
 		{			
-			send_U_Packet(id, ERROR_REGISTRATION, NULL); // ERROR_LOGIN
+			send_U_Packet(id, ERROR_REGISTRATION, NULL);
 			reset_Pair(id);
 			close(id);
-		} else 
+		} else 				// Если добавление пользователя прошло успешно
 		{
 			std::cout << "SUCCESSFULLY register new user ---> \n"
 						<< "first_name: "	<< first_name	<< "\n"
@@ -1831,6 +1822,9 @@ void register_new_client_in_db(int id)
 						
 			// В данном варианте работы клиента этот code_op не используется
 			//send_U_Packet(id, SUCCES_REGISTRATION, NULL);
+			
+			// По скольку это этап регистрации и пользователь создался с полем APPROVE = 0,
+			// необходимо разорвать соединение
 			send_U_Packet(id, CLIENT_NOT_APPROVE, NULL);
 			reset_Pair(id);
 			close(id);
@@ -1843,10 +1837,14 @@ void login_user(int id)
 	std::vector<std::string> fields_names;
 	std::vector<string> fields;
 	
-	std::string file_name = "./tmp/client_login_file_" + std::to_string(id);
+	std::string file_name = TMP_LOGIN_FILE_PATH + std::to_string(id);
 	
 	read_registration_login(file_name,&fields_names,&fields);
 	
+	// После того, как информация была прочитана, файл можно удалить
+	system(std::string("rm " + file_name).c_str());
+	
+	// Если структура файла неправильная
 	if(fields.size() < 4)
 	{
 		send_U_Packet(id, ERROR_REGISTRATION, NULL);
@@ -1862,15 +1860,19 @@ void login_user(int id)
 	int result_2 = -1;
 	
 	DB_mutex.lock();
+	// Выполним выбоку пользователей, тем самым обновим данные в ОЗУ в db
 	db->select_all_users();
+	// Выполним проверку на тот факт, что такой пользователь существует !!! И допущен(APPROVE = 1)
 	result_2 = db->user_exist_approved(login,password);
+	// Из ОЗУ(из db) получает "first_name" и "second_name" этого пользователя
 	db->get_first_name_second_name(login,&first_name,&second_name);
 	DB_mutex.unlock();
 	
 	switch(result_2)
 	{
-		case 0:
+		case 0: // Если пользователь существует и подтвержден
 		{
+			// В ответ сервер отправляет пользоватею его "first_name" и "second_name"
 			char *buff = (char*)malloc(DATA_BUFFER);
 			memset(buff,0,DATA_BUFFER);
 			if(first_name.length() > 38) // 38 Макситально возможная длина для "first_name" 
@@ -1887,13 +1889,26 @@ void login_user(int id)
 			} else 
 			{
 				memcpy(buff+38,second_name.c_str(),second_name.length());
-			}					
-			send_U_Packet(id, SUCCES_LOGIN, buff);
+			}
+			
+			//Выполним проверку на то, есть ли такой пльзователь уже онлайн?
+			if(users_online_checker(login) == true) // Если такой пользователь уже онлайн
+			{
+				send_U_Packet(id, ERROR_LOGIN, NULL);			
+				reset_Pair(id);
+				close(id);
+			} else 
+			{
+				// Делаем запись о новом пользователе "онлайн"
+				users_online.push_back(user_online{id,login});
+				send_U_Packet(id, SUCCES_LOGIN, buff);
+			}
+			
 			free(buff);
 			break;
 		}
 		
-		case -1:
+		case -1: // Если пользователь НЕ существует
 		{			
 			send_U_Packet(id, ERROR_LOGIN, NULL);			
 			reset_Pair(id);
@@ -1901,7 +1916,7 @@ void login_user(int id)
 			break;
 		}
 		
-		case -2:
+		case -2: // Если пользователь существует, но не подтвержден
 		{
 			send_U_Packet(id, CLIENT_NOT_APPROVE, NULL);
 			reset_Pair(id);
@@ -1909,4 +1924,35 @@ void login_user(int id)
 			break;
 		}
 	}
+}
+
+bool users_online_checker(std::string login)
+{
+	users_online_mutex.lock();
+	for(int i = 0; i < users_online.size(); i++)
+	{
+		if(users_online.at(i).login.compare(login) == 0)
+		{
+			users_online_mutex.unlock();
+			return true;
+		}
+	}	
+	users_online_mutex.unlock();
+	return false;
+}
+
+void delete_from_users_online(int id)
+{
+	users_online_mutex.lock();
+	for(int i = 0; i < users_online.size(); i++)
+	{
+		if(users_online.at(i).id == id)
+		{
+			users_online.erase(users_online.begin() + i);
+			users_online_mutex.unlock();
+			return;
+		}
+	}	
+	users_online_mutex.unlock();
+	return;
 }
