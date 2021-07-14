@@ -163,8 +163,8 @@ void Data_Transfer_Module::analyze_recv_data(QByteArray recv) {
             emit data_updated_signal(true);
             break;
         }
-        case SUCCES_REGISTRATION: {
-            emit registered_signal(true);
+        case CLIENT_NOT_APPROVE: {
+            emit not_approved_signal();
             break;
         }
         case ERROR_REGISTRATION: {
