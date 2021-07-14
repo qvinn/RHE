@@ -1829,6 +1829,7 @@ void register_new_client_in_db(int id)
 						<< "login: "		<< login		<< "\n"
 						<< "password: "		<< password		<< "\n";
 						
+			// В данном варианте работы клиента этот code_op не используется
 			//send_U_Packet(id, SUCCES_REGISTRATION, NULL);
 			send_U_Packet(id, CLIENT_NOT_APPROVE, NULL);
 			reset_Pair(id);
@@ -1858,21 +1859,35 @@ void login_user(int id)
 	std::string password	= fields.at(3);
 	
 	bool result = false;
+	int result_2 = -1;
 	
 	DB_mutex.lock();
 	db->select_all_users();
-	result = db->user_exist_approved(login,password);
+	result_2 = db->user_exist_approved(login,password);
 	DB_mutex.unlock();
 	
-	std::cout << "login result: " << result << "\n";
-	
-	if(result == true)
+	switch(result_2)
 	{
-		send_U_Packet(id, SUCCES_LOGIN, NULL);
-	} else 
-	{
-		send_U_Packet(id, ERROR_LOGIN, NULL);
-		reset_Pair(id);
-		close(id);
+		case 0:
+		{
+			send_U_Packet(id, SUCCES_LOGIN, NULL);
+			break;
+		}
+		
+		case -1:
+		{
+			send_U_Packet(id, ERROR_LOGIN, NULL);
+			reset_Pair(id);
+			close(id);
+			break;
+		}
+		
+		case -2:
+		{
+			send_U_Packet(id, CLIENT_NOT_APPROVE, NULL);
+			reset_Pair(id);
+			close(id);
+			break;
+		}
 	}
 }
