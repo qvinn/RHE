@@ -8,7 +8,8 @@ std::vector<std::string> vocabulory{"create_db"	,
 									"t_select"	,
 									"t_approve"	,
 									"t_delete"	,
-									"t_insert"};
+									"t_insert"	,
+									"help"};
 
 char *command_generator(const char *text, int state) {
   static std::vector<std::string> matches;
@@ -19,9 +20,9 @@ char *command_generator(const char *text, int state) {
     match_index = 0;
 
     std::string textstr(text);
-    for (auto word : vocabulory) {
-      if (word.size() >= textstr.size() &&
-          word.compare(0, textstr.size(), textstr) == 0) {
+    for (std::string word : vocabulory) {
+      if (word.size() >= textstr.size() && word.compare(0, textstr.size(), textstr) == 0)
+	  {
         matches.push_back(word);
       }
     }
@@ -56,17 +57,15 @@ int main(int argc, char* argv[]){
 	
 	char * buf;
 	
-	std::cout << "*\t create_db\n"
+	std::cout << "*\t help\n"
+			<< "*\t create_db\n"
 			<< "*\t t_select\n"
 			<< "*\t t_approve\n"
 			<< "*\t t_delete\n"
 			<< "*\t t_insert\n\n";
 	
 	while((buf = readline("Enter command -> ")) != nullptr)
-    {
-        //std::cout << "Enter command -> ";
-		//std::cin >> cmd;
-		
+    {		
 		cmd = std::string(buf);
 		if (cmd.size() > 0)
 		{
@@ -102,8 +101,8 @@ int main(int argc, char* argv[]){
 			db->select_all_users();
         } else if(cmd == "t_approve")
         {
-			std::cout << "\nchoose user_id for approve: "; std::cin >> choose_user;			
-			std::cout << "\nchoose approve mode: "; std::cin >> approve_mode;			
+			std::cout << "\nchoose user_id for approve: ";	std::cin >> choose_user;			
+			std::cout << "\nchoose approve mode: ";			std::cin >> approve_mode;			
 			db->user_set_approved(choose_user,approve_mode);
 			db->select_all_users();
         } else if(cmd == "t_delete")
