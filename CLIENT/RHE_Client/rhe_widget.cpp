@@ -131,7 +131,7 @@ void RHE_Widget::resizeEvent(QResizeEvent *) {
     }
     ui->label->setVisible(!pixmp_brd.isNull());
     if(!pixmp_brd.isNull()) {
-        ui->label->setPixmap(pixmp_brd.scaled(ui->label->size(), Qt::KeepAspectRatio));
+        ui->label->setPixmap(pixmp_brd.scaled(ui->label->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
     }
 }
 
@@ -541,7 +541,7 @@ void RHE_Widget::change_board_pixmap() {
             if(pixmp_brd.load(path)) {
                 remove_horizontal_spacer();
                 showEvent(nullptr);
-                ui->label->setPixmap(pixmp_brd.scaled(ui->label->size(), Qt::KeepAspectRatio));
+                ui->label->setPixmap(pixmp_brd.scaled(ui->label->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
             } else {
                 ui->label->clear();
                 if(wvfrm_vwr->as_window) {
