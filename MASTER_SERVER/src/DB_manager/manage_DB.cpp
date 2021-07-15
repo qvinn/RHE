@@ -1,7 +1,47 @@
 #include "DB_module.h"
 #include <iostream>
+#include <sstream>
+#include <readline/history.h>
+#include <readline/readline.h>
+	
+std::vector<std::string> vocabulory{"create_db"	,
+									"t_select"	,
+									"t_approve"	,
+									"t_delete"	,
+									"t_insert"};
+
+char *command_generator(const char *text, int state) {
+  static std::vector<std::string> matches;
+  static size_t match_index = 0;
+
+  if (state == 0) {
+    matches.clear();
+    match_index = 0;
+
+    std::string textstr(text);
+    for (auto word : vocabulory) {
+      if (word.size() >= textstr.size() &&
+          word.compare(0, textstr.size(), textstr) == 0) {
+        matches.push_back(word);
+      }
+    }
+  }
+
+  if (match_index >= matches.size()) {
+    return nullptr;
+  } else {
+    return strdup(matches[match_index++].c_str());
+  }
+}
+
+char **command_completion(const char *text, int start, int end) {
+  rl_attempted_completion_over = 1;
+  return rl_completion_matches(text, command_generator);
+}
 
 int main(int argc, char* argv[]){
+
+	rl_attempted_completion_function = command_completion;
 	
 	DB_module *db = new DB_module();
 	std::string cmd;
@@ -14,35 +54,29 @@ int main(int argc, char* argv[]){
 	int choose_user;
 	int approve_mode;
 	
-	while(1)
+	char * buf;
+	
+	std::cout << "*\t create_db\n"
+			<< "*\t t_select\n"
+			<< "*\t t_approve\n"
+			<< "*\t t_delete\n"
+			<< "*\t t_insert\n\n";
+	
+	while((buf = readline("Enter command -> ")) != nullptr)
     {
-        std::cout << "Enter command -> ";
-		std::cin >> cmd;
+        //std::cout << "Enter command -> ";
+		//std::cin >> cmd;
 		
-/* 		switch(cmd)
+		cmd = std::string(buf);
+		if (cmd.size() > 0)
 		{
-			case "create_db":
-			{
-				db->create_DB();
-				break;
-			}
+			add_history(buf);
+		}
 			
-			case "tst":
-			{
-				db->string form_sql_query(std::string("Please, ? the vowels in this sentence by asterisks."),std::vector<std::string>{"rep"});
-				break;
-			}
-			
-			case "t_insert":
-			{
-				break;
-			}
-			
-			case "t_select":
-			{
-				break;
-			}
-		} */
+		free(buf);
+		std::stringstream scmd(cmd);
+		scmd >> cmd;
+		
 
         if(cmd == "create_db")
         {

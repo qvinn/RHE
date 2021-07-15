@@ -1,6 +1,6 @@
 CC		= g++
 CFLAGS  += -g -std=c++11
-LFLAGS  += -L./lib -lpthread -liniparser -lsqlite3 -lssl -lcrypto
+LFLAGS  += -L./lib -lpthread -liniparser -lsqlite3 -lssl -lcrypto -lreadline
 IFLAG	+= -I./src/Parser -I./src/DB/ -I./src/Resource_manager/ -I./src/DB/
 FILES	+= ./src/server/server_v2.cpp ./src/Resource_manager/resource_manager.cpp ./src/DB/DB_module.cpp
 

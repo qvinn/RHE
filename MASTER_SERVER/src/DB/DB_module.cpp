@@ -4,6 +4,7 @@
 #include <fstream>			// for write to wile with c++
 
 //---STATIC--!!!
+// callback-функция, которая вызывается для большинства методов при обращении к БД
 static int callback(void *data, int argc, char **argv, char **azColName) {
 	int i;
 	fprintf(stderr, "%s: ", (const char*)data);
@@ -15,7 +16,8 @@ static int callback(void *data, int argc, char **argv, char **azColName) {
 }
 
 static int select_callback(void *data, int argc, char **argv, char **azColName) {
-	int i;
+	// Для runtime исследования информации во время запроса, раскомментировать
+	//int i;
 	//fprintf(stderr, "%s: ", (const char*)data);
 /* 	for(i = 0; i<argc; i++) {
 		printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
@@ -38,7 +40,7 @@ static int select_callback(void *data, int argc, char **argv, char **azColName) 
 
 DB_module::DB_module()
 {
-	// Проверим наличие .ini-файла
+	// Проверим наличие файла Бд
 	std::ifstream db_file("users.db");
 	if(!db_file.good())
 	{
@@ -49,7 +51,6 @@ DB_module::DB_module()
 
 bool DB_module::create_DB()
 {
-	/* Open database */
 	rc = sqlite3_open("users.db", &db);
 	
 	if( rc ) {
@@ -159,7 +160,7 @@ int DB_module::user_exist_approved(std::string _login, std::string _password)
 	{
 		if(users_buffer.at(i).login.compare(_login) == 0 &&  users_buffer.at(i).password.compare(_password) == 0)
 		{
-			// Нашли данного пользователя
+			// Нашли данного пользователя - выполним проверку на тот факт, что этот пользоватль допущен к работе
 			if(users_buffer.at(i).approve > 0)
 			{
 				return 0;
@@ -290,11 +291,11 @@ void DB_module::look_all_users(std::vector<user_info> users_vec)
 	for(int i = 0; i < users_vec.size(); i++)
 	{
 
-		std::cout << users_vec.at(i).user_id << "\t"
-					<< users_vec.at(i).first_name << "\t"
-					<< users_vec.at(i).second_name << "\t"
-					<< users_vec.at(i).login << "\t"
-					<< users_vec.at(i).password << "\t"
-					<< users_vec.at(i).approve << "\t" << "\n";
+		std::cout << users_vec.at(i).user_id		<< "\t"
+					<< users_vec.at(i).first_name	<< "\t"
+					<< users_vec.at(i).second_name	<< "\t"
+					<< users_vec.at(i).login		<< "\t"
+					<< users_vec.at(i).password		<< "\t"
+					<< users_vec.at(i).approve		<< "\t"	<< "\n";
 	}
 }

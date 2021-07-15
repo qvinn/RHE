@@ -88,8 +88,6 @@
 #define CLIENT_SENDING_FILE_U_TO_SERVER 62
 #define CLIENT_FINISH_SEND_FILE_U_TO_SERVER 63
 #define SERVER_END_TAKE_UPDATE 64
-/* #define CLIENT_WANT_REGISTRATION 65
-#define CLIENT_WANT_LOGIN 66 */
 #define ERROR_REGISTRATION 65
 #define SUCCES_REGISTRATION 66
 #define ERROR_LOGIN 67
@@ -127,16 +125,21 @@ int total_clients = 0;
 int total_slave_servers = 0;
 // Параметры сервера, которые считываются с .ini-файла - КОНЕЦ
 
+// Указатель на "Менеджер ресурсов" - с помощью этого модуля выполняется процес получения
+// хэш-сумм
 Resource_manager *r_manager;
 
+// Указатель на модуль работы с БД
 DB_module *db;
 
-// Packet Description
+// Описание универсально пакета, который используется для приема/отправки
 struct U_packet {
 	int code_op;    // 4 байта
 	char data[DATA_BUFFER];
 };
 
+// Описание структуры, которая хранит в себе информацию о новом подключаемом устройстве
+//(Если новое уст-во - клиент), поле FPGA_id игнорируется
 typedef struct info_about_new_device {
 	int id;				// 4 байта
 	char FPGA_id[20];	// 20 байт
@@ -148,8 +151,8 @@ typedef struct Chain_Pair {
 	int id_SS;		// (-1 | ID slave-сервер)
 	std::string FPGA_id;
 	int id_Cl;		// (-1 | ID клиента)
-	int client_curr_rcv_file; // параметр, который определяет текущий принимаемый файл от устройства
-	int s_server_curr_rcv_file; // параметр, который определяет текущий принимаемый файл от устройства
+	int client_curr_rcv_file;	// параметр, который определяет текущий принимаемый файл от устройства
+	int s_server_curr_rcv_file;	// параметр, который определяет текущий принимаемый файл от устройства
 } Chain_Pair;
 
 // Структура для описания пользователей, которые в данный момент пользуются системой
@@ -215,7 +218,14 @@ int find_available_s_server(int ignore_index);
 // int for_client_id - ID клиента, которому необходимо передать информацию
 void reqest_IDT_ODT_from_s_server(int for_client_id);
 
-void read_2_str_column_file(std::string filename, std::vector<std::string> *column_1, std::vector<string> *column_2);
+// Универсальный метод для чтеня и рабора фала, который имеет структуру:
+// <колонка_1>\t<колонка_2>
+/*
+	* std::string filename	- название файла
+	* std::vector<std::string> *column_1	- Вектор, в который будет помещена информация с <колонка_1>
+	* std::vector<string> *column_2			- Вектор, в который будет помещена информация с <колонка_2>
+*/
+void read_2_str_column_file(std::string filename, std::vector<std::string> *column_1, std::vector<std::string> *column_2);
 
 // Метод запроса обновления для клиента
 // int id - ID клиента, которому необходимо передать обновление
@@ -228,7 +238,7 @@ void take_update(int id);
 	* std::vector<std::string> *_files_names	- вектор к которые будет сохранен первый столбик
 	* std::vector<string> *_files_hashes		- вектор к которые будет сохранен второй столбик
 */
-void read_upd_file(std::string filename, std::vector<std::string> *_files_names, std::vector<string> *_files_hashes);
+void read_upd_file(std::string filename, std::vector<std::string> *_files_names, std::vector<std::string> *_files_hashes);
 
 // Метод для формирования пакета перед отправкой - необходим для добавления размера
 // посылки в ее начало
@@ -282,7 +292,7 @@ void end_rcv_U_File(int id, char *data);
 	* std::vector<std::string> *_fields_names	- Первая колонка(названия полей)
 	* std::vector<string> *_fields				- Вторая колонка(значения полей)
 */
-void read_registration_login(std::string filename, std::vector<std::string> *_fields_names, std::vector<string> *_fields);
+void read_registration_login(std::string filename, std::vector<std::string> *_fields_names, std::vector<std::string> *_fields);
 
 // Метод для регистрации нового пользователя в базе данных(перед этим сервер уже должен получить)
 // информацию об этом пользователе и хранить ее в фале
@@ -1301,7 +1311,7 @@ void reqest_IDT_ODT_from_s_server(int for_client_id)
 	}	
 }
 
-void read_2_str_column_file(std::string filename, std::vector<std::string> *column_1, std::vector<string> *column_2)
+void read_2_str_column_file(std::string filename, std::vector<std::string> *column_1, std::vector<std::string> *column_2)
 {
 	std::string line;
 	std::string word;
@@ -1498,7 +1508,7 @@ void take_update(int id)
 
 }
 
-void read_upd_file(std::string filename, std::vector<std::string> *_files_names, std::vector<string> *_files_hashes)
+void read_upd_file(std::string filename, std::vector<std::string> *_files_names, std::vector<std::string> *_files_hashes)
 {
 	read_2_str_column_file(filename,_files_names,_files_hashes);
 }
@@ -1758,7 +1768,7 @@ void end_rcv_U_File(int id, char *data)
 	}
 }
 
-void read_registration_login(std::string filename, std::vector<std::string> *_fields_names, std::vector<string> *_fields)
+void read_registration_login(std::string filename, std::vector<std::string> *_fields_names, std::vector<std::string> *_fields)
 {
 	read_2_str_column_file(filename,_fields_names,_fields);
 }
