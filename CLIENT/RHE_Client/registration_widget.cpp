@@ -22,6 +22,23 @@ RegistrationWidget::~RegistrationWidget() {
 }
 
 //-------------------------------------------------------------------------
+// DISPLAYING OF REGISTRATION WIDGET
+//-------------------------------------------------------------------------
+void RegistrationWidget::showEvent(QShowEvent *) {
+    resizeEvent(nullptr);
+}
+
+//-------------------------------------------------------------------------
+// RESIZING OF REGISTRATION WIDGET
+//-------------------------------------------------------------------------
+void RegistrationWidget::resizeEvent(QResizeEvent *) {
+    ui->verticalLayoutWidget_3->setGeometry(0, 0, this->width(), ui->verticalLayoutWidget_3->height());
+    ui->horizontalLayoutWidget->setGeometry(ui->grpBx_rgstr->contentsRect().x(), ui->grpBx_rgstr->contentsRect().y(), ui->grpBx_rgstr->contentsRect().width(), ui->grpBx_rgstr->contentsRect().height());
+    ui->verticalLayoutWidget_2->setGeometry(ui->grpBx_lgn->contentsRect().x(), ui->grpBx_lgn->contentsRect().y(), ui->grpBx_lgn->contentsRect().width(), ui->grpBx_lgn->contentsRect().height());
+    ui->verticalSpacer_2->changeSize(ui->verticalSpacer_2->geometry().width(), (ui->grpBx_rgstr->contentsMargins().top() + ui->verticalSpacer_4->sizeHint().height()));
+}
+
+//-------------------------------------------------------------------------
 // REGISTRATION OF USER
 //-------------------------------------------------------------------------
 bool RegistrationWidget::register_user() {
