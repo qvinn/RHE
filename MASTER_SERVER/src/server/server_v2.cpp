@@ -1177,6 +1177,7 @@ void reset_Pair( int id)
 					// Отсылаем пакет клиенту и говорим ему, что отключаем его
 					send_U_Packet(Pairs.at(i).id_Cl, DROP_CONNECTION, NULL);
 					close(Pairs.at(i).id_Cl);
+					delete_from_users_online(Pairs.at(i).id_Cl);
 					printf("--->   Reset client with ID: %i\n",Pairs.at(i).id_Cl);
 				}
 			} else 
@@ -1388,6 +1389,7 @@ void take_update(int id)
 	}
 	
 	// ДЛЯ ОТЛАДКИ
+	std::cout << "files for update(client_upd_list):\n" ;
 	for(int i = 0; i < client_upd_list.size(); i++)
 	{
 		std::cout << "file name: " << client_upd_list.at(i).file_name << "\tfile hash: " << client_upd_list.at(i).hash << "\n";
