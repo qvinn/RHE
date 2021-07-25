@@ -111,23 +111,12 @@ void RHE_Widget::paintEvent(QPaintEvent *) {
 // RESIZING OF RHE WIDGET
 //-------------------------------------------------------------------------
 void RHE_Widget::resizeEvent(QResizeEvent *) {
-    ui->horizontalLayoutWidget->setGeometry(0, (this->height() - ui->horizontalLayoutWidget->height()), this->width(), ui->horizontalLayoutWidget->height());
-    ui->line_horizontal->setGeometry(0, (ui->horizontalLayoutWidget->y() - 1), this->width(), ui->line_horizontal->geometry().height());
-    ui->widget->resize(this->width(), (this->height() - ui->horizontalLayoutWidget->height()));
-    ui->horizontalLayoutWidget_2->setGeometry(0, 0, ui->widget->width(), ui->widget->height());
-    ui->verticalLayout_3->setGeometry(QRect((ui->widget->width() - ui->verticalLayout_3->geometry().width()), 0, ui->verticalLayout_3->geometry().width(), ui->widget->height()));
-    if(!language_changed) {
-        ui->prgrssBr_fl_sts->resize(ui->prgrssBr_fl_sts->minimumWidth(), ui->prgrssBr_fl_sts->height());
-    }
-    ui->scrollArea->setMinimumSize(ui->prgrssBr_fl_sts->width(), 0);
-    ui->scrollArea->adjustSize();
-    ui->scrollArea->setMinimumSize(ui->scrollArea->width(), (ui->scrollAreaWidgetContents->height() + 2));
-    if(!wvfrm_vwr->as_window && (ui->cmbBx_chs_brd->currentIndex() != -1)) {
+    if(ui->cmbBx_chs_brd->currentIndex() != -1) {
         int val = static_cast<int>(!((pixmp_names->count() == 0) || (pixmp_names->at(ui->cmbBx_chs_brd->currentIndex()).count() == 0) || pixmp_brd.isNull()));      //USING HACK - CONVERTATION 'BOOL -> INT' TO AVOID UNNECESSARY 'IF...ELSE'
         ui->verticalLayout_3->contentsMargins().setTop(5 * val);
         ui->verticalLayout_3->contentsMargins().setBottom(7 * val);
         ui->label->setSizePolicy(QSizePolicy::Expanding, static_cast<QSizePolicy::Policy>(7 * val));
-        ui->label->resize((ui->verticalLayout_3->geometry().width() * val), ((ui->verticalLayout_3->geometry().height() - wvfrm_vwr->height() - (ui->verticalLayout_3->contentsMargins().bottom() + ui->verticalLayout_3->contentsMargins().top() + ui->verticalLayout_3->spacing())) * val));
+        ui->label->resize(((ui->frame->geometry().width() - ui->verticalLayout_3->contentsMargins().right()) * val), ((ui->frame->geometry().height() - (wvfrm_vwr->height() * (ui->verticalLayout_3->count() - 1)) - (ui->verticalLayout_3->contentsMargins().bottom() + ui->verticalLayout_3->contentsMargins().top() + ui->verticalLayout_3->spacing())) * val));
     }
     ui->label->setVisible(!pixmp_brd.isNull());
     if(!pixmp_brd.isNull()) {
@@ -423,7 +412,6 @@ void RHE_Widget::initialize_ui() {
     ui->prgrssBr_fl_sts->setStyleSheet("QProgressBar { border: 2px solid grey; border-radius: 5px; color: #FFFFFF; background-color: #000000; } QProgressBar::chunk { background-color: #0020FF; width: 10px; margin: 0.5px; }");
     ui->chckBx_strt_dbg_aftr_flsh->setCheckState(static_cast<Qt::CheckState>(abs(gen_widg->get_setting("settings/START_DEBUG_AFTER_FPGA_FLASHING").toInt() - 2)));
     ui->chckBx_strt_sqnc_of_sgn_with_dbg->setCheckState(static_cast<Qt::CheckState>(abs(gen_widg->get_setting("settings/START_SEQUENCE_OF_SIGNALS_WITH_DEBUG").toInt() - 2)));
-    ui->cmbBx_chs_brd->setCurrentIndex(abs(gen_widg->get_setting("settings/CURRENT_BOARD").toInt() - 1));
     if(gen_widg->get_setting("settings/MANUALY_LOAD_FIRMWARE").toBool() && gen_widg->get_setting("settings/ENABLE_FILE_CHEKING").toBool()) {
         pshBttn_chs_frmwr_set_enabled(false);
     }
@@ -461,6 +449,7 @@ void RHE_Widget::post_post_initialize_ui(QString jtag_id_code) {
             prev_board_index = i;
         }
     }
+    emit ui->cmbBx_chs_brd->currentIndexChanged(gen_widg->get_setting("settings/CURRENT_BOARD").toInt());
     ui->cmbBx_chs_brd->setCurrentIndex(gen_widg->get_setting("settings/CURRENT_BOARD").toInt());
     change_cnt_of_dbg_pins(16);
     ui->spnBx_dbg_tm->setValue(gen_widg->get_setting("settings/DEBUG_DISCRETENESS_TIME").toInt());
@@ -496,8 +485,8 @@ void RHE_Widget::set_ui_text() {
     state_strs = {tr("Firmware sending"), tr("Firmware Sended"), tr("FPGA Flashing"), tr("FPGA Flashed"), tr("Debugging"), tr("Sequence Of Signals File Sending"), tr("Sequence Of Signals File Sended"), ""};
     ui->prgrssBr_fl_sts->setFormat(state_strs.at(crrnt_state_strs));
     ui->lbl_dbg_tm_tp_lmt->setText(ui->cmbBx_dbg_tm_tp->itemText(dbg_tm_tp_lmt));
-    resizeEvent(nullptr);
     language_changed = true;
+    resizeEvent(nullptr);
 }
 
 //-------------------------------------------------------------------------
@@ -552,7 +541,7 @@ void RHE_Widget::change_board_pixmap() {
                 pixmp_brd.swap(tmp);
             }
         }
-        emit resize_signal();
+        resizeEvent(nullptr);
     }
 }
 
@@ -984,6 +973,7 @@ void RHE_Widget::slot_accept_board(bool flg) {
     if(flg) {
         prev_board_index = ui->cmbBx_chs_brd->currentIndex();
     } else {
+        gen_widg->show_message_box(tr("Error"), tr("Selected board '") + ui->cmbBx_chs_brd->currentText() + tr("' not available"), 0, gen_widg->get_position());
         emit ui->cmbBx_chs_brd->setCurrentIndex(prev_board_index);
     }
 }
@@ -1126,7 +1116,7 @@ void RHE_Widget::slot_accept_output_data_table(QByteArray output_data_table) {
         sldr->setSingleStep(1);
         sldr->setBaseSize(100, 21);
         sldr->setStyleSheet("QSlider { background-color: #F5F5F5; color: #000000; selection-background-color: #308CC6; selection-color: #FFFFFF; } QSlider:disabled { color: #393939; }");
-        sldr->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        sldr->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
         connect(sldr, &QSlider::valueChanged, this, &RHE_Widget::slot_input_val_changed);
         connect(sldr, &QSlider::sliderPressed, this, &RHE_Widget::slot_slider_pressed);
         inpt_sldrs->append(sldr);
@@ -1144,8 +1134,13 @@ void RHE_Widget::slot_accept_output_data_table(QByteArray output_data_table) {
         inpt_stts->append(lcd_val);
         h_layout->addWidget(lcd_val);
     }
+    if(inpt_lbls->count() != 0) {
+        int height = (pi_pins_nums->count() * inpt_lbls->at(0)->height()) + ((pi_pins_nums->count() - 1) * ui->verticalLayout_4->spacing()) + (ui->verticalLayout_2->contentsMargins().top() * 2) + (ui->scrollArea->lineWidth() * 2);
+        ui->scrollArea->setFixedHeight(height);
+        ui->scrollArea->updateGeometry();
+    }
     change_cnt_of_dbg_pins(wvfrm_vwr->graph_count + pin_count);
-    emit resize_signal();
+    resizeEvent(nullptr);
 }
 
 //-------------------------------------------------------------------------
@@ -1226,6 +1221,7 @@ void RHE_Widget::slot_end_sequence_of_signals() {
 //-------------------------------------------------------------------------
 void RHE_Widget::slot_as_window() {
     if(!wvfrm_vwr->as_window) {
+        wvfrm_vwr->resize((ui->label->width() / 2), (ui->label->height() / 2));
         wvfrm_vwr->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         ui->verticalLayout_3->addWidget(wvfrm_vwr);
         if((pixmp_names->count() == 0) || (pixmp_names->at(ui->cmbBx_chs_brd->currentIndex()).count() == 0) || pixmp_brd.isNull()) {
@@ -1237,7 +1233,7 @@ void RHE_Widget::slot_as_window() {
             add_horizontal_spacer();
         }
     }
-    emit resize_signal();
+    resizeEvent(nullptr);
 }
 
 //-------------------------------------------------------------------------

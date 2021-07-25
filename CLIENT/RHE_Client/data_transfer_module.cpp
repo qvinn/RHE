@@ -87,7 +87,6 @@ void Data_Transfer_Module::analyze_recv_data(QByteArray recv) {
             break;
         }
         case NOT_SUCCESS_CHANGE_FPGA: {
-            emit show_message_box_signal(tr("Error"), tr("Selected board not available"), 0, gen_widg->get_position());
             emit accept_board_signal(false);
             break;
         }
@@ -407,6 +406,7 @@ int Data_Transfer_Module::end_recive_file() {
 //-------------------------------------------------------------------------
 QByteArray Data_Transfer_Module::analyze_data_dir() {
     QByteArray upd_file;
+    gen_widg->check_is_data_dir_exist();
     QDir dir_name(gen_widg->get_app_path() + "/" + gen_widg->get_setting("settings/PATH_TO_DATA").toString());
     QFileInfoList dirContent = dir_name.entryInfoList(QStringList() << "*", (QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot));
     QRegExp tagExp("/");

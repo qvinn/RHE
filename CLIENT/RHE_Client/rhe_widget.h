@@ -140,7 +140,6 @@
             void slot_timer_timeout();
 
         signals:
-            void resize_signal();
             void set_disconnected_signal();
             void get_FPGA_id_signal();
             void set_FPGA_id_signal(QString jtag_id_code);

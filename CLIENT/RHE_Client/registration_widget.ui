@@ -108,7 +108,7 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string notr="true"/>
   </property>
   <property name="autoFillBackground">
    <bool>true</bool>
@@ -262,6 +262,12 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="minimumSize">
+           <size>
+            <width>399</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="palette">
            <palette>
             <active>
@@ -337,7 +343,7 @@
             <rect>
              <x>-1</x>
              <y>19</y>
-             <width>381</width>
+             <width>401</width>
              <height>131</height>
             </rect>
            </property>
@@ -398,7 +404,7 @@
              <widget class="QLineEdit" name="lineEdit_login">
               <property name="minimumSize">
                <size>
-                <width>170</width>
+                <width>359</width>
                 <height>0</height>
                </size>
               </property>
@@ -577,7 +583,7 @@
              <widget class="QLineEdit" name="lineEdit_password">
               <property name="minimumSize">
                <size>
-                <width>170</width>
+                <width>359</width>
                 <height>0</height>
                </size>
               </property>
@@ -811,7 +817,7 @@
            <widget class="QLineEdit" name="lineEdit_FName">
             <property name="minimumSize">
              <size>
-              <width>170</width>
+              <width>359</width>
               <height>0</height>
              </size>
             </property>
@@ -990,7 +996,7 @@
            <widget class="QLineEdit" name="lineEdit_LName">
             <property name="minimumSize">
              <size>
-              <width>170</width>
+              <width>359</width>
               <height>0</height>
              </size>
             </property>
