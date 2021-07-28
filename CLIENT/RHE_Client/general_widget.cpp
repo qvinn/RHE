@@ -19,7 +19,7 @@ General_Widget::General_Widget() {
     create_base_settings();
     check_is_data_dir_exist();
 #ifdef __linux__
-    QString icon_path = (app_path + "/" + "icon.png");
+    QString icon_path = (app_path + "/" + "icon.ico");
     check_is_icon_exist(icon_path);
     qApp->setWindowIcon(QIcon(icon_path));
 #endif
@@ -178,7 +178,7 @@ void General_Widget::check_is_icon_exist(QString path) {
     QFile r_icon_file(path);
     if(!r_icon_file.exists()) {
         if(r_icon_file.open(QIODevice::WriteOnly)) {
-            QFile i_icon_file(":/icons/1.png");
+            QFile i_icon_file(":/icons/1.ico");
             if(i_icon_file.open(QIODevice::ReadOnly)) {
                 QByteArray arr = i_icon_file.readAll();
                 r_icon_file.write(arr, arr.size());
