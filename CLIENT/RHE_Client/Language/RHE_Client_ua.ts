@@ -809,7 +809,7 @@
         <translation>Вхід</translation>
     </message>
     <message>
-        <location filename="../registration_widget.ui" line="518"/>
+        <location filename="../registration_widget.ui" line="626"/>
         <source>Login</source>
         <translation>Логін</translation>
     </message>
@@ -819,12 +819,12 @@
         <translation>Пароль</translation>
     </message>
     <message>
-        <location filename="../registration_widget.ui" line="724"/>
+        <location filename="../registration_widget.ui" line="940"/>
         <source>First Name</source>
         <translation>Ім&apos;я</translation>
     </message>
     <message>
-        <location filename="../registration_widget.ui" line="1011"/>
+        <location filename="../registration_widget.ui" line="1443"/>
         <source>Last Name</source>
         <translation>Прізвище</translation>
     </message>
