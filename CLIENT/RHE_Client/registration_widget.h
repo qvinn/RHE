@@ -39,10 +39,6 @@
             void slot_set_user_fname_lname(QString f_name, QString l_name);
             void slot_re_translate();
 
-        private slots:
-            void showEvent(QShowEvent *) override;
-            void resizeEvent(QResizeEvent *) override;
-
         signals:
             void init_connection_signal();
             void get_id_for_client_signal();

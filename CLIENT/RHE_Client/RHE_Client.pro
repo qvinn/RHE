@@ -25,6 +25,7 @@ FORMS += \
     dialog_set_server_ip.ui \
     mainwindow.ui \
     registration_widget.ui \
+    registration_widget_old.ui \
     rhe_widget.ui \
     waveform_viewer.ui
 
