@@ -819,58 +819,58 @@
         <translation>Пароль</translation>
     </message>
     <message>
-        <location filename="../registration_widget.ui" line="1011"/>
+        <location filename="../registration_widget.ui" line="724"/>
         <source>First Name</source>
         <translation>Ім&apos;я</translation>
     </message>
     <message>
-        <location filename="../registration_widget.ui" line="978"/>
+        <location filename="../registration_widget.ui" line="1011"/>
         <source>Last Name</source>
         <translation>Прізвище</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="32"/>
-        <location filename="../registration_widget.cpp" line="61"/>
-        <location filename="../registration_widget.cpp" line="71"/>
-        <location filename="../registration_widget.cpp" line="83"/>
-        <location filename="../registration_widget.cpp" line="94"/>
-        <location filename="../registration_widget.cpp" line="103"/>
-        <location filename="../registration_widget.cpp" line="113"/>
+        <location filename="../registration_widget.cpp" line="36"/>
+        <location filename="../registration_widget.cpp" line="65"/>
+        <location filename="../registration_widget.cpp" line="75"/>
+        <location filename="../registration_widget.cpp" line="87"/>
+        <location filename="../registration_widget.cpp" line="98"/>
+        <location filename="../registration_widget.cpp" line="107"/>
+        <location filename="../registration_widget.cpp" line="117"/>
         <source>Error</source>
         <translation>Помилка</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="103"/>
+        <location filename="../registration_widget.cpp" line="107"/>
         <source>The same login does already exist</source>
         <translation>Такий логін вже існує</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="32"/>
+        <location filename="../registration_widget.cpp" line="36"/>
         <source>Enter login, password, first and last names</source>
         <translation>Введіть логін, пароль, ім&apos;я та прізвище</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="71"/>
+        <location filename="../registration_widget.cpp" line="75"/>
         <source>Can&apos;t init connection</source>
         <translation>Не вдається ініціювати підключення</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="83"/>
+        <location filename="../registration_widget.cpp" line="87"/>
         <source>Can&apos;t get ID</source>
         <translation>Неможливо отримати ID</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="94"/>
+        <location filename="../registration_widget.cpp" line="98"/>
         <source>Your account not approved</source>
         <translation>Ваш аккаунт не підтверджено</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="113"/>
+        <location filename="../registration_widget.cpp" line="117"/>
         <source>You enter wrong login or password</source>
         <translation>Ви неправильно ввели логін або пароль</translation>
     </message>
     <message>
-        <location filename="../registration_widget.cpp" line="61"/>
+        <location filename="../registration_widget.cpp" line="65"/>
         <source>Enter login and password</source>
         <translation>Введіть логін та пароль</translation>
     </message>
@@ -901,34 +901,28 @@
 <context>
     <name>RegistrationWidget_old</name>
     <message>
-        <location filename="../registration_widget_old.ui" line="221"/>
         <source>Registration</source>
-        <translation>Реєстрація</translation>
+        <translation type="vanished">Реєстрація</translation>
     </message>
     <message>
-        <location filename="../registration_widget_old.ui" line="336"/>
         <source>Logging</source>
-        <translation>Вхід</translation>
+        <translation type="vanished">Вхід</translation>
     </message>
     <message>
-        <location filename="../registration_widget_old.ui" line="399"/>
         <source>Login</source>
-        <translation>Логін</translation>
+        <translation type="vanished">Логін</translation>
     </message>
     <message>
-        <location filename="../registration_widget_old.ui" line="578"/>
         <source>Password</source>
-        <translation>Пароль</translation>
+        <translation type="vanished">Пароль</translation>
     </message>
     <message>
-        <location filename="../registration_widget_old.ui" line="812"/>
         <source>First Name</source>
-        <translation>Ім&apos;я</translation>
+        <translation type="vanished">Ім&apos;я</translation>
     </message>
     <message>
-        <location filename="../registration_widget_old.ui" line="991"/>
         <source>Last Name</source>
-        <translation>Прізвище</translation>
+        <translation type="vanished">Прізвище</translation>
     </message>
 </context>
 <context>
