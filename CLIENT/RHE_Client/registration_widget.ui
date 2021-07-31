@@ -337,7 +337,13 @@
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>16</height>
+             <height>21</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>21</height>
             </size>
            </property>
            <property name="font">
@@ -364,6 +370,12 @@
            <property name="minimumSize">
             <size>
              <width>0</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
              <height>24</height>
             </size>
            </property>
@@ -485,7 +497,13 @@
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>16</height>
+             <height>21</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>21</height>
             </size>
            </property>
            <property name="font">
@@ -511,7 +529,13 @@
            </property>
            <property name="minimumSize">
             <size>
-             <width>353</width>
+             <width>354</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
              <height>24</height>
             </size>
            </property>
@@ -682,6 +706,12 @@
              <height>24</height>
             </size>
            </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>24</height>
+            </size>
+           </property>
            <property name="palette">
             <palette>
              <active>
@@ -803,6 +833,12 @@
              <height>24</height>
             </size>
            </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>24</height>
+            </size>
+           </property>
            <property name="palette">
             <palette>
              <active>
@@ -921,7 +957,13 @@
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>16</height>
+             <height>21</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>21</height>
             </size>
            </property>
            <property name="font">
@@ -948,7 +990,13 @@
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>16</height>
+             <height>21</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>21</height>
             </size>
            </property>
            <property name="font">

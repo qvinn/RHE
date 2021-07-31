@@ -809,22 +809,22 @@
         <translation>Вхід</translation>
     </message>
     <message>
-        <location filename="../registration_widget.ui" line="500"/>
+        <location filename="../registration_widget.ui" line="518"/>
         <source>Login</source>
         <translation>Логін</translation>
     </message>
     <message>
-        <location filename="../registration_widget.ui" line="352"/>
+        <location filename="../registration_widget.ui" line="358"/>
         <source>Password</source>
         <translation>Пароль</translation>
     </message>
     <message>
-        <location filename="../registration_widget.ui" line="963"/>
+        <location filename="../registration_widget.ui" line="1011"/>
         <source>First Name</source>
         <translation>Ім&apos;я</translation>
     </message>
     <message>
-        <location filename="../registration_widget.ui" line="936"/>
+        <location filename="../registration_widget.ui" line="978"/>
         <source>Last Name</source>
         <translation>Прізвище</translation>
     </message>
