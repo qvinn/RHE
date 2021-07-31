@@ -819,12 +819,12 @@
         <translation>Пароль</translation>
     </message>
     <message>
-        <location filename="../registration_widget.ui" line="960"/>
+        <location filename="../registration_widget.ui" line="963"/>
         <source>First Name</source>
         <translation>Имя</translation>
     </message>
     <message>
-        <location filename="../registration_widget.ui" line="933"/>
+        <location filename="../registration_widget.ui" line="936"/>
         <source>Last Name</source>
         <translation>Фамилия</translation>
     </message>
