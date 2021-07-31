@@ -809,7 +809,7 @@
         <translation>Вход</translation>
     </message>
     <message>
-        <location filename="../registration_widget.ui" line="626"/>
+        <location filename="../registration_widget.ui" line="407"/>
         <source>Login</source>
         <translation>Логин</translation>
     </message>
