@@ -15,6 +15,10 @@ RegistrationWidget::RegistrationWidget(QWidget *parent, General_Widget *widg, Da
     connect(data_transfer_mod, &Data_Transfer_Module::logined_signal, this, &RegistrationWidget::slot_client_logined);
     connect(data_transfer_mod, &Data_Transfer_Module::set_user_fname_lname_signal, this, &RegistrationWidget::slot_set_user_fname_lname);
     ui->lineEdit_password->setEchoMode(QLineEdit::Password);
+#ifdef __linux__
+    ui->label->setFixedHeight(ui->label->height() - 3);
+    ui->frame->setContentsMargins(ui->frame->contentsMargins().left(), (ui->frame->contentsMargins().top() + 4), ui->frame->contentsMargins().right(), ui->frame->contentsMargins().bottom());
+#endif
 }
 
 RegistrationWidget::~RegistrationWidget() {
