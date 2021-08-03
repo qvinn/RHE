@@ -156,7 +156,7 @@
         <translation type="vanished">Розмір шрифту відміток на вісях і часовій мітці курсору</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="1322"/>
+        <location filename="../waveform_viewer_widget.cpp" line="1326"/>
         <source>Select diagram settings</source>
         <translation>Вибір налаштувань діаграми</translation>
     </message>
@@ -197,7 +197,7 @@
         <translation type="vanished">Відміна</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="1207"/>
+        <location filename="../waveform_viewer_widget.cpp" line="1211"/>
         <source>Select pins for display</source>
         <translation>Виберіть піни для відображування</translation>
     </message>
@@ -269,22 +269,22 @@
         <translation>Увага</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="326"/>
+        <location filename="../general_widget.cpp" line="330"/>
         <source>Question</source>
         <translation>Питання</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="331"/>
+        <location filename="../general_widget.cpp" line="335"/>
         <source>Yes</source>
         <translation>Так</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="332"/>
+        <location filename="../general_widget.cpp" line="336"/>
         <source>No</source>
         <translation>Ні</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="335"/>
+        <location filename="../general_widget.cpp" line="339"/>
         <source>Information</source>
         <translation>Інформація</translation>
     </message>
@@ -1081,7 +1081,7 @@
         <translation>Збереження часової діаграми</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="523"/>
+        <location filename="../waveform_viewer_widget.cpp" line="527"/>
         <source>No data for saving</source>
         <translation>Немає даних для збереження</translation>
     </message>

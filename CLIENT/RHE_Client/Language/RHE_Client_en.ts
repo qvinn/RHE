@@ -156,7 +156,7 @@
         <translation type="vanished">Axis and cursor time labels font size</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="1322"/>
+        <location filename="../waveform_viewer_widget.cpp" line="1326"/>
         <source>Select diagram settings</source>
         <translation>Select diagram settings</translation>
     </message>
@@ -197,7 +197,7 @@
         <translation type="vanished">Cancell</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="1207"/>
+        <location filename="../waveform_viewer_widget.cpp" line="1211"/>
         <source>Select pins for display</source>
         <translation>Select pins for display</translation>
     </message>
@@ -269,22 +269,22 @@
         <translation>Warning</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="326"/>
+        <location filename="../general_widget.cpp" line="330"/>
         <source>Question</source>
         <translation>Question</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="331"/>
+        <location filename="../general_widget.cpp" line="335"/>
         <source>Yes</source>
         <translation>Yes</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="332"/>
+        <location filename="../general_widget.cpp" line="336"/>
         <source>No</source>
         <translation>No</translation>
     </message>
     <message>
-        <location filename="../general_widget.cpp" line="335"/>
+        <location filename="../general_widget.cpp" line="339"/>
         <source>Information</source>
         <translation>Information</translation>
     </message>
@@ -1089,7 +1089,7 @@
         <translation>Saving waveform</translation>
     </message>
     <message>
-        <location filename="../waveform_viewer_widget.cpp" line="523"/>
+        <location filename="../waveform_viewer_widget.cpp" line="527"/>
         <source>No data for saving</source>
         <translation>No data for saving</translation>
     </message>

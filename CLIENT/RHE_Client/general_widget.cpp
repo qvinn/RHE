@@ -1,6 +1,6 @@
 #include "general_widget.h"
 
-General_Widget::General_Widget() {
+General_Widget::General_Widget(QWidget *parent) : QWidget(parent) {
 #ifdef __linux__
     app_path.append(QProcessEnvironment::systemEnvironment().value(QStringLiteral("APPIMAGE")));        //Path Of Image Deployed with 'linuxdeployqt'
 #endif
@@ -315,12 +315,16 @@ QString General_Widget::load_file_path(QWidget *prnt, QString title, QString fil
 //-------------------------------------------------------------------------
 // DISPLAYING WARNING/QUESTION/INFO MESSAGES
 //-------------------------------------------------------------------------
-int General_Widget::show_message_box(QString title, QString message, int type, QPoint position) {
+int General_Widget::show_message_box(QString title, QString message, int type, /*QPoint position*/QWidget *parent) {
     QMessageBox msgBox(QMessageBox::Warning, title, QString("\n").append(message));
     if(title.count() == 0) {
         msgBox.setWindowTitle(tr("Warning"));
     }
-    msgBox.setParent(this);
+    QWidget *prnt = this;
+    if(parent != nullptr) {
+        prnt = parent;
+    }
+    msgBox.setParent(prnt);
     if(type == 1) {
         if(title.count() == 0) {
             msgBox.setWindowTitle(tr("Question"));
@@ -341,10 +345,10 @@ int General_Widget::show_message_box(QString title, QString message, int type, Q
     msgBox.setWindowFlags(msgBox.windowFlags() | Qt::WindowStaysOnTopHint);
     msgBox.setStyleSheet(get_style_sheet("QMessageBox", "QMessageBox QLabel { color: #000000; }"));
     //hack to place message window at centre of window with 'position' coordinates
-    msgBox.show();
-    msgBox.hide();
+//    msgBox.show();
+//    msgBox.hide();
     //end hack
-    msgBox.move((position.x() - (msgBox.width() / 2)), (position.y() - (msgBox.height() / 2)));
+//    msgBox.move((position.x() - (msgBox.width() / 2)), (position.y() - (msgBox.height() / 2)));
     return msgBox.exec();
 }
 

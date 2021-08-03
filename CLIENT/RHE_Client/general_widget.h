@@ -17,7 +17,7 @@
     class General_Widget : public QWidget {
         Q_OBJECT
         public:
-            General_Widget();
+            General_Widget(QWidget *parent = nullptr);
             ~General_Widget() override;
 
             QString get_app_path();
@@ -86,7 +86,7 @@
              * QString message - text of message
              * QPoint position - coordinates(x, y) of current active window
              */
-            int show_message_box(QString title, QString message, int type, QPoint position);
+            int show_message_box(QString title, QString message, int type, /*QPoint position*/QWidget *parent);
 
             void change_current_locale();
 

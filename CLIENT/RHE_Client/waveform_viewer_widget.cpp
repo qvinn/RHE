@@ -385,14 +385,14 @@ void Waveform_Viewer_Widget::load_waveform() {
     }
     QStringList *lst = gen_widg->load_files(prnt, tr("Choose waveform file"), tr("Waveform (*.wvfrm)"), false, false);
     if((lst == nullptr) || (lst->count() == 0)) {
-        QPoint pos;
-        if(standalone || as_window) {
-            pos.setX(this->x() + (this->width() / 2));
-            pos.setY(this->y() + (this->height() / 2));
-        } else {
-            pos = gen_widg->get_position();
-        }
-        gen_widg->show_message_box(tr("Error"), tr("Waveform file not choosed"), 0, pos);
+//        QPoint pos;
+//        if(standalone || as_window) {
+//            pos.setX(this->x() + (this->width() / 2));
+//            pos.setY(this->y() + (this->height() / 2));
+//        } else {
+//            pos = gen_widg->get_position();
+//        }
+        gen_widg->show_message_box(tr("Error"), tr("Waveform file not choosed"), 0, /*pos*/prnt);
         return;
     }
     QFile *file = new QFile(QFileInfo(lst->at(0)).absoluteFilePath());
@@ -513,14 +513,18 @@ void Waveform_Viewer_Widget::save_waveform() {
             gen_widg->save_file(prnt, tr("Saving waveform"), tr("Waveform (*.wvfrm)"), &str, &fn_nm, false, true);
         }
     } else {
-        QPoint pos;
-        if(standalone || as_window) {
-            pos.setX(this->x() + (this->width() / 2));
-            pos.setY(this->y() + (this->height() / 2));
-        } else {
-            pos = gen_widg->get_position();
+//        QPoint pos;
+//        if(standalone || as_window) {
+//            pos.setX(this->x() + (this->width() / 2));
+//            pos.setY(this->y() + (this->height() / 2));
+//        } else {
+//            pos = gen_widg->get_position();
+//        }
+        QWidget *prnt = this;
+        if((this->parentWidget() != nullptr) && !as_window) {
+            prnt = this->parentWidget();
         }
-        gen_widg->show_message_box("", tr("No data for saving"), 0, pos);
+        gen_widg->show_message_box("", tr("No data for saving"), 0, prnt);
     }
 }
 
