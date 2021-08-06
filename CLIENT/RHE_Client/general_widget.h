@@ -7,6 +7,7 @@
     #include <QDebug>
     #include <QWidget>
     #include <QSettings>
+    #include <QGridLayout>
     #include <QTranslator>
     #include <QMessageBox>
     #include <QFileDialog>
@@ -17,7 +18,7 @@
     class General_Widget : public QWidget {
         Q_OBJECT
         public:
-            General_Widget(QWidget *parent = nullptr);
+            General_Widget(QWidget *prnt = nullptr);
             ~General_Widget() override;
 
             QString get_app_path();
@@ -86,7 +87,7 @@
              * QString message - text of message
              * QPoint position - coordinates(x, y) of current active window
              */
-            int show_message_box(QString title, QString message, int type, /*QPoint position*/QWidget *parent);
+            int show_message_box(QString title, QString message, int type, QWidget *parent);
 
             void change_current_locale();
 
@@ -112,6 +113,7 @@
             QString app_path = "";
             QLocale cur_locale;
             QPalette palette;
+            QWidget *parent = nullptr;
 
         signals:
             void re_translate_signal();

@@ -45,21 +45,21 @@ void Data_Transfer_Module::analyze_recv_data(QByteArray recv) {
             break;
         }
         case PING_TO_SERVER: {
-            emit show_message_box_signal("", tr("Server answer PING"), 2, /*gen_widg->get_position()*/nullptr);
+            emit show_message_box_signal("", tr("Server answer PING"), 2, nullptr);
             break;
         }
         case S_SERVER_ANSWER_TO_CLIENT: {
-            emit show_message_box_signal("", tr("Slave server answer PING"), 2, /*gen_widg->get_position()*/nullptr);
+            emit show_message_box_signal("", tr("Slave server answer PING"), 2, nullptr);
             break;
         }
         case DROP_CONNECTION: {
             emit set_disconnected_signal();
-            emit show_message_box_signal(tr("Error"), tr("Server disabled"), 0, /*gen_widg->get_position()*/nullptr);
+            emit show_message_box_signal(tr("Error"), tr("Server disabled"), 0, nullptr);
             break;
         }
         case NO_MORE_PLACES: {
             emit set_disconnected_signal();
-            emit show_message_box_signal(tr("Error"), tr("Can't get ID from Server - no more places"), 0, /*gen_widg->get_position()*/nullptr);
+            emit show_message_box_signal(tr("Error"), tr("Can't get ID from Server - no more places"), 0, nullptr);
             break;
         }
         case S_SERVER_END_RCV_FILE: {
@@ -135,7 +135,7 @@ void Data_Transfer_Module::analyze_recv_data(QByteArray recv) {
         }
         case RUN_DEBUG_FIRSTLY: {
             emit debug_not_started_signal();
-            //emit show_message_box_signal("", tr("Run debug firstly"), 0, /*gen_widg->get_position()*/nullptr);
+            //emit show_message_box_signal("", tr("Run debug firstly"), 0, nullptr);
             break;
         }
         case S_SERVER_SEND_FPGA_ID: {
@@ -282,7 +282,6 @@ bool Data_Transfer_Module::send_file_to_ss_universal(QByteArray File_byteArray, 
         QList<QByteArray> packets;
         QByteArray tmp_data;
         QByteArray tmp_data_1;
-        QByteArray packet;
         // Чтобы было удобней отсчитывать в цикле, определим первую посылку отдельно
         tmp_data_1 = File_byteArray.mid(0, SEND_FILE_BUFFER).data();
         tmp_data = form_send_file_packet(&tmp_data_1);

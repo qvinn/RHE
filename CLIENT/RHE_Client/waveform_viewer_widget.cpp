@@ -385,14 +385,7 @@ void Waveform_Viewer_Widget::load_waveform() {
     }
     QStringList *lst = gen_widg->load_files(prnt, tr("Choose waveform file"), tr("Waveform (*.wvfrm)"), false, false);
     if((lst == nullptr) || (lst->count() == 0)) {
-//        QPoint pos;
-//        if(standalone || as_window) {
-//            pos.setX(this->x() + (this->width() / 2));
-//            pos.setY(this->y() + (this->height() / 2));
-//        } else {
-//            pos = gen_widg->get_position();
-//        }
-        gen_widg->show_message_box(tr("Error"), tr("Waveform file not choosed"), 0, /*pos*/prnt);
+        gen_widg->show_message_box(tr("Error"), tr("Waveform file not choosed"), 0, prnt);
         return;
     }
     QFile *file = new QFile(QFileInfo(lst->at(0)).absoluteFilePath());
@@ -513,13 +506,6 @@ void Waveform_Viewer_Widget::save_waveform() {
             gen_widg->save_file(prnt, tr("Saving waveform"), tr("Waveform (*.wvfrm)"), &str, &fn_nm, false, true);
         }
     } else {
-//        QPoint pos;
-//        if(standalone || as_window) {
-//            pos.setX(this->x() + (this->width() / 2));
-//            pos.setY(this->y() + (this->height() / 2));
-//        } else {
-//            pos = gen_widg->get_position();
-//        }
         QWidget *prnt = this;
         if((this->parentWidget() != nullptr) && !as_window) {
             prnt = this->parentWidget();
@@ -534,8 +520,8 @@ void Waveform_Viewer_Widget::save_waveform() {
 void Waveform_Viewer_Widget::add_graphs_to_plot() {
     for(int i = 0; i < graph_count; i++) {
         graph_list->append(ui->diagram->addGraph());
-        graph_list->at(i * 2 + 0)->setPen(QPen(QColor("#00000000"), 1));
-        graph_list->at(i * 2 + 0)->setBrush(QBrush(QColor("#00000000")));
+        graph_list->at(i * 2 + 0)->setPen(QPen(QColor("transparent"), 1));
+        graph_list->at(i * 2 + 0)->setBrush(QBrush(QColor("transparent")));
         graph_list->append(ui->diagram->addGraph());
         graph_list->at(i * 2 + 1)->setPen(QPen(grph_clr, 1));
     }
@@ -767,12 +753,11 @@ void Waveform_Viewer_Widget::select_diagram_settings() {
             sttngs_lst.append(gen_widg->get_setting(tmp).toString());
         }
     }
-    Dialog_Select_Diagram_Settings settings_select_dialog(sttngs_lst, gen_widg, this);
-    if(standalone || as_window) {
-        settings_select_dialog.move((this->pos().x() + (abs(this->width() - settings_select_dialog.width()) / 2)), (this->pos().y() + (abs(this->height() - settings_select_dialog.height()) / 2)));
-    } else {
-        settings_select_dialog.move((gen_widg->get_position().x() - (settings_select_dialog.width() / 2)), (gen_widg->get_position().y() - (settings_select_dialog.height() / 2)));
+    QWidget *prnt = this;
+    if((this->parentWidget() != nullptr) && !as_window) {
+        prnt = this->parentWidget();
     }
+    Dialog_Select_Diagram_Settings settings_select_dialog(sttngs_lst, gen_widg, prnt);
     if(settings_select_dialog.exec() == QDialog::Accepted) {
         QList<QString> sttngs_lst_new = settings_select_dialog.get_diagram_settings();
         for(int i = 0; i < sttngs_lst_new.count(); i++) {
@@ -819,12 +804,11 @@ void Waveform_Viewer_Widget::select_displayable_pins() {
         }
         dsplbl_pins.append(*pin_names);
     }
-    Dialog_Select_Displayable_Pins pins_select_dialog(avlbl_pins, dsplbl_pins, this);
-    if(standalone || as_window) {
-        pins_select_dialog.move((this->pos().x() + (abs(this->width() - pins_select_dialog.width()) / 2)), (this->pos().y() + (abs(this->height() - pins_select_dialog.height()) / 2)));
-    } else {
-        pins_select_dialog.move((gen_widg->get_position().x() - (pins_select_dialog.width() / 2)), (gen_widg->get_position().y() - (pins_select_dialog.height() / 2)));
+    QWidget *prnt = this;
+    if((this->parentWidget() != nullptr) && !as_window) {
+        prnt = this->parentWidget();
     }
+    Dialog_Select_Displayable_Pins pins_select_dialog(avlbl_pins, dsplbl_pins, prnt);
     if(pins_select_dialog.exec() == QDialog::Accepted) {
         QStringList dsplbl_pins_lst = pins_select_dialog.get_displayable_pins();
         if((dsplbl_pins_lst.count() == 0) && (svd_vals->count() == 0)) {

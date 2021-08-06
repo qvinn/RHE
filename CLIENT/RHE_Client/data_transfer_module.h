@@ -184,7 +184,7 @@
             void accept_debug_data_signal(QByteArray debug_data);
             void accept_input_data_table_signal(QByteArray input_data_table);
             void accept_output_data_table_signal(QByteArray output_data_table);
-            void show_message_box_signal(QString str1, QString str2, int type, /*QPoint position*/QWidget *parent);
+            void show_message_box_signal(QString str1, QString str2, int type, QWidget *parent);
             void set_disconnected_signal();
             void send_data_signal(QByteArray send_buf);
     };

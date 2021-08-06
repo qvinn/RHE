@@ -4,7 +4,7 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
-    gen_widg = new General_Widget(/*this*/nullptr);
+    gen_widg = new General_Widget(this);
     QDir::setCurrent(gen_widg->get_app_path());
     snd_rcv_module = new Send_Receive_Module(gen_widg);
     data_transfer_module = new Data_Transfer_Module(gen_widg);
@@ -300,10 +300,10 @@ void MainWindow::set_enable_login_buttons(bool flg) {
 void MainWindow::login() {
     if(ui->stackedWidget->currentWidget() == ptr_registration_widg) {
         if(gen_widg->get_setting("settings/SERVER_IP").toString().compare("0.0.0.0", Qt::CaseInsensitive) == 0) {
-            gen_widg->show_message_box(tr("Warning"), tr("Change server-IP in settings"), 0, /*gen_widg->get_position()*/this);
+            gen_widg->show_message_box(tr("Warning"), tr("Change server-IP in settings"), 0, this);
             return;
         } else if(gen_widg->get_setting("settings/SERVER_PORT").toInt() == -1) {
-            gen_widg->show_message_box(tr("Warning"), tr("Change server-port in settings"), 0, /*gen_widg->get_position()*/this);
+            gen_widg->show_message_box(tr("Warning"), tr("Change server-port in settings"), 0, this);
             return;
         }
         crrnt_state_strs = 0;
@@ -441,7 +441,7 @@ void Dialog_Set_Server_IP::on_pshBttn_ok_clicked() {
     if(ui->lnEdt_port->text().count() != 0) {
         int port = ui->lnEdt_port->text().toInt();
         if((port < 0) || (port > 65535)) {
-            gen_widg->show_message_box(tr("Error"), tr("Wrong server port!"), 0, /*gen_widg->get_position()*/this);
+            gen_widg->show_message_box(tr("Error"), tr("Wrong server port!"), 0, this);
         } else {
             QString ip = "";
             for(int i = 0; i < octt_lst->count(); i++) {
@@ -455,7 +455,7 @@ void Dialog_Set_Server_IP::on_pshBttn_ok_clicked() {
             QDialog::done(1);
         }
     } else {
-        gen_widg->show_message_box("Error", tr("Set port value"), 0, /*gen_widg->get_position()*/this);
+        gen_widg->show_message_box("Error", tr("Set port value"), 0, this);
     }
 }
 

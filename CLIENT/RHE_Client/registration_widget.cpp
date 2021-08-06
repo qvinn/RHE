@@ -33,7 +33,7 @@ bool RegistrationWidget::register_user() {
         flag = FILE_REGIST;
         return true;
     } else {
-        gen_widg->show_message_box(tr("Error"), tr("Enter login, password, first and last names"), 0, /*gen_widg->get_position()*/this);
+        gen_widg->show_message_box(tr("Error"), tr("Enter login, password, first and last names"), 0, this);
         return false;
     }
 }
@@ -62,7 +62,7 @@ void RegistrationWidget::login() {
         emit init_connection_signal();      // Иницализируем поключение
     } else {
         emit logined_signal(false);
-        gen_widg->show_message_box(tr("Error"), tr("Enter login and password"), 0, /*gen_widg->get_position()*/this);
+        gen_widg->show_message_box(tr("Error"), tr("Enter login and password"), 0, this);
     }
 }
 
@@ -72,7 +72,7 @@ void RegistrationWidget::login() {
 void RegistrationWidget::slot_link_established(bool flg) {
     if(!flg) {
         emit logined_signal(false);
-        gen_widg->show_message_box(tr("Error"), tr("Can't init connection"), 0, /*gen_widg->get_position()*/this);
+        gen_widg->show_message_box(tr("Error"), tr("Can't init connection"), 0, this);
         return;
     }
     emit get_id_for_client_signal();
@@ -84,7 +84,7 @@ void RegistrationWidget::slot_link_established(bool flg) {
 void RegistrationWidget::slot_id_received(bool flg) {
     if(!flg) {
         emit logined_signal(false);
-        gen_widg->show_message_box(tr("Error"), tr("Can't get ID"), 0, /*gen_widg->get_position()*/this);
+        gen_widg->show_message_box(tr("Error"), tr("Can't get ID"), 0, this);
         return;
     }
     emit send_login_register_data_signal(arr, flag);
@@ -95,7 +95,7 @@ void RegistrationWidget::slot_id_received(bool flg) {
 // USER ACCOUNT NOT APPROVED
 //-------------------------------------------------------------------------
 void RegistrationWidget::slot_not_approved() {
-    gen_widg->show_message_box(tr("Error"), tr("Your account not approved"), 0, /*gen_widg->get_position()*/this);
+    gen_widg->show_message_box(tr("Error"), tr("Your account not approved"), 0, this);
     emit logined_signal(false);
 }
 
@@ -104,7 +104,7 @@ void RegistrationWidget::slot_not_approved() {
 //-------------------------------------------------------------------------
 void RegistrationWidget::slot_client_registered(bool flg) {
     if(!flg) {
-        gen_widg->show_message_box(tr("Error"), tr("The same login does already exist"), 0, /*gen_widg->get_position()*/this);
+        gen_widg->show_message_box(tr("Error"), tr("The same login does already exist"), 0, this);
     }
     emit logined_signal(flg);
 }
@@ -114,7 +114,7 @@ void RegistrationWidget::slot_client_registered(bool flg) {
 //-------------------------------------------------------------------------
 void RegistrationWidget::slot_client_logined(bool flg) {
     if(!flg) {
-        gen_widg->show_message_box(tr("Error"), tr("You enter wrong login or password"), 0, /*gen_widg->get_position()*/this);
+        gen_widg->show_message_box(tr("Error"), tr("You enter wrong login or password"), 0, this);
     }
     emit logined_signal(flg);
 }

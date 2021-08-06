@@ -97,7 +97,7 @@ void Send_Receive_Module::slot_timer_timeout() {
     close_sock_wait->stop();
     if(!manual_disconnect) {
         close_connection();
-        emit show_message_box_signal(tr("Error"), tr("Server disconnected"), 0, /*gen_widg->get_position()*/nullptr);
+        emit show_message_box_signal(tr("Error"), tr("Server disconnected"), 0, nullptr);
     } else {
         manual_disconnect = false;
     }

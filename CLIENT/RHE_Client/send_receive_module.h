@@ -37,7 +37,7 @@
             void reset_ID_signal();
             void clear_FPGA_id_code_signal();
             void received_data(QByteArray data);
-            void show_message_box_signal(QString str1, QString str2, int type, /*QPoint position*/QWidget *parent);
+            void show_message_box_signal(QString str1, QString str2, int type, QWidget *parent);
     };
 
 #endif // SEND_RECEIVE_MODULE_H

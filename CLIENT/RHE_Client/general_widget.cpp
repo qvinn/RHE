@@ -1,6 +1,7 @@
 #include "general_widget.h"
 
-General_Widget::General_Widget(QWidget *parent) : QWidget(parent) {
+General_Widget::General_Widget(QWidget *prnt) {
+    parent = prnt;
 #ifdef __linux__
     app_path.append(QProcessEnvironment::systemEnvironment().value(QStringLiteral("APPIMAGE")));        //Path Of Image Deployed with 'linuxdeployqt'
 #endif
@@ -315,16 +316,16 @@ QString General_Widget::load_file_path(QWidget *prnt, QString title, QString fil
 //-------------------------------------------------------------------------
 // DISPLAYING WARNING/QUESTION/INFO MESSAGES
 //-------------------------------------------------------------------------
-int General_Widget::show_message_box(QString title, QString message, int type, /*QPoint position*/QWidget *parent) {
+int General_Widget::show_message_box(QString title, QString message, int type, QWidget *prnt) {
     QMessageBox msgBox(QMessageBox::Warning, title, QString("\n").append(message));
     if(title.count() == 0) {
         msgBox.setWindowTitle(tr("Warning"));
     }
-    QWidget *prnt = this;
-    if(parent != nullptr) {
-        prnt = parent;
+    if(prnt != nullptr) {
+        msgBox.setParent(prnt);
+    } else {
+        msgBox.setParent(parent);
     }
-    msgBox.setParent(prnt);
     if(type == 1) {
         if(title.count() == 0) {
             msgBox.setWindowTitle(tr("Question"));
@@ -344,11 +345,9 @@ int General_Widget::show_message_box(QString title, QString message, int type, /
     msgBox.setModal(true);
     msgBox.setWindowFlags(msgBox.windowFlags() | Qt::WindowStaysOnTopHint);
     msgBox.setStyleSheet(get_style_sheet("QMessageBox", "QMessageBox QLabel { color: #000000; }"));
-    //hack to place message window at centre of window with 'position' coordinates
-//    msgBox.show();
-//    msgBox.hide();
-    //end hack
-//    msgBox.move((position.x() - (msgBox.width() / 2)), (position.y() - (msgBox.height() / 2)));
+    QGridLayout *layout = dynamic_cast<QGridLayout *>(msgBox.layout());
+    layout->setColumnMinimumWidth(1, 20);
+    msgBox.setLayout(layout);
     return msgBox.exec();
 }
 
