@@ -1,8 +1,12 @@
 #include "resource_manager.h"
 
+#ifdef __linux__
+	#include <sys/mman.h>
+#else
+	#include "mmap-windows.h"
+#endif
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/mman.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -156,7 +160,7 @@ std::string Resource_manager::create_hash(std::string file_name)
 #endif
 	
     file_buffer = static_cast<char*>(mmap(0, file_size, PROT_READ, MAP_SHARED, file_descript, 0));
-    MD5((unsigned char*) file_buffer, file_size, result);
+	MD5((unsigned char*) file_buffer, file_size, result);
     munmap(file_buffer, file_size);
 	
 #ifdef PRINT_INFO

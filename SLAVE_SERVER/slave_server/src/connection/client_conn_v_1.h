@@ -2,8 +2,13 @@
 #define CLIENT_CONN_V_1_H
 
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
+#ifdef __linux__
+	#include <sys/socket.h>
+	#include <netinet/in.h>
+#else
+	#include <winsock2.h>
+	#include <ws2tcpip.h>
+#endif
 #include <stddef.h>
 #include <string.h>
 #include <stdio.h>
@@ -14,7 +19,9 @@
 #include <fcntl.h>	// for open
 #include <unistd.h>	// for close
 #include <signal.h>	// for SIGPIPE
-#include <arpa/inet.h>
+#ifdef __linux__
+	#include <arpa/inet.h>
+#endif
 #include "iniparser.h"	// for .ini parse
 
 #include <iostream> // for write to wile with c++

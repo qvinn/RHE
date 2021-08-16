@@ -1,6 +1,9 @@
 CC		= g++
 CFLAGS  += -g -std=c++11
 LFLAGS  += -L./lib -liniparser -lpthread
+ifeq ($(OS),Windows_NT)
+	LFLAGS +=  -lwsock32 -lws2_32
+endif
 IFLAG	+= -I./src/Parser -I./src/connection -I./src/Debug_module
 FILES	+= ./src/slave_server/client_v_2.c ./src/connection/client_conn_v_1.cpp
 

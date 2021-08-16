@@ -540,6 +540,12 @@ void client_conn_v_1::reset_ID()
 
 int client_conn_v_1::establish_socket()
 {
+#ifndef __linux__
+	WORD sockVersion;
+    WSADATA wsaData;
+    sockVersion = MAKEWORD(2, 2);
+    WSAStartup(sockVersion, &wsaData);
+#endif
     int sock = socket(AF_INET, SOCK_STREAM, 0); // SOCK_STREAM/SOCK_SEQPACKET
     if(sock < 0)
     {

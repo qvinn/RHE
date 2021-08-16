@@ -1,7 +1,11 @@
 //lsof -c server | lsof -c <Имя процесса> - отладка утечки FD (lsof -p <PID>)
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
+#ifdef __linux__
+	#include <sys/socket.h>
+	#include <netinet/in.h>
+#else
+	#include <WinSock2.h>
+#endif
 #include <stddef.h>
 #include <string.h>
 #include <stdio.h>
@@ -363,8 +367,14 @@ int main()
 	total_clients = iniparser_getint(ini, "start:total_clients", -1);
 	total_slave_servers = iniparser_getint(ini, "start:total_slave_servers", -1);	
 	// Инициализируем настройки у slave-сервера - КОНЕЦ
-	
+#ifdef __linux__
 	signal(SIGPIPE, SIG_IGN); // Игнорируем SIGPIPE
+#else
+	WORD sockVersion;
+    WSADATA wsaData;
+    sockVersion = MAKEWORD(2, 2);
+    WSAStartup(sockVersion, &wsaData);
+#endif
 	// sigaction(SIGPIPE, &(struct sigaction){SIG_IGN}, NULL);
 	
 	// void sigpipe_handler(int unused){}
@@ -396,7 +406,11 @@ int main()
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	
 	int opt = 1;
+#ifdef __linux__
     if (setsockopt (listener, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof (opt)) == -1)
+#else
+	if (setsockopt (listener, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof (opt)) == -1)
+#endif
 	{
 		perror("setsockopt");
 	}
