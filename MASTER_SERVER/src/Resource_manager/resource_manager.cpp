@@ -26,11 +26,11 @@
 Resource_manager::Resource_manager(std::string _resource_dir)
 {
 	// Создадим необходимые папки
-	std::string cmd = "mkdir -p " + _resource_dir;	// Папка с ресурсами
+	std::string cmd = "mkdir " + _resource_dir;	// Папка с ресурсами
 	system(cmd.c_str());
-	cmd = "mkdir -p ./tmp";							// Папка с временным хранилищем
+	cmd = "mkdir tmp";							// Папка с временным хранилищем
 	system(cmd.c_str());
-	cmd = "rm -r -f ./tmp/*";						// Очистим папку с временным хранилищем
+	cmd = "rm -r -f tmp/*";						// Очистим папку с временным хранилищем
 	system(cmd.c_str());
 	
 	this->resource_dir = _resource_dir;

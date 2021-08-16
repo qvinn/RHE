@@ -34,7 +34,7 @@
 #define INIT_ID		-1				// Начальное ID для клиента/slave-сервера
 // Вспомогательные флаги - КОНЕЦ
 
-#define RESOURCE_DIR "./resources/"
+#define RESOURCE_DIR "resources/"
 
 // Карта code_op 
 #define CLIENT_WANT_INIT_CONNECTION 10
@@ -114,9 +114,9 @@
 #define FILE_D_DELETE	2	// FILE_D_DELETE
 
 // СТАНДАРТНЫЕ НАЗВАНИЯ ДЛЯ ФАЙЛОВ
-#define TMP_UPD_FILE_PATH		"./tmp/client_upd_file_"
-#define TMP_REGISTER_FILE_PATH	"./tmp/client_register_file_"
-#define TMP_LOGIN_FILE_PATH		"./tmp/client_login_file_"
+#define TMP_UPD_FILE_PATH		"tmp/client_upd_file_"
+#define TMP_REGISTER_FILE_PATH	"tmp/client_register_file_"
+#define TMP_LOGIN_FILE_PATH		"tmp/client_login_file_"
 
 
 // Карта code_op - КОНЕЦ
@@ -1415,7 +1415,7 @@ void take_update(int id)
 	
 	// Пройдем по эталонному списку и выполним сравнение
 	// Перед этим создадим файл, в который мы запишем результат анализа
-	std::string client_upd_compare = "./tmp/client_upd_compare_" + std::to_string(id);
+	std::string client_upd_compare = "tmp/client_upd_compare_" + std::to_string(id);
 	std::ifstream client_upd_compare_ifs(client_upd_compare);
 	
 	bool file_finded = false;
