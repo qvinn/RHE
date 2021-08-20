@@ -99,6 +99,7 @@ int main(int argc, char* argv[]){
         } else if(cmd == "t_select")
         {
 			db->select_all_users();
+			db->look_all_users();
         } else if(cmd == "t_approve")
         {
 			std::cout << "\nchoose user_id for approve: ";	std::cin >> choose_user;			

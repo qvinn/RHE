@@ -1095,7 +1095,7 @@ void recive_new_data(char *buf, int sock)
 		
 		case CLIENT_START_SEND_FILE_U_TO_SERVER:
 		{		
-			printf("\t|___Client with id %i give UPD list\n", sock);
+			printf("\t|___Client with id %i START_SENDING_U_FILE \n", sock);
 			//explore_byte_buff(tmp_packet->data, DATA_BUFFER);
 			if(start_rcv_U_File(sock,tmp_packet->data) == false)
 			{
@@ -1107,14 +1107,14 @@ void recive_new_data(char *buf, int sock)
 		case CLIENT_SENDING_FILE_U_TO_SERVER:
 		{		
 			rcv_U_File(sock,tmp_packet->data);
-			printf("\t|___Client with id %i give SENDING_FILE_U_TO_SERVER\n", sock);		
+			printf("\t|___Client with id %i SENDING_FILE_U_TO_SERVER\n", sock);		
 			break;	
 		}
 		
 		case CLIENT_FINISH_SEND_FILE_U_TO_SERVER:
 		{	
 			end_rcv_U_File(sock,tmp_packet->data);
-			printf("\t|___Client with id %i give FINISH_SEND_FILE_U_TO_SERVER\n", sock);
+			printf("\t|___Client with id %i FINISH_SEND_FILE_U_TO_SERVER\n", sock);
 			break;	
 		}
 		
@@ -1366,12 +1366,13 @@ void take_update(int id)
 	Resource_manager_mutex.unlock();
 	
 	// ДЛЯ ОТЛАДКИ
-	std::cout << "Start UPDATE PROCESS WITH MACHINE WITH ID " << id << "\n";
-	std::cout << "server_upd_list.size(): " << server_upd_list.size() << "\n";
+	std::cout << "-->Start UPDATE PROCESS WITH MACHINE WITH ID " << id << "\n";
+	std::cout << "\tFILES_HASHES FROM SERVER:\n";
 	for(int i = 0; i < server_upd_list.size(); i++)
 	{
 		std::cout << "server file name: " << server_upd_list.at(i).file_name << "\tserver file hash:" << server_upd_list.at(i).hash << "\n";
 	}
+	std::cout << "\tFILES_HASHES FROM SERVER: - END\n" ;
 	// ДЛЯ ОТЛАДКИ
 	
 	// На данном этапе условимся, что клиент уже присылает необходимый файл с описанием
@@ -1383,17 +1384,28 @@ void take_update(int id)
 	std::string client_upd_file_name = TMP_UPD_FILE_PATH + std::to_string(id);
 	read_upd_file(client_upd_file_name,&files_names,&files_hashes);
 	
+	std::cout << "\tCLIENT_files_names().size(): " << files_names.size() << "\n";
+	std::cout << "\tCLIENT_files_hashes().size(): " << files_hashes.size() << "\n";
+	
+	// Если по какой-то причине колическо имен файлов и их хэщ-сумм отличается,
+	// прекратить передачу процесс обновления
+	if(files_names.size() != files_hashes.size())
+	{
+		send_U_Packet(id, SERVER_END_TAKE_UPDATE, NULL);
+	}
+	
 	for(int i = 0; i < files_names.size(); i++)
 	{
 		client_upd_list.push_back(Resource_manager::file_info{files_names.at(i),files_hashes.at(i)});
 	}
 	
 	// ДЛЯ ОТЛАДКИ
-	std::cout << "files for update(client_upd_list):\n" ;
+	std::cout << "\tFILES_HASHES FROM CLIENT:\n" ;
 	for(int i = 0; i < client_upd_list.size(); i++)
 	{
 		std::cout << "file name: " << client_upd_list.at(i).file_name << "\tfile hash: " << client_upd_list.at(i).hash << "\n";
 	}
+	std::cout << "\tFILES_HASHES FROM CLIENT: - END\n" ;
 	// ДЛЯ ОТЛАДКИ
 	
 	// После того, как мы имеем два списка файлов: эталонный на сервере и тот, который прислал
@@ -1414,12 +1426,14 @@ void take_update(int id)
 		std::ofstream client_upd_compare_ofs (client_upd_compare);
 		if (client_upd_compare_ofs.is_open())
 		{
+			// Основной цикл проходит по списку файлов/хэшей на сервере
 			for(i = 0; i < server_upd_list.size(); i++)
 			{				
 				// Теперь попытаемся найти в списке файлов клиента файл с таким названием
 				for(j = 0; j < client_upd_list.size(); j++)
 				{
 					// Сначала убедимся в том, что такой файл существует у клиента
+					// if - если встретили файл с таким названием
 					if(server_upd_list.at(i).file_name.compare(client_upd_list.at(j).file_name) == 0)
 					{
 						file_finded = true;
