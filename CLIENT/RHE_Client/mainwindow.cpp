@@ -16,7 +16,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     initialize_ui();
     set_ui_text();
     load_settings();
-    connect(ptr_RHE_widg, &RHE_Widget::resize_signal, this, &MainWindow::slot_re_size);
     connect(ptr_RHE_widg, &RHE_Widget::set_disconnected_signal, snd_rcv_module, &Send_Receive_Module::set_disconnected);
     connect(gen_widg, &General_Widget::re_translate_signal, this, &MainWindow::slot_re_translate);
     connect(gen_widg, &General_Widget::re_translate_signal, ptr_registration_widg, &RegistrationWidget::slot_re_translate);
@@ -210,7 +209,7 @@ void MainWindow::initialize_ui() {
     font_size = 10;
     height = 21;
 #endif
-    ui->menu_bar->setFixedSize(ui->menu_file->width(), height);
+    ui->menu_bar->setFixedHeight(height);
     ui->menu_bar->setFont(QFont("Tahoma", font_size));
     ui->menu_settings->setStyleSheet(qmenu_stylesheet);
     cmbBx_lng_chs = new QComboBox(ui->menu_settings);
@@ -361,16 +360,6 @@ void MainWindow::logout() {
     } else {
         logined(false);
     }
-}
-
-//-------------------------------------------------------------------------
-// HACK TO UPDATING SIZE OF ALL COMPONENTS OF UI
-//-------------------------------------------------------------------------
-void MainWindow::slot_re_size() {
-    QSize cur_size = this->size();
-    this->resize(QSize((this->width() + 1), (this->height() + 1)));
-    this->updateGeometry();
-    this->resize(cur_size);
 }
 
 //-------------------------------------------------------------------------

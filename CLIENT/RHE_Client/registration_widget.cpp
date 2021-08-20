@@ -15,27 +15,14 @@ RegistrationWidget::RegistrationWidget(QWidget *parent, General_Widget *widg, Da
     connect(data_transfer_mod, &Data_Transfer_Module::logined_signal, this, &RegistrationWidget::slot_client_logined);
     connect(data_transfer_mod, &Data_Transfer_Module::set_user_fname_lname_signal, this, &RegistrationWidget::slot_set_user_fname_lname);
     ui->lineEdit_password->setEchoMode(QLineEdit::Password);
+#ifdef __linux__
+    ui->label->setFixedHeight(ui->label->height() - 3);
+    ui->frame->setContentsMargins(ui->frame->contentsMargins().left(), (ui->frame->contentsMargins().top() + 4), ui->frame->contentsMargins().right(), ui->frame->contentsMargins().bottom());
+#endif
 }
 
 RegistrationWidget::~RegistrationWidget() {
     delete ui;
-}
-
-//-------------------------------------------------------------------------
-// DISPLAYING OF REGISTRATION WIDGET
-//-------------------------------------------------------------------------
-void RegistrationWidget::showEvent(QShowEvent *) {
-    resizeEvent(nullptr);
-}
-
-//-------------------------------------------------------------------------
-// RESIZING OF REGISTRATION WIDGET
-//-------------------------------------------------------------------------
-void RegistrationWidget::resizeEvent(QResizeEvent *) {
-    ui->verticalLayoutWidget_3->setGeometry(0, 0, this->width(), ui->verticalLayoutWidget_3->height());
-    ui->horizontalLayoutWidget->setGeometry(ui->grpBx_rgstr->contentsRect().x(), ui->grpBx_rgstr->contentsRect().y(), ui->grpBx_rgstr->contentsRect().width(), ui->grpBx_rgstr->contentsRect().height());
-    ui->verticalLayoutWidget_2->setGeometry(ui->grpBx_lgn->contentsRect().x(), ui->grpBx_lgn->contentsRect().y(), ui->grpBx_lgn->contentsRect().width(), ui->grpBx_lgn->contentsRect().height());
-    ui->verticalSpacer_2->changeSize(ui->verticalSpacer_2->geometry().width(), (ui->grpBx_rgstr->contentsMargins().top() + ui->verticalSpacer_4->sizeHint().height()));
 }
 
 //-------------------------------------------------------------------------

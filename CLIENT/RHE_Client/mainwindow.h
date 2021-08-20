@@ -68,14 +68,13 @@
             void chkBx_ld_mnl_frmwr_state_changed();
             void pshBttn_set_srvr_IP();
             void cmbBx_lng_chs_current_index_changed(int index);
-            void slot_re_size();
             void slot_waveform_viewer_closed();
             void slot_timer_waveform_viewer_timeout();
             void slot_timer_progress_bar_timeout();
 
         signals:
             void update_data_signal();
-            void set_disconnected_signal();      
+            void set_disconnected_signal();
     };
 
     //////////////////////////////////////////////////DIALOG SET SERVER IP///////////////////////////////////////////////////
