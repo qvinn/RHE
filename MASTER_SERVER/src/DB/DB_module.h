@@ -66,6 +66,9 @@ class DB_module {
 		*/
 		bool get_first_name_second_name(std::string _login, std::string *_first_name, std::string *_second_name);
 		
+		// Метод для отображения в консоли всех пользоватетей
+		void look_all_users();
+		
 
 	private:
 		// Указатель на БД
@@ -106,8 +109,5 @@ class DB_module {
 			* return						- Выходной вектор
 		*/
 		std::vector<std::string> prepare_parameters(std::vector<std::string> vec);
-		
-		// Метод для отображения в консоли всех пользоватетей
-		void look_all_users(std::vector<user_info> users_vec);
 		
 };

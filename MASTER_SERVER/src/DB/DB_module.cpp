@@ -129,7 +129,6 @@ bool DB_module::select_all_users()
 	
 	users_buffer = {};
 	rc = sqlite3_exec(db, sql.c_str(), select_callback, &users_buffer, &zErrMsg);
-	look_all_users(users_buffer);
 	
 	if( rc != SQLITE_OK ){
 		fprintf(stderr, "SQL error: %s\n", zErrMsg);
@@ -185,6 +184,23 @@ bool DB_module::get_first_name_second_name(std::string _login, std::string *_fir
 		}
 	}
 	return false;
+}
+
+void DB_module::look_all_users()
+{
+	std::vector<user_info> users_vec = users_buffer;
+	std::cout << "users size: " << users_vec.size() << "\n";
+	std::cout << "user_id\tfirst_name\tsecond_name\tlogin\tpassword\tapprove\n";
+	for(int i = 0; i < users_vec.size(); i++)
+	{
+
+		std::cout << users_vec.at(i).user_id		<< "\t"
+					<< users_vec.at(i).first_name	<< "\t"
+					<< users_vec.at(i).second_name	<< "\t"
+					<< users_vec.at(i).login		<< "\t"
+					<< users_vec.at(i).password		<< "\t"
+					<< users_vec.at(i).approve		<< "\t"	<< "\n";
+	}
 }
 
 bool DB_module::user_set_approved(int user_id, int approve)
@@ -282,20 +298,4 @@ std::vector<std::string> DB_module::prepare_parameters(std::vector<std::string> 
 		result.push_back(tmp_str);
 	}
 	return result;
-}
-
-void DB_module::look_all_users(std::vector<user_info> users_vec)
-{
-	std::cout << "users size: " << users_vec.size() << "\n";
-	std::cout << "user_id\tfirst_name\tsecond_name\tlogin\tpassword\tapprove\n";
-	for(int i = 0; i < users_vec.size(); i++)
-	{
-
-		std::cout << users_vec.at(i).user_id		<< "\t"
-					<< users_vec.at(i).first_name	<< "\t"
-					<< users_vec.at(i).second_name	<< "\t"
-					<< users_vec.at(i).login		<< "\t"
-					<< users_vec.at(i).password		<< "\t"
-					<< users_vec.at(i).approve		<< "\t"	<< "\n";
-	}
 }
