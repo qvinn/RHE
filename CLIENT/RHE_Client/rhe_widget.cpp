@@ -409,6 +409,7 @@ void RHE_Widget::initialize_ui() {
     pshBttn_chk_prj_stat_set_enabled(false);
     ui->pshBttn_snd_sgnls_sqnc->setEnabled(false);
     ui->prgrssBr_fl_sts->setStyleSheet("QProgressBar { border: 2px solid grey; border-radius: 5px; color: #FFFFFF; background-color: #000000; } QProgressBar::chunk { background-color: #0020FF; width: 10px; margin: 0.5px; }");
+    ui->prgrssBr_fl_sts->setFont(QFont("Tahoma", 10, QFont::Bold));
     ui->chckBx_strt_dbg_aftr_flsh->setCheckState(static_cast<Qt::CheckState>(abs(gen_widg->get_setting("settings/START_DEBUG_AFTER_FPGA_FLASHING").toInt() - 2)));
     ui->chckBx_strt_sqnc_of_sgn_with_dbg->setCheckState(static_cast<Qt::CheckState>(abs(gen_widg->get_setting("settings/START_SEQUENCE_OF_SIGNALS_WITH_DEBUG").toInt() - 2)));
     if(gen_widg->get_setting("settings/MANUALY_LOAD_FIRMWARE").toBool() && gen_widg->get_setting("settings/ENABLE_FILE_CHEKING").toBool()) {
