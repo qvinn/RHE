@@ -2,6 +2,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <stddef.h>
 #include <string.h>
 #include <stdio.h>
@@ -162,6 +163,7 @@ typedef struct user_online {
 } user_online;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void get_ip_fom_socket(int sock, char *clientip);
 void explore_byte_buff(char *data, int size);
 
 // Метод для отправки данных в сокет
@@ -419,8 +421,11 @@ int main()
         {
             perror("accept");
             exit(3);
-		}
-		printf("___NEW CLIENT|SLAVE_S WANT CONNECT ON SOCKET: %i\n",sock);
+		}		
+		char *dev_ip = new char[20];
+		get_ip_fom_socket(sock,dev_ip);
+		printf("___NEW CLIENT|SLAVE_S WANT CONNECT ON SOCKET: %i ---> IP: %s\n",sock,dev_ip);
+		delete[] dev_ip;		
 		// Проанализируем данные для первичной обработки
 		int bytes_read = 0;
 		char *buf = (char*)malloc(sizeof(char)*RECIVE_BUFFER_SIZE);
@@ -500,6 +505,14 @@ int main()
 	printf("End program\n");
     
     return 0;
+}
+
+void get_ip_fom_socket(int sock, char *clientip)
+{
+	struct sockaddr_in addr;
+    socklen_t addr_size = sizeof(struct sockaddr_in);
+    int res = getpeername(sock, (struct sockaddr *)&addr, &addr_size);
+    strcpy(clientip, inet_ntoa(addr.sin_addr));
 }
 
 void explore_byte_buff(char *data, int size)
@@ -1392,6 +1405,7 @@ void take_update(int id)
 	if(files_names.size() != files_hashes.size())
 	{
 		send_U_Packet(id, SERVER_END_TAKE_UPDATE, NULL);
+		return;
 	}
 	
 	for(int i = 0; i < files_names.size(); i++)
