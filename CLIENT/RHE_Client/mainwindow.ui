@@ -543,6 +543,88 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="pshBttn_abrt_cnnctn">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>135</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>250</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QPushButton:checked{
+	background-color: lightblue;
+	border-style: outset;
+	color: black;
+	font: bold 10p;
+	border-style: outset;
+	border-width: 1px;
+	border-radius: 0px;
+	border-color: blue;
+	padding: 0px 0px;
+}
+QPushButton:pressed{
+	background-color: lightblue;
+	border-style: outset;
+	color: black;
+	font: bold 10p;
+	border-style: outset;
+	border-width: 1px;
+	border-radius: 0px;
+	border-color: blue;
+	padding: 0px 0px;
+}
+QPushButton:disabled{
+	background-color: lightblue;
+	border-style: outset;
+	color: black;
+	font: bold 10p;
+	border-style: outset;
+	border-width: 1px;
+	border-radius: 0px;
+	border-color: blue;
+	padding: 0px 0px;
+}
+QPushButton{
+	background-color: lightGray;
+	color: black;
+	border-style: outset;
+	border-width: 1px;
+	border-radius: 0px;
+	border-color: gray;
+	padding: 0px 0px;
+}
+QPushButton:hover{
+	border-style: outset;
+	border-width: 1px;
+	border-radius: 0px;
+	border-color: royalblue;
+}</string>
+          </property>
+          <property name="text">
+           <string>  Abort Connection  </string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>

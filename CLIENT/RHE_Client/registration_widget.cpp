@@ -68,10 +68,12 @@ void RegistrationWidget::login() {
 //-------------------------------------------------------------------------
 // CONNECTION WITH SERVER ESTABLISHED
 //-------------------------------------------------------------------------
-void RegistrationWidget::slot_link_established(bool flg) {
-    if(!flg) {
+void RegistrationWidget::slot_link_established(int flg) {
+    if(flg == 0 || flg == 1) {
         emit logined_signal(false);
-        gen_widg->show_message_box(tr("Error"), tr("Can't init connection"), 0, this);
+        if(flg == 0) {
+            gen_widg->show_message_box(tr("Error"), tr("Can't init connection"), 0, this);
+        }
         return;
     }
     emit get_id_for_client_signal();

@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ptr_registration_widg, &RegistrationWidget::logined_signal, this, &MainWindow::logined);
     connect(this, &MainWindow::update_data_signal, data_transfer_module, &Data_Transfer_Module::get_update_data);
     connect(this, &MainWindow::set_disconnected_signal, snd_rcv_module, &Send_Receive_Module::set_disconnected);
+    connect(this, &MainWindow::abort_connection_signal, snd_rcv_module, &Send_Receive_Module::abort_connection);
     connect(snd_rcv_module, &Send_Receive_Module::logout_signal, this, &MainWindow::logout);
     connect(snd_rcv_module, &Send_Receive_Module::received_data, data_transfer_module, &Data_Transfer_Module::analyze_recv_data, Qt::QueuedConnection);
     connect(snd_rcv_module, &Send_Receive_Module::reset_ID_signal, data_transfer_module, &Data_Transfer_Module::reset_ID);
@@ -188,6 +189,13 @@ void MainWindow::on_pshBttn_register_clicked() {
 }
 
 //-------------------------------------------------------------------------
+// PUSH BUTTON 'ABORT CONNECTION' CLICKED
+//-------------------------------------------------------------------------
+void MainWindow::on_pshBttn_abrt_cnnctn_clicked() {
+    emit abort_connection_signal();
+}
+
+//-------------------------------------------------------------------------
 // INITIALIZING OF UI COMPONENTS
 //-------------------------------------------------------------------------
 void MainWindow::initialize_ui() {
@@ -197,6 +205,7 @@ void MainWindow::initialize_ui() {
     ui->prgrssBr_cnnctn_stat->setStyleSheet("QProgressBar { border: 2px solid grey; border-radius: 5px; color: #FFFFFF; background-color: #000000; } "
                                             "QProgressBar::chunk { background-color: #0020FF; width: 10px; margin: 0.5px; }");
     ui->prgrssBr_cnnctn_stat->setVisible(false);
+    ui->pshBttn_abrt_cnnctn->setVisible(false);
     ui->menu_bar->setStyleSheet("QMenuBar { background-color: #F5F5F5; color: #000000; } QMenu:disabled { color: #898989; } "
                                 "QMenuBar::item:selected { background: #9D9D90; color: #FFFFFF; } QMenuBar::item:pressed { background: #5D5D50; color: #FFFFFF; }");
     ui->menu_file->setStyleSheet(qmenu_stylesheet);
@@ -252,6 +261,9 @@ void MainWindow::set_ui_text() {
     if(!ui->pshBttn_register->isHidden()) {
         ui->pshBttn_register->setText(tr("Register"));
     }
+    if(!ui->pshBttn_abrt_cnnctn->isHidden()) {
+        ui->pshBttn_abrt_cnnctn->setText(tr("  Abort Connection  "));
+    }
     state_strs = {tr("Connecting To Server"), tr("Updating Data"), ""};
     if(!ui->prgrssBr_cnnctn_stat->isHidden()) {
         ui->prgrssBr_cnnctn_stat->setFormat(state_strs.at(crrnt_state_strs));
@@ -288,6 +300,7 @@ void MainWindow::load_settings() {
 //-------------------------------------------------------------------------
 void MainWindow::set_enable_login_buttons(bool flg) {
     ui->prgrssBr_cnnctn_stat->setVisible(!flg);
+    ui->pshBttn_abrt_cnnctn->setVisible(!flg);
     ui->pshBttn_register->setEnabled(flg);
     ui->pshBttn_login_logout->setEnabled(flg);
     ui->pshBttn_set_srvr_ip->setEnabled(flg);

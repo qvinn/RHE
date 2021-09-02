@@ -61,6 +61,7 @@
             void closeEvent(QCloseEvent *) override;
             void on_pshBttn_login_logout_clicked();
             void on_pshBttn_register_clicked();
+            void on_pshBttn_abrt_cnnctn_clicked();
             void pshBttn_wvfrm_vwr();
             void pshBttn_exit();
             void chkBx_fls_chckng_state_changed();
@@ -75,6 +76,7 @@
         signals:
             void update_data_signal();
             void set_disconnected_signal();
+            void abort_connection_signal();
     };
 
     //////////////////////////////////////////////////DIALOG SET SERVER IP///////////////////////////////////////////////////

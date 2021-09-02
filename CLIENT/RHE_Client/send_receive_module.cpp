@@ -4,16 +4,21 @@ Send_Receive_Module::Send_Receive_Module(General_Widget *widg) {
     gen_widg = widg;
     socket = new QTcpSocket(this);
     close_sock_wait = new QTimer(this);
-    connect(close_sock_wait, &QTimer::timeout, this, &Send_Receive_Module::slot_timer_timeout);
+    wait_connection = new QTimer(this);
+    connect(close_sock_wait, &QTimer::timeout, this, &Send_Receive_Module::slot_timer_close_sock_wait_timeout);
+    connect(wait_connection, &QTimer::timeout, this, &Send_Receive_Module::slot_wait_connection_timeout);
     socket->setReadBufferSize(RECIVE_BUFFER_SIZE);
     connect(socket, &QAbstractSocket::readyRead, this, &Send_Receive_Module::receive_data);
+    connect(socket, &QAbstractSocket::connected, this, &Send_Receive_Module::server_connected);
     connect(socket, &QAbstractSocket::disconnected, this, &Send_Receive_Module::server_disconnected);
     connect(qApp, &QApplication::aboutToQuit, this, &Send_Receive_Module::set_disconnected);
     connect(this, &Send_Receive_Module::show_message_box_signal, gen_widg, &General_Widget::show_message_box);
     close_sock_wait->stop();
+    wait_connection->stop();
 }
 
 Send_Receive_Module::~Send_Receive_Module() {
+    delete wait_connection;
     delete close_sock_wait;
     delete socket;
 }
@@ -22,11 +27,10 @@ Send_Receive_Module::~Send_Receive_Module() {
 // ESTABLISH SOCKET
 //-------------------------------------------------------------------------
 bool Send_Receive_Module::establish_socket() {
+    wait_connection->setInterval(60000);
+    wait_connection->start();
     socket->connectToHost(gen_widg->get_setting("settings/SERVER_IP").toString(), static_cast<quint16>(gen_widg->get_setting("settings/SERVER_PORT").toInt()), QIODevice::ReadWrite);
-    if(!socket->isOpen() || !socket->isValid()) {
-        return false;
-    }
-    return socket->waitForConnected(60000);     //60000 msec timeout for establishing connection
+    return (socket->isOpen() && socket->isValid());
 }
 
 //-------------------------------------------------------------------------
@@ -37,8 +41,8 @@ void Send_Receive_Module::init_connection() {
     if(!connected) {
         emit reset_ID_signal();
         socket->close();
+        emit link_established_signal(0);
     }
-    emit link_established_signal(connected);
 }
 
 //-------------------------------------------------------------------------
@@ -60,6 +64,22 @@ void Send_Receive_Module::close_connection() {
 void Send_Receive_Module::set_disconnected() {
     manual_disconnect = true;
     close_connection();
+}
+
+//-------------------------------------------------------------------------
+// ABORT CONNECTION
+//-------------------------------------------------------------------------
+void Send_Receive_Module::abort_connection() {
+    wait_connection->stop();
+    socket->abort();
+    emit link_established_signal(1);
+}
+
+//-------------------------------------------------------------------------
+// SERVER CONNECTED
+//-------------------------------------------------------------------------
+void Send_Receive_Module::server_connected() {
+    emit link_established_signal(2);
 }
 
 //-------------------------------------------------------------------------
@@ -91,9 +111,17 @@ void Send_Receive_Module::send_data(QByteArray data) {
 }
 
 //-------------------------------------------------------------------------
+// TIMEOUT OF WAITING CONNECTION TO SERVER
+//-------------------------------------------------------------------------
+void Send_Receive_Module::slot_wait_connection_timeout() {
+    wait_connection->stop();
+    emit link_established_signal(0);
+}
+
+//-------------------------------------------------------------------------
 // TIMEOUT OF WAITING TO FORCE CLOSE SOCKET
 //-------------------------------------------------------------------------
-void Send_Receive_Module::slot_timer_timeout() {
+void Send_Receive_Module::slot_timer_close_sock_wait_timeout() {
     close_sock_wait->stop();
     if(!manual_disconnect) {
         close_connection();
