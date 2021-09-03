@@ -524,7 +524,11 @@ int main()
 void get_ip_fom_socket(int sock, char *clientip)
 {
 	struct sockaddr_in addr;
+#ifdef __linux__
     socklen_t addr_size = sizeof(struct sockaddr_in);
+#else
+	int addr_size = sizeof(struct sockaddr_in);
+#endif
     int res = getpeername(sock, (struct sockaddr *)&addr, &addr_size);
     strcpy(clientip, inet_ntoa(addr.sin_addr));
 }
