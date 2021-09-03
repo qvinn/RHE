@@ -39,6 +39,7 @@ bool Send_Receive_Module::establish_socket() {
 void Send_Receive_Module::init_connection() {
     connected = establish_socket();
     if(!connected) {
+        wait_connection->stop();
         emit reset_ID_signal();
         socket->close();
         emit link_established_signal(0);
@@ -79,6 +80,7 @@ void Send_Receive_Module::abort_connection() {
 // SERVER CONNECTED
 //-------------------------------------------------------------------------
 void Send_Receive_Module::server_connected() {
+    wait_connection->stop();
     emit link_established_signal(2);
 }
 

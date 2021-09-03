@@ -938,12 +938,12 @@
 <context>
     <name>Send_Receive_Module</name>
     <message>
-        <location filename="../send_receive_module.cpp" line="128"/>
+        <location filename="../send_receive_module.cpp" line="130"/>
         <source>Error</source>
         <translation>Помилка</translation>
     </message>
     <message>
-        <location filename="../send_receive_module.cpp" line="128"/>
+        <location filename="../send_receive_module.cpp" line="130"/>
         <source>Server disconnected</source>
         <translation>Сервер вимкнено</translation>
     </message>
