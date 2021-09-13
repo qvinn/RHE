@@ -28,6 +28,8 @@ Waveform_Viewer_Widget::Waveform_Viewer_Widget(QWidget *parent, General_Widget *
     pin_names_board = new QList<QString>();
     svd_vals = new QList<QList<int> *>();
     svd_dbg_time = new QList<double>();
+//    ui->diagram->setNotAntialiasedElements(QCP::aeAll);
+//    ui->diagram->setNoAntialiasingOnDrag(true);
     flags = this->windowFlags();
 }
 
@@ -59,7 +61,7 @@ void Waveform_Viewer_Widget::showEvent(QShowEvent *) {
 //-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::leaveEvent(QEvent *) {
     ui->diagram->layer("layerCursor")->setVisible(false);
-    ui->diagram->replot();
+    ui->diagram->replot(QCustomPlot::rpQueuedReplot);
     qApp->setOverrideCursor(QCursor(Qt::ArrowCursor));
 }
 
@@ -127,7 +129,7 @@ void Waveform_Viewer_Widget::on_spnBx_wvfrm_vwr_dscrtnss_tm_valueChanged(int val
         (*dyn_tckr)->setScaleStrategy(QCPAxisTickerFixed::ssMultiples);
         ui->diagram->xAxis->setTicker(*dyn_tckr);
         set_measurement_label_text();
-        ui->diagram->replot();
+        ui->diagram->replot(QCustomPlot::rpQueuedReplot);
     }
 }
 
@@ -520,9 +522,13 @@ void Waveform_Viewer_Widget::save_waveform() {
 void Waveform_Viewer_Widget::add_graphs_to_plot() {
     for(int i = 0; i < graph_count; i++) {
         graph_list->append(ui->diagram->addGraph());
+        graph_list->last()->setAdaptiveSampling(false);
+//        graph_list->last()->setAntialiased(false);
         graph_list->at(i * 2 + 0)->setPen(QPen(QColor("transparent"), 1));
         graph_list->at(i * 2 + 0)->setBrush(QBrush(QColor("transparent")));
         graph_list->append(ui->diagram->addGraph());
+        graph_list->last()->setAdaptiveSampling(false);
+//        graph_list->last()->setAntialiased(false);
         graph_list->at(i * 2 + 1)->setPen(QPen(grph_clr, 1));
     }
     change_pin_names();
@@ -555,7 +561,7 @@ void Waveform_Viewer_Widget::re_scale_graph() {
     ui->diagram->yAxis->rescale();
     ui->diagram->yAxis->setRange(0, (graph_count * 2));
     ui->diagram->xAxis->setRange(0, ui->diagram->xAxis->range().maxRange);
-    ui->diagram->replot();
+    ui->diagram->replot(QCustomPlot::rpQueuedReplot);
     ui->diagram->setProperty("xmin", ui->diagram->xAxis->range().minRange);
     ui->diagram->setProperty("xmax", ui->diagram->xAxis->range().maxRange);
     ui->diagram->setProperty("ymin", ui->diagram->yAxis->range().lower);
@@ -589,7 +595,7 @@ void Waveform_Viewer_Widget::add_data_to_graph(QList<int> val, QList<int> *prev_
 //-------------------------------------------------------------------------
 void Waveform_Viewer_Widget::add_data_to_graph_rltm(QList<int> val, QList<int> *prev_vals, double time, bool val_changed) {
     add_data_to_graph(val, prev_vals, time, val_changed);
-    ui->diagram->replot();
+    ui->diagram->replot(QCustomPlot::rpQueuedReplot);
 }
 
 //-------------------------------------------------------------------------
@@ -902,7 +908,7 @@ void Waveform_Viewer_Widget::draw_from_saved_vals(int val) {
             add_data_to_graph(tmp_vals_frm_svd.at(i), &prev_vals, svd_dbg_time->at(i), val_changed);
         }
     }
-    ui->diagram->replot();
+    ui->diagram->replot(QCustomPlot::rpQueuedReplot);
 }
 
 //-------------------------------------------------------------------------
@@ -981,7 +987,7 @@ void Waveform_Viewer_Widget::slot_mouse_move(QMouseEvent *event) {
     if(mouse_inside_object(x_coord, y_coord, false)) {
         if(ui->diagram->layer("layerCursor")->visible()) {
             ui->diagram->layer("layerCursor")->setVisible(false);
-            ui->diagram->replot();
+            ui->diagram->replot(QCustomPlot::rpQueuedReplot);
         }
         if(this->cursor().shape() != Qt::ClosedHandCursor) {
             qApp->setOverrideCursor(QCursor(Qt::OpenHandCursor));
@@ -1054,7 +1060,7 @@ void Waveform_Viewer_Widget::slot_mouse_move(QMouseEvent *event) {
                             add_data_to_graph(tmp_vals_frm_svd.at(i), &prev_vals, svd_dbg_time->at(i), val_changed);
                         }
                     }
-                    ui->diagram->replot();
+                    ui->diagram->replot(QCustomPlot::rpQueuedReplot);
                     coef = int_cur_y;
                 }
             }
@@ -1064,7 +1070,7 @@ void Waveform_Viewer_Widget::slot_mouse_move(QMouseEvent *event) {
         if(!mouse_inside_object(x_coord, y_coord, true)) {
             if(ui->diagram->layer("layerCursor")->visible()) {
                 ui->diagram->layer("layerCursor")->setVisible(false);
-                ui->diagram->replot();
+                ui->diagram->replot(QCustomPlot::rpQueuedReplot);
             }
             qApp->setOverrideCursor(QCursor(Qt::ArrowCursor));
             this->setCursor(Qt::ArrowCursor);
@@ -1104,7 +1110,7 @@ void Waveform_Viewer_Widget::slot_mouse_pressed(QMouseEvent *event) {
             if(mouse_inside_object(x_coord, y_coord, true)) {
                 zoom_pressed = true;
                 ui->diagram->layer("layerCursor")->setVisible(false);
-                ui->diagram->replot();
+                ui->diagram->replot(QCustomPlot::rpQueuedReplot);
                 ui->diagram->setSelectionRectMode(QCP::srmZoom);
             }
         }
@@ -1123,7 +1129,7 @@ void Waveform_Viewer_Widget::slot_mouse_pressed(QMouseEvent *event) {
             if(count_of_press == 1) {
                 if(!ui->diagram->layer("layerMeasure")->visible()) {
                     ui->diagram->layer("layerMeasure")->setVisible(true);
-                    ui->diagram->replot();
+                    ui->diagram->replot(QCustomPlot::rpQueuedReplot);
                 }
                 draw_line(frst_msr_line, x_coord, x_coord, -QCPRange::maxRange, QCPRange::maxRange);
             } else if(count_of_press == 2) {
