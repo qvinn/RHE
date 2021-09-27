@@ -213,17 +213,17 @@
         <translation type="obsolete">Set server IP</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="457"/>
+        <location filename="../mainwindow.cpp" line="458"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="457"/>
+        <location filename="../mainwindow.cpp" line="458"/>
         <source>Wrong server port!</source>
         <translation>Wrong server port!</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="471"/>
+        <location filename="../mainwindow.cpp" line="472"/>
         <source>Set port value</source>
         <translation>Set port value</translation>
     </message>
@@ -241,22 +241,22 @@
     </message>
     <message>
         <location filename="../dialog_set_server_ip.ui" line="137"/>
-        <location filename="../mainwindow.cpp" line="426"/>
+        <location filename="../mainwindow.cpp" line="427"/>
         <source>Setting of server IP</source>
         <translation>Setting of server IP</translation>
     </message>
     <message>
-        <location filename="../dialog_set_server_ip.ui" line="221"/>
+        <location filename="../dialog_set_server_ip.ui" line="224"/>
         <source>Ok</source>
         <translation>Ok</translation>
     </message>
     <message>
-        <location filename="../dialog_set_server_ip.ui" line="298"/>
+        <location filename="../dialog_set_server_ip.ui" line="301"/>
         <source>Cancel</source>
         <translation>Cancel</translation>
     </message>
     <message>
-        <location filename="../dialog_set_server_ip.ui" line="384"/>
+        <location filename="../dialog_set_server_ip.ui" line="388"/>
         <source>Server IP</source>
         <translation>Server IP</translation>
     </message>
@@ -293,20 +293,20 @@
     <name>MainWindow</name>
     <message>
         <location filename="../mainwindow.ui" line="921"/>
-        <location filename="../mainwindow.cpp" line="262"/>
+        <location filename="../mainwindow.cpp" line="263"/>
         <source>Register</source>
         <translation>  Register  </translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1206"/>
-        <location filename="../mainwindow.cpp" line="257"/>
-        <location filename="../mainwindow.cpp" line="370"/>
+        <location filename="../mainwindow.cpp" line="258"/>
+        <location filename="../mainwindow.cpp" line="371"/>
         <source>Login</source>
         <translation>Login</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="259"/>
-        <location filename="../mainwindow.cpp" line="361"/>
+        <location filename="../mainwindow.cpp" line="260"/>
+        <location filename="../mainwindow.cpp" line="362"/>
         <source>Logout</source>
         <translation>Logout</translation>
     </message>
@@ -316,12 +316,12 @@
         <translation>File</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="267"/>
+        <location filename="../mainwindow.cpp" line="268"/>
         <source>Updating Data</source>
         <translation>Updating Data</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="246"/>
+        <location filename="../mainwindow.cpp" line="247"/>
         <source>Remote Hardware Education</source>
         <translation>Remote Hardware Education</translation>
     </message>
@@ -331,7 +331,7 @@
     </message>
     <message>
         <location filename="../mainwindow.ui" line="623"/>
-        <location filename="../mainwindow.cpp" line="265"/>
+        <location filename="../mainwindow.cpp" line="266"/>
         <source>  Abort Connection  </source>
         <translation>  Abort Connection  </translation>
     </message>
@@ -371,41 +371,41 @@
         <translation>Set server IP</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="248"/>
-        <location filename="../mainwindow.cpp" line="252"/>
+        <location filename="../mainwindow.cpp" line="249"/>
+        <location filename="../mainwindow.cpp" line="253"/>
         <source>English</source>
         <translation>English</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="249"/>
-        <location filename="../mainwindow.cpp" line="253"/>
+        <location filename="../mainwindow.cpp" line="250"/>
+        <location filename="../mainwindow.cpp" line="254"/>
         <source>Ukrainian</source>
         <translation>Ukrainian</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="250"/>
-        <location filename="../mainwindow.cpp" line="254"/>
+        <location filename="../mainwindow.cpp" line="251"/>
+        <location filename="../mainwindow.cpp" line="255"/>
         <source>Russian</source>
         <translation>Russian</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="316"/>
-        <location filename="../mainwindow.cpp" line="319"/>
+        <location filename="../mainwindow.cpp" line="317"/>
+        <location filename="../mainwindow.cpp" line="320"/>
         <source>Warning</source>
         <translation>Warning</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="316"/>
+        <location filename="../mainwindow.cpp" line="317"/>
         <source>Change server-IP in settings</source>
         <translation>Change server-IP in settings</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="319"/>
+        <location filename="../mainwindow.cpp" line="320"/>
         <source>Change server-port in settings</source>
         <translation>Change server-port in settings</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="267"/>
+        <location filename="../mainwindow.cpp" line="268"/>
         <source>Connecting To Server</source>
         <translation>Connecting To Server</translation>
     </message>
@@ -456,69 +456,69 @@
 <context>
     <name>RHE_Widget</name>
     <message>
-        <location filename="../rhe_widget.ui" line="227"/>
+        <location filename="../rhe_widget.ui" line="233"/>
         <source>Choose board:</source>
         <translation>Choose board:</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="657"/>
+        <location filename="../rhe_widget.ui" line="669"/>
         <location filename="../rhe_widget.cpp" line="473"/>
         <source>Start Debug</source>
         <translation>  Start Debug  </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="750"/>
+        <location filename="../rhe_widget.ui" line="768"/>
         <location filename="../rhe_widget.cpp" line="474"/>
         <source>Stop Debug</source>
         <translation>  Stop Debug  </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="830"/>
+        <location filename="../rhe_widget.ui" line="848"/>
         <source>Start debug after FPGA flashing</source>
         <translation>Start debug after FPGA flashing</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="929"/>
+        <location filename="../rhe_widget.ui" line="947"/>
         <source>Choose Sequence Of Signals File</source>
         <translation>Choose Sequence Of Signals File</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="1028"/>
+        <location filename="../rhe_widget.ui" line="1046"/>
         <source>Send Sequence Of Signals File</source>
         <translation>Send Sequence Of Signals File</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="1127"/>
+        <location filename="../rhe_widget.ui" line="1145"/>
         <source>Start Sequence Of Signals</source>
         <translation>Start Sequence Of Signals</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="1226"/>
+        <location filename="../rhe_widget.ui" line="1250"/>
         <source>Start sequence with debug</source>
         <translation>Start sequence with debug</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="1261"/>
+        <location filename="../rhe_widget.ui" line="1291"/>
         <source>Debug time discreteness:</source>
         <translation>Debug time discreteness:</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="1798"/>
+        <location filename="../rhe_widget.ui" line="1936"/>
         <source>Debug time limit, </source>
         <translation>Debug time limit, </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="2036"/>
+        <location filename="../rhe_widget.ui" line="2180"/>
         <source>FPGA Inputs:</source>
         <translation>FPGA Inputs:</translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="2371"/>
+        <location filename="../rhe_widget.ui" line="2521"/>
         <source>Send Firmware</source>
         <translation>  Send Firmware  </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="2454"/>
+        <location filename="../rhe_widget.ui" line="2604"/>
         <source>Choose Firmware</source>
         <translation>  Choose Firmware  </translation>
     </message>
@@ -527,12 +527,12 @@
         <translation type="vanished">  Load Firmware  </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="2537"/>
+        <location filename="../rhe_widget.ui" line="2687"/>
         <source>Check Project State</source>
         <translation>  Check Project State  </translation>
     </message>
     <message>
-        <location filename="../rhe_widget.ui" line="2620"/>
+        <location filename="../rhe_widget.ui" line="2770"/>
         <source>Choose project directory</source>
         <translation>  Choose project directory  </translation>
     </message>
@@ -1005,9 +1005,8 @@
         <translation>  Full scale  </translation>
     </message>
     <message>
-        <location filename="../waveform_viewer.ui" line="1975"/>
         <source>Measurement</source>
-        <translation>  Measurement  </translation>
+        <translation type="vanished">  Measurement  </translation>
     </message>
     <message>
         <location filename="../waveform_viewer.ui" line="245"/>
@@ -1028,6 +1027,11 @@
         <location filename="../waveform_viewer.ui" line="1690"/>
         <source>Select Displayable Pins</source>
         <translation>  Select Displayable Pins  </translation>
+    </message>
+    <message>
+        <location filename="../waveform_viewer.ui" line="1975"/>
+        <source> Measurement </source>
+        <translation> Measurement </translation>
     </message>
     <message>
         <location filename="../waveform_viewer.ui" line="2276"/>

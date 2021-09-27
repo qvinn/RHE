@@ -522,7 +522,7 @@ QComboBox QAbstractItemView {
      <item>
       <widget class="QPushButton" name="pshBttn_chng_sttngs">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -535,7 +535,7 @@ QComboBox QAbstractItemView {
        </property>
        <property name="maximumSize">
         <size>
-         <width>250</width>
+         <width>16777215</width>
          <height>25</height>
         </size>
        </property>
@@ -842,7 +842,7 @@ QPushButton:hover{
      <item>
       <widget class="QPushButton" name="pshBttn_fl_scl">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -855,7 +855,7 @@ QPushButton:hover{
        </property>
        <property name="maximumSize">
         <size>
-         <width>260</width>
+         <width>16777215</width>
          <height>25</height>
         </size>
        </property>
@@ -1127,7 +1127,7 @@ QPushButton:hover{
      <item>
       <widget class="QPushButton" name="pshBttn_clr">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -1140,7 +1140,7 @@ QPushButton:hover{
        </property>
        <property name="maximumSize">
         <size>
-         <width>180</width>
+         <width>16777215</width>
          <height>25</height>
         </size>
        </property>
@@ -1412,7 +1412,7 @@ QPushButton:hover{
      <item>
       <widget class="QPushButton" name="pshBttn_slct_dsplbl_pins">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -1425,7 +1425,7 @@ QPushButton:hover{
        </property>
        <property name="maximumSize">
         <size>
-         <width>280</width>
+         <width>16777215</width>
          <height>25</height>
         </size>
        </property>
@@ -1697,7 +1697,7 @@ QPushButton:hover{
      <item>
       <widget class="QPushButton" name="pshBttn_msr">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -1710,7 +1710,7 @@ QPushButton:hover{
        </property>
        <property name="maximumSize">
         <size>
-         <width>250</width>
+         <width>16777215</width>
          <height>25</height>
         </size>
        </property>
@@ -1972,7 +1972,7 @@ QPushButton:hover{
 }</string>
        </property>
        <property name="text">
-        <string>Measurement</string>
+        <string> Measurement </string>
        </property>
        <property name="checkable">
         <bool>true</bool>
@@ -1998,7 +1998,7 @@ QPushButton:hover{
      <item>
       <widget class="QPushButton" name="pshBttn_open_save_wvfrm">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -2011,7 +2011,7 @@ QPushButton:hover{
        </property>
        <property name="maximumSize">
         <size>
-         <width>280</width>
+         <width>16777215</width>
          <height>25</height>
         </size>
        </property>

@@ -545,7 +545,7 @@
         <item>
          <widget class="QPushButton" name="pshBttn_abrt_cnnctn">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -558,8 +558,8 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>250</width>
-            <height>16777215</height>
+            <width>16777215</width>
+            <height>25</height>
            </size>
           </property>
           <property name="font">
@@ -656,7 +656,7 @@ QPushButton:hover{
           </property>
           <property name="maximumSize">
            <size>
-            <width>120</width>
+            <width>16777215</width>
             <height>25</height>
            </size>
           </property>
@@ -941,7 +941,7 @@ QPushButton:hover{
           </property>
           <property name="maximumSize">
            <size>
-            <width>90</width>
+            <width>16777215</width>
             <height>25</height>
            </size>
           </property>

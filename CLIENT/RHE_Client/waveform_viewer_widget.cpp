@@ -1199,7 +1199,7 @@ void Waveform_Viewer_Widget::slot_re_translate() {
 Dialog_Select_Displayable_Pins::Dialog_Select_Displayable_Pins(QStringList avlbl_pins, QStringList dsplbl_pins, QWidget *parent) : QDialog(parent), ui(new Ui::Dialog_Select_Displayable_Pins) {
     ui->setupUi(this);
     this->setWindowTitle(tr("Select pins for display"));
-    this->setFixedSize(600, 300);
+    this->resize(600, 300);
     this->updateGeometry();
     available_pins_model = new QStringListModel(this);
     available_pins_model->setStringList(avlbl_pins);
@@ -1314,7 +1314,7 @@ Dialog_Select_Diagram_Settings::Dialog_Select_Diagram_Settings(QList<QString> _s
     ui->setupUi(this);
     gen_widg = widg;
     this->setWindowTitle(tr("Select diagram settings"));
-    this->setFixedSize(600, 300);
+    this->resize(600, 300);
     this->updateGeometry();
     sttngs_lst = _sttngs_lst;
     bttns_lst = new QList<QPushButton *>();

@@ -170,7 +170,7 @@
        </property>
        <property name="maximumSize">
         <size>
-         <width>350</width>
+         <width>16777215</width>
          <height>21</height>
         </size>
        </property>
@@ -205,6 +205,12 @@
      </item>
      <item>
       <widget class="QLabel" name="lbl_chs_brd">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -254,7 +260,7 @@
        </property>
        <property name="maximumSize">
         <size>
-         <width>350</width>
+         <width>16777215</width>
          <height>21</height>
         </size>
        </property>
@@ -583,6 +589,12 @@ QComboBox QAbstractItemView {
        </property>
        <item>
         <widget class="QPushButton" name="pshBttn_strt_dbg">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
            <width>60</width>
@@ -591,7 +603,7 @@ QComboBox QAbstractItemView {
          </property>
          <property name="maximumSize">
           <size>
-           <width>180</width>
+           <width>16777215</width>
            <height>25</height>
           </size>
          </property>
@@ -676,6 +688,12 @@ QPushButton:hover{
        </item>
        <item>
         <widget class="QPushButton" name="pshBttn_stp_dbg">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
            <width>60</width>
@@ -684,7 +702,7 @@ QPushButton:hover{
          </property>
          <property name="maximumSize">
           <size>
-           <width>180</width>
+           <width>16777215</width>
            <height>25</height>
           </size>
          </property>
@@ -785,7 +803,7 @@ QPushButton:hover{
        </property>
        <property name="maximumSize">
         <size>
-         <width>350</width>
+         <width>16777215</width>
          <height>21</height>
         </size>
        </property>
@@ -863,7 +881,7 @@ QPushButton:hover{
        </property>
        <property name="maximumSize">
         <size>
-         <width>350</width>
+         <width>16777215</width>
          <height>25</height>
         </size>
        </property>
@@ -962,7 +980,7 @@ QPushButton:hover{
        </property>
        <property name="maximumSize">
         <size>
-         <width>350</width>
+         <width>16777215</width>
          <height>25</height>
         </size>
        </property>
@@ -1061,7 +1079,7 @@ QPushButton:hover{
        </property>
        <property name="maximumSize">
         <size>
-         <width>350</width>
+         <width>16777215</width>
          <height>25</height>
         </size>
        </property>
@@ -1146,6 +1164,12 @@ QPushButton:hover{
      </item>
      <item>
       <widget class="QCheckBox" name="chckBx_strt_sqnc_of_sgn_with_dbg">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
          <width>240</width>
@@ -1154,7 +1178,7 @@ QPushButton:hover{
        </property>
        <property name="maximumSize">
         <size>
-         <width>350</width>
+         <width>16777215</width>
          <height>21</height>
         </size>
        </property>
@@ -1245,6 +1269,12 @@ QPushButton:hover{
      </item>
      <item>
       <widget class="QLabel" name="lbl_dbg_tm_dscrtnss">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -1270,20 +1300,20 @@ QPushButton:hover{
        <item>
         <widget class="QSpinBox" name="spnBx_dbg_tm">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
          <property name="minimumSize">
           <size>
-           <width>40</width>
+           <width>163</width>
            <height>21</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>280</width>
+           <width>16777215</width>
            <height>21</height>
           </size>
          </property>
@@ -1562,7 +1592,7 @@ QPushButton:hover{
        <item>
         <widget class="QComboBox" name="cmbBx_dbg_tm_tp">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -1575,7 +1605,7 @@ QPushButton:hover{
          </property>
          <property name="maximumSize">
           <size>
-           <width>70</width>
+           <width>16777215</width>
            <height>21</height>
           </size>
          </property>
@@ -2128,6 +2158,12 @@ QComboBox QAbstractItemView {
      </item>
      <item>
       <widget class="QLabel" name="lbl_fpga_inpts">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
          <width>240</width>
@@ -2136,7 +2172,7 @@ QComboBox QAbstractItemView {
        </property>
        <property name="maximumSize">
         <size>
-         <width>350</width>
+         <width>16777215</width>
          <height>21</height>
         </size>
        </property>
@@ -2176,7 +2212,7 @@ QComboBox QAbstractItemView {
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>238</width>
+          <width>240</width>
           <height>68</height>
          </rect>
         </property>
@@ -2268,7 +2304,7 @@ QComboBox QAbstractItemView {
        </property>
        <property name="maximumSize">
         <size>
-         <width>350</width>
+         <width>16777215</width>
          <height>21</height>
         </size>
        </property>
@@ -2405,6 +2441,12 @@ QComboBox QAbstractItemView {
      </item>
      <item>
       <widget class="QPushButton" name="pshBttn_snd_frmwr">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
          <width>110</width>
@@ -2413,7 +2455,7 @@ QComboBox QAbstractItemView {
        </property>
        <property name="maximumSize">
         <size>
-         <width>200</width>
+         <width>16777215</width>
          <height>25</height>
         </size>
        </property>
@@ -2496,7 +2538,7 @@ QPushButton:hover{
        </property>
        <property name="maximumSize">
         <size>
-         <width>230</width>
+         <width>16777215</width>
          <height>25</height>
         </size>
        </property>
@@ -2579,7 +2621,7 @@ QPushButton:hover{
        </property>
        <property name="maximumSize">
         <size>
-         <width>260</width>
+         <width>16777215</width>
          <height>25</height>
         </size>
        </property>
@@ -2662,7 +2704,7 @@ QPushButton:hover{
        </property>
        <property name="maximumSize">
         <size>
-         <width>180</width>
+         <width>16777215</width>
          <height>25</height>
         </size>
        </property>
