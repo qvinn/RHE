@@ -1,6 +1,6 @@
 *.ini
 CLIENT/build*
-*.user
+*.user*
 build*
 SLAVE_SERVER/slave_server/slave_server
 SLAVE_SERVER/slave_server/any_project.svf

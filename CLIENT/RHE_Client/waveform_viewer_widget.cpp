@@ -385,7 +385,9 @@ void Waveform_Viewer_Widget::load_waveform() {
     if((this->parentWidget() != nullptr) && !as_window) {
         prnt = this->parentWidget();
     }
-    QStringList *lst = gen_widg->load_files(prnt, tr("Choose waveform file"), tr("Waveform (*.wvfrm)"), false, false);
+    QList<int> filedialog_bttns = {QFileDialog::Accept, QFileDialog::Reject};
+    QList<QString> filedialog_bttns_names = {tr("Open"), tr("Cancel")};
+    QStringList *lst = gen_widg->load_files(prnt, tr("Choose waveform file"), tr("Waveform (*.wvfrm)"), &filedialog_bttns, &filedialog_bttns_names, false, false);
     if((lst == nullptr) || (lst->count() == 0)) {
         gen_widg->show_message_box(tr("Error"), tr("Waveform file not choosed"), 0, prnt);
         return;
@@ -490,7 +492,9 @@ void Waveform_Viewer_Widget::save_waveform() {
         if((this->parentWidget() != nullptr) && !as_window) {
             prnt = this->parentWidget();
         }
-        gen_widg->save_file(prnt, tr("Saving waveform"), tr("Waveform (*.wvfrm)"), &str, &fn_nm, false, false);
+        QList<int> filedialog_bttns = {QFileDialog::Accept, QFileDialog::Reject};
+        QList<QString> filedialog_bttns_names = {tr("Save"), tr("Cancel")};
+        gen_widg->save_file(prnt, tr("Saving waveform"), tr("Waveform (*.wvfrm)"), &str, &fn_nm, &filedialog_bttns, &filedialog_bttns_names, false, false);
         str.clear();
         for(int i = 0; i < cnt; i++) {
             str.clear();
@@ -505,7 +509,7 @@ void Waveform_Viewer_Widget::save_waveform() {
                     str.append("\n");
                 }
             }
-            gen_widg->save_file(prnt, tr("Saving waveform"), tr("Waveform (*.wvfrm)"), &str, &fn_nm, false, true);
+            gen_widg->save_file(prnt, tr("Saving waveform"), tr("Waveform (*.wvfrm)"), &str, &fn_nm, nullptr, nullptr, false, true);
         }
     } else {
         QWidget *prnt = this;
@@ -1209,8 +1213,8 @@ Dialog_Select_Displayable_Pins::Dialog_Select_Displayable_Pins(QStringList avlbl
     displayable_pins_model->setStringList(dsplbl_pins);
     ui->lstVw_dspbl_pins->setModel(displayable_pins_model);
     ui->lstVw_dspbl_pins->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    connect(ui->lstVw_avlbl_pins->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(available_pins_selection_changed(const QItemSelection &)));
-    connect(ui->lstVw_dspbl_pins->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(displayable_pins_selection_changed(const QItemSelection &)));
+    connect(ui->lstVw_avlbl_pins->selectionModel(), &QItemSelectionModel::selectionChanged, this, &Dialog_Select_Displayable_Pins::available_pins_selection_changed);
+    connect(ui->lstVw_dspbl_pins->selectionModel(), &QItemSelectionModel::selectionChanged, this, &Dialog_Select_Displayable_Pins::displayable_pins_selection_changed);
     ui->lstVw_avlbl_pins->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->lstVw_avlbl_pins->selectionModel()->clearSelection();
     ui->lstVw_dspbl_pins->selectionModel()->clearSelection();
@@ -1270,8 +1274,9 @@ void Dialog_Select_Displayable_Pins::replace_selected_pin(QStringListModel *recv
 //-------------------------------------------------------------------------
 // SELECTION CHANGED IN LIST WITH DISPLAYABLE PINS
 //-------------------------------------------------------------------------
-void Dialog_Select_Displayable_Pins::displayable_pins_selection_changed(const QItemSelection &sel) {
+void Dialog_Select_Displayable_Pins::displayable_pins_selection_changed(const QItemSelection &sel, const QItemSelection &desel) {
     Q_UNUSED(sel);
+    Q_UNUSED(desel);
     ui->pshBttn_dlt->setEnabled(true);
     ui->lstVw_avlbl_pins->selectionModel()->clearSelection();
 }
@@ -1279,7 +1284,8 @@ void Dialog_Select_Displayable_Pins::displayable_pins_selection_changed(const QI
 //-------------------------------------------------------------------------
 // SELECTION CHANGED IN LIST WITH NON-DISPLAYABLE PINS
 //-------------------------------------------------------------------------
-void Dialog_Select_Displayable_Pins::available_pins_selection_changed(const QItemSelection &sel) {
+void Dialog_Select_Displayable_Pins::available_pins_selection_changed(const QItemSelection &sel, const QItemSelection &desel) {
+    Q_UNUSED(desel);
     if(sel.indexes().count() > 0) {
         QModelIndex index = sel.indexes().first();
         QString pin_name = available_pins_model->data(index).toString();
@@ -1317,101 +1323,36 @@ Dialog_Select_Diagram_Settings::Dialog_Select_Diagram_Settings(QList<QString> _s
     this->resize(600, 300);
     this->updateGeometry();
     sttngs_lst = _sttngs_lst;
-    bttns_lst = new QList<QPushButton *>();
-    bttns_lst->append(ui->pshBttn_axs_lbls_clr);
-    bttns_lst->append(ui->pshBttn_dgrm_grd_clr);
-    bttns_lst->append(ui->pshBttn_dgrm_bckgrnd_clr);
-    bttns_lst->append(ui->pshBttn_slctn_clr);
-    bttns_lst->append(ui->pshBttn_crsr_ln_clr);
-    bttns_lst->append(ui->pshBttn_crsr_tm_lbl_brdr_clr);
-    bttns_lst->append(ui->pshBttn_crsr_tm_lbl_fll_clr);
-    bttns_lst->append(ui->pshBttn_grph_clr);
+    dlg_bttns_lst = new QList<QPushButton *>{ui->pshBttn_cncl, ui->pshBttn_ok};
+    bttns_lst = new QList<QPushButton *>{ui->pshBttn_axs_lbls_clr, ui->pshBttn_dgrm_grd_clr, ui->pshBttn_dgrm_bckgrnd_clr, ui->pshBttn_slctn_clr,
+                                         ui->pshBttn_crsr_ln_clr, ui->pshBttn_crsr_tm_lbl_brdr_clr, ui->pshBttn_crsr_tm_lbl_fll_clr, ui->pshBttn_grph_clr};
     for(int i = 0; i < bttns_lst->count(); i++) {
-        bttns_lst->at(i)->setStyleSheet("background-color: " + sttngs_lst.at(i));
+        if(i < dlg_bttns_lst->count()) {
+            connect(dlg_bttns_lst->at(i), &QPushButton::clicked, this, [=]() {
+                QDialog::done(i);
+            });
+        }
+        connect(bttns_lst->at(i), &QPushButton::clicked, this, [=]() {
+            change_color(i);
+        });
+        set_button_color(bttns_lst->at(i), sttngs_lst.at(i));
     }
     ui->spnBx_axs_lbls_fnr_sz->setValue(sttngs_lst.last().toInt());
 }
 
 Dialog_Select_Diagram_Settings::~Dialog_Select_Diagram_Settings() {
+    bttns_lst->clear();
     delete bttns_lst;
+    dlg_bttns_lst->clear();
+    delete dlg_bttns_lst;
     delete ui;
-}
-
-//-------------------------------------------------------------------------
-// CHANGE COLOR OF AXIS LABELS
-//-------------------------------------------------------------------------
-void Dialog_Select_Diagram_Settings::on_pshBttn_axs_lbls_clr_clicked() {
-    change_color(0);
-}
-
-//-------------------------------------------------------------------------
-// CHANGE COLOR OF DIAGRAM GRID
-//-------------------------------------------------------------------------
-void Dialog_Select_Diagram_Settings::on_pshBttn_dgrm_grd_clr_clicked() {
-    change_color(1);
-}
-
-//-------------------------------------------------------------------------
-// CHANGE COLOR OF DIAGRAM BACKGROUND
-//-------------------------------------------------------------------------
-void Dialog_Select_Diagram_Settings::on_pshBttn_dgrm_bckgrnd_clr_clicked() {
-    change_color(2);
-}
-
-//-------------------------------------------------------------------------
-// CHANGE COLOR OF SELECTION AREA
-//-------------------------------------------------------------------------
-void Dialog_Select_Diagram_Settings::on_pshBttn_slctn_clr_clicked() {
-    change_color(3);
-}
-
-//-------------------------------------------------------------------------
-// CHANGE COLOR OF CURSOR/MEASUREMENT LINE
-//-------------------------------------------------------------------------
-void Dialog_Select_Diagram_Settings::on_pshBttn_crsr_ln_clr_clicked() {
-    change_color(4);
-}
-
-//-------------------------------------------------------------------------
-// CHANGE COLOR OF CURSOR/MEASUREMENT TIME'S LABEL BORDER
-//-------------------------------------------------------------------------
-void Dialog_Select_Diagram_Settings::on_pshBttn_crsr_tm_lbl_brdr_clr_clicked() {
-    change_color(5);
-}
-
-//-------------------------------------------------------------------------
-// CHANGE COLOR OF CURSOR/MEASUREMENT TIME'S LABEL FILLED AREA
-//-------------------------------------------------------------------------
-void Dialog_Select_Diagram_Settings::on_pshBttn_crsr_tm_lbl_fll_clr_clicked() {
-    change_color(6);
-}
-
-//-------------------------------------------------------------------------
-// CHANGE COLOR OF DIAGRAM GRAPHS
-//-------------------------------------------------------------------------
-void Dialog_Select_Diagram_Settings::on_pshBttn_grph_clr_clicked() {
-    change_color(7);
 }
 
 //-------------------------------------------------------------------------
 // CHANGE FONT SIZE FOR AXIS LABELS
 //-------------------------------------------------------------------------
 void Dialog_Select_Diagram_Settings::on_spnBx_axs_lbls_fnr_sz_valueChanged(int value) {
-    sttngs_lst.replace(8, QString::number(value));
-}
-
-//-------------------------------------------------------------------------
-// PUSH BUTTON 'OK' CLICKED
-//-------------------------------------------------------------------------
-void Dialog_Select_Diagram_Settings::on_pshBttn_ok_clicked() {
-    QDialog::done(1);
-}
-
-//-------------------------------------------------------------------------
-// PUSH BUTTON 'CANCEL' CLICKED
-//-------------------------------------------------------------------------
-void Dialog_Select_Diagram_Settings::on_pshBttn_cncl_clicked() {
-    QDialog::done(0);
+    sttngs_lst.replace((sttngs_lst.count() - 1), QString::number(value));
 }
 
 //-------------------------------------------------------------------------
@@ -1432,11 +1373,19 @@ void Dialog_Select_Diagram_Settings::change_color(int value) {
                                                                 "QColorDialog QLineEdit { background-color: #FFFFFF; color: #000000; selection-background-color: #308CC6; selection-color: #FFFFFF; }"
                                                                 "QColorDialog QColorLuminancePicker { background-color: #F5F5F5; color: #000000; }"));
     dlg.setCurrentColor(QColor(sttngs_lst.at(value)));
-    if(dlg.exec() == QDialog::Accepted) {
-        QColor color = dlg.selectedColor();
-        if(color.isValid()) {
-            sttngs_lst.replace(value, color.name());
-            bttns_lst->at(value)->setStyleSheet("background-color: " + color.name());
-        }
+    if((dlg.exec() == QDialog::Accepted) && (dlg.selectedColor().isValid())) {
+        sttngs_lst.replace(value, dlg.selectedColor().name());
+        set_button_color(bttns_lst->at(value), dlg.selectedColor().name(QColor::HexRgb));
     }
+}
+
+//-------------------------------------------------------------------------
+// CHANGING COLOR FOR CERTAIN BUTTON
+//-------------------------------------------------------------------------
+void Dialog_Select_Diagram_Settings::set_button_color(QPushButton *bttn, QString color_name) {
+    QColor tmp_clr = QColor(color_name);
+    tmp_clr.setHsv(tmp_clr.hue(), tmp_clr.saturation(), (tmp_clr.value() * 0.7));
+    bttn->setStyleSheet("QPushButton { border-style: outset; border-width: 1px; border-color: black; border-radius: 0px; background-color: " + color_name + " }"
+                        "QPushButton:hover { border-color: blue; }"
+                        "QPushButton:pressed { border-color: blue; background-color: " + tmp_clr.name(QColor::HexRgb) + "}");
 }

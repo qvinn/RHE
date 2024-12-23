@@ -10,6 +10,7 @@
             Send_Receive_Module(General_Widget *widg = nullptr);
             ~Send_Receive_Module() override;
 
+            void set_stop_thread_flag(bool *flg);
             void init_connection();
             void close_connection();
             void set_disconnected();
@@ -28,6 +29,7 @@
             QTimer *wait_connection = nullptr;
             QByteArray recv_buff_arr;
 
+            bool *stop_thread = nullptr;
             bool manual_disconnect = false;
             bool connected = false;
 

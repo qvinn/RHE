@@ -218,8 +218,8 @@
             void on_pshBttn_cncl_clicked();
             void on_pshBttn_add_clicked();
             void on_pshBttn_dlt_clicked();
-            void displayable_pins_selection_changed(const QItemSelection &sel);
-            void available_pins_selection_changed(const QItemSelection &sel);
+            void displayable_pins_selection_changed(const QItemSelection &sel, const QItemSelection &desel);
+            void available_pins_selection_changed(const QItemSelection &sel, const QItemSelection &desel);
     };
 
     //////////////////////////////////////////////////DIALOG SELECT DIAGRAM SETTINGS///////////////////////////////////////////////////
@@ -239,24 +239,16 @@
 
         private:
             void change_color(int value);
+            void set_button_color(QPushButton *bttn, QString color_name);
 
             Ui::Dialog_Select_Diagram_Settings *ui;
             General_Widget *gen_widg = nullptr;
             QList<QPushButton *> *bttns_lst = nullptr;
+            QList<QPushButton *> *dlg_bttns_lst = nullptr;
             QList<QString> sttngs_lst;
 
         private slots:
-            void on_pshBttn_axs_lbls_clr_clicked();
-            void on_pshBttn_dgrm_grd_clr_clicked();
-            void on_pshBttn_dgrm_bckgrnd_clr_clicked();
-            void on_pshBttn_slctn_clr_clicked();
-            void on_pshBttn_crsr_ln_clr_clicked();
-            void on_pshBttn_crsr_tm_lbl_brdr_clr_clicked();
-            void on_pshBttn_crsr_tm_lbl_fll_clr_clicked();
-            void on_pshBttn_grph_clr_clicked();
             void on_spnBx_axs_lbls_fnr_sz_valueChanged(int value);
-            void on_pshBttn_ok_clicked();
-            void on_pshBttn_cncl_clicked();
     };
 
 #endif // WAVEFORM_VIEWER_WIDGET_H

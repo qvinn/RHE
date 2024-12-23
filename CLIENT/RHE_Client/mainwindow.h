@@ -38,17 +38,18 @@
             RegistrationWidget *ptr_registration_widg = nullptr;
             RHE_Widget *ptr_RHE_widg = nullptr;
             Waveform_Viewer_Widget *wvfrm_vwr = nullptr;
+            QThread *thread_data_trnsfr_mod = nullptr;
+            QThread *thread_send_recv_mod = nullptr;
             QComboBox *cmbBx_lng_chs = nullptr;
             QWidgetAction *cmbBx_lng_chs_actn = nullptr;
             QTimer *tmr_waveform_viewer = nullptr;
             QTimer *tmr_progress_bar = nullptr;
             QList<QString> state_strs;
-            QThread thread_data_trnsfr_mod;
-            QThread thread_send_recv_mod;
 
             bool ui_initialized = false;
             bool language_changed = false;
             bool shw_at_cntr = true;
+            bool stop_thread = false;
 
             int crrnt_state_strs = 1;
 
