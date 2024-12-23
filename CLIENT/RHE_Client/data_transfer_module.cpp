@@ -410,8 +410,9 @@ QByteArray Data_Transfer_Module::analyze_data_dir() {
     QFileInfoList dirContent = dir_name.entryInfoList(QStringList() << "*", (QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot));
     QRegExp tagExp("/");
     QStringList lst;
+    QByteArray hash;
     for(int i = 0; i < dirContent.size(); i++) {
-        QByteArray hash = gen_widg->get_file_checksum(dirContent.at(i).filePath(), QCryptographicHash::Md5);
+        hash = gen_widg->get_file_checksum(dirContent.at(i).filePath(), QCryptographicHash::Md5);
         lst = dirContent.at(i).filePath().split(tagExp);
         upd_file.append(QString(lst.last() + "\t" + hash.toHex() + "\n").toLatin1());
     }

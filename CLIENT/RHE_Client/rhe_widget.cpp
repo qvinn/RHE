@@ -187,7 +187,9 @@ void RHE_Widget::on_chckBx_strt_dbg_aftr_flsh_stateChanged(int state) {
 // PUSH BUTTON 'CHOOSE SEQUENCE OF SIGNALS FILE' CLICKED
 //-------------------------------------------------------------------------
 void RHE_Widget::on_pshBttn_chs_sgnls_sqnc_clicked() {
-    QString str = gen_widg->load_file_path(this, tr("Choose csv-file with sequence of signals"), tr("Comma-Separated Values files (*.csv)"));
+    QList<int> filedialog_bttns = {QFileDialog::Accept, QFileDialog::Reject};
+    QList<QString> filedialog_bttns_names = {tr("Open"), tr("Cancel")};
+    QString str = gen_widg->load_file_path(this, tr("Choose csv-file with sequence of signals"), tr("Comma-Separated Values files (*.csv)"), &filedialog_bttns, &filedialog_bttns_names);
     csv_exist = static_cast<bool>(str.length());
     csv_sended = false;
     if(csv_exist) {
@@ -273,7 +275,9 @@ void RHE_Widget::on_cmbBx_dbg_tm_tp_currentIndexChanged(int index) {
 // PUSH BUTTON 'CHOOSE PROJECT DIRECTORY' CLICKED
 //-------------------------------------------------------------------------
 void RHE_Widget::on_pshBttn_set_path_to_proj_clicked() {
-    QStringList *lst = gen_widg->load_files(this, "", "", false, true);
+    QList<int> filedialog_bttns = {QFileDialog::Accept, QFileDialog::Reject};
+    QList<QString> filedialog_bttns_names = {tr("Choose"), tr("Cancel")};
+    QStringList *lst = gen_widg->load_files(this, "", "", &filedialog_bttns, &filedialog_bttns_names, false, true);
     if(lst == nullptr) {
         return;
     }
@@ -294,14 +298,15 @@ void RHE_Widget::on_pshBttn_chk_prj_stat_clicked() {
 // PUSH BUTTON 'CHOOSE FIRMWARE' CLICKED
 //-------------------------------------------------------------------------
 void RHE_Widget::on_pshBttn_chs_frmwr_clicked() {
-    QString str = gen_widg->load_file_path(this, tr("Choose svf-file with firmware"), tr("Serial Vector Format files (*.svf)"));
+    QList<int> filedialog_bttns = {QFileDialog::Accept, QFileDialog::Reject};
+    QList<QString> filedialog_bttns_names = {tr("Choose"), tr("Cancel")};
+    QString str = gen_widg->load_file_path(this, tr("Choose svf-file with firmware"), tr("Serial Vector Format files (*.svf)"), &filedialog_bttns, &filedialog_bttns_names);
     if(str.length() != 0) {
         if(!gen_widg->get_setting("settings/ENABLE_FILE_CHEKING").toBool()) {
             QRegExp tag_exp_path("/");
-            QStringList path_lst = str.split(tag_exp_path);
             path_to_proj->clear();
             path_to_proj->append(str);
-            path_to_proj->replace(("/" + path_lst.last()), "");
+            path_to_proj->replace(("/" + str.split(tag_exp_path).last()), "");
             check_is_proj_folder(false);
         }
         svf_exist = true;

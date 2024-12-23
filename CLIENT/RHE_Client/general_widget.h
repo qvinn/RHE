@@ -6,7 +6,9 @@
     #include <QTimer>
     #include <QDebug>
     #include <QWidget>
+    #include <QTreeView>
     #include <QSettings>
+    #include <QPushButton>
     #include <QGridLayout>
     #include <QTranslator>
     #include <QMessageBox>
@@ -56,7 +58,7 @@
              * bool files - if true -> loading multiple files
              * bool path - if true -> choosing-directory mode
              */
-            QStringList* load_files(QWidget *prnt, QString title, QString filter, bool files, bool path);
+            QStringList* load_files(QWidget *prnt, QString title, QString filter, QList<int> *buttons_flgs, QList<QString> *translated_names, bool files, bool path);
 
             /*
              * QWidget *prnt - pointer to parental widget
@@ -67,14 +69,16 @@
              * bool re_write - if true -> rewrite exiting file
              * bool fl_nm_exist - if true -> appending existing file
              */
-            void save_file(QWidget *prnt = nullptr, QString title = "", QString filter = "", QString *data = nullptr, QString *file_name = nullptr, bool re_write = false, bool fl_nm_exist = false);
+            void save_file(QWidget *prnt = nullptr, QString title = "", QString filter = "", QString *data = nullptr, QString *file_name = nullptr, QList<int> *buttons_flgs = nullptr, QList<QString> *translated_names = nullptr, bool re_write = false, bool fl_nm_exist = false);
 
             /*
              * QWidget *prnt - pointer to parental widget
              * QString title - title of file-loading dialog
              * QString filter - needed file extension
              */
-            QString load_file_path(QWidget *prnt, QString title, QString filter);
+            QString load_file_path(QWidget *prnt, QString title, QString filter, QList<int> *buttons_flgs, QList<QString> *translated_names);
+
+            void configure_file_dialog(QFileDialog *dialog, QList<int> *buttons_flgs, QList<QString> *translated_names);
 
             /*
              * QString file_path - path to file, which checksum will be calculated

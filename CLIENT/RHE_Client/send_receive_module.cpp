@@ -18,9 +18,15 @@ Send_Receive_Module::Send_Receive_Module(General_Widget *widg) {
 }
 
 Send_Receive_Module::~Send_Receive_Module() {
+    wait_connection->stop();
+    close_sock_wait->stop();
     delete wait_connection;
     delete close_sock_wait;
     delete socket;
+}
+
+void Send_Receive_Module::set_stop_thread_flag(bool *flg) {
+    stop_thread = flg;
 }
 
 //-------------------------------------------------------------------------
@@ -97,6 +103,9 @@ void Send_Receive_Module::server_disconnected() {
 //-------------------------------------------------------------------------
 void Send_Receive_Module::receive_data() {
     while(socket->bytesAvailable() > (RECIVE_BUFFER_SIZE - 1)) {
+        if(*stop_thread) {
+            return;
+        }
         recv_buff_arr.clear();
         recv_buff_arr.append(socket->read(RECIVE_BUFFER_SIZE));
         emit received_data(recv_buff_arr);

@@ -201,11 +201,8 @@ QString General_Widget::get_style_sheet(QString pattern_1, QString pattern_2) {
 //-------------------------------------------------------------------------
 // LOAD FILE/FILES
 //-------------------------------------------------------------------------
-QStringList* General_Widget::load_files(QWidget *prnt, QString title, QString filter, bool files, bool path) {
+QStringList* General_Widget::load_files(QWidget *prnt, QString title, QString filter, QList<int> *buttons_flgs, QList<QString> *translated_names, bool files, bool path) {
     QFileDialog dialog(prnt, title, QDir::current().path(), filter);
-    dialog.setOption(QFileDialog::DontUseNativeDialog, true);
-    dialog.resize(800, 600);
-    dialog.setOption(QFileDialog::HideNameFilterDetails);
     if(files) {
         dialog.setFileMode(QFileDialog::ExistingFiles);
     } else if(path) {
@@ -213,13 +210,7 @@ QStringList* General_Widget::load_files(QWidget *prnt, QString title, QString fi
     } else {
         dialog.setFileMode(QFileDialog::ExistingFile);
     }
-    dialog.setStyleSheet(get_style_sheet("QFileDialog", "QFileDialog QLineEdit { background-color: #FFFFFF; color: #000000; }"
-                                                        "QFileDialog QLabel { color: #000000; }"
-                                                        "QFileDialog QToolButton { background-color: darkGrey; color: #000000; }"));
-    QList<QWidget *> widgets = dialog.findChildren<QWidget *>();
-    for(int i = 0; i < widgets.count(); i++) {
-        widgets.at(i)->setPalette(palette);
-    }
+    configure_file_dialog(&dialog, buttons_flgs, translated_names);
     if(dialog.exec() == QDialog::Accepted) {
         files_list->clear();
         files_list->append(dialog.selectedFiles());
@@ -235,24 +226,15 @@ QStringList* General_Widget::load_files(QWidget *prnt, QString title, QString fi
 //-------------------------------------------------------------------------
 // SAVE/APPEND/REWRITE FILE
 //-------------------------------------------------------------------------
-void General_Widget::save_file(QWidget *prnt, QString title, QString filter, QString *data, QString *file_name, bool re_write, bool fl_nm_exist) {
+void General_Widget::save_file(QWidget *prnt, QString title, QString filter, QString *data, QString *file_name, QList<int> *buttons_flgs, QList<QString> *translated_names, bool re_write, bool fl_nm_exist) {
     QString fileName;
     if(fl_nm_exist) {
         fileName.append(*file_name);
     } else {
         QFileDialog dialog(prnt, title, QDir::current().path(), filter);
-        dialog.setOption(QFileDialog::DontUseNativeDialog, true);
-        dialog.setOption(QFileDialog::HideNameFilterDetails);
-        dialog.resize(800, 600);
         dialog.setFileMode(QFileDialog::AnyFile);
         dialog.setAcceptMode(QFileDialog::AcceptSave);
-        dialog.setStyleSheet(get_style_sheet("QFileDialog", "QFileDialog QLineEdit { background-color: #FFFFFF; color: #000000; }"
-                                                            "QFileDialog QLabel { color: #000000; }"
-                                                            "QFileDialog QToolButton { background-color: darkGrey; color: #000000; }"));
-        QList<QWidget *> widgets = dialog.findChildren<QWidget *>();
-        for(int i = 0; i < widgets.count(); i++) {
-            widgets.at(i)->setPalette(palette);
-        }
+        configure_file_dialog(&dialog, buttons_flgs, translated_names);
         if(dialog.exec() == QDialog::Accepted) {
             fileName = dialog.selectedFiles().at(0);
             QStringList lst_1 = filter.split("*");
@@ -282,6 +264,52 @@ void General_Widget::save_file(QWidget *prnt, QString title, QString filter, QSt
 }
 
 //-------------------------------------------------------------------------
+// GET PATH OF FILE LOADED WITH 'LOAD_FILES' METHOD
+//-------------------------------------------------------------------------
+QString General_Widget::load_file_path(QWidget *prnt, QString title, QString filter, QList<int> *buttons_flgs, QList<QString> *translated_names) {
+    QStringList *lst = load_files(prnt, title, filter, buttons_flgs, translated_names, false, false);
+    QString file_path = "";
+    if(lst == nullptr) {
+        return file_path;
+    }
+    for(int i = 0; i < lst->count(); i++) {
+        QFileInfo fileInf(lst->at(i));
+        file_path.append(fileInf.absoluteFilePath());
+    }
+    return file_path;
+}
+
+void General_Widget::configure_file_dialog(QFileDialog *dialog, QList<int> *buttons_flgs, QList<QString> *translated_names) {
+    dialog->setOption(QFileDialog::DontUseNativeDialog, true);
+    dialog->setOption(QFileDialog::HideNameFilterDetails);
+    dialog->resize(800, 600);
+    dialog->setStyleSheet(get_style_sheet("QFileDialog", "QFileDialog QLineEdit { background-color: #FFFFFF; color: #000000; }"
+                                                         "QFileDialog QLabel { color: #000000; }"
+                                                         "QFileDialog QToolButton { background-color: darkGrey; color: #000000; }"));
+    QList<QWidget *> widgets = dialog->findChildren<QWidget *>();
+    for(int i = 0; i < widgets.count(); i++) {
+        widgets.at(i)->setPalette(palette);
+    }
+    if(buttons_flgs != nullptr) {
+        for(int i = 0; i < buttons_flgs->count(); i++) {
+            if((translated_names != nullptr) && (i < translated_names->count())) {
+                dialog->setLabelText(static_cast<QFileDialog::DialogLabel>(buttons_flgs->at(i)), translated_names->at(i));
+                QList<QPushButton *> buttons = dialog->findChildren<QPushButton *>();
+                for(int j = 0; j < buttons.count(); j++) {
+                    buttons.at(j)->setMinimumWidth(120);
+                }
+                QList<QTreeView *> views = dialog->findChildren<QTreeView *>();
+                for(int j = 0; j < views.count(); j++) {
+                    connect(views.at(j)->selectionModel(), &QItemSelectionModel::selectionChanged, this, [dialog, i, buttons_flgs, translated_names]() {
+                        dialog->setLabelText(static_cast<QFileDialog::DialogLabel>(buttons_flgs->at(i)), translated_names->at(i));
+                    });
+                }
+            }
+        }
+    }
+}
+
+//-------------------------------------------------------------------------
 // GET CHECKSUM OF FILE
 //-------------------------------------------------------------------------
 QByteArray General_Widget::get_file_checksum(QString file_path, QCryptographicHash::Algorithm hash_algorithm) {
@@ -295,22 +323,6 @@ QByteArray General_Widget::get_file_checksum(QString file_path, QCryptographicHa
         qDebug() << "Cant open file";
     }
     return QByteArray();
-}
-
-//-------------------------------------------------------------------------
-// GET PATH OF FILE LOADED WITH 'LOAD_FILES' METHOD
-//-------------------------------------------------------------------------
-QString General_Widget::load_file_path(QWidget *prnt, QString title, QString filter) {
-    QStringList *lst = load_files(prnt, title, filter, false, false);
-    QString file_path = "";
-    if(lst == nullptr) {
-        return file_path;
-    }
-    for(int i = 0; i < lst->count(); i++) {
-        QFileInfo fileInf(lst->at(i));
-        file_path.append(fileInf.absoluteFilePath());
-    }
-    return file_path;
 }
 
 //-------------------------------------------------------------------------

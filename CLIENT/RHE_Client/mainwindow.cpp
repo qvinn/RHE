@@ -7,6 +7,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     gen_widg = new General_Widget(this);
     QDir::setCurrent(gen_widg->get_app_path());
     snd_rcv_module = new Send_Receive_Module(gen_widg);
+    snd_rcv_module->set_stop_thread_flag(&stop_thread);
     data_transfer_module = new Data_Transfer_Module(gen_widg);
     ptr_registration_widg = new RegistrationWidget(this, gen_widg, data_transfer_module, snd_rcv_module);
     ptr_RHE_widg = new RHE_Widget(this, gen_widg, data_transfer_module);
@@ -16,6 +17,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     initialize_ui();
     set_ui_text();
     load_settings();
+    thread_send_recv_mod = new QThread();
+    thread_data_trnsfr_mod = new QThread();
     connect(ptr_RHE_widg, &RHE_Widget::set_disconnected_signal, snd_rcv_module, &Send_Receive_Module::set_disconnected);
     connect(gen_widg, &General_Widget::re_translate_signal, this, &MainWindow::slot_re_translate);
     connect(gen_widg, &General_Widget::re_translate_signal, ptr_registration_widg, &RegistrationWidget::slot_re_translate);
@@ -31,10 +34,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(data_transfer_module, &Data_Transfer_Module::data_updated_signal, this, &MainWindow::data_updated);
     connect(data_transfer_module, &Data_Transfer_Module::set_disconnected_signal, snd_rcv_module, &Send_Receive_Module::set_disconnected);
     connect(data_transfer_module, &Data_Transfer_Module::send_data_signal, snd_rcv_module, &Send_Receive_Module::send_data, Qt::QueuedConnection);
-    snd_rcv_module->moveToThread(&thread_send_recv_mod);
-    data_transfer_module->moveToThread(&thread_data_trnsfr_mod);
-    thread_send_recv_mod.start();
-    thread_data_trnsfr_mod.start();
+
+    snd_rcv_module->moveToThread(thread_send_recv_mod);
+    data_transfer_module->moveToThread(thread_data_trnsfr_mod);
+    thread_send_recv_mod->start();
+    thread_data_trnsfr_mod->start();
     gen_widg->change_current_locale();
     tmr_waveform_viewer = new QTimer(this);
     connect(tmr_waveform_viewer, &QTimer::timeout, this, &MainWindow::slot_timer_waveform_viewer_timeout);
@@ -44,9 +48,27 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 }
 
 MainWindow::~MainWindow() {
+    connect(thread_send_recv_mod, &QThread::finished, this, [=]() {
+        delete thread_send_recv_mod;
+//        delete snd_rcv_module;
+    }/*thread_send_recv_mod, &QObject::deleteLater*/);
+    connect(thread_data_trnsfr_mod, &QThread::finished, this, [=]() {
+        delete thread_data_trnsfr_mod;
+        delete data_transfer_module;
+    }/*thread_data_trnsfr_mod, &QObject::deleteLater*/);
+    stop_thread = true;
+    emit set_disconnected_signal();
+    thread_send_recv_mod->blockSignals(true);
+//    snd_rcv_module->deleteLater();
+    thread_data_trnsfr_mod->blockSignals(true);
+//    data_transfer_module->deleteLater();
+    thread_send_recv_mod->exit();
+    thread_data_trnsfr_mod->exit();
+//    delete snd_rcv_module;
+//    delete data_transfer_module;
 //    thread.terminate();
-    thread_send_recv_mod.quit();
-    thread_data_trnsfr_mod.quit();
+//    thread_send_recv_mod.quit();
+//    thread_data_trnsfr_mod.quit();
     disconnect(tmr_waveform_viewer, &QTimer::timeout, this, &MainWindow::slot_timer_waveform_viewer_timeout);
     slot_timer_waveform_viewer_timeout();
     delete tmr_waveform_viewer;
@@ -55,9 +77,9 @@ MainWindow::~MainWindow() {
     delete ptr_RHE_widg;
     delete cmbBx_lng_chs;
     delete cmbBx_lng_chs_actn;
-//    delete snd_rcv_module;
-//    delete data_transfer_module
     delete gen_widg;
+    delete data_transfer_module;
+    delete snd_rcv_module;
     delete ui;
 }
 
@@ -146,7 +168,9 @@ void MainWindow::chkBx_ld_mnl_frmwr_state_changed() {
     if(ui_initialized) {
         ptr_RHE_widg->pshBttn_chs_frmwr_set_visible(ui->chkBx_ld_mnl_frmwr_actn->isChecked());
         gen_widg->save_setting("settings/MANUALY_LOAD_FIRMWARE", (static_cast<int>(ui->chkBx_ld_mnl_frmwr_actn->isChecked())));
-        ptr_RHE_widg->pshBttn_chs_frmwr_set_enabled(gen_widg->get_setting("settings/MANUALY_LOAD_FIRMWARE").toBool() && (!gen_widg->get_setting("settings/ENABLE_FILE_CHEKING").toBool() || ptr_RHE_widg->sof_exist));
+        bool tmp = ((gen_widg->get_setting("settings/MANUALY_LOAD_FIRMWARE").toBool() && gen_widg->get_setting("settings/ENABLE_FILE_CHEKING").toBool() && ptr_RHE_widg->sof_exist) || (gen_widg->get_setting("settings/MANUALY_LOAD_FIRMWARE").toBool() && !gen_widg->get_setting("settings/ENABLE_FILE_CHEKING").toBool()));
+//        ptr_RHE_widg->pshBttn_chs_frmwr_set_enabled(gen_widg->get_setting("settings/MANUALY_LOAD_FIRMWARE").toBool() && (!gen_widg->get_setting("settings/ENABLE_FILE_CHEKING").toBool() || ptr_RHE_widg->sof_exist));
+        ptr_RHE_widg->pshBttn_chs_frmwr_set_enabled(tmp);
     }
 }
 
@@ -436,10 +460,10 @@ Dialog_Set_Server_IP::Dialog_Set_Server_IP(General_Widget *widg, QWidget *parent
     if(serv_port > -1) {
         ui->lnEdt_port->setText(QString::number(serv_port));
     }
-    connect(ui->spnBx_frst_octt->findChild<QLineEdit *>(), SIGNAL(textEdited(const QString &)), this, SLOT(lineEdit_frst_octet_text_edited(const QString &)));
-    connect(ui->spnBx_scnd_octt->findChild<QLineEdit *>(), SIGNAL(textEdited(const QString &)), this, SLOT(lineEdit_scnd_octet_text_edited(const QString &)));
-    connect(ui->spnBx_thrd_octt->findChild<QLineEdit *>(), SIGNAL(textEdited(const QString &)), this, SLOT(lineEdit_thrd_octet_text_edited(const QString &)));
-    connect(ui->spnBx_frth_octt->findChild<QLineEdit *>(), SIGNAL(textEdited(const QString &)), this, SLOT(lineEdit_frth_octet_text_edited(const QString &)));
+    connect(ui->spnBx_frst_octt->findChild<QLineEdit*>(), &QLineEdit::textEdited, this, &Dialog_Set_Server_IP::lineEdit_frst_octet_text_edited);
+    connect(ui->spnBx_scnd_octt->findChild<QLineEdit*>(), &QLineEdit::textEdited, this, &Dialog_Set_Server_IP::lineEdit_scnd_octet_text_edited);
+    connect(ui->spnBx_thrd_octt->findChild<QLineEdit*>(), &QLineEdit::textEdited, this, &Dialog_Set_Server_IP::lineEdit_thrd_octet_text_edited);
+    connect(ui->spnBx_frth_octt->findChild<QLineEdit*>(), &QLineEdit::textEdited, this, &Dialog_Set_Server_IP::lineEdit_frth_octet_text_edited);
     ui_initialized = true;
 }
 
